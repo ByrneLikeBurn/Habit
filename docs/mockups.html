@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Habit mockups, phase 1</title>
+<style>
+@font-face{font-family:"Alegreya Sans";font-weight:400;src:url("mockups/fonts/alegreyasans/AlegreyaSans-Regular.ttf")}
+@font-face{font-family:"Alegreya Sans";font-weight:500;src:url("mockups/fonts/alegreyasans/AlegreyaSans-Medium.ttf")}
+@font-face{font-family:"Alegreya Sans";font-weight:700;src:url("mockups/fonts/alegreyasans/AlegreyaSans-Bold.ttf")}
+@font-face{font-family:"Shantell Sans";font-weight:300 800;src:url("mockups/fonts/shantellsans/ShantellSans%5BBNCE%2CINFM%2CSPAC%2Cwght%5D.ttf")}
+@font-face{font-family:"Fraunces";font-weight:100 900;src:url("mockups/fonts/fraunces/Fraunces%5BSOFT%2CWONK%2Copsz%2Cwght%5D.ttf")}
+@font-face{font-family:"Playpen Sans";font-weight:100 800;src:url("mockups/fonts/playpensans/PlaypenSans%5Bwght%5D.ttf")}
+
+:root{--ui:-apple-system,"SF Pro Text",system-ui,"Inter",sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#E9E6DF;color:#1c1a17;font-family:var(--ui);-webkit-font-smoothing:antialiased}
+header.page{padding:28px 32px 0;max-width:1100px}
+header.page h1{font:600 22px/1.2 var(--ui);margin:0 0 6px}
+header.page p{font:400 14px/1.5 var(--ui);margin:0 0 4px;color:#4a4640}
+h2.group{font:600 15px/1.2 var(--ui);margin:28px 32px 0;color:#1c1a17}
+.sheet{display:flex;flex-wrap:wrap;gap:28px;padding:16px 32px 8px;align-items:flex-start}
+figure{margin:0}
+figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
+
+/* ---- phone frame ---- */
+.phone{width:393px;min-height:852px;position:relative;overflow:hidden;border-radius:42px;
+  background-color:var(--paper);background-image:var(--grain);background-size:256px 256px;color:var(--text);
+  padding-bottom:104px;font-variant-numeric:lining-nums}
+.phone.board{min-height:0;padding-bottom:28px;border-radius:20px}
+.status{height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 8px;font:600 16px/1 var(--ui)}
+.status .r{display:flex;gap:6px;align-items:center}
+.status i{display:block;background:var(--text);border-radius:2px}
+.nav{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:400 17px/1 var(--ui)}
+.nav .btn{min-width:44px;height:44px;display:flex;align-items:center;gap:3px;padding:0 6px;color:var(--text)}
+.nav .btn svg{display:block}
+.title{padding:2px 21px 0}
+.title h1{font-family:var(--display);font-weight:var(--dbold);font-size:calc(34px*var(--dscale));line-height:1.18;margin:0;letter-spacing:var(--dtrack);font-variation-settings:var(--dvar)}
+.title p{font:400 15px/1.35 var(--ui);color:var(--text2);margin:2px 0 0}
+.sec{font:600 13px/1 var(--ui);letter-spacing:.04em;text-transform:uppercase;color:var(--text2);margin:26px 21px 10px}
+
+/* ---- scene card: 350 x 118 ---- */
+.scene{width:350px;height:118px;margin:14px auto 6px;position:relative}
+.scene img{display:block;width:100%;height:100%;object-fit:cover}
+.penAndInk .scene{border:1px solid var(--text);padding:4px}
+.penAndInk .scene img{outline:.5px solid var(--text2)}
+.pencil .scene{padding:6px}
+.pencil .scene svg{position:absolute;inset:0}
+.watercolor .scene img{-webkit-mask-image:var(--deckle);mask-image:var(--deckle);-webkit-mask-size:100% 100%;mask-size:100% 100%}
+
+/* ---- habit rows ---- */
+.list{padding:4px 21px 0}
+.row{display:grid;grid-template-columns:30px 1fr 44px;gap:12px;align-items:center;min-height:64px;padding:9px 0;position:relative}
+.row + .row::before{content:"";position:absolute;left:42px;right:0;top:0;height:1px;background:var(--rule)}
+.pencil .row + .row::before{height:1.2px;border-radius:1px;transform:rotate(-.15deg);opacity:.9}
+.row .ic{width:30px;height:30px;color:var(--text)}
+.row .nm{font-family:var(--display);font-weight:var(--dmed);font-size:calc(20px*var(--dscale));line-height:1.25;letter-spacing:var(--dtrack);font-variation-settings:var(--dvar);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.row .sb{font:400 13px/1.35 var(--ui);color:var(--text2);margin-top:2px}
+.row .ck{width:44px;height:44px;display:grid;place-items:center}
+.note{margin:14px 21px 0;padding:0;font:400 15px/1.4 var(--ui);color:var(--text2)}
+.note b{font-weight:600;color:var(--text)}
+
+/* ---- system chrome, drawn plain. The app does not restyle it. ---- */
+.tabbar{position:absolute;left:21px;right:21px;bottom:22px;height:62px;border-radius:31px;display:grid;grid-template-columns:repeat(4,1fr);
+  align-items:center;background:color-mix(in srgb,var(--paper) 78%,transparent);border:.5px solid var(--rule2);
+  box-shadow:0 6px 20px rgba(0,0,0,.08);backdrop-filter:blur(12px)}
+.tabbar div{display:grid;justify-items:center;gap:3px;font:500 10px/1 var(--ui);color:var(--text2)}
+.tabbar div.on{color:var(--text);font-weight:600}
+.seg{margin:14px 21px 0;height:34px;border-radius:17px;background:var(--fill);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:2px;font:500 13px/1 var(--ui)}
+.seg span{display:grid;place-items:center;border-radius:15px;color:var(--text)}
+.seg span.on{background:var(--raised);box-shadow:0 1px 3px rgba(0,0,0,.14);font-weight:600}
+
+/* ---- heat map ---- */
+.month{display:flex;align-items:center;justify-content:space-between;margin:18px 21px 8px}
+.month b{font-family:var(--display);font-weight:var(--dmed);font-size:calc(20px*var(--dscale));font-variation-settings:var(--dvar)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);margin:0 16px;justify-items:center;row-gap:2px}
+.grid .wd{font:500 12px/1 var(--ui);color:var(--text3);height:20px}
+.stats{margin:14px 21px 0}
+.stat{display:flex;justify-content:space-between;align-items:baseline;padding:11px 0;position:relative}
+.stat + .stat::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--rule)}
+.stat span{font:400 15px/1.3 var(--ui);color:var(--text2)}
+.stat b{font-family:var(--display);font-weight:var(--dmed);font-size:calc(20px*var(--dscale));font-variation-settings:var(--dvar);font-variant-numeric:lining-nums tabular-nums}
+.key{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin:6px 21px 0}
+.key div{display:flex;align-items:center;gap:8px;font:400 13px/1.2 var(--ui);color:var(--text2);min-height:34px}
+
+/* ---- appearance ---- */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 21px}
+.tile{border:1px solid var(--rule2);border-radius:14px;padding:12px 10px 10px;display:grid;justify-items:center;gap:8px;min-height:104px;position:relative}
+.tile.on{border:1.5px solid var(--text)}
+.tile .aa{font-size:28px;line-height:1;display:flex;align-items:center;gap:8px}
+.tile .lb{font:500 13px/1.2 var(--ui)}
+.radio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--text2);display:grid;place-items:center;flex:none}
+.radio.on{border-color:var(--text)}
+.radio.on::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--text)}
+.tile .radio{position:absolute;top:8px;right:8px;width:16px;height:16px}
+.tile .radio.on::after{width:8px;height:8px}
+.scenes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 21px}
+.sc{display:grid;gap:6px;justify-items:center;font:500 11px/1.2 var(--ui);color:var(--text2)}
+.sc .th{width:100%;aspect-ratio:350/118;border:1px solid var(--rule2);border-radius:3px;overflow:hidden;display:grid;place-items:center}
+.sc.on .th{border:1.5px solid var(--text)}
+.sc.on{color:var(--text);font-weight:600}
+.sc img{width:100%;height:100%;object-fit:cover;display:block}
+.opt{display:flex;align-items:center;gap:12px;min-height:44px;margin:0 21px;position:relative;font:400 16px/1.3 var(--ui)}
+.opt + .opt::before{content:"";position:absolute;left:30px;right:0;top:0;height:1px;background:var(--rule)}
+.opt img{width:66px;height:22px;object-fit:cover;border-radius:2px;margin-left:auto;border:.5px solid var(--rule2)}
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 0;margin:4px 21px 0;justify-items:center}
+.sw div{display:grid;justify-items:center;gap:0;font:400 11px/1.2 var(--ui);color:var(--text2);min-width:44px}
+
+/* ---- marks board ---- */
+.mk{display:grid;grid-template-columns:1fr 52px 48px 62px;align-items:center;margin:0 21px;min-height:50px;position:relative;font:400 15px/1.25 var(--ui)}
+.mk + .mk::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--rule)}
+.mk small{display:block;font:400 12px/1.3 var(--ui);color:var(--text2)}
+.mk.hd{min-height:26px;font:600 10px/1 var(--ui);letter-spacing:.03em;text-transform:uppercase;color:var(--text2);white-space:nowrap}
+.mk > *:not(:first-child){justify-self:center}
+.year{margin:6px 21px 0;display:grid;grid-template-columns:repeat(26,1fr);gap:2px}
+.year i{display:block;aspect-ratio:1;border-radius:1.5px;background:var(--accent)}
+
+/* ---- font specimens ---- */
+.spec{width:560px;background:#FBFAF6;color:#16130F;border-radius:16px;padding:22px 24px}
+.spec .meta{font:400 12px/1.5 var(--ui);color:#5a554d;margin:0 0 12px}
+.spec .meta b{font:600 15px/1.3 var(--ui);color:#16130F;display:block}
+.spec .a{font-size:20px;line-height:1.25;margin:0 0 10px;max-width:330px}
+.spec .b{font-size:28px;line-height:1.2;margin:0 0 10px;font-variant-numeric:lining-nums}
+.spec .c{font-size:44px;line-height:1.1;margin:0}
+.spec .miss{font:400 13px/1.4 var(--ui);color:#5a554d;border:1px dashed #b9b3a8;border-radius:8px;padding:10px 12px;margin:0}
+</style>
+</head>
+<body>
+
+<header class="page">
+  <h1>Habit mockups, phase 1</h1>
+  <p>Four screens and a marks board, in three styles and two appearances. All data is fixture data.</p>
+  <p>The tab bar, navigation bar and segmented controls are system chrome. They are drawn plain here and the app does not restyle them.</p>
+  <p>Pen and ink uses New York, and the OS font candidates are Optima and Chalkboard SE. Open this file in Safari on a Mac to see them. The PNGs were rendered on Linux, where Charter stands in for New York and Inter stands in for SF.</p>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Pencil: lines wobble a little and the graphite breaks up on the paper tooth -->
+    <filter id="pencil" x="-15%" y="-15%" width="130%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="4" result="w"/>
+      <feDisplacementMap in="SourceGraphic" in2="w" scale="2.4" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="9" result="t"/>
+      <feColorMatrix in="t" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  2.6 0 0 0 -0.35" result="ta"/>
+      <feComposite in="d" in2="ta" operator="in"/>
+    </filter>
+    <!-- Watercolor: edges bleed and the shape is slightly uneven -->
+    <filter id="wet" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="12" result="w"/>
+      <feDisplacementMap in="SourceGraphic" in2="w" scale="4.2" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="0.35"/>
+    </filter>
+  </defs>
+</svg>
+
+<div id="root"></div>
+
+<script>
+const DECKLE = /*MASK*/"data:image/png;base64,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"/*ENDMASK*/;   // docs/mockups/scenes/deckle-mask.png, inlined by tools/mockups/build.py
+document.documentElement.style.setProperty("--deckle", `url("${DECKLE}")`);
+const TOKENS = /*TOKENS*/{"note":"Phase 1 design tokens. The Swift style files will be generated from, or checked against, this file.","hatchAngleDegrees":56,"styles":{"penAndInk":{"display":"New York","paper":{"paper":"#FBFAF6","text":"#16130F","secondaryAlpha":0.7,"tertiaryAlpha":0.6,"ruleAlpha":0.16},"ink":{"paper":"#14120F","text":"#F3EFE6","secondaryAlpha":0.7,"tertiaryAlpha":0.53,"ruleAlpha":0.18}},"pencil":{"display":"Shantell Sans","paper":{"paper":"#FDFBF5","text":"#0C0B09","secondaryAlpha":0.72,"tertiaryAlpha":0.62,"ruleAlpha":0.22,"grain":{"color":"#6E675C","maxAlpha":0.045}},"ink":{"paper":"#151310","text":"#F7F3EA","secondaryAlpha":0.7,"tertiaryAlpha":0.52,"ruleAlpha":0.24,"grain":{"color":"#000000","maxAlpha":0.45}}},"watercolor":{"display":"Alegreya Sans","paper":{"paper":"#FEFDFB","text":"#0E0D0B","secondaryAlpha":0.72,"tertiaryAlpha":0.62,"ruleAlpha":0.0,"grain":{"color":"#8C8479","maxAlpha":0.05}},"ink":{"paper":"#121214","text":"#F4F1EA","secondaryAlpha":0.7,"tertiaryAlpha":0.53,"ruleAlpha":0.0,"grain":{"color":"#000000","maxAlpha":0.4}}}},"swatches":{"ochre":"#A47C1E","moss":"#6E8B2E","leaf":"#3E8A45","teal":"#2A8A86","blue":"#4C78C8","indigo":"#6A6AD0","plum":"#9A5DB0","graphite":"#6F6B66"},"palettes":{"sunrise":{"accent":"#A8802A","top":["#F6D3BE","#E9A27F","#A56A49","#573A2C"],"bottom":["#F8E3B2","#E5BA60","#987230","#523F1F"]},"midday":{"accent":"#3F8554","top":["#D5E6D0","#84B383","#2F6B4B","#0D2E20"],"bottom":["#DDE8C4","#97B66B","#44702F","#162F0E"]},"sunset":{"accent":"#B26A2C","top":["#F0C17C","#D58C3A","#85501F","#3F2510"],"bottom":["#EDAB8C","#D27C55","#864A2D","#40241A"]},"bluehour":{"accent":"#5B72C4","top":["#CCDBF1","#7195D1","#2D4D90","#13224B"],"bottom":["#DAD1EE","#9B85CC","#543C85","#271A49"]},"night":{"accent":"#6B6FB8","paper":"#C6C9DF","top":["#959ABF","#5C6294","#2E325F","#141631"],"bottom":["#9A97C2","#625F98","#332F62","#171433"]}}}/*END*/;
+
+const STYLE_NAMES = {penAndInk:"Pen and ink", pencil:"Pencil", watercolor:"Watercolor"};
+const DISPLAY = {
+  penAndInk: {stack:'ui-serif,"New York","Charter","Bitstream Charter",Georgia,serif', scale:1, med:500, bold:700, track:"-0.005em", vari:"normal"},
+  pencil:    {stack:'"Shantell Sans","Chalkboard SE",sans-serif', scale:.95, med:450, bold:650, track:"0", vari:'"INFM" 35, "BNCE" 12'},
+  watercolor:{stack:'"Alegreya Sans","Optima",sans-serif', scale:1.08, med:500, bold:700, track:"0", vari:"normal"},
+};
+// Fixture: the clock is frozen at Saturday 14 November 2026. Paper frames show 11:00, Ink frames show 20:30.
+const PALETTE_FOR = {paper:"midday", ink:"bluehour"};
+
+const rgba = (hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
+
+function vars(style, app){
+  const t = TOKENS.styles[style][app], d = DISPLAY[style];
+  const accent = TOKENS.palettes[PALETTE_FOR[app]].accent;
+  return {
+    "--paper":t.paper, "--text":t.text, "--text2":rgba(t.text,t.secondaryAlpha), "--text3":rgba(t.text,t.tertiaryAlpha),
+    "--rule":rgba(t.text,t.ruleAlpha), "--rule2":rgba(t.text,Math.max(t.ruleAlpha,.18)),
+    "--fill":rgba(t.text,.08), "--raised":app==="paper"?"#fff":rgba(t.text,.22),
+    "--accent":accent, "--grain":t.grain?`url("mockups/grain/${style}-${app}.png")`:"none",
+    "--display":d.stack, "--dscale":d.scale, "--dmed":d.med, "--dbold":d.bold, "--dtrack":d.track, "--dvar":d.vari,
+  };
+}
+
+/* ---------- marks ---------- */
+let uid = 0;
+const TH = 56 * Math.PI / 180;                     // one hatch angle in every style
+function hatch(cx, cy, a, n, attrs){               // n parallel strokes through a square of side a
+  const dx = Math.cos(TH), dy = -Math.sin(TH), nx = Math.sin(TH), ny = Math.cos(TH);
+  let s = "";
+  for(let i=0;i<n;i++){
+    const o = (i-(n-1)/2) * (a*1.25/n);
+    const x = cx + nx*o, y = cy + ny*o;
+    s += `<line x1="${(x-dx*a).toFixed(2)}" y1="${(y-dy*a).toFixed(2)}" x2="${(x+dx*a).toFixed(2)}" y2="${(y+dy*a).toFixed(2)}" ${attrs(i)}/>`;
+  }
+  return s;
+}
+function mark(state, o){
+  const size=o.size, pad=6, S=size+pad*2, c=S/2, a=size*.78, x0=c-a/2, r=a/2;
+  const A="var(--accent)", K="var(--text)";
+  const sw = size<24?1.25:1.5;
+  let g="", ring="";
+  const id="c"+(uid++);
+  if(o.style==="penAndInk"){
+    const box=(extra)=>`<rect x="${x0}" y="${x0}" width="${a}" height="${a}" rx="${a*.07}" ${extra}/>`;
+    const clip=`<clipPath id="${id}">${box("")}</clipPath>`;
+    if(state==="solid") g=box(`fill="${A}"`);
+    if(state==="hatched") g=clip+`<g clip-path="url(#${id})">${hatch(c,c,a,5,()=>`stroke="${A}" stroke-width="${sw}"`)}</g>`+box(`fill="none" stroke="${A}" stroke-width="${sw}"`);
+    if(state==="missed") g=box(`fill="none" stroke="${A}" stroke-width="${sw}"`);
+    if(state==="paused") g=`<line x1="${c-a*.24}" y1="${c}" x2="${c+a*.24}" y2="${c}" stroke="${A}" stroke-width="${sw+.6}" stroke-linecap="round"/>`;
+    if(state==="extra") g=`<path d="M${c} ${c-a*.33}L${c+a*.33} ${c}L${c} ${c+a*.33}L${c-a*.33} ${c}Z" fill="${A}"/>`;
+    if(state==="future") g=box(`fill="none" stroke="${A}" stroke-width="${sw-.25}" stroke-dasharray="2.6 2.6" opacity=".45"`);
+    const q=a+7, q0=c-q/2;
+    ring=`<rect x="${q0}" y="${q0}" width="${q}" height="${q}" rx="${q*.1}" fill="none" stroke="${K}" stroke-width="1.5"/>`;
+    if(state==="open") g=`<rect x="${x0}" y="${x0}" width="${a}" height="${a}" rx="${a*.07}" fill="none" stroke="${K}" stroke-width="1.5"/>`;
+  }
+  if(o.style==="pencil"){
+    const box=(rot,extra)=>`<rect x="${x0}" y="${x0}" width="${a}" height="${a}" rx="${a*.1}" transform="rotate(${rot} ${c} ${c})" ${extra}/>`;
+    const outline=box(-1.6,`fill="none" stroke="${A}" stroke-width="${sw}"`)+box(1.8,`fill="none" stroke="${A}" stroke-width="${sw*.7}" opacity=".6"`);
+    const clip=`<clipPath id="${id}">${box(0,"")}</clipPath>`;
+    if(state==="solid") g=clip+`<g clip-path="url(#${id})">${hatch(c,c,a,11,i=>`stroke="${A}" stroke-width="${(a/7.2)*(i%3===1?.8:1)}" stroke-linecap="round" opacity="${i%2?.95:.8}"`)}</g>`+outline;
+    if(state==="hatched") g=clip+`<g clip-path="url(#${id})">${hatch(c,c,a,5,i=>`stroke="${A}" stroke-width="${i%2?sw+.5:sw+1.1}" stroke-linecap="round" opacity="${i%2?.8:1}"`)}</g>`+outline;
+    if(state==="missed") g=outline;
+    if(state==="paused") g=`<path d="M${c-a*.26} ${c+.6}L${c+a*.26} ${c-.8}M${c-a*.22} ${c-.9}L${c+a*.24} ${c+.9}" stroke="${A}" stroke-width="${sw+.3}" stroke-linecap="round" fill="none"/>`;
+    if(state==="extra"){const d=`M${c} ${c-a*.36}L${c+a*.34} ${c}L${c} ${c+a*.36}L${c-a*.34} ${c}Z`;
+      g=`<clipPath id="${id}"><path d="${d}"/></clipPath><g clip-path="url(#${id})">${hatch(c,c,a,9,()=>`stroke="${A}" stroke-width="${a/7.5}" opacity=".9"`)}</g><path d="${d}" fill="none" stroke="${A}" stroke-width="${sw}"/>`;}
+    if(state==="future") g=box(-1,`fill="none" stroke="${A}" stroke-width="${sw-.2}" stroke-dasharray="3 3.4" stroke-linecap="round" opacity=".5"`);
+    const rr=a*.5+5;
+    ring=`<ellipse cx="${c}" cy="${c}" rx="${rr+1}" ry="${rr-.5}" transform="rotate(-14 ${c} ${c})" fill="none" stroke="${K}" stroke-width="1.3"/><path d="M${c-rr} ${c+2}A${rr} ${rr-1} 0 0 1 ${c+rr*.5} ${c-rr*.86}" transform="rotate(9 ${c} ${c})" fill="none" stroke="${K}" stroke-width="1" opacity=".7"/>`;
+    if(state==="open") g=box(-1.6,`fill="none" stroke="${K}" stroke-width="1.5"`)+box(1.8,`fill="none" stroke="${K}" stroke-width="1" opacity=".6"`);
+    g=`<g filter="url(#pencil)">${g}</g>`; ring=`<g filter="url(#pencil)">${ring}</g>`;
+  }
+  if(o.style==="watercolor"){
+    const grad=`<radialGradient id="g${id}" cx=".42" cy=".4" r=".62"><stop offset="0" stop-color="${A}" stop-opacity=".46"/><stop offset=".72" stop-color="${A}" stop-opacity=".62"/><stop offset="1" stop-color="${A}" stop-opacity=".9"/></radialGradient>`;
+    if(state==="solid") g=grad+`<circle cx="${c}" cy="${c}" r="${r}" fill="url(#g${id})"/>`;
+    if(state==="hatched") g=`<clipPath id="${id}"><circle cx="${c}" cy="${c}" r="${r*1.04}"/></clipPath><g clip-path="url(#${id})">${hatch(c,c,a,3,i=>`stroke="${A}" stroke-width="${a*.17}" stroke-linecap="round" opacity="${i===1?.72:.58}"`)}</g>`;
+    if(state==="missed") g=`<circle cx="${c}" cy="${c}" r="${r*.92}" fill="none" stroke="${A}" stroke-width="${sw+.3}" opacity=".7"/>`;
+    if(state==="paused") g=`<rect x="${c-a*.3}" y="${c-a*.085}" width="${a*.6}" height="${a*.17}" rx="${a*.085}" fill="${A}" opacity=".66"/>`;
+    if(state==="extra") g=grad+`<path d="M${c} ${c-a*.36}L${c+a*.34} ${c}L${c} ${c+a*.36}L${c-a*.34} ${c}Z" fill="url(#g${id})" stroke="${A}" stroke-opacity=".35" stroke-width="1" stroke-linejoin="round"/>`;
+    if(state==="future") g=`<circle cx="${c}" cy="${c}" r="${r*.92}" fill="none" stroke="${A}" stroke-width="${sw+.2}" stroke-dasharray="1 4.2" stroke-linecap="round" opacity=".5"/>`;
+    ring=`<circle cx="${c}" cy="${c}" r="${r+4.2}" fill="none" stroke="${K}" stroke-width="1.3" opacity=".85"/>`;
+    if(state==="open") g=`<circle cx="${c}" cy="${c}" r="${r*.96}" fill="none" stroke="${K}" stroke-width="1.5" opacity=".9"/>`;
+    g=`<g filter="url(#wet)">${g}</g>`; ring=`<g filter="url(#wet)">${ring}</g>`;
+  }
+  return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" style="display:block;overflow:visible" role="img" aria-label="${state}${o.today?", today":""}">${g}${o.today?ring:""}</svg>`;
+}
+
+/* ---------- icons: 1.5 pt line art on a 48 grid ---------- */
+const ICONS = {
+  drop:'<path d="M24 8C17 18 13 24.500 13 30a11 11 0 0 0 22 0C35 24.500 31 18 24 8Z"/><path d="M19 31a5.500 5.500 0 0 0 4 5"/>',
+  book:'<path d="M7 12h12a5 5 0 0 1 5 5v21a4 4 0 0 0-4-4H7Z"/><path d="M41 12H29a5 5 0 0 0-5 5v21a4 4 0 0 1 4-4h13Z"/>',
+  leaf:'<path d="M11 37C11 21 21 11 38 10c0 17-10 27-27 27Z"/><path d="M11 37 27 21"/>',
+  pen:'<path d="m9 39 3.500-12L31 8.500l8.500 8.500L21 35.500Z"/><path d="m26.500 13 8.500 8.500"/>',
+  pill:'<path d="M15.500 32.500a7.800 7.800 0 0 1 0-11l6-6a7.800 7.800 0 0 1 11 11l-6 6a7.800 7.800 0 0 1-11 0Z"/><path d="m18.500 18.500 11 11"/>',
+  moon:'<path d="M36 29.500A14 14 0 1 1 18.500 12 11.500 11.500 0 0 0 36 29.500Z"/>',
+};
+const icon = (n,sz=30)=>`<svg class="ic" width="${sz}" height="${sz}" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+const TAB = {
+  today:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M8 3v4M16 3v4"/>',
+  progress:'<rect x="4" y="4" width="6.500" height="6.500" rx="1.500"/><rect x="13.500" y="4" width="6.500" height="6.500" rx="1.500"/><rect x="4" y="13.500" width="6.500" height="6.500" rx="1.500"/><rect x="13.500" y="13.500" width="6.500" height="6.500" rx="1.500"/>',
+  tags:'<path d="M3.500 12.500V5a1.500 1.500 0 0 1 1.500-1.500h7.500l8 8a1.500 1.500 0 0 1 0 2.100l-6.900 6.900a1.500 1.500 0 0 1-2.100 0Z"/><circle cx="8" cy="8" r="1.300"/>',
+  you:'<circle cx="12" cy="12" r="8.500"/><circle cx="12" cy="10" r="3"/><path d="M6.500 18.300a6.500 6.500 0 0 1 11 0"/>',
+};
+const tabIcon = n=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.600" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TAB[n]}</svg>`;
+
+/* ---------- shared pieces ---------- */
+const status = ()=>`<div class="status"><span>9:41</span><span class="r"><i style="width:17px;height:11px;opacity:.9"></i><i style="width:15px;height:11px;opacity:.9"></i><i style="width:25px;height:12px;border-radius:4px"></i></span></div>`;
+const tabbar = on=>`<div class="tabbar">${[["today","Today"],["progress","Progress"],["tags","Tags"],["you","You"]].map(([k,l])=>`<div class="${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("")}</div>`;
+const chev = `<svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 2 10l8 8"/></svg>`;
+const plus = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"><path d="M11 3v16M3 11h16"/></svg>`;
+function scene(style, app, pal){
+  const img=`<img src="mockups/scenes/lake-${pal||PALETTE_FOR[app]}-${app}.jpg" alt="">`;
+  const frame = style==="pencil" ? `<svg width="350" height="118" viewBox="0 0 350 118" fill="none" stroke="var(--text)" stroke-linecap="round" filter="url(#pencil)" aria-hidden="true">
+    <path d="M1 3.500 348.500 2.600M2.600 115.400 349 114.600M3.200 .500 2.800 117.500M347.200 1 346.600 117" stroke-width="1.400"/>
+    <path d="M4 5.200 344 4.400M5 113.200 346 112.800" stroke-width=".8" opacity=".55"/></svg>` : "";
+  // Decorative. The app gives the card one accessibility label, for example "Lake, midday", and no text sits on it.
+  return `<div class="scene" role="img" aria-label="Lake, ${pal||PALETTE_FOR[app]}">${img}${frame}</div>`;
+}
+
+const HABITS = [
+  {icon:"drop", name:"Drink water", sub:"3 of 8 glasses", state:"hatched"},
+  {icon:"book", name:"Read", sub:"Every day", state:"solid"},
+  {icon:"leaf", name:"Walk outside", sub:"Every day", state:"open"},
+  {icon:"pen",  name:"Write three lines in the journal before the day gets going", sub:"Every day", state:"open"},
+  {icon:"pill", name:"Take vitamins", sub:"Every day", state:"solid"},
+  {icon:"moon", name:"Stretch before bed", sub:"Every day", state:"open"},
+];
+const row = (h,style,state)=>`<div class="row">${icon(h.icon)}<div><div class="nm">${h.name}</div><div class="sb">${h.sub}</div></div><div class="ck">${mark(state||h.state,{style,size:30})}</div></div>`;
+
+/* ---------- screens ---------- */
+function today(style, app){
+  return status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>
+  <div class="title"><h1>Today</h1><p>Saturday 14 November</p></div>
+  ${scene(style,app)}
+  <div class="list">${HABITS.map(h=>row(h,style)).join("")}</div>${tabbar("today")}`;
+}
+function gentle(style, app){
+  const st = ["paused","extra","paused","paused","paused","paused"];
+  const sb = ["Paused","Logged. Extra credit","Paused","Paused","Paused","Paused"];
+  return status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>
+  <div class="title"><h1>Today</h1><p>Saturday 14 November</p></div>
+  ${scene(style,app)}
+  <p class="note"><b>Gentle Mode is on.</b> Everything is paused. Anything you log is extra credit.</p>
+  <div class="list">${HABITS.map((h,i)=>row({...h,sub:sb[i]},style,st[i])).join("")}</div>${tabbar("today")}`;
+}
+function detail(style, app){
+  // November 2026, weeks start on Monday. The habit is scheduled every day except Thursday.
+  const S = {1:"solid",2:"solid",3:"hatched",4:"solid",6:"paused",7:"extra",8:"paused",9:"solid",10:"missed",11:"solid",13:"solid",14:"hatched"};
+  let cells = "";
+  for(const d of "MTWTFSS") cells += `<span class="wd">${d}</span>`;
+  for(let i=0;i<6;i++) cells += `<span></span>`;
+  for(let d=1; d<=30; d++){
+    const dow = (d+5)%7;                              // 1 November 2026 is a Sunday: index 6
+    const st = dow===3 ? "blank" : (S[d] || (d>14 ? "future" : "missed"));
+    cells += mark(st,{style,size:32,today:d===14});
+  }
+  const K = [["solid","Done"],["hatched","Part done"],["missed","Not logged"],["paused","Paused"],["extra","Extra credit"],["future","Ahead"]];
+  return status()+`<div class="nav"><span class="btn">${chev}&nbsp;Today</span><span class="btn">Edit</span></div>
+  <div class="title"><h1>Drink water</h1><p>8 glasses a day. Every day except Thursday.</p></div>
+  <div class="seg"><span>Week</span><span class="on">Month</span><span>Year</span></div>
+  <div class="month"><b>November 2026</b></div>
+  <div class="grid">${cells}</div>
+  <div class="stats"><div class="stat"><span>Current run</span><b>2 days</b></div><div class="stat"><span>Longest run</span><b>31 days</b></div><div class="stat"><span>Extra credit</span><b>4 days</b></div></div>
+  <div class="sec">Key</div>
+  <div class="key">${K.map(([s,l])=>`<div>${mark(s,{style,size:20})}${l}</div>`).join("")}</div>${tabbar("progress")}`;
+}
+function appearance(style, app){
+  const tiles = Object.keys(STYLE_NAMES).map(s=>{
+    const d = DISPLAY[s], v = vars(s,app);
+    return `<div class="tile ${s===style?"on":""}"><span class="radio ${s===style?"on":""}"></span>
+      <div class="aa" style="font-family:${d.stack.replace(/"/g,"'")};font-weight:${d.med};font-variation-settings:${d.vari.replace(/"/g,"'")}">Aa ${mark("solid",{style:s,size:22})}</div><div class="lb">${STYLE_NAMES[s]}</div></div>`;
+  }).join("");
+  const scenes = ["Lake","Redwoods","Desert","Coast","Mountains"].map((n,i)=>`<div class="sc ${i===0?"on":""}"><div class="th">${i===0?`<img src="mockups/scenes/lake-${PALETTE_FOR[app]}-${app}.jpg" alt="">`:""}</div>${n}</div>`).join("");
+  const pals = [["sunrise","Sunrise"],["midday","Midday"],["sunset","Sunset"],["bluehour","Blue hour"],["night","Night"]]
+    .map(([k,l])=>`<div class="opt"><span class="radio"></span>${l}<img src="mockups/scenes/lake-${k}-${app}.jpg" alt=""></div>`).join("");
+  const sws = Object.entries(TOKENS.swatches).map(([k,hex])=>`<div style="--accent:${hex}">${mark("solid",{style,size:28})}${k[0].toUpperCase()+k.slice(1)}</div>`).join("");
+  return status()+`<div class="nav"><span class="btn">${chev}&nbsp;You</span><span></span></div>
+  <div class="title"><h1>Appearance</h1></div>
+  <div class="sec">Style</div><div class="tiles">${tiles}</div>
+  <div class="sec">Appearance</div><div class="seg" style="margin-top:0"><span>System</span><span class="${app==="paper"?"on":""}">Paper</span><span class="${app==="ink"?"on":""}">Ink</span></div>
+  <div class="sec">Scene</div><div class="scenes">${scenes}</div>
+  <div class="sec">Palette</div><div class="opt"><span class="radio on"></span>Follow the time of day</div>${pals}
+  <div class="sec">Accent</div><div class="opt"><span class="radio on"></span>Follow the palette</div>
+  <div class="sw">${sws}</div>${tabbar("you")}`;
+}
+function marks(style, app){
+  const R = [["solid","Done","Solid"],["hatched","Part done","Hatched"],["missed","Not logged","Empty outline"],["paused","Paused","Centred dash"],
+             ["extra","Extra credit","Centred diamond"],["blank","Off schedule","Blank"],["future","Ahead","Dashed outline, faint"]];
+  const steps = [0,.25,.5,.75,1];
+  let yr = ""; for(let i=0;i<26*5;i++){ const o = steps[(i*7 + (i>>2)*3) % 5]; yr += `<i style="opacity:${o===0?.1:o}"></i>`; }
+  return `<div class="title" style="padding-top:22px"><h1 style="font-size:calc(26px*var(--dscale))">Marks</h1><p>${STYLE_NAMES[style]}, ${app==="paper"?"Paper":"Ink"}. State is carried by shape.</p></div>
+  <div class="mk hd" style="margin-top:14px"><span>State</span><span>Large</span><span>Small</span><span>On today</span></div>
+  ${R.map(([s,l,d])=>`<div class="mk"><span>${l}<small>${d}</small></span>${mark(s,{style,size:30})}${mark(s,{style,size:22})}${mark(s,{style,size:30,today:true})}</div>`).join("")}
+  <div class="mk"><span>Today, nothing logged<small>The outline alone</small></span>${mark("open",{style,size:30})}<span></span><span></span></div>
+  <div class="sec">Year view</div><p class="note" style="margin-top:0;font-size:13px">Cells are too small to hatch. Solid ink at four opacity steps.</p>
+  <div class="year">${yr}</div>`;
+}
+
+/* ---------- font specimens ---------- */
+const FONTS = {
+  Watercolor: [
+    {name:"Alegreya Sans", css:'"Alegreya Sans"', w:500, lic:"SIL Open Font License 1.1. Huerta Tipográfica.", src:"github.com/huertatipografica/Alegreya-Sans", pick:true},
+    {name:"Fraunces", css:'"Fraunces"', w:450, vari:'"SOFT" 100, "WONK" 0', lic:"SIL Open Font License 1.1. Undercase Type.", src:"github.com/undercasetype/Fraunces"},
+    {name:"Optima", css:'"Optima"', w:400, os:true, lic:"Installed with iOS and macOS. Nothing to ship or license.", src:"The OS"},
+  ],
+  Pencil: [
+    {name:"Shantell Sans", css:'"Shantell Sans"', w:450, vari:'"INFM" 35, "BNCE" 12', lic:"SIL Open Font License 1.1. Shantell Martin, Arrow Type.", src:"github.com/arrowtype/shantell-sans", pick:true},
+    {name:"Playpen Sans", css:'"Playpen Sans"', w:400, lic:"SIL Open Font License 1.1. TypeTogether.", src:"github.com/TypeTogether/Playpen-Sans"},
+    {name:"Chalkboard SE", css:'"Chalkboard SE"', w:400, os:true, lic:"Installed with iOS and macOS. Nothing to ship or license.", src:"The OS"},
+  ],
+};
+function installed(css){
+  const c = document.createElement("canvas").getContext("2d"), t = "Hamburgefonstiv 0123456789";
+  c.font = "40px monospace"; const a = c.measureText(t).width;
+  c.font = `40px ${css}, monospace`; return c.measureText(t).width !== a;
+}
+function specimen(f){
+  const st = `font-family:${f.css.replace(/"/g,"'")};font-weight:${f.w};${f.vari?`font-variation-settings:${f.vari.replace(/"/g,"'")};`:""}`;
+  const body = (f.os && !installed(f.css))
+    ? `<p class="miss">${f.name} is not on the machine that rendered this. Open docs/mockups.html in Safari on a Mac to see it.</p>`
+    : `<p class="a" style="${st}">Write three lines in the journal before the day gets going</p>
+       <p class="b" style="${st}">0123456789&nbsp; O0&nbsp; Il1&nbsp; 3 of 8</p>
+       <p class="c" style="${st}">Small things, most days</p>`;
+  return `<div class="spec"><p class="meta"><b>${f.name}${f.pick?" (my pick, used in the mockups)":""}</b>${f.lic} Source: ${f.src}</p>${body}</div>`;
+}
+
+/* ---------- page ---------- */
+const SCREENS = {today:[today,"Today"], detail:[detail,"Habit detail"], gentle:[gentle,"Gentle Mode on Today"], appearance:[appearance,"Appearance"], marks:[marks,"Marks board"]};
+let html = "";
+for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
+  html += `<h2 class="group">${STYLE_NAMES[style]}, ${app==="paper"?"Paper":"Ink"}</h2><div class="sheet">`;
+  const v = Object.entries(vars(style,app)).map(([k,x])=>`${k}:${x}`).join(";");
+  for(const [key,[fn,label]] of Object.entries(SCREENS)){
+    html += `<figure><div class="phone ${style} ${app} ${key==="marks"?"board":""}" data-shot="${style}-${app}-${key}" style='${v}'>${fn(style,app)}</div><figcaption>${label}</figcaption></figure>`;
+  }
+  html += `</div>`;
+}
+for(const [style,list] of Object.entries(FONTS)){
+  html += `<h2 class="group">Display fonts for ${style}</h2><div class="sheet" data-shot="fonts-${style.toLowerCase()}" style="background:#E9E6DF">${list.map(specimen).join("")}</div>`;
+}
+document.getElementById("root").innerHTML = html;
+</script>
+</body>
+</html>
