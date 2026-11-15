@@ -237,19 +237,22 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 
 | # | Milestone | Holds |
 |---|---|---|
-| 1 | Core loop in Pen and ink | Before it: the App Group test with free signing. Then models and data rules, Today, first run, New habit, yes-or-no and counted logging with typed numbers and the count sheet, `LogHabitIntent`, the style layer as data with Pen and ink only in Paper and Ink, the Lake card in five palettes, the Appearance page with Light or dark, Marks and Scene colours, privacy manifest. The Edit form and Archive, the control-side setting |
+| 1 | Core loop in Pen and ink | Before it: the App Group test with free signing. Then models and data rules, Today, first run, New habit, yes-or-no and counted logging with typed numbers and the count sheet, `LogHabitIntent`, the style layer as data with Pen and ink only in Paper and Ink, the eight swatches, Light or dark, the Edit form and Archive, the control-side setting, privacy manifest. No scene card |
 | 2 | History, export and import | Heat map (week, month, year), logging a past day, JSON export and import with a round-trip test |
 | 3 | Pausing | `Pause` records, Vacation Mode, Gentle Mode, extra-credit run maths |
 | | Stop and report | |
 | 4 | Pencil and Watercolor | Both styles, their fonts, the style picker, the custom colour ring |
-| 5 | Sync | Skipped until the owner says |
-| 6 | Ambient | Widgets, App Intents surfaces, Watch app and complication |
-| 7 | Nudges | Scheduling engine, wording tones, settings |
-| 8 | Ordering | Focus, manual, by time, then learned |
-| 9 | NFC | Tag writing and the Shortcuts walkthrough |
-| 10 | Obsidian | Append to our own file, then the daily-note option |
-| 11 | Removal | Archive, restore, Recently Deleted, purge |
-| 12 | Polish | Accessibility audit, Dynamic Type sweep |
+| 5 | Scenes | The scene card, the five palettes by clock, "Follow the scene" for marks, the Lake, then each other scene through the scene gate |
+| 6 | Sync | Skipped until the owner says |
+| 7 | Ambient | Widgets, App Intents surfaces, Watch app and complication |
+| 8 | Nudges | Scheduling engine, wording tones, settings |
+| 9 | Ordering | Focus, manual, by time, then learned |
+| 10 | NFC | Tag writing and the Shortcuts walkthrough |
+| 11 | Obsidian | Append to our own file, then the daily-note option |
+| 12 | Removal | Restore, Recently Deleted, purge |
+| 13 | Polish | Accessibility audit, Dynamic Type sweep, the usage data page if approved |
+
+**Art is supplemental. Owner.** Scene art waits for milestone 5. Until then Today has no card and marks use a swatch. The default swatch is Graphite (**Guess**). Whether each style gets its own drawing of a scene is decided in milestone 5.
 
 ## Usage data
 
@@ -275,9 +278,8 @@ Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
-| 1 | One painting per scene, or one drawing per scene per style. The senior designer wants an ink Lake for Pen and ink. The product owner and the size budget point the other way | Keep one painting for milestone 1, in one plain frame. Try an ink Lake as a scene-gate variant before milestone 4 | Milestone 1 |
 | 2 | The data rules | Accept as written | Milestone 1 |
-| 3 | The usage data page | Build it in milestone 12 from the existing log fields | Milestone 12 |
+| 3 | The usage data page | Build it in milestone 13 from the existing log fields | Milestone 13 |
 | 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
 | 5 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
 
