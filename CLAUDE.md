@@ -16,7 +16,7 @@ This file is the project brief for every session. `docs/spec.md` records decisio
 
 ## Who decides
 
-The owner set this on 14 November 2026. The brief began as an idea. Development follows evidence. Where an expert review disagrees with this file on design, UI or UX, and the change serves the user, the review wins. Every such change is written in `docs/spec.md` with the review that asked for it, and is reported to the owner.
+The owner set this on 14 November 2026. The brief began as an idea. Development follows evidence. Where an expert review disagrees with this file on design, UI or UX, and the change serves the user, the review wins. Every such change is written in `docs/decisions.md` with the review that asked for it, and is reported to the owner with two or three sentences that say what changed and why.
 
 This does not cover privacy, what leaves the device, dependencies, the additive schema rule, or cost. Those stay with the owner. Where two reviews disagree, the owner decides.
 

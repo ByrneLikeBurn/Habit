@@ -186,7 +186,7 @@ The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settab
 
 ## Data rules
 
-All **Guess** unless marked. These came from the engineering and QA reviews. They are decided before milestone 1 because the schema is additive forever.
+**Owner** accepted these on 14 November 2026. They came from the engineering and QA reviews. They are decided before milestone 1 because the schema is additive forever.
 
 - Every model property is optional or has a default, relationships are optional, and nothing is marked unique. CloudKit needs this later.
 - `LogEvent` has a stable id. Import skips an event whose id is already in the store.
@@ -319,7 +319,6 @@ Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
-| 2 | The data rules | Accept as written | Milestone 1 |
 | 3 | The usage data page | Build it in milestone 13 from the existing log fields | Milestone 13 |
 | 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
 | 5 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
