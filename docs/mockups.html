@@ -500,13 +500,14 @@ function add(style, app){
   <div class="frow"><span>Target each day</span><b class="num typed" role="textbox">8</b></div>
   <div class="frow"><span>Unit</span><span class="val">glasses</span></div>
   <div class="frow"><span>One tap adds</span><b class="num typed" role="textbox">1</b></div>
-  <div class="sec">Days</div><div class="dayrow">${days}</div>`;
+  <p class="note hint">Each tap on Today adds this much.</p>
+  <div class="sec">Days</div><div class="dayrow">${days}</div><p class="note hint">Every day except Thursday</p>`;
 }
 function count(style, app){
   // The amount starts at the habit's tap amount. Add and Take away each apply the change and close the sheet.
   return `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>Drink water</b><span class="btn"></span></div>
   <div class="bigcount"><b class="num">3</b><span>of 8 glasses today</span></div>
-  <div class="amt"><span>Amount</span><b class="num typed big" role="textbox" aria-label="Amount">1</b></div>
+  <div class="amt"><span>Amount to add or take away</span><b class="num typed big" role="textbox" aria-label="Amount">1</b></div>
   <div class="two"><span class="sysbtn ghost wide">Take away</span><span class="sysbtn wide">Add</span></div>`;
 }
 function ax5(style, app){
@@ -557,7 +558,7 @@ function todayDone(style, app){
 }
 function todayNone(style, app){
   return status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>${head("Today","Saturday 14 November")}
-  <div class="empty"><p class="big">Nothing is due today</p><p>Your habits are set for other days.</p></div>${tabbar("today")}`;
+  <div class="empty"><p class="big">Nothing set for today</p><p>Your habits are set for other days.</p></div>${tabbar("today")}`;
 }
 function addYesNo(style, app){
   const days = "MTWTFSS".split("").map(d=>`<span class="dayb on">${d}</span>`).join("");
@@ -574,14 +575,14 @@ function edit(style, app){
   return `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>Edit habit</b><span class="btn"><b>Save</b></span></div>
   <div class="sec">Name</div><div class="field nm">Drink water</div>
   <div class="sec">Symbol</div><div class="symrow">${syms}</div>
-  <div class="sec">Kind</div><div class="frow"><span>Count</span><span class="val">Set when the habit has logs</span></div>
+  <div class="sec">Kind</div><div class="frow"><span>Count</span><span class="val">Cannot change once it has logs</span></div>
   <div class="frow"><span>Target each day</span><b class="num typed" role="textbox">8</b></div>
   <div class="frow"><span>Unit</span><span class="val">glasses</span></div>
   <div class="frow"><span>One tap adds</span><b class="num typed" role="textbox">1</b></div>
-  <div class="sec">Days</div><div class="dayrow">${days}</div>
+  <div class="sec">Days</div><div class="dayrow">${days}</div><p class="note hint">Every day except Thursday</p>
   <p class="note hint" style="margin-top:14px">A change applies from today. Earlier days keep what they had.</p>
   <div class="noteact" style="margin-top:18px"><span class="sysbtn ghost">Archive habit</span></div>
-  <p class="note hint">Archiving hides the habit and keeps its history. You can bring it back.</p>`;
+  <p class="note hint">You can bring it back at any time. Its history is kept.</p>`;
 }
 function you(style, app){
   return status()+`<div class="nav"><span></span><span></span></div>${head("You")}
