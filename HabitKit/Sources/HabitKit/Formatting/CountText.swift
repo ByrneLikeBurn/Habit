@@ -41,7 +41,12 @@ public enum CountText {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
         if let value = Int(trimmed) { return value }
-        return try? Int(trimmed, format: .number.locale(locale))
+        // Allow the grouping separator, but never a fraction.
+        guard let value = try? Decimal(trimmed, format: .number.locale(locale)),
+              abs(value) < Decimal(Int32.max) else { return nil }
+        let number = NSDecimalNumber(decimal: value)
+        guard number == NSDecimalNumber(value: number.intValue) else { return nil }
+        return number.intValue
     }
 
     /// The default tap amount for a target: 1 when the target is 20 or less or empty, otherwise
