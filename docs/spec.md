@@ -148,7 +148,7 @@ One drawing has one meaning.
 
 **Page width. Guess.** On iPad and Mac the content is one page, 393 points wide, centred in the window. The scene card stays 350 by 118 points. Tabs become the system sidebar. A mark is never more than a page width from its habit name.
 
-**Tags tab. Guess.** The Tags tab is shown on iPhone only. iPad and Mac cannot read NFC tags.
+**Tags.** There is no Tags tab. Tags is a row in You, shown on iPhone only, because iPad and Mac cannot read NFC tags.
 
 **Large text.** At accessibility sizes a Today row becomes one column: symbol, name, count, then the control, which grows to 76 points. The name is never cut. The three-line limit applies only at standard sizes. On Appearance, the style tiles and the scene picker become lists. The scene card does not scale.
 
@@ -164,7 +164,7 @@ One drawing has one meaning.
 
 ## Product, from the brief
 
-**Tabs.** Today, Progress, Tags, You. Today is the list, the check-offs and the scene card. Progress is the all-habit ledger with a heat map. Tags is the NFC walkthrough. You holds Nudges, Appearance, Gentle Mode, Vacation, Archive and Export.
+**Tabs.** The brief had four: Today, Progress, Tags, You. There are now three, with Tags inside You. Today is the list, the check-offs and the scene card. Progress is the all-habit ledger with a heat map. Tags is the NFC walkthrough. You holds Nudges, Appearance, Gentle Mode, Vacation, Archive and Export.
 
 **Pausing.** Vacation Mode pauses with a start and end date. Gentle Mode is armed once with one switch and pauses everything with no end date until it is turned off.
 
@@ -237,7 +237,7 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 
 | # | Milestone | Holds |
 |---|---|---|
-| 1 | Core loop in Pen and ink | Before it: the App Group test with free signing. Then models and data rules, Today, first run, New habit, yes-or-no and counted logging with typed numbers and the count sheet, `LogHabitIntent`, the style layer as data with Pen and ink only in Paper and Ink, the Lake card in five palettes, the Appearance page with Light or dark, Marks and Scene colours, privacy manifest. Proposed: the Edit form and Archive |
+| 1 | Core loop in Pen and ink | Before it: the App Group test with free signing. Then models and data rules, Today, first run, New habit, yes-or-no and counted logging with typed numbers and the count sheet, `LogHabitIntent`, the style layer as data with Pen and ink only in Paper and Ink, the Lake card in five palettes, the Appearance page with Light or dark, Marks and Scene colours, privacy manifest. The Edit form and Archive, the control-side setting |
 | 2 | History, export and import | Heat map (week, month, year), logging a past day, JSON export and import with a round-trip test |
 | 3 | Pausing | `Pause` records, Vacation Mode, Gentle Mode, extra-credit run maths |
 | | Stop and report | |
@@ -259,22 +259,27 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 - **From Apple, later.** After the owner joins the Developer Program and ships through the App Store or TestFlight, App Store Connect reports crashes, hangs, launch time and energy for users who opted in at the system level. It needs no code and no SDK.
 - **Not proposed.** A third-party analytics SDK or a server. Either one breaks three locked decisions and the "Data not collected" privacy label.
 
+## Decided by deferring to the reviews
+
+**Owner**, 14 November 2026: design, UI and UX questions follow the expert reviews.
+
+- Milestone 1 holds the Edit form and Archive. Restore, Recently Deleted and purge stay in milestone 11. Kind is locked after the first log.
+- The default tap amount is 1 when the target is 20 or less. Above that it is empty, which means a tap opens the count sheet.
+- You has one setting for which side the control sits on.
+- There are three tabs: Today, Progress, You. Tags is a row in You, on iPhone only.
+- In the month view a future day shows its date alone. The faint dashed outline is kept for the week view.
+
 ## Open decisions
 
 Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
-| 1 | Milestone 1 also holds the Edit form and Archive (hide a habit). A habit made wrongly would otherwise stay on Today until milestone 11 | Yes. Restore, Recently Deleted and purge stay in milestone 11. Kind is locked after the first log | Milestone 1 |
+| 1 | One painting per scene, or one drawing per scene per style. The senior designer wants an ink Lake for Pen and ink. The product owner and the size budget point the other way | Keep one painting for milestone 1, in one plain frame. Try an ink Lake as a scene-gate variant before milestone 4 | Milestone 1 |
 | 2 | The data rules | Accept as written | Milestone 1 |
-| 3 | The default tap amount. 1 is right for glasses and wrong for 15,000 steps | 1 when the target is 20 or less. Empty above that, which means a tap opens the count sheet | Milestone 1 |
-| 4 | A setting for which side the control sits on. A left thumb cannot reach the trailing edge | Yes, one setting in You | Milestone 1 |
-| 5 | The Tags tab. NFC is a shortcut, is iPhone only, and arrives in milestone 9 | Three tabs. Tags becomes a row in You | Milestone 1 |
-| 6 | Future days in the month view. The brief draws them as faint dashed outlines. They are the largest area of ink on the screen | Show the date alone. Keep the dashed outline for the week view | Milestone 2 |
-| 7 | One painting per scene, or one drawing per scene per style. The senior designer wants an ink Lake and a pencil Lake | Keep one painting. The owner approved it, the brief describes scenes as washes, and three drawings triple the hardest work. Revisit in milestone 4 | Milestone 1 |
-| 8 | The usage data page | Build it in milestone 12 from the existing log fields | Milestone 12 |
-| 9 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
-| 10 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
+| 3 | The usage data page | Build it in milestone 12 from the existing log fields | Milestone 12 |
+| 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
+| 5 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
 
 Decided on 14 November 2026 and now written into this file and `CLAUDE.md`: whole-number deltas and typed numbers, the `.entitlements` file for the App Group, the milestone order, export in milestone 2, three review lenses per milestone, red allowed as a user's accent, and three more lenses (UI and UX, human factors, senior designer).
 

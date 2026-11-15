@@ -108,7 +108,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 **Review lenses.** Each lens runs as a separate subagent that has not seen the working. It gets its brief, this file and the thing under review. It returns at most five findings, ranked, each with a file and line or a screen, and a concrete failure scenario. Valid findings are fixed. The rest are listed with the reason.
 
-After each milestone three lenses run: senior software engineer, QA engineer and tired daily user. Accessibility is added when the diff changes the UI. Security and privacy is added when the diff adds a permission, a file or a dependency. All sixteen run at each stop: the end of phase 1, after milestone 3, and at the end. Run lenses two or three at a time, not all at once. The owner set this on 14 November 2026.
+After each milestone three lenses run: senior software engineer, QA engineer and tired daily user. Accessibility is added when the diff changes the UI. Security and privacy is added when the diff adds a permission, a file or a dependency. All nineteen run at each stop: the end of phase 1, after milestone 3, and at the end. Run lenses two or three at a time, not all at once. The owner set this on 14 November 2026.
 
 | Lens | Team role | Brief |
 |---|---|---|
@@ -127,6 +127,9 @@ After each milestone three lenses run: senior software engineer, QA engineer and
 | UI and UX designer | Interaction designer | Task flows from start to finish, every state of every screen (empty, partial, full, error), navigation, feedback after each action, recovery from a mistake, consistency of controls across screens |
 | Human factors | Human interface and human factors | Glance time, reach and thumb zones, target size and spacing, slips and mistaken taps, memory load, mode errors, how many decisions a task takes, use while tired, walking or one-handed |
 | Senior designer | Design lead | Whether the product holds together as one thing: hierarchy, rhythm, restraint, what to remove, whether the three styles are distinct and each complete, whether every screen earns its place |
+| Behavioural scientist | Behaviour change research | Does the design help a habit form: a clear cue, low friction, a small reward at the moment of logging. Whether runs, counts and extra credit motivate or pressure. Fit for people with ADHD or low executive function |
+| Returning user | User research | Someone who opens the app after three weeks away, and someone on day 200. Is the first screen free of judgment? Is it easy to start again, drop a habit, or change a target? Does a long history stay readable? |
+| Illustrator | Art director for scenes | Each scene as a painting: composition, value structure, edges, whether it reads as the place, whether it is calm, and the brief's list of what failed before. Runs at every scene gate as well as at stops |
 | Release engineer | Build and release | What works with a free Apple account, App Groups and the shared store, signing, privacy manifest and required-reason APIs, when the notification prompt appears, widget tint modes, app icon variants, App Review rules |
 
 Roles a typical app team has that this project leaves out, with the reason: backend and DevOps (there is no server), data analyst (there is no analytics), growth and marketing (the app is free and has no accounts), monetisation (there is no paywall).
