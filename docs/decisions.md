@@ -122,3 +122,13 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **A password on export comes after the MVP.** The reviews agree it should exist and be off by default, because a forgotten password loses that copy for good. The system password manager may offer to save it, which the owner agreed to. The app itself never stores it.
 
 **Invariant 5 names import as a second way in.** The engineering, QA and security reviews agreed that import must share the write code but cannot call the intent once per log, because a failure part way would leave half a file written. The owner approved the new wording. A source check keeps any other code from writing a log.
+
+## 15 November 2026, milestone 3 design
+
+**"Gentle Mode" names the feature, and its two controls are named for what they do.** The reviews first replaced both names with "Pause everything" and "Pause for dates", because mood names hide the action. The owner asked to keep the name, for recognition and an icon. Both reviews then accepted "Gentle Mode" as the section header with the pause symbol, over two action rows with a description each. "Vacation" is gone, because someone ill will not look there.
+
+**Every pause ends the same way.** The reviews first disagreed: one wanted today always kept paused, the other wanted a slip to be fully undone. Both accepted one rule. Ending a pause resumes tomorrow, and a pause that began today is removed whole.
+
+**"Pause everything" is one tap from Today.** The first draft had it only in You, which is three steps on a bad day. It needs no confirmation because a pause does no harm and can be undone.
+
+**A paused counted row shows no target.** "0 of 8 glasses" on a rest day reads as a demand. It now shows "0 glasses".

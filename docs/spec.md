@@ -415,6 +415,30 @@ Not adopted: filling the past-day amount with what is left to the target. A past
 
 **Fixture faults found.** The year strip started at May while the stats said 28 April. The month with runs on showed a run of 2 where the marks give 3.
 
+## Milestone 3 screens
+
+Drawn in `docs/mockups/png/sheet-m3.png`, in Pen and ink. Three reviews saw the first draft on 15 November 2026: neurodiversity with behavioural and returning user, accessibility, and UI and UX with QA. They disagreed on how a pause ends and settled on one rule in a second round. These rules replace the earlier Gentle Mode and Vacation paragraphs where they differ.
+
+**Names.** "Gentle Mode" is the name of the whole feature. It appears as the section header in You and in the help page, with the pause symbol, and nowhere else. Under it are two rows named for what they do, each with one line of description: "Pause everything. Until you turn it off." and "Pause for dates. Choose a first and last day. Dates can be in the past." "Vacation" is gone, because someone ill is not on vacation and will not look there. A single habit has "Pause this habit". The pause symbol also marks the Today button and the widget header. Note for translators on the header: "Feature name. Translate as a concept (rest, easy days). Do not translate 'Mode' literally." The owner asked to keep the name. The content review wanted action labels and the neurodiversity review wanted the name kept as permission to rest. Both accepted this course.
+
+**Reaching it.** Today has a quiet text button under its last row, "Pause everything". It asks for no confirmation. You has the same switch and a "Pause for dates" row. The row menu and Edit have "Pause this habit".
+
+**One ending rule.** Ending any pause sets its last day to today. Today stays paused and the habit starts again tomorrow. The button reads "Resume tomorrow". After it, Today reads "Resumes tomorrow." with "Keep paused". A pause whose first day is today is removed whole, and its button reads "Undo pause", so a slip leaves no trace and today's logs draw as normal marks. After a tap on "Pause everything", that button becomes "Undo pause" in place, and the line at the top of Today shows the same.
+
+**Words.** Today reads "Everything is paused." or "Paused until 27 November." The helper is "Paused days leave your runs as they are. You can still log." It replaces "never counts against you", which implied that other days do. In Edit a paused habit reads "It starts again tomorrow. You can still log today."
+
+**Rows while paused.** A counted row shows "0 glasses", then "3 glasses" after a log, with no target. The control shows the dash until the first log. This changes the rule that a counted row always shows "0 of 8".
+
+**Pause for dates.** The row opens a list of dated pauses, coming and earlier, and "Pause everything" pauses that have ended. Each can be opened and changed. Save is off until the last day is set and is not before the first. A pause that has started offers "Resume tomorrow". One that has not started offers "Remove". The form says how many logged days will change mark, and how many days gain or lose a pause.
+
+**Storage.** "Pause everything" and "Pause for dates" are each one `Pause` record with no habit. A day is paused if any pause covers it. A habit added during a pause is paused too. "Pause everything" outranks dates in the line on Today. The "today" in the form is the habit day, built from the day-start hour.
+
+**Edit.** Archive sits in its own section, away from Pause, to prevent a slip.
+
+**Widget.** Small and medium. Rows keep Today's order. The whole row is the button, 44 points high, and logs through `LogHabitIntent`. Text uses text styles, and a row is dropped before text shrinks. The header reads "Paused" during a pause. VoiceOver reads one element per row: "Drink water, 3 of 8 glasses, button, adds 1", "Read, logged while paused", "Walk outside, paused, button". Marks draw from the store only, never ahead of a write, so a tap on a locked device changes nothing until it is unlocked. The timeline has an entry at each day start and each pause edge. The intent carries the day the widget showed and the state it wanted. On a mismatch it reloads and writes nothing. In tinted and clear modes marks are full opacity and marked accentable, with no row rules.
+
+**Still owed.** The largest text size for the Today lines and the widget, clear mode, the Mac and Watch versions, and tests for travel across a pause edge.
+
 ## Open decisions
 
 Each needs the owner. The recommendation is mine.

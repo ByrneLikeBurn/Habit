@@ -113,6 +113,7 @@ def render() -> None:
     flow_sheet(png)
     m1_sheet(png, [i for i in ids if i.startswith("m1-")])
     m1_sheet(png, [i for i in ids if i.startswith("m2-")], "sheet-m2.png", 7)
+    m1_sheet(png, [i for i in ids if i.startswith("m3-")], "sheet-m3.png", 7)
 
 
 def sheets(png: pathlib.Path, ids) -> None:
