@@ -12,7 +12,7 @@ This file records decisions. Items marked **Guess** were made where the brief is
 
 ## Status
 
-Phase 1, design. No Swift exists. The owner approved Lake variant A. No other scene is started. Review findings are in `docs/reviews/phase-1.md`.
+Phase 2. Milestone 1, the core loop in Pen and ink, is on `feat/core-loop`. The owner approved Lake variant A. No other scene is started. Phase 1 review findings are in `docs/reviews/phase-1.md`.
 
 ## Creative direction
 
@@ -137,7 +137,7 @@ One drawing has one meaning.
 - VoiceOver gets adjustable actions named "Increase" and "Decrease" with the step as the value. System undo takes back the last log.
 - One haptic confirms a log and a take-back.
 
-**Hit areas.** The control's target is the full row height by 76 points from the trailing edge. The count line's target is 44 points high. A tap on the name or symbol opens Habit detail. On the Watch the whole row logs.
+**Hit areas.** The control's target is the full row height by 76 points from the trailing edge. The count line's target is 44 points high. A tap on the name or symbol logs, the same as the control. The owner decided this on 15 November 2026. Habit detail opens from the row menu. On the Watch the whole row logs.
 
 **Past days. Guess.** In the month view of Habit detail, a tap on a past day opens a small sheet for that day. The sheet names the date and the day's state. For a yes-or-no habit it has one action, "Mark done" or "Clear". For a counted habit it is the count sheet. A past day never changes on a single tap. An off-schedule day says "Not scheduled" and still allows a log. One line under the grid says "Tap a past day to change it." The month title has previous and next controls. Future days cannot be logged.
 
@@ -173,6 +173,19 @@ One drawing has one meaning.
 
 **Shared store.** Widgets, App Intents and the Watch app need the SwiftData store in an App Group container. An `.entitlements` file is allowed for the App Group only (**Owner**). The owner has a free Apple account. Before milestone 1, a throwaway project checks that an App Group works with free signing.
 
+**Shared-store test.** Run on 15 November 2026 with Xcode 27.2. Free signing gave both the app and a widget extension a profile with the App Group. On an iPhone, a value written by the app in shared UserDefaults, a file and a SwiftData store was read by the widget. It works. The profiles expire after 7 days. SwiftData logs errors if `Library/Application Support` does not exist in the group container, so the app creates that folder before it opens the store.
+
+**Identifiers. Owner**, 15 November 2026.
+
+| | Id |
+|---|---|
+| App | `dev.byrnelikeburn.Habit` |
+| Widget | `dev.byrnelikeburn.Habit.Widget` |
+| Watch | `dev.byrnelikeburn.Habit.Watch` |
+| App Group | `group.dev.byrnelikeburn.Habit` |
+
+The signing team is not committed. It lives in `Config/Local.xcconfig`, which git ignores.
+
 ## Product, from the brief
 
 **Tabs.** The brief had four: Today, Progress, Tags, You. There are now three, with Tags inside You. Today is the list, the check-offs and the scene card. Progress is the all-habit ledger with a heat map. Tags is the NFC walkthrough. You holds Nudges, Appearance, Gentle Mode, Vacation, Archive and Export.
@@ -186,6 +199,8 @@ One drawing has one meaning.
 | `Habit` | id, name, symbol name, kind (binary or counted), target (1 for binary), unit, schedule mask (weekday bits, 127 is daily), sort index, focus flag, Gentle Mode flag, Vacation default flag, tag nickname, nudge hour (default 9), descriptor, nudge phrase, nudge text, keep-wording flag, created, archived and deleted dates, relationships to events and pauses |
 | `LogEvent` | Append-only. delta, habit, day key, source (manual, watch, widget, shortcut, siri, control), timestamp, device id |
 | `Pause` | habit, start day, end day (nil is open-ended), reason (vacation, gentle, manual) |
+
+**Frozen shapes.** `Habit.rules` stores `[HabitRule]`, a struct of first day, target and schedule mask. SwiftData stores it as one composite attribute, so the struct's shape is frozen like any other stored type. A later per-rule value goes in a new field beside it, never inside it. `rules` is the source of truth for history, and `Habit.target` and `Habit.scheduleMask` hold the current values. Both are written only through `setRule`.
 
 The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settable day-start hour (default 04:00) and fixed at write time. Day totals are derived and cached in memory, never stored.
 
@@ -287,7 +302,7 @@ The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settab
 
 The behavioural scientist, neurodiversity and returning-user lenses reviewed `docs/mockups/png/sheet-m1.png`. The owner defers to the reviews on design, so these are adopted. All four items that were owed are now drawn.
 
-**Reaching Edit and Archive.** Until Habit detail exists, a tap on a habit's name opens the Edit form. Touch and hold on a row opens a menu with Edit, Archive and Move. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows for a few seconds. Drawn in `sheet-m1.png`.
+**Reaching Edit and Archive.** A tap on a habit's name logs. A swipe left on a row shows Edit and Archive. Touch and hold on the name opens a menu with Edit, Archive and Move. VoiceOver offers the same three as actions on the row. The owner decided this on 15 November 2026. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows until the next action. The menu is drawn in `sheet-m1.png`.
 
 **Order.** Manual reorder is in milestone 1, using the system list edit mode and VoiceOver move actions. Done rows stay where they are, so a row never moves under a thumb.
 
@@ -295,7 +310,7 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 
 **New habit.** The name is the only required field. Defaults are Yes or no, every day, and the first symbol. Unit and "One tap adds" sit under one "More" row in New habit and are open in Edit. A sentence under the day circles restates the choice, for example "Every day except Thursday". Day letters use two letters where initials repeat. The name placeholder models a plan with a cue: "Stretch after brushing teeth". If Add is disabled, a line says why.
 
-**Controls that differ.** A counted control shows a small plus inside the square until the target is met, so it reads as "adds" before the tap. Drawn in `sheet-m1.png`. After a yes-or-no log is taken back, one line with Undo shows for a few seconds.
+**Controls that differ.** A counted control shows a small plus inside the square until the target is met, so it reads as "adds" before the tap. Drawn in `sheet-m1.png`. After a yes-or-no log is taken back, one line with Undo shows until the next action.
 
 **Feedback.** A mark draws in as one short stroke, under 300 ms. With Reduce Motion it swaps with no animation. The count line changes on every tap. There is no all-done banner.
 
@@ -344,7 +359,7 @@ Accessibility, UI and UX, and a combined behavioural and returning-user review l
 
 **Year.** Each month is one button, 44 points high: its label and its block of weeks. A week belongs to the month that holds its Monday. The year starts at the month of the "Since" date. VoiceOver reads one element per month, for example "June 2026. 22 days done, 3 part done, 2 paused. Opens the month." At accessibility text sizes the grid becomes a list of months as text rows.
 
-**History tab.** A whole row is one button and one VoiceOver element. A tap on a past cell opens the day sheet. A tap on the name opens detail. Today's cell is drawn as the thin today outline at mark size, not as the Today control. An off-schedule day shows a small dot, so a habit set for three days a week does not look half empty. Owed drawings: month and year, no habits, 30 habits, the largest text size.
+**History tab.** A whole row is one button and one VoiceOver element. A tap on a past cell opens the day sheet. A tap on the name opens Habit detail. History is not a place to log today, so the name does not log here as it does on Today. Today's cell is drawn as the thin today outline at mark size, not as the Today control. An off-schedule day shows a small dot, so a habit set for three days a week does not look half empty. Owed drawings: month and year, no habits, 30 habits, the largest text size.
 
 **Import and export.** After a file is picked, a preview says what the file holds and what is new, with Import and Cancel. A file with nothing new ends on "Nothing new in this file". A file that is not a Habit export and a file from a newer version get separate messages. First-run Today has a second, quiet action, "Import a copy". Export and Import rows are buttons with no chevron. Owed: rules for a habit whose id exists but whose details differ, for a habit archived here and live in the file, and whether pauses and settings are in the file.
 
@@ -367,12 +382,18 @@ Accessibility, UI and UX, and a combined behavioural and returning-user review l
 - "Since" and the first month of the year view use the earlier of the day the habit was added and its first log. The previous-year arrow is on when that falls in an earlier year.
 - The week view puts the date beside the weekday, so the only number under a mark is the count.
 - Day sheet: Add and Mark done write, close the sheet and show the Undo line. "Take away" and "Clear this day" are text buttons under Add. Take away cannot go below zero. A yes-or-no day that is done shows "Done" and "Clear this day".
-- The Undo line sits above the tab bar and covers nothing. It is announced ("Cleared 7 November. Undo available"). With VoiceOver or Switch Control on it stays until the next action.
+- The Undo line sits above the tab bar and covers nothing. It is announced ("Cleared 7 November. Undo available"). It stays until the next action, for everyone, as milestone 1 built it.
 - Import: a habit whose id is here with different details keeps this device's version. The preview says how many differ (**Guess**, to be checked by the engineering and QA reviews).
 - "Add a past day", the period arrows, the period title and text buttons have a 44 point hit area.
 - The year grid has an `AXChartDescriptor`.
 
 Not adopted: filling the past-day amount with what is left to the target. A past-day fix is as often small as full, and the field already takes any typed number.
+
+**Reaching Habit detail from Today.** The row menu and the swipe actions gain "Details", beside Edit and Archive. VoiceOver gets the same action. The word is not "History", because that is now the tab (**Guess**, for the content review at the milestone 2 build). A name tap on Today still logs.
+
+**A log on a day off.** It draws the diamond and reads "Logged on a day off", as milestone 1 built it. The day sheet for such a day shows that after a log.
+
+**Export needs the owner.** A file of the user's habits leaves the app when the user shares it. That is a privacy matter, so the reviews cannot approve it. Also owed before the build, for the engineering and QA reviews: a habit archived here and live in the file, whether pauses and settings are in the file, and whether the file keeps the device id.
 
 **Words.** "No history yet" becomes "Nothing logged so far" and shows only for a habit with no logs ever.
 

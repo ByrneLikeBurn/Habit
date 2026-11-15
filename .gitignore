@@ -8,3 +8,4 @@ __pycache__/
 .venv/
 node_modules/
 /tmp/
+Config/Local.xcconfig

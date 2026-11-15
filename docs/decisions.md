@@ -46,6 +46,60 @@ One entry per decision that changed the brief. Each says what changed and why, i
 
 **The Pencil control square stays dark.** The senior designer wanted it in soft grey so empty rows go quiet. The accessibility review wanted it easy to find. Accessibility wins, because the square is the thing the user taps and the goal is inclusion from the first milestone. The line gets thinner, which answers the designer's point about weight.
 
+## 15 November 2026, milestone 1
+
+**The shared store works with free signing.** A throwaway project with an app and a widget shared one App Group on the owner's iPhone. The widget read what the app wrote in shared settings, a file and a SwiftData store. Milestone 1 builds on that store.
+
+**Day keys use the Gregorian calendar.** A key is yyyymmdd, and a non-Gregorian calendar would make stored keys mean different days for different users. Keys are Gregorian in the user's time zone, and dates are shown in the user's own calendar.
+
+**Two tabs until history exists.** Progress has nothing to show before the heat map in milestone 2. An empty tab is a dead end, so Today and You are the only tabs until then.
+
+**An off-schedule log reads "Logged on a day off".** The data rules credit a log on an off-schedule day like a log on a paused day, and both draw the diamond. "Logged while paused" would be untrue on a day that was never paused, so VoiceOver and the marks board use their own words for it.
+
+**A part-done day extends a run.** The spec says a part-done day never breaks a run. Something is better than nothing, so it also counts toward the run, as any logged day does. A tested rule keeps it from drifting later.
+
+**The models hold what milestone 1 uses.** `Habit` has the fields milestone 1 needs, and `Pause` exists now so the set of models does not change in milestone 3. Focus, nudge, tag and descriptor fields are added in the milestone that first uses them, which the additive schema rule allows without a new schema version.
+
+**An empty tap amount opens the count sheet.** `tapAmount` is optional with a default of 1, and empty means a tap opens the sheet. That is what the spec asks for above a target of 20, and it needs no special number.
+
+**A yes-or-no tap always lifts the day to done.** Two devices taking back one log offline can leave a total of −1, which shows as 0. A tap then writes enough to reach 1, so it is never swallowed. Typed amounts are always written as typed.
+
+**Archived habits still log from Shortcuts.** A tag or shortcut that stopped working would break invariant 4. The intent logs it and says the habit is archived and can be brought back in You.
+
+**The Undo line waits for VoiceOver.** It shows for five seconds. With VoiceOver on it stays until the next action, because five seconds is too short to reach the button. System undo also takes back the last log.
+
+**The count sheet amount starts selected.** The UI test found that typing 12 after the tap amount of 1 gave 112. The amount now starts focused and selected, so typing replaces it and Add still works with no typing.
+
+**Mark colour sits on the Appearance page.** The milestone 1 mockup shows the eight swatches on the page itself. The separate "Marks" list in the spec comes with "Follow the scene" in milestone 5.
+
+**Large text gets lists where controls do not grow.** A segmented control keeps its small text at accessibility sizes. At those sizes Kind and Light or dark become lists, and symbol cells grow with the text.
+
+**Each reason sits under its field.** If Add is disabled, the reason appears under the field that causes it: the name, the target, the tap amount or the days. A reason at the bottom of the form would be off screen while the keyboard is up.
+
+**Cancel asks before throwing away changes.** A swipe down is blocked when the form has changes, and Cancel asks "Discard changes?". Without changes Cancel closes at once.
+
+**The signing team is not committed.** The team id lives in `Config/Local.xcconfig`, which git ignores, with an example file beside it. The repo is public and the id is tied to a person.
+
+**Screenshots are half-size JPEGs.** Thirty-seven PNGs at full size would add about 20 MB to a public repo. `tools/screenshots/m1.sh` makes them the same way each time.
+
+**A shortcut only ever logs.** The QA review found that running a yes-or-no shortcut twice took the log back, because a tap toggles. Shortcuts, Siri and NFC now mean "log", and Take away with no amount takes away one tap. In-app taps still toggle, as the spec says.
+
+**Every counted change shows Undo.** The tired daily user review found that an extra tap on a counted habit had no quick way back. Every add and take-away on a counted habit now shows its new count with Undo. A yes-or-no log shows only its mark.
+
+**The Undo line stays until the next action.** The accessibility review found five seconds too short for Switch Control and Voice Control users. The line now stays until the next log or archive, for everyone. This replaces the earlier five-second rule.
+
+**Typed numbers stop at 1,000,000.** The QA review showed that a huge number could overflow a sum and crash the app at every launch. Typing, Shortcuts and writes share one cap.
+
+**The count sheet opens full height at large text.** The accessibility review found the keyboard hid the total at AX5. At accessibility sizes the sheet opens full height and waits for a tap on the amount.
+
+**A tap on the name logs.** The tired daily user review found most of a row opened Edit, so a tired tap on the name did nothing useful. The spec had the name open Edit, from the inclusion and human factors reviews. The owner chose the log on 15 November 2026. Edit and Archive are in swipe actions and the touch-and-hold menu, and a wrong log has Undo.
+
+**Logging needs an unlocked device.** The security review found that Siri could read habit names and counts aloud on a locked phone. Habit names can be health details. The owner decided on 15 November 2026 that every intent needs an unlocked device, and a test checks each intent in every target.
+
+**The branch history was rewritten.** The first nine milestone 1 commits carried the owner's personal email. The owner approved a rewrite and force push on 15 November 2026. The commits now carry the GitHub noreply address, and their contents did not change.
+
+## 15 November 2026, milestone 2 design
+
 **Future days in the month view show the date alone.** The accessibility review wanted a faint dashed box so a future day differs from a blank past day. The senior designer wanted it gone because it was the loudest thing on the screen and said the least. The "Add a past day" button now gives a clear way to log a past day, so the boxes no longer earn their place.
 
 **Every addition must earn its place.** The owner set this as the test when two reviews disagree: it must add value and fit the vision and the expert reviews.
@@ -54,11 +108,11 @@ One entry per decision that changed the brief. Each says what changed and why, i
 
 **The Progress tab is now History.** Three reviews agreed (behavioural, neurodiversity and returning user, content). "Progress" implies a direction, so a quiet week reads as a lack of it. "Log" was ruled out because the app already uses it for an entry.
 
-**A part-done day extends a run.** The same three reviews agreed. If 5 of 8 did not count, the run would treat a small log the same as no log, which teaches that only the full target counts. The rule is now one sentence for every habit kind: any scheduled day with a log counts.
-
 **After a gap, Current run reads "Between runs".** The reviews first split three ways: hide the row, "Starts with any log", or a state phrase. In a second round all three accepted the state phrase, because it shows no zero, gives no instruction and keeps the row the user asked for. Before the first log it reads "No run yet".
 
 
 **A day that is not scheduled shows a small dot.** The brief drew it blank, the same as a day with nothing logged. The accessibility and tired-user reviews found that a returning user counts those blanks as gaps, and that the app showed "off" three different ways. One dot is now used in week, month, year and History.
 
 **A History row puts the name above its seven days.** The UI and accessibility reviews found the day cells were 23 points apart, so a thumb aimed at Wednesday could open Tuesday. Each cell is now 44 points wide.
+
+**Three reviews confirmed that a part-done day extends a run.** Milestone 1 already built it that way. The behavioural, neurodiversity and content reviews reached the same answer on their own.
