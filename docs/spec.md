@@ -270,11 +270,37 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 
 **Owner**, 14 November 2026: design, UI and UX questions follow the expert reviews.
 
-- Milestone 1 holds the Edit form and Archive. Restore, Recently Deleted and purge stay in milestone 11. Kind is locked after the first log.
+- Milestone 1 holds the Edit form and Archive. Recently Deleted and purge stay in milestone 12. Kind is locked after the first log.
 - The default tap amount is 1 when the target is 20 or less. Above that it is empty, which means a tap opens the count sheet.
 - You has one setting for which side the control sits on.
 - There are three tabs: Today, Progress, You. Tags is a row in You, on iPhone only.
 - In the month view a future day shows its date alone. The faint dashed outline is kept for the week view.
+
+## Milestone 1 screens, after the inclusion reviews
+
+The behavioural scientist, neurodiversity and returning-user lenses reviewed `docs/mockups/png/sheet-m1.png`. The owner defers to the reviews on design, so these are adopted. Items marked "to draw" are not in the mockups yet.
+
+**Reaching Edit and Archive.** Until Habit detail exists, a tap on a habit's name opens the Edit form. Touch and hold on a row opens a menu with Edit, Archive and Move. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows for a few seconds. To draw.
+
+**Order.** Manual reorder is in milestone 1, using the system list edit mode and VoiceOver move actions. Done rows stay where they are, so a row never moves under a thumb.
+
+**Not scheduled today.** Today ends with one collapsed row, "Not scheduled today". It opens to those habits with the same controls. A log there is extra credit. To draw.
+
+**New habit.** The name is the only required field. Defaults are Yes or no, every day, and the first symbol. Unit and "One tap adds" sit under one "More" row in New habit and are open in Edit. A sentence under the day circles restates the choice, for example "Every day except Thursday". Day letters use two letters where initials repeat. The name placeholder models a plan with a cue: "Stretch after brushing teeth". If Add is disabled, a line says why.
+
+**Controls that differ.** A counted control shows a small plus inside the square until the target is met, so it reads as "adds" before the tap. To draw. After a yes-or-no log is taken back, one line with Undo shows for a few seconds.
+
+**Feedback.** A mark draws in as one short stroke, under 300 ms. With Reduce Motion it swaps with no animation. The count line changes on every tap. There is no all-done banner.
+
+**Day boundary.** Between midnight and the day-start hour, Today shows "Until 04:00" under the date. The day-start setting has the caption "Logs before this time count for the day before."
+
+**Stats.** Habit detail leads with Days done, with its start date, and for a counted habit a total in the user's unit. Longest run and Current run are behind one switch, "Show runs". "Show days not logged" is a separate switch. A run row is never hidden at zero.
+
+**Pausing one habit.** Milestone 3 adds "Pause this habit" to the Edit form and the row menu, open-ended, with Resume in the same place. Gentle Mode is reachable from Today as well as from You. The Vacation form says the start can be in the past.
+
+**Year view.** It starts at the habit's first month, labels months, and a tap on a month opens it.
+
+**Words.** "Nothing set for today" replaces "Nothing is due today". The Archive caption leads with "You can bring it back at any time."
 
 ## Open decisions
 
@@ -282,6 +308,10 @@ Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
+| A | A counted habit may have no target. Any log then draws as done. Three reviews say a required target turns a count into a pass or fail test | Yes. It changes the locked "Habit kinds" row, and it is additive in the schema | Milestone 1 |
+| B | A part-done day never breaks a run, and Habit detail counts "Days logged" beside "Days done" | Yes | Milestone 1 |
+| C | One Home Screen widget inside the minimum app. Without one, milestones 1 to 3 give the user no cue to open the app | Yes, in milestone 3, if the App Group test passes | Milestone 3 |
+| D | Rename "Extra credit". Three reviews read it as grading language | "Logged while paused" | Milestone 3 |
 | 2 | The data rules | Accept as written | Milestone 1 |
 | 3 | The usage data page | Build it in milestone 13 from the existing log fields | Milestone 13 |
 | 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
