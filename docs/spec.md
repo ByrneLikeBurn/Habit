@@ -456,6 +456,15 @@ Drawn in `docs/mockups/png/sheet-ax.png`. The accessibility and low-vision revie
 - The widget shows two rows, with no symbol and no plus. The whole row is the button.
 - Not checked: a phone smaller than 393 by 852 points.
 
+## Mac window, milestones 2 and 3
+
+Drawn in `docs/mockups/png/sheet-mac.png`. First draft, 15 November 2026, not yet reviewed (**Guess**). The Watch app is milestone 7, so no Watch screens are owed for milestones 2 and 3.
+
+- The sidebar takes the place of the tab bar: Today, History, You. The page keeps the phone's width, centred.
+- A past day and the forms open as sheets on the window.
+- Every action has a menu bar command. Habit menu: New Habit, Log Selected Habit, Add an Amount, Take Back Last Log, Details, Edit, Pause This Habit, Archive, Pause Everything, Pause for Dates, Add a Past Day. View menu: Today, History, You, Week, Month, Year, Previous Period, Next Period, Go to Today. File menu: Export a Copy, Import a Copy.
+- The shortcuts in the drawing are proposals.
+
 ## Open decisions
 
 Each needs the owner. The recommendation is mine.

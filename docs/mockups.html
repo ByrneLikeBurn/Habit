@@ -338,6 +338,23 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .axtog .tog{margin-left:0;width:92px;height:56px;border-radius:28px;background:var(--fill);border:1.5px solid var(--text3)}
 .axtog .tog::after{width:48px;height:48px;left:3px;top:2.5px}
 .axtog b{font:500 40px/1 var(--ui)}
+.mac .status,.mac .tabbar{display:none}
+.mac .main{position:relative}
+.mac .page{overflow:hidden}
+.mac .page .nav{margin-top:-6px}
+.macsheet{position:absolute;left:50%;top:60px;width:393px;transform:translateX(-50%);background:var(--paper);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3);border:.5px solid var(--rule2);padding-bottom:24px}
+.macsheet .grab{display:none}
+.mac .main:has(.macsheet) .page{opacity:.45}
+.macmenus{width:940px;height:520px;position:relative;background:var(--paper);color:var(--text);font:400 13px/1 var(--ui);border:1px solid rgba(0,0,0,.2);border-radius:12px;overflow:hidden}
+.menubar{display:flex;gap:18px;align-items:center;height:28px;padding:0 16px;background:rgba(120,115,105,.14);border-bottom:1px solid var(--rule2)}
+.menubar .on{background:var(--fill);padding:5px 8px;border-radius:5px;margin:0 -8px}
+.mmenu{position:absolute;left:150px;top:34px;width:250px;background:var(--paper);border:.5px solid var(--rule2);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:5px}
+.mmenu.v{left:430px}
+.mmenu.v.f{left:680px}
+.mmenu b{display:block;padding:6px 10px;color:var(--text2);font-weight:600}
+.mmenu div{display:flex;justify-content:space-between;padding:6px 10px}
+.mmenu kbd{font:400 13px/1 var(--ui);color:var(--text2)}
+.mmenu hr{border:0;border-top:1px solid var(--rule);margin:4px 8px}
 .ymons{display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 21px 0}
 .ym{display:grid;gap:5px;min-height:44px;align-content:start}
 .ym span{font:500 11px/1 var(--ui);color:var(--text3)}
@@ -1023,6 +1040,21 @@ function axYou(style){
 }
 function axWidget(style){ return `<div class="wtitle">Today</div>${WH.slice(0,2).map(h=>`<div class="wr" role="button"><span class="wn"><b>${h.name}</b></span>${mark(h.state,{style,size:34,today:true,ctl:true})}</div>`).join("")}`; }
 
+/* ---------- Mac window, milestones 2 and 3 ---------- */
+// The Mac uses the sidebar in place of the tab bar and keeps the phone's page width. Sheets are sheets on the window.
+const macWin = (on, body, over)=>{ const side = [["today","Today"],["progress","History"],["you","You"]].map(([k,l])=>`<div class="it ${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("");
+  return `<div class="side"><div class="lights"><i></i><i></i><i></i></div>${side}</div><div class="main"><div class="page">${body}</div>${over?`<div class="macsheet">${over}</div>`:""}</div>`; };
+const macToday = s=>macWin("today", m3Today(s));
+const macPaused = s=>macWin("today", m3PausedNew(s));
+const macDetail = s=>macWin("today", m2MonthRuns(s));
+const macHistory = s=>macWin("progress", m2Progress(s));
+const macYou = s=>macWin("you", m3You(s));
+const macDay = s=>macWin("today", m2Month(s), m2DayLogged(s));
+const macMenu = s=>`<div class="menubar"><b>Habit</b><span>File</span><span>Edit</span><span class="on">Habit</span><span>View</span><span>Window</span><span>Help</span></div>
+  <div class="mmenu">${[["New Habit","⌘N"],["Log Selected Habit","Space"],["Add an Amount…","⌘L"],["Take Back Last Log","⌘Z"],null,["Details","⌘I"],["Edit…","⌘E"],["Pause This Habit",""],["Archive","⌘⌫"],null,["Pause Everything","⇧⌘P"],["Pause for Dates…",""],null,["Add a Past Day…","⇧⌘D"]].map(x=>x?`<div><span>${x[0]}</span><kbd>${x[1]}</kbd></div>`:`<hr>`).join("")}</div>
+  <div class="mmenu v"><b>View</b>${[["Today","⌘1"],["History","⌘2"],["You","⌘3"],null,["Week","⌥⌘1"],["Month","⌥⌘2"],["Year","⌥⌘3"],null,["Previous Period","⌘["],["Next Period","⌘]"],["Go to Today","⌘T"]].map(x=>x?`<div><span>${x[0]}</span><kbd>${x[1]}</kbd></div>`:`<hr>`).join("")}</div>
+  <div class="mmenu v f"><b>File</b>${[["Export a Copy…","⇧⌘E"],["Import a Copy…","⇧⌘I"]].map(x=>`<div><span>${x[0]}</span><kbd>${x[1]}</kbd></div>`).join("")}</div>`;
+
 /* ---------- page ---------- */
 const SCREENS = {today:[today,"Today"], detail:[detail,"Habit detail"], gentle:[gentle,"Gentle Mode on Today"], appearance:[appearance,"Appearance"], marks:[marks,"Marks board"]};
 const css = v=>Object.entries(v).map(([k,x])=>`${k}:${x}`).join(";");
@@ -1092,6 +1124,15 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
              ["widget","widget axw",axWidget,"Widget at its largest text"]];
   html += `<h2 class="group">Largest text size (AX5), milestones 2 and 3</h2><div class="sheet">`;
   for(const [k,cls,fn,label] of G) html += `<figure><div class="${cls} ${s} paper" data-shot="ax-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `</div>`; M1 = false;
+}
+{ // Mac window, milestones 2 and 3
+  M1 = true;
+  const s = "penAndInk", v = css({...vars(s,"paper"), "--accent":TOKENS.swatches.blue});
+  const G = [["today",macToday,"Mac, Today"],["paused",macPaused,"Mac, Today paused"],["detail",macDetail,"Mac, Habit detail"],["history",macHistory,"Mac, History"],["you",macYou,"Mac, You"],["day",macDay,"Mac, a past day as a sheet"]];
+  html += `<h2 class="group">Mac window, milestones 2 and 3</h2><div class="sheet">`;
+  for(const [k,fn,label] of G) html += `<figure><div class="mac ${s} paper" data-shot="mac-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `<figure><div class="macmenus ${s} paper" data-shot="mac-menus" style='${v}'>${macMenu(s)}</div><figcaption>Mac, menu bar commands</figcaption></figure>`;
   html += `</div>`; M1 = false;
 }
 for(const [style,list] of Object.entries(FONTS)){
