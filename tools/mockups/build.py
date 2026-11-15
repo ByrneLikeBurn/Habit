@@ -49,7 +49,7 @@ def tile(seed: int, sigmas, weights, size: int = 512) -> np.ndarray:
 def grain_tiles() -> None:
     """Paper grain. Alpha never exceeds the maxAlpha in tokens.json, which is what the contrast check assumes."""
     d = OUT / "grain"; d.mkdir(parents=True, exist_ok=True)
-    recipes = {"pencil": ((0.7, 1.6, 5.0), (0.6, 0.5, 0.25), 1.6),      # fine tooth
+    recipes = {"pencil": ((1.3, 3.2, 10.0), (0.45, 0.6, 0.55), 1.25),      # fine tooth
                "watercolor": ((1.4, 3.2, 9.0), (0.35, 0.6, 0.35), 2.2)}  # cold-press dimples
     for style, (sig, wts, power) in recipes.items():
         n = tile(11 if style == "pencil" else 23, sig, wts) ** power

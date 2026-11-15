@@ -37,3 +37,5 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **"Extra credit" became "Logged while paused".** Three reviews read the old name as grading language. The rule itself did not change.
 
 **Data rules accepted.** Ten rules for how logs are stored, from the engineering and QA reviews. They are fixed before milestone 1 because stored data can only be added to later.
+
+**Pencil marks redrawn.** The senior designer found that Pencil read as Pen and ink with a marker font. Done is now cross-hatched and part done is hatched one way, so the two differ by shape and each stroke shows. The font is lighter and the paper tooth is coarser.

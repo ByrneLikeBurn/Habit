@@ -146,7 +146,9 @@ One drawing has one meaning.
 
 **Dark material. To design.** Ink is a dark paper, and each style needs a stated material on it: light ink in Pen and ink, light and coloured pencil in Pencil, opaque paint in Watercolor. In Ink the scene's lightest value sits below the heading text. The Pen and ink frame is one hairline in the rule colour in both appearances.
 
-**Pencil. To design before milestone 4.** The senior designer review found that Pencil reads as Pen and ink with a marker font. Owed: done marks as visible strokes at 56 degrees with stroke ends showing, rules drawn by hand, paper tooth that shows on a phone, a lighter weight of the display font, and a Today control that is the four-stroke square, with the hand circle kept for today in calendars.
+**Pencil, first pass done.** Done is cross-hatched with visible strokes. Part done is three strokes one way. The Today control is a square of four strokes, and the hand circle is kept for today in calendars. Rules are pencil lines, the paper tooth is coarser, and the display font is lighter (weight 380, was 450). Still owed: a review by the senior designer and the typographer, and the dark version.
+
+**Pencil, the finding that started it.** The senior designer review found that Pencil reads as Pen and ink with a marker font. Owed: done marks as visible strokes at 56 degrees with stroke ends showing, rules drawn by hand, paper tooth that shows on a phone, a lighter weight of the display font, and a Today control that is the four-stroke square, with the hand circle kept for today in calendars.
 
 **Screens not drawn yet.** You, Progress, Tags, Vacation, the Edit form, the accent and palette lists, the hue ring, the day sheet, export and import, Archive, week and year views in place, and the Mac and Watch versions of the sheets. Each is mocked with its states at the start of the milestone that builds it (**Guess**). States owed for the drawn screens are listed in `docs/reviews/phase-1.md`.
 
