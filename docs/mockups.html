@@ -329,6 +329,15 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .widget.axw .wn b{font-size:19px}
 .widget.axw .wtitle{font-size:19px}
 .widget.axw .wr{min-height:62px}
+.ax5 .opt.axview{padding:10px 0}
+.ax5 .opt .go{top:50%;margin-top:-14px}
+.ax5 .opt .go svg{width:16px;height:28px;opacity:1}
+.ax5 .nav .btn svg{width:30px;height:30px}
+.axm{width:60px;flex:none;display:grid;place-items:center}
+.axtog{display:flex;align-items:center;gap:18px;margin:4px 21px 16px;transform:none;height:auto}
+.axtog .tog{margin-left:0;width:92px;height:56px;border-radius:28px;background:var(--fill);border:1.5px solid var(--text3)}
+.axtog .tog::after{width:48px;height:48px;left:3px;top:2.5px}
+.axtog b{font:500 40px/1 var(--ui)}
 .ymons{display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 21px 0}
 .ym{display:grid;gap:5px;min-height:44px;align-content:start}
 .ym span{font:500 11px/1 var(--ui);color:var(--text3)}
@@ -758,7 +767,7 @@ const detailTop = (sel)=>status()+`<div class="nav"><span class="btn">${chev}&nb
   <div class="seg"><span class="${sel===0?"on":""}">Week</span><span class="${sel===1?"on":""}">Month</span><span class="${sel===2?"on":""}">Year</span></div>`;
 const stat = (l,v)=>`<div class="stat"><span>${l}</span><b>${v}</b></div>`;
 const marksRow = `<div class="opt" style="margin-top:14px">What the marks mean<span class="go">${chev}</span></div>`;
-const offDot = s=>`<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" aria-hidden="true"><circle cx="${s/2}" cy="${s/2}" r="2.6" fill="var(--text3)"/></svg>`;
+const offDot = s=>`<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" aria-hidden="true"><circle cx="${s/2}" cy="${s/2}" r="${Math.max(2.6,s*0.11).toFixed(1)}" fill="var(--text3)"/></svg>`;
 const HINT = `<p class="note hint">Tap a past day to add or change a log.</p>`;
 const addPast = `<div class="noteact"><span class="sysbtn ghost small">Add a past day</span></div>`;
 const since = `<p class="note hint since">Since 28 April 2026</p>`;
@@ -969,17 +978,17 @@ function m3WidgetEmpty(style){ return `<div class="wtitle">Today</div><p class="
 function m3WidgetNone(style){ return `<div class="wtitle">Today</div><p class="wnote">Nothing scheduled today.</p>`; }
 
 /* ---------- largest text size (AX5), milestones 2 and 3 ---------- */
-const axView = v=>`<div class="opt">View<span class="val">${v}</span><span class="go">${chev}</span></div>`;
+const axView = v=>`<div class="opt axview" role="button">View: ${v}<span class="go">${chev}</span></div>`;
 const axDetailTop = v=>status()+`<div class="nav"><span class="btn">${chev}&nbsp;Today</span><span class="btn">Edit</span></div>${head("Drink water")}${axView(v)}`;
 function axMonth(style){
+  const W = [["9 to 15 November","3 done, 1 part done"],["2 to 8 November","3 done, 1 part done, 2 paused"],["26 October to 1 November","6 done"]];
   return axDetailTop("Month")+`<div class="month"><b class="plink">November 2026</b></div><div class="mnav axnav"><i>${chev}</i><i class="off">${chev}</i></div>
-  ${monthGrid(style,false)}${addPast}${since}
-  <div class="stats">${stat("Days logged","171")}${stat("Glasses","1,104")}</div>`;
+  <div class="axlist">${W.map(([m,t])=>`<div class="axr" role="button"><span><b>${m}</b><small>${t}</small></span></div>`).join("")}</div>${addPast}`;
 }
 function axWeek(style){
-  const W = [["Mon 9","solid","8 glasses"],["Tue 10","blank","Nothing logged"],["Wed 11","solid","8 glasses"],["Thu 12","off","Not scheduled"],["Fri 13","solid","8 glasses"],["Sat 14","hatched","3 glasses"]];
+  const W = [["Mon 9","solid","8 glasses"],["Tue 10","blank","Nothing logged"],["Wed 11","solid","8 glasses"],["Thu 12","off","Not scheduled"],["Fri 13","solid","8 glasses"],["Sat 14","hatched","3 glasses"],["Sun 15","future","To come"]];
   return axDetailTop("Week")+`<div class="month"><b class="plink">9 to 15 November</b></div>
-  <div class="axlist">${W.map(([d,st,t],i)=>`<div class="axr" role="button">${st==="off"?offDot(52):mark(st,{style,size:52,today:i===5})}<span><b>${d}</b><small>${t}</small></span></div>`).join("")}</div>`;
+  <div class="axlist">${W.map(([d,st,t],i)=>`<div class="axr" role="button"><i class="axm">${st==="off"?offDot(52):mark(st,{style,size:52,today:i===5})}</i><span><b>${d}</b><small>${t}</small></span></div>`).join("")}</div>`;
 }
 function axYear(style){
   const M = [["November","9 done, 2 part done, 2 paused"],["October","24 done, 2 part done"],["September","19 done, 4 part done, 3 paused"],["August","22 done, 1 part done"]];
@@ -1008,11 +1017,11 @@ function axPaused(style){
 function axYou(style){
   return status()+`<div class="nav"><span></span><span></span></div>${head("You")}
   <div class="sec">${pauseGlyph}Gentle Mode</div>
-  <div class="opt desc"><span class="ol">Pause everything<small>Until you turn it off.</small></span></div><div class="axtog"><span class="tog"></span></div>
+  <div class="opt desc"><span class="ol">Pause everything<small>Until you turn it off.</small></span></div><div class="axtog"><span class="tog"></span><b>Off</b></div>
   <div class="opt desc"><span class="ol">Pause for dates<small>Choose a first and last day. Dates can be in the past.</small></span></div>
   <p class="note hint">${HELP}</p>`;
 }
-function axWidget(style){ return `<div class="wtitle">Today</div>${WH.slice(0,2).map(h=>wrow(h,style)).join("")}`; }
+function axWidget(style){ return `<div class="wtitle">Today</div>${WH.slice(0,2).map(h=>`<div class="wr" role="button"><span class="wn"><b>${h.name}</b></span>${mark(h.state,{style,size:34,today:true,ctl:true})}</div>`).join("")}`; }
 
 /* ---------- page ---------- */
 const SCREENS = {today:[today,"Today"], detail:[detail,"Habit detail"], gentle:[gentle,"Gentle Mode on Today"], appearance:[appearance,"Appearance"], marks:[marks,"Marks board"]};

@@ -441,17 +441,20 @@ Drawn in `docs/mockups/png/sheet-m3.png`, in Pen and ink. Three reviews saw the 
 
 ## Largest text size, milestones 2 and 3
 
-Drawn in `docs/mockups/png/sheet-ax.png`. First draft, 15 November 2026, not yet reviewed (**Guess**).
+Drawn in `docs/mockups/png/sheet-ax.png`. The accessibility and low-vision reviews saw the first draft on 15 November 2026. These are the rules after their findings.
 
-- Week, Month and Year become one "View" row that opens a list, as milestone 1 did for segmented controls.
-- Week is a list of days: mark, date and the day's count in words.
+- Week, Month and Year become one row, "View: Month", that opens a list. The whole row is the target.
+- Month is a list of weeks at accessibility sizes, each with its counts in words. The grid stays up to the largest standard size. The two reviews disagreed on keeping the grid and both accepted this.
+- Week is a list of all seven days: mark, date and the day's count in words. The mark sits in a column of fixed width. A day to come shows the dashed outline.
 - Year is a list of months as text.
-- Month keeps seven columns. Marks stay at 30 points and the date numerals are capped.
+- Marks, symbols and arrows are sized from the text style. The dot for a day not scheduled is at least 8 points.
 - Stats stack the label over the value.
 - A History row puts the name above seven cells.
 - The day sheet stacks Add, Take away and Clear this day as full-width buttons.
+- A switch sits on its own line at full size, with "On" or "Off" in words beside it.
 - The paused line on Today shows only its first sentence and its button.
-- The widget shows two rows.
+- The widget shows two rows, with no symbol and no plus. The whole row is the button.
+- Not checked: a phone smaller than 393 by 852 points.
 
 ## Open decisions
 
