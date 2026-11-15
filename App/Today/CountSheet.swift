@@ -15,6 +15,7 @@ struct CountSheet: View {
     @Environment(\.modelContext) private var context
     @Environment(\.undoManager) private var undoManager
     @State private var amountText: String
+    @State private var selection: TextSelection?
     @FocusState private var amountFocused: Bool
 
     init(habit: Habit, day: DayKey) {
@@ -49,7 +50,7 @@ struct CountSheet: View {
                         .font(style.label(.footnote))
                         .foregroundStyle(style.secondary)
                         .padding(.top, 16)
-                    TextField("Amount", text: $amountText)
+                    TextField("Amount", text: $amountText, selection: $selection)
                         .font(style.count(.title))
                         .foregroundStyle(style.text)
                         .multilineTextAlignment(.center)
@@ -89,7 +90,18 @@ struct CountSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
-        .onAppear { if habit.tapAmount == nil { amountFocused = true } }
+        .task {
+            // The amount starts selected, so typing replaces it and Add works at once.
+            try? await Task.sleep(for: .milliseconds(350))
+            amountFocused = true
+        }
+        .onChange(of: amountFocused) { _, focused in
+            guard focused else { return }
+            Task {
+                try? await Task.sleep(for: .milliseconds(50))
+                selection = TextSelection(range: amountText.startIndex..<amountText.endIndex)
+            }
+        }
     }
 
     @ViewBuilder

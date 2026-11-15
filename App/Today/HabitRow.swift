@@ -134,6 +134,7 @@ struct HabitRow: View {
         .buttonStyle(.plain)
         .accessibilityLabel(Text(countLine))
         .accessibilityHint(Text("Opens the count"))
+        .accessibilityIdentifier("count-\(habit.name)")
     }
 
     private var countLine: String {
@@ -163,6 +164,7 @@ struct HabitRow: View {
         .accessibilityValue(Text(accessibilityValue))
         .accessibilityHint(Text(accessibilityHint))
         .accessibilityAddTraits(.isButton)
+        .accessibilityIdentifier("control-\(habit.name)")
         .accessibilityAction { actions.log(.tap) }
         .modifier(CountAdjustable(habit: habit, log: actions.log, openCount: actions.openCount))
     }

@@ -200,7 +200,12 @@ struct HabitFormView: View {
                 // The default tap amount follows the target until the user types one.
                 if !tapEdited { tapText = CountText.defaultTapAmount(forTarget: target)?.formatted() ?? "" }
             }
-            .onAppear { if !isEdit { nameFocused = true } }
+            .task {
+                guard !isEdit else { return }
+                // Focus after the sheet has settled; earlier focus is dropped.
+                try? await Task.sleep(for: .milliseconds(350))
+                nameFocused = true
+            }
         }
     }
 

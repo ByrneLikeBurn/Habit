@@ -10,7 +10,18 @@
 		B00000000000000000000001 /* HabitKit in Frameworks */ = {isa = PBXBuildFile; productRef = B00000000000000000000083 /* HabitKit */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B00000000000000000000021 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B00000000000000000000099 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B00000000000000000000051;
+			remoteInfo = Habit;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		B00000000000000000000015 /* HabitUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HabitUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00000000000000000000010 /* Habit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Habit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00000000000000000000011 /* Habit.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Habit.xcconfig; sourceTree = "<group>"; };
 		B00000000000000000000012 /* Habit-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Habit-iOS.entitlements"; sourceTree = "<group>"; };
@@ -19,10 +30,12 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		B00000000000000000000042 /* AppUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = AppUITests; sourceTree = "<group>"; };
 		B00000000000000000000041 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; path = App; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B00000000000000000000062 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = ( ); runOnlyForDeploymentPostprocessing = 0; };
 		B00000000000000000000061 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -38,6 +51,7 @@
 			isa = PBXGroup;
 			children = (
 				B00000000000000000000041 /* App */,
+				B00000000000000000000042 /* AppUITests */,
 				B00000000000000000000014 /* HabitKit */,
 				B00000000000000000000072 /* Config */,
 				B00000000000000000000071 /* Products */,
@@ -48,6 +62,7 @@
 			isa = PBXGroup;
 			children = (
 				B00000000000000000000010 /* Habit.app */,
+				B00000000000000000000015 /* HabitUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -65,6 +80,27 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		B00000000000000000000052 /* HabitUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B000000000000000000000B2 /* Build configuration list for PBXNativeTarget "HabitUITests" */;
+			buildPhases = (
+				B00000000000000000000084 /* Sources */,
+				B00000000000000000000062 /* Frameworks */,
+				B00000000000000000000092 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B00000000000000000000022 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B00000000000000000000042 /* AppUITests */,
+			);
+			name = HabitUITests;
+			productName = HabitUITests;
+			productReference = B00000000000000000000015 /* HabitUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		B00000000000000000000051 /* Habit */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B000000000000000000000B1 /* Build configuration list for PBXNativeTarget "Habit" */;
@@ -101,6 +137,10 @@
 					B00000000000000000000051 = {
 						CreatedOnToolsVersion = 27.0;
 					};
+					B00000000000000000000052 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = B00000000000000000000051;
+					};
 				};
 			};
 			buildConfigurationList = B000000000000000000000B0 /* Build configuration list for PBXProject "Habit" */;
@@ -121,17 +161,28 @@
 			projectRoot = "";
 			targets = (
 				B00000000000000000000051 /* Habit */,
+				B00000000000000000000052 /* HabitUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B00000000000000000000092 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = ( ); runOnlyForDeploymentPostprocessing = 0; };
 		B00000000000000000000091 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = ( ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B00000000000000000000084 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = ( ); runOnlyForDeploymentPostprocessing = 0; };
 		B00000000000000000000081 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = ( ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B00000000000000000000022 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B00000000000000000000051 /* Habit */;
+			targetProxy = B00000000000000000000021 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		B000000000000000000000C0 /* Debug */ = {
@@ -244,6 +295,40 @@
 			};
 			name = Release;
 		};
+		B000000000000000000000C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.byrnelikeburn.Habit.UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Habit;
+			};
+			name = Debug;
+		};
+		B000000000000000000000C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.byrnelikeburn.Habit.UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Habit;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -261,6 +346,15 @@
 			buildConfigurations = (
 				B000000000000000000000C2 /* Debug */,
 				B000000000000000000000C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B000000000000000000000B2 /* Build configuration list for PBXNativeTarget "HabitUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B000000000000000000000C4 /* Debug */,
+				B000000000000000000000C5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
