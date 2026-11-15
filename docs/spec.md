@@ -357,6 +357,22 @@ Accessibility, UI and UX, and a combined behavioural and returning-user review l
 
 **Tab name.** The ledger tab is called "History". "Progress" implies a direction, so a quiet week reads as none. "Log" is already the app's word for an entry. The same three reviews agreed.
 
+**Second review, 15 November.** Accessibility, UI and UX, and the tired daily user looked at the redrawn sheet. Adopted:
+
+- A day the habit is not scheduled shows a small dot in week, month, year and History. It was blank in month, "Off" in week and a dot in History. The dot is in "What the marks mean".
+- Dates a user can tap are drawn in secondary text. Future dates are tertiary and are not buttons.
+- A History row puts the name above seven equal cells, each 44 points. Today is marked once in the header and by a thin outline in the cell. VoiceOver reads the row as one element with one action per day, for example "Open Tuesday 10 November". Cells take keyboard focus.
+- In the year view a month button is at least 44 points wide.
+- "Since" and the first month of the year view use the earlier of the day the habit was added and its first log. The previous-year arrow is on when that falls in an earlier year.
+- The week view puts the date beside the weekday, so the only number under a mark is the count.
+- Day sheet: Add and Mark done write, close the sheet and show the Undo line. "Take away" and "Clear this day" are text buttons under Add. Take away cannot go below zero. A yes-or-no day that is done shows "Done" and "Clear this day".
+- The Undo line sits above the tab bar and covers nothing. It is announced ("Cleared 7 November. Undo available"). With VoiceOver or Switch Control on it stays until the next action.
+- Import: a habit whose id is here with different details keeps this device's version. The preview says how many differ (**Guess**, to be checked by the engineering and QA reviews).
+- "Add a past day", the period arrows, the period title and text buttons have a 44 point hit area.
+- The year grid has an `AXChartDescriptor`.
+
+Not adopted: filling the past-day amount with what is left to the target. A past-day fix is as often small as full, and the field already takes any typed number.
+
 **Words.** "No history yet" becomes "Nothing logged so far" and shows only for a habit with no logs ever.
 
 **Fixture faults found.** The year strip started at May while the stats said 28 April. The month with runs on showed a run of 2 where the marks give 3.

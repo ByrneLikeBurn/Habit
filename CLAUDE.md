@@ -59,7 +59,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 - Text contrast floor, every style, paper / ink: body 17.7:1 / 16.2:1, secondary 6.8:1 / 8.3:1, tertiary 4.8:1 / 5.1:1. Measured against the worst pixel of the style's paper.
 - State is carried by shape, never by wash colour or intensity.
-- Mark states: solid (done), hatched (part done), centred dash (paused), diamond (logged while paused), blank (off schedule, or nothing logged), dashed outline at reduced opacity (to come). Today is an outline overlaid on the day's state.
+- Mark states: solid (done), hatched (part done), centred dash (paused), diamond (logged while paused), small dot (off schedule), blank (nothing logged), dashed outline at reduced opacity (to come). Today is an outline overlaid on the day's state.
 - A past day with no log draws nothing. The empty outline for such a day, and the current run, appear only when the user turns on "Show days not logged". The owner decided this on 14 November 2026.
 - The year view carries state by small shapes, never by opacity. The owner decided this on 14 November 2026.
 - The user's accent choice comes first. Following the palette is the default option, not a rule. A custom colour is picked by hue. Any hue is allowed, red included. The app sets its lightness so marks keep 3:1. The app's own tokens, swatches and palettes never use red.

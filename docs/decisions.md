@@ -57,3 +57,7 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **A part-done day extends a run.** The same three reviews agreed. If 5 of 8 did not count, the run would treat a small log the same as no log, which teaches that only the full target counts. The rule is now one sentence for every habit kind: any scheduled day with a log counts.
 
 **After a gap, Current run reads "Between runs".** The reviews first split three ways: hide the row, "Starts with any log", or a state phrase. In a second round all three accepted the state phrase, because it shows no zero, gives no instruction and keeps the row the user asked for. Before the first log it reads "No run yet".
+
+**A day that is not scheduled shows a small dot.** The brief drew it blank, the same as a day with nothing logged. The accessibility and tired-user reviews found that a returning user counts those blanks as gaps, and that the app showed "off" three different ways. One dot is now used in week, month, year and History.
+
+**A History row puts the name above its seven days.** The UI and accessibility reviews found the day cells were 23 points apart, so a thumb aimed at Wednesday could open Tuesday. Each cell is now 44 points wide.
