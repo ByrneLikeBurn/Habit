@@ -103,7 +103,8 @@ One drawing has one meaning.
 | Part done | Hatched | A counted habit has some logs and is under target |
 | Paused | Centred dash | The day is paused and has no log |
 | Extra credit | Diamond, as large as a done mark | The day is paused and has a log |
-| Blank | Nothing | The day is off schedule, or it has no log |
+| Dot | A small dot | The habit is not scheduled that day |
+| Blank | Nothing | The day has no log |
 | To come | Dashed outline, faint | The day is in the future and scheduled |
 | Not logged | Empty outline | A past scheduled day with no log, and only when Show days not logged is on |
 
