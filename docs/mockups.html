@@ -288,6 +288,10 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .wtitle span{font-size:12px}
 .note.quiet{margin-top:18px}
 .sheetnav b.dis{opacity:.35}
+.opt.desc{min-height:60px}
+.ol{display:grid;gap:3px}
+.ol small{font:400 13px/1.3 var(--ui);color:var(--text2)}
+.pg{vertical-align:-2px;margin-right:5px}
 .ymons{display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 21px 0}
 .ym{display:grid;gap:5px;min-height:44px;align-content:start}
 .ym span{font:500 11px/1 var(--ui);color:var(--text3)}
@@ -856,9 +860,10 @@ function m2Empty(style){
 const PAUSED_ALL = ["paused","extra","paused","paused","paused","paused"];
 const pill = t=>`<span class="pill">${t}</span>`;
 const pausedRows = style=>`<div class="list">${HABITS.map((h,i)=>row(i===0?{...h,count:false}:h,style,PAUSED_ALL[i],i===0?pill("0 glasses"):(i===1?"Logged while paused":""))).join("")}</div>`;
+const pauseGlyph = `<svg class="pg" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M5.4 4.6v4.8M8.6 4.6v4.8"/></svg>`;
 const HELP = "Paused days leave your runs as they are. You can still log.";
 const banner = (b, rest, btn)=>`<p class="note"><b>${b}</b> ${rest}</p><div class="noteact"><span class="sysbtn ghost small">${btn}</span></div>`;
-const quiet = t=>`<p class="note quiet"><span class="lnk">${t}</span></p>`;
+const quiet = t=>`<p class="note quiet"><span class="lnk">${pauseGlyph}${t}</span></p>`;
 function m3Today(style){ return m1Head()+`<div class="list">${HABITS.map(h=>row(h,style)).join("")}</div>${nst(false)}${quiet("Pause everything")}${tabbar("today")}`; }
 function m3PausedNew(style){ return m1Head()+banner("Everything is paused.",HELP,"Undo pause")+pausedRows(style)+quiet("Undo pause")+tabbar("today"); }
 function m3Paused(style){ return m1Head()+banner("Everything is paused.",HELP,"Resume tomorrow")+pausedRows(style)+tabbar("today"); }
@@ -878,8 +883,9 @@ function m3MenuPaused(style){
 function m3You(style, state){
   return status()+`<div class="nav"><span></span><span></span></div>${head("You")}
   <div class="sec">Look</div><div class="opt">Appearance<span class="val">Paper, Blue</span><span class="go">${chev}</span></div>
-  <div class="sec">Pausing</div><div class="opt">Pause everything<span class="tog ${state==="all"?"on":""}"></span></div>
-  <div class="opt">Pause for dates<span class="val">${state==="dates"?"20 to 27 November":"None"}</span><span class="go">${chev}</span></div>
+  <div class="sec">${pauseGlyph}Gentle Mode</div>
+  <div class="opt desc"><span class="ol">Pause everything<small>Until you turn it off.</small></span><span class="tog ${state==="all"?"on":""}"></span></div>
+  <div class="opt desc"><span class="ol">Pause for dates<small>${state==="dates"?"20 to 27 November":"Choose a first and last day. Dates can be in the past."}</small></span><span class="go">${chev}</span></div>
   <p class="note hint">${HELP}</p>
   <div class="sec">History</div><div class="opt">Show runs<span class="tog"></span></div><div class="opt">Show days not logged<span class="tog"></span></div>
   <div class="sec">Your data</div><div class="opt">Export a copy</div><div class="opt">Import a copy</div>
@@ -921,7 +927,7 @@ const WH = [HABITS[0],HABITS[1],HABITS[3],HABITS[2],HABITS[4]];
 function m3WidgetSmall(style){ return `<div class="wtitle">Today</div>${WH.slice(0,3).map(h=>wrow(h,style)).join("")}`; }
 function m3WidgetMed(style){ return `<div class="wtitle">Today<span>Saturday 14 November</span></div><div class="wcols">${WH.slice(0,4).map(h=>wrow(h,style)).join("")}</div>`; }
 function m3WidgetDone(style){ return `<div class="wtitle">Today</div>${WH.slice(0,3).map(h=>wrow(h,style,"solid")).join("")}`; }
-function m3WidgetPaused(style){ return `<div class="wtitle">Today<span>Paused</span></div>${WH.slice(0,3).map((h,i)=>wrow(h,style,i===1?"extra":"paused")).join("")}`; }
+function m3WidgetPaused(style){ return `<div class="wtitle">Today<span>${pauseGlyph}Paused</span></div>${WH.slice(0,3).map((h,i)=>wrow(h,style,i===1?"extra":"paused")).join("")}`; }
 function m3WidgetEmpty(style){ return `<div class="wtitle">Today</div><p class="wnote">Nothing to track yet.</p><p class="wnote"><b>Add a habit</b></p>`; }
 function m3WidgetNone(style){ return `<div class="wtitle">Today</div><p class="wnote">Nothing scheduled today.</p>`; }
 

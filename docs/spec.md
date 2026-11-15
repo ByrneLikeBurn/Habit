@@ -419,7 +419,7 @@ Not adopted: filling the past-day amount with what is left to the target. A past
 
 Drawn in `docs/mockups/png/sheet-m3.png`, in Pen and ink. Three reviews saw the first draft on 15 November 2026: neurodiversity with behavioural and returning user, accessibility, and UI and UX with QA. They disagreed on how a pause ends and settled on one rule in a second round. These rules replace the earlier Gentle Mode and Vacation paragraphs where they differ.
 
-**Names.** "Gentle Mode" is now "Pause everything". "Vacation" is now "Pause for dates". A single habit has "Pause this habit". The reviews found that mood names hide the action: someone ill is not on vacation and will not look there.
+**Names.** "Gentle Mode" is the name of the whole feature. It appears as the section header in You and in the help page, with the pause symbol, and nowhere else. Under it are two rows named for what they do, each with one line of description: "Pause everything. Until you turn it off." and "Pause for dates. Choose a first and last day. Dates can be in the past." "Vacation" is gone, because someone ill is not on vacation and will not look there. A single habit has "Pause this habit". The pause symbol also marks the Today button and the widget header. Note for translators on the header: "Feature name. Translate as a concept (rest, easy days). Do not translate 'Mode' literally." The owner asked to keep the name. The content review wanted action labels and the neurodiversity review wanted the name kept as permission to rest. Both accepted this course.
 
 **Reaching it.** Today has a quiet text button under its last row, "Pause everything". It asks for no confirmation. You has the same switch and a "Pause for dates" row. The row menu and Edit have "Pause this habit".
 
