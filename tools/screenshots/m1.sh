@@ -4,9 +4,11 @@
 # Usage: tools/screenshots/m1.sh   (run from the repo root)
 set -e
 DEVICE_NAME="iPhone 17 Pro"
+RUNTIME="iOS 26.5"   # the screenshots in the repo were taken on this runtime
 OUT=docs/screenshots/m1
 APP=DerivedData/Build/Products/Debug-iphonesimulator/Habit.app
-SIM=$(xcrun simctl list devices available | /usr/bin/grep -m1 "    $DEVICE_NAME (" | sed -E 's/.*\(([0-9A-F-]{36})\).*/\1/')
+SIM=$(xcrun simctl list devices available | sed -n "/-- $RUNTIME --/,/^--/p" | /usr/bin/grep -m1 "    $DEVICE_NAME (" | sed -E 's/.*\(([0-9A-F-]{36})\).*/\1/')
+[[ -n "$SIM" ]] || { echo "No $DEVICE_NAME on $RUNTIME"; exit 1; }
 
 xcodebuild -scheme Habit -destination "id=$SIM" -derivedDataPath DerivedData build -quiet
 xcrun simctl boot "$SIM" 2>/dev/null || true
@@ -21,8 +23,9 @@ shot() {   # name appearance size contrast args...
   xcrun simctl ui "$SIM" content_size "$size"
   xcrun simctl ui "$SIM" increase_contrast "$contrast"
   xcrun simctl terminate "$SIM" dev.byrnelikeburn.Habit 2>/dev/null || true
-  xcrun simctl launch "$SIM" dev.byrnelikeburn.Habit "$@" > /dev/null
-  sleep 3
+  # Language and region are pinned, so numbers and dates do not follow the Mac.
+  xcrun simctl launch "$SIM" dev.byrnelikeburn.Habit -AppleLanguages "(en)" -AppleLocale en_GB "$@" > /dev/null
+  sleep 4
   xcrun simctl io "$SIM" screenshot "$OUT/$name.png" > /dev/null 2>&1
   # JPEG at half size keeps the public repo small.
   sips -Z 1311 -s format jpeg -s formatOptions 70 "$OUT/$name.png" --out "$OUT/$name.jpg" > /dev/null

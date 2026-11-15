@@ -15,6 +15,8 @@ struct HabitRow: View {
 
     let habit: Habit
     let day: DayKey
+    /// The day's raw total, from one fetch for all of Today.
+    let total: Int
     let actions: Actions
 
     @Environment(Settings.self) private var settings
@@ -59,8 +61,8 @@ struct HabitRow: View {
         .padding(.bottom, habit.kind == .counted ? 0 : 6)
     }
 
-    private var state: DayState { habit.state(on: day, today: day) }
-    private var total: Int { habit.total(on: day) }
+    private var shown: Int { max(0, total) }
+    private var state: DayState { habit.state(on: day, today: day, total: shown) }
     private var target: Int? { habit.rule(on: day).target }
 
     // MARK: Name
@@ -138,7 +140,7 @@ struct HabitRow: View {
     }
 
     private var countLine: String {
-        CountText.line(total: total, target: target, unit: habit.unit)
+        CountText.line(total: shown, target: target, unit: habit.unit)
     }
 
     // MARK: Control
@@ -185,7 +187,7 @@ struct HabitRow: View {
     private var accessibilityHint: String {
         switch habit.kind {
         case .binary:
-            return total > 0 ? String(localized: "Takes the log back") : String(localized: "Logs it")
+            return shown > 0 ? String(localized: "Takes the log back") : String(localized: "Logs it")
         case .counted:
             guard let amount = habit.tapAmount, amount > 0 else { return String(localized: "Opens the count") }
             return String(localized: "Adds \(amount.formatted())")

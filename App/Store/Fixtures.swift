@@ -16,6 +16,8 @@ enum Fixtures {
         var schedule: Weekdays = .all
         var logged = 0
         var archived = false
+        /// Days of past logs before today, so performance is checked against a real history.
+        var history = 0
     }
 
     static let weekdaysOnly = Weekdays(rawValue: 0b0111110)
@@ -54,7 +56,7 @@ enum Fixtures {
             return (1...30).map { i in
                 Spec(name: "Habit \(i)", symbol: symbols[i % symbols.count],
                      kind: i % 3 == 0 ? .counted : .binary, target: i % 3 == 0 ? 5 : 1,
-                     unit: i % 3 == 0 ? "minutes" : "", logged: i % 2)
+                     unit: i % 3 == 0 ? "minutes" : "", logged: i % 2, history: 200)
             }
         }
     }
@@ -80,6 +82,14 @@ enum Fixtures {
             if spec.logged > 0 {
                 let intent = LogHabitIntent(habitID: habit.id, name: habit.name, action: .add(spec.logged), source: .manual, day: today)
                 _ = try? intent.execute(in: context, clock: clock)
+            }
+            if spec.history > 0 {
+                habit.rules = [HabitRule(fromDay: today.adding(days: -spec.history), target: habit.target, schedule: habit.schedule)]
+                for offset in 1...spec.history where (offset + index) % 4 != 0 {
+                    let amount = spec.kind == .counted ? 1 + (offset % 3) : 1
+                    let intent = LogHabitIntent(habitID: habit.id, name: habit.name, action: .add(amount), source: .manual, day: today.adding(days: -offset))
+                    _ = try? intent.execute(in: context, clock: clock)
+                }
             }
         }
         try? context.save()

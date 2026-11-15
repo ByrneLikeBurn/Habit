@@ -15,7 +15,7 @@ struct RootView: View {
         StyledScreen {
             TabView(selection: $tab) {
                 Tab("Today", systemImage: "calendar", value: Section.today) {
-                    NavigationStack { TodayView() }
+                    NavigationStack { TodayScreen() }
                 }
                 Tab("You", systemImage: "person.crop.circle", value: Section.you) {
                     YouView()

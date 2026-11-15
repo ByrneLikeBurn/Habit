@@ -11,6 +11,8 @@ struct TodayView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     @Query private var habits: [Habit]
+    /// Only today's events are fetched, so Today costs the same on day 1 and day 1,000.
+    @Query private var todaysEvents: [LogEvent]
     @State private var showNotScheduled = LaunchOptions.current.screen == .notScheduled
     @State private var headingScrolled = false
     /// Changes when the day turns over or passes midnight, so Today redraws.
@@ -19,11 +21,21 @@ struct TodayView: View {
     @State private var editMode: EditMode = .inactive
     #endif
 
+    /// The day this list shows. TodayScreen rebuilds the view when it changes.
+    private let day: DayKey
+
+    init(day: DayKey) {
+        self.day = day
+        let key = day.rawValue
+        _todaysEvents = Query(filter: #Predicate<LogEvent> { $0.dayKey == key })
+    }
+
     var body: some View {
         let clock = settings.clock
-        let today = clock.today
+        let today = day
         let split = Ordering.today(habits, day: today)
         let active = Ordering.sorted(habits)
+        let totals = DayTotals(day: today, events: todaysEvents).totals
 
         List {
             TodayHeading(clock: clock)
@@ -42,7 +54,7 @@ struct TodayView: View {
             }
 
             ForEach(split.scheduled) { habit in
-                HabitRow(habit: habit, day: today, actions: actions(for: habit, in: split.scheduled, clock: clock))
+                HabitRow(habit: habit, day: today, total: totals[habit.id] ?? 0, actions: actions(for: habit, in: split.scheduled, day: today, clock: clock))
                     .habitRow(style, leading: settings.controlsLeading)
             }
             .onMove { source, destination in
@@ -53,7 +65,7 @@ struct TodayView: View {
             if !split.notScheduled.isEmpty {
                 DisclosureGroup(isExpanded: $showNotScheduled) {
                     ForEach(split.notScheduled) { habit in
-                        HabitRow(habit: habit, day: today, actions: actions(for: habit, in: split.notScheduled, clock: clock))
+                        HabitRow(habit: habit, day: today, total: totals[habit.id] ?? 0, actions: actions(for: habit, in: split.notScheduled, day: today, clock: clock))
                             .habitRow(style, leading: settings.controlsLeading)
                     }
                     .onMove { source, destination in
@@ -119,14 +131,15 @@ struct TodayView: View {
         }
     }
 
-    private func actions(for habit: Habit, in list: [Habit], clock: HabitClock) -> HabitRow.Actions {
+    private func actions(for habit: Habit, in list: [Habit], day: DayKey, clock: HabitClock) -> HabitRow.Actions {
         let active = Ordering.sorted(habits)
         let index = list.firstIndex { $0.id == habit.id }
         return HabitRow.Actions(
+            // The row logs the day it shows, even if the day turns over before the next redraw.
             log: { action in
-                model.log(action, habit: habit, context: context, clock: clock, undoManager: undoManager)
+                model.log(action, habit: habit, day: day, context: context, clock: clock, undoManager: undoManager)
             },
-            openCount: { model.counting = CountRequest(habit: habit, day: clock.today) },
+            openCount: { model.counting = CountRequest(habit: habit, day: day) },
             edit: { model.editing = habit },
             archive: { model.archive(habit, context: context, clock: clock) },
             move: { model.isReordering = true },
@@ -222,12 +235,14 @@ struct UndoLineView: View {
                 .font(style.label(.subheadline))
                 .foregroundStyle(style.text)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Button("Undo") {
-                line.undo()
-                model.undoLine = nil
+            if let undo = line.undo {
+                Button("Undo") {
+                    undo()
+                    model.undoLine = nil
+                }
+                .font(style.label(.subheadline, weight: .semibold))
+                .frame(minWidth: 44, minHeight: 44)
             }
-            .font(style.label(.subheadline, weight: .semibold))
-            .frame(minWidth: 44, minHeight: 44)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 4)
@@ -259,21 +274,57 @@ extension View {
 }
 
 #Preview("Today") {
-    NavigationStack { TodayView() }
+    NavigationStack { TodayScreen() }
         .previewEnvironment()
 }
 
 #Preview("Today, Ink") {
-    NavigationStack { TodayView() }
+    NavigationStack { TodayScreen() }
         .previewEnvironment(appearance: .ink)
 }
 
 #Preview("First run") {
-    NavigationStack { TodayView() }
+    NavigationStack { TodayScreen() }
         .previewEnvironment(.empty)
 }
 
 #Preview("Nothing set for today") {
-    NavigationStack { TodayView() }
+    NavigationStack { TodayScreen() }
         .previewEnvironment(.noneToday)
+}
+
+/// Raw totals for one day from that day's events, keyed by habit id.
+struct DayTotals {
+    let totals: [UUID: Int]
+
+    init(day: DayKey, events: [LogEvent]) {
+        var totals: [UUID: Int] = [:]
+        for event in events where event.dayKey == day.rawValue {
+            guard let id = event.habit?.id else { continue }
+            let (sum, overflow) = (totals[id] ?? 0).addingReportingOverflow(event.delta)
+            totals[id] = overflow ? (event.delta > 0 ? .max : .min) : sum
+        }
+        self.totals = totals
+    }
+}
+
+/// Rebuilds Today when the day changes, so its query follows the new day.
+struct TodayScreen: View {
+    @Environment(Settings.self) private var settings
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var day: DayKey?
+
+    var body: some View {
+        let today = day ?? settings.clock.today
+        TodayView(day: today)
+            .id(today)
+            .task(id: scenePhase) {
+                while !Task.isCancelled {
+                    let now = settings.clock.today
+                    if now != day { day = now }
+                    try? await Task.sleep(for: .seconds(30))
+                }
+            }
+            .onChange(of: settings.dayStartHour) { day = settings.clock.today }
+    }
 }

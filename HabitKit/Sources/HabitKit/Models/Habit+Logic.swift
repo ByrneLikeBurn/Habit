@@ -6,10 +6,8 @@ extension Habit {
         set { kindRaw = newValue.rawValue }
     }
 
-    public var schedule: Weekdays {
-        get { Weekdays(rawValue: scheduleMask) }
-        set { scheduleMask = newValue.rawValue }
-    }
+    /// The current schedule. Change it only through `setRule`, which keeps the history in step.
+    public var schedule: Weekdays { Weekdays(rawValue: scheduleMask) }
 
     public var isArchived: Bool { archivedAt != nil }
     public var isActive: Bool { archivedAt == nil && deletedAt == nil }
@@ -28,7 +26,7 @@ extension Habit {
     public func setRule(target newTarget: Int?, schedule newSchedule: Weekdays, from day: DayKey) {
         let resolvedTarget = kind == .binary ? 1 : newTarget
         target = resolvedTarget
-        schedule = newSchedule
+        scheduleMask = newSchedule.rawValue
         let current = rule(on: day)
         if current.target == resolvedTarget, current.scheduleMask == newSchedule.rawValue { return }
         rules.removeAll { $0.fromDay >= day.rawValue }
@@ -38,7 +36,7 @@ extension Habit {
 
     /// The sum of every delta logged for `day`. May be negative after edits on two devices.
     public func rawTotal(on day: DayKey) -> Int {
-        (events ?? []).reduce(0) { $1.dayKey == day.rawValue ? $0 + $1.delta : $0 }
+        (events ?? []).reduce(0) { $1.dayKey == day.rawValue ? $0.addingSaturating($1.delta) : $0 }
     }
 
     /// The total shown to the user. A total below 0 is shown as 0.
@@ -56,9 +54,14 @@ extension Habit {
 
     /// The state of one day, drawn as a mark.
     public func state(on day: DayKey, today: DayKey, sharedPauses: [Pause] = [], showDaysNotLogged: Bool = false) -> DayState {
+        state(on: day, today: today, total: total(on: day), sharedPauses: sharedPauses, showDaysNotLogged: showDaysNotLogged)
+    }
+
+    /// The state of one day when its total is already known, so the events are not scanned again.
+    public func state(on day: DayKey, today: DayKey, total: Int, sharedPauses: [Pause] = [], showDaysNotLogged: Bool = false) -> DayState {
         let rule = rule(on: day)
         return DayState.resolve(DayInput(
-            total: total(on: day),
+            total: max(0, total),
             kind: kind,
             target: rule.target,
             scheduled: rule.schedule.contains(day),

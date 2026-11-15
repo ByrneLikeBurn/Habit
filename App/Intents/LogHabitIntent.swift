@@ -40,10 +40,9 @@ struct LogHabitIntent: AppIntent {
         self.day = day
     }
 
-    private var resolvedAction: LogAction {
-        if let action { return action }
-        guard let amount else { return .tap }
-        return takeAway ? .takeAway(amount) : .add(amount)
+    /// In-app calls pass their action. A shortcut means "log": running it twice never takes a log back.
+    private func resolvedAction(for habit: Habit) -> LogAction {
+        action ?? .external(amount: amount, takeAway: takeAway, kind: habit.kind, tapAmount: habit.tapAmount)
     }
 
     /// Writes the log. `context` is passed by the app and by fixtures; otherwise the shared store is used.
@@ -59,7 +58,7 @@ struct LogHabitIntent: AppIntent {
         }
         let clock = clock ?? Settings().clock
         let outcome = try LogWriter.log(
-            resolvedAction,
+            resolvedAction(for: model),
             habit: model,
             day: day ?? clock.today,
             source: source,
@@ -78,6 +77,8 @@ struct LogHabitIntent: AppIntent {
         case .wrote(_, let total), .unchanged(let total):
             if model.kind == .counted {
                 line = CountText.line(total: total, target: model.rule(on: Settings().clock.today).target, unit: model.unit)
+            } else if case .unchanged = outcome, total > 0 {
+                line = String(localized: "Already logged today.")
             } else {
                 line = total > 0 ? String(localized: "Logged.") : String(localized: "Taken back.")
             }

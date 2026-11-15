@@ -7,12 +7,15 @@ struct SourceChecks {
     private static let styleFolder = "HabitKit/Sources/HabitKit/Style/"
     private static let intentFile = "App/Intents/LogHabitIntent.swift"
 
+    /// Every Swift source in the repo except build output and tools. New targets are covered without a change here.
     private func swiftFiles() throws -> [(path: String, text: String)] {
-        let roots = ["App", "HabitKit/Sources"].map { repoRoot.appending(path: $0) }
+        let skip: Set<String> = ["DerivedData", "build", "tools", "docs", ".git", ".build"]
+        let top = try FileManager.default.contentsOfDirectory(at: repoRoot, includingPropertiesForKeys: [.isDirectoryKey])
+        let roots = top.filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true && !skip.contains($0.lastPathComponent) }
         var files: [(String, String)] = []
         for root in roots {
             guard let walker = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil) else { continue }
-            for case let url as URL in walker where url.pathExtension == "swift" {
+            for case let url as URL in walker where url.pathExtension == "swift" && !url.path.contains("/.build/") && !url.path.contains("/HabitKit/Tests/") {
                 let relative = String(url.path(percentEncoded: false).dropFirst(repoRoot.path(percentEncoded: false).count))
                 files.append((relative, try String(contentsOf: url, encoding: .utf8)))
             }
@@ -54,15 +57,41 @@ struct SourceChecks {
         #expect(!"style.swatchColor(swatch)".contains(pattern))
     }
 
-    /// Invariant 5: every LogEvent is written by LogHabitIntent.
+    /// Invariant 5: every LogEvent is written by LogHabitIntent, in any target.
+    static var writePatterns: [Regex<Substring>] { [
+        try! Regex(#"LogWriter\.log\("#),
+        try! Regex(#"(?:^|[^A-Za-z_.])LogEvent\("#),
+        try! Regex(#"\.delta\s*[-+]?=[^=]"#),
+    ] }
+    static let writeAllowed: Set<String> = [
+        intentFile,
+        "HabitKit/Sources/HabitKit/Logic/LogWriter.swift",
+        "HabitKit/Sources/HabitKit/Models/Schema.swift",
+    ]
+
     @Test func onlyTheIntentWritesLogs() throws {
         var offences: [String] = []
-        for file in try swiftFiles() where file.path.hasPrefix("App/") && file.path != Self.intentFile {
-            if file.text.contains("LogWriter.log(") || file.text.contains("LogEvent(") {
-                offences.append(file.path)
+        for file in try swiftFiles() where !Self.writeAllowed.contains(file.path) && !file.path.hasPrefix("HabitKit/Tests/") {
+            for (number, line) in file.text.split(separator: "\n", omittingEmptySubsequences: false).enumerated() {
+                if Self.writePatterns.contains(where: { line.contains($0) }) {
+                    offences.append("\(file.path):\(number + 1)")
+                }
             }
         }
         #expect(offences.isEmpty, "\(offences)")
+    }
+
+    @Test func theWriteCheckCanFail() {
+        let samples = ["try LogWriter.log(.tap, habit: h)", "context.insert(LogEvent(delta: 1))", "event.delta = 4", "event.delta += 1"]
+        for sample in samples {
+            #expect(Self.writePatterns.contains { sample.contains($0) }, "\(sample)")
+        }
+        #expect(!Self.writePatterns.contains { "if event.delta == 0 {}".contains($0) })
+    }
+
+    @Test func checksSeeEveryTarget() throws {
+        let folders = Set(try swiftFiles().map { String($0.path.split(separator: "/").first ?? "") })
+        #expect(folders.isSuperset(of: ["App", "AppUITests", "HabitKit"]), "\(folders)")
     }
 
     /// The app's container is built through the migration plan, never a bare Schema.

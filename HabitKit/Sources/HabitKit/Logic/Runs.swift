@@ -66,17 +66,22 @@ extension Habit {
         let first = DayKey(rawValue: rules.map(\.fromDay).min() ?? today.rawValue)
         let earliestLog = (events ?? []).map(\.dayKey).min().map(DayKey.init(rawValue:))
         let start = min(first, earliestLog ?? first)
-        let count = max(0, start.days(to: today))
+        // A day after today that already holds a log (after travel, or a new day-start hour) still counts.
+        let latestLog = (events ?? []).filter { $0.delta != 0 }.map(\.dayKey).max().map(DayKey.init(rawValue:))
+        let end = max(today, latestLog ?? today)
+        let count = max(0, start.days(to: end))
+        var totals: [Int: Int] = [:]
+        for event in events ?? [] { totals[event.dayKey] = (totals[event.dayKey] ?? 0).addingSaturating(event.delta) }
         let days = (0...count).map { offset -> DayInput in
             let day = start.adding(days: offset)
             let rule = rule(on: day)
             return DayInput(
-                total: total(on: day),
+                total: max(0, totals[day.rawValue] ?? 0),
                 kind: kind,
                 target: rule.target,
                 scheduled: rule.schedule.contains(day),
                 paused: isPaused(on: day, sharedPauses: sharedPauses),
-                relation: day == today ? .today : .past
+                relation: day < today ? .past : .today
             )
         }
         return Runs.summarise(days)

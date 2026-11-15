@@ -7,6 +7,13 @@ struct HabitApp: App {
     @State private var settings = Settings()
     @State private var model = AppModel()
 
+    init() {
+        #if os(iOS)
+        // Screenshots run with animations off, system sheets included.
+        if LaunchOptions.current.fixture != nil { UIView.setAnimationsEnabled(false) }
+        #endif
+    }
+
     var body: some Scene {
         WindowGroup {
             Group {

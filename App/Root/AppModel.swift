@@ -6,7 +6,13 @@ import HabitKit
 struct UndoLine: Identifiable {
     let id = UUID()
     let message: String
-    let undo: @MainActor () -> Void
+    /// nil for a line that only informs, such as a failed save.
+    let undo: (@MainActor () -> Void)?
+
+    init(message: String, undo: (@MainActor () -> Void)? = nil) {
+        self.message = message
+        self.undo = undo
+    }
 }
 
 /// The count sheet's subject.
@@ -31,7 +37,14 @@ final class AppModel {
     /// Logs through LogHabitIntent, the one write path, and registers undo.
     func log(_ action: LogAction, habit: Habit, day: DayKey? = nil, context: ModelContext, clock: HabitClock, undoManager: UndoManager?) {
         let intent = LogHabitIntent(habitID: habit.id, name: habit.name, action: action, source: .manual, day: day)
-        guard let (outcome, _) = try? intent.execute(in: context, clock: clock) else { return }
+        let outcome: LogOutcome
+        do {
+            outcome = try intent.execute(in: context, clock: clock).outcome
+        } catch {
+            // Nothing was written. Say so, with no blame and no alarm.
+            show(UndoLine(message: String(localized: "That log could not be saved. Try again.")))
+            return
+        }
         switch outcome {
         case .needsAmount:
             counting = CountRequest(habit: habit, day: day ?? clock.today)

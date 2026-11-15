@@ -2,6 +2,9 @@ import Foundation
 
 /// Words for counts. The user's unit is shown as typed. Numbers use the locale's grouping.
 public enum CountText {
+    /// The largest number that can be typed or logged at once.
+    public static let maximumAmount = 1_000_000
+
     /// The count line under a counted habit, for example "3 of 8 glasses" or "3 glasses".
     public static func line(total: Int, target: Int?, unit: String, locale: Locale = .autoupdatingCurrent) -> String {
         let n = total.formatted(.number.locale(locale))
@@ -36,14 +39,15 @@ public enum CountText {
         }
     }
 
-    /// Parses a typed whole number, allowing the locale's grouping separator. nil if not a whole number.
+    /// Parses a typed whole number, allowing the locale's grouping separator.
+    /// nil if it is not a whole number or is beyond `maximumAmount` either way.
     public static func parse(_ text: String, locale: Locale = .autoupdatingCurrent) -> Int? {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
-        if let value = Int(trimmed) { return value }
+        if let value = Int(trimmed) { return abs(value) <= maximumAmount ? value : nil }
         // Allow the grouping separator, but never a fraction.
         guard let value = try? Decimal(trimmed, format: .number.locale(locale)),
-              abs(value) < Decimal(Int32.max) else { return nil }
+              abs(value) <= Decimal(maximumAmount) else { return nil }
         let number = NSDecimalNumber(decimal: value)
         guard number == NSDecimalNumber(value: number.intValue) else { return nil }
         return number.intValue

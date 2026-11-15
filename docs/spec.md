@@ -195,6 +195,8 @@ The signing team is not committed. It lives in `Config/Local.xcconfig`, which gi
 | `LogEvent` | Append-only. delta, habit, day key, source (manual, watch, widget, shortcut, siri, control), timestamp, device id |
 | `Pause` | habit, start day, end day (nil is open-ended), reason (vacation, gentle, manual) |
 
+**Frozen shapes.** `Habit.rules` stores `[HabitRule]`, a struct of first day, target and schedule mask. SwiftData stores it as one composite attribute, so the struct's shape is frozen like any other stored type. A later per-rule value goes in a new field beside it, never inside it. `rules` is the source of truth for history, and `Habit.target` and `Habit.scheduleMask` hold the current values. Both are written only through `setRule`.
+
 The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settable day-start hour (default 04:00) and fixed at write time. Day totals are derived and cached in memory, never stored.
 
 ## Data rules
