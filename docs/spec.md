@@ -327,12 +327,42 @@ Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Not yet reviewed by an
 - You gains "Show runs", "Show days not logged", "Export a copy" and "Import a copy".
 - Import ends on a sheet that counts what was added and what was skipped. A file that cannot be read says so and changes nothing.
 
+## Milestone 2 rules, from the reviews
+
+Accessibility, UI and UX, and a combined behavioural and returning-user review looked at `sheet-m2.png`. These are adopted. The drawings do not show them all yet.
+
+**Stats.** Order is Days logged, then the unit total, then Days done. A counted habit with no target shows the first two only. There is never a rate, a percentage or "of N days". The same stats mean the same thing in week, month and year: all time, under the label "Since 28 April 2026". The week view adds one line for the week's total, and only when the week has a log. A week with no log shows no zeros.
+
+**Place.** Habit detail keeps one anchor date per visit. Switching between week, month and year opens the period that holds it. The period title is a button that returns to the current period. Opened from Progress, detail shows the same range and period, and Back reads "Progress".
+
+**Days.** Any day up to today opens the day sheet, in week and month. The hit area is the whole cell, with or without a mark. Past days and today are buttons with the hint "Opens this day". Future days are not buttons. "Add a past day" is on every Habit detail state. It opens a date picker and then the day sheet. The month view can page back before the habit was added.
+
+**Day sheet.** It names the habit and the date. At zero a count reads "Nothing logged", like a yes-or-no habit, with the amount field and Add below. "of 8 glasses" shows once the day has a log. Take away is off at zero. A day with a log has "Clear this day", which writes minus the total. After any change to a past day, the Undo line shows. The hint under the grid reads "Tap a past day to add or change a log."
+
+**Year.** Each month is one button, 44 points high: its label and its block of weeks. A week belongs to the month that holds its Monday. The year starts at the month of the "Since" date. VoiceOver reads one element per month, for example "June 2026. 22 days done, 3 part done, 2 paused. Opens the month." At accessibility text sizes the grid becomes a list of months as text rows.
+
+**Progress.** A whole row is one button and one VoiceOver element. A tap on a past cell opens the day sheet. A tap on the name opens detail. Today's cell is drawn as the thin today outline at mark size, not as the Today control. An off-schedule day shows a small dot, so a habit set for three days a week does not look half empty. Owed drawings: month and year, no habits, 30 habits, the largest text size.
+
+**Import and export.** After a file is picked, a preview says what the file holds and what is new, with Import and Cancel. A file with nothing new ends on "Nothing new in this file". A file that is not a Habit export and a file from a newer version get separate messages. First-run Today has a second, quiet action, "Import a copy". Export and Import rows are buttons with no chevron. Owed: rules for a habit whose id exists but whose details differ, for a habit archived here and live in the file, and whether pauses and settings are in the file.
+
+**You.** Switches are the system toggle, not restyled. One line under the two History switches says what each adds.
+
+**Largest text size.** Week becomes seven rows. A Progress row puts the name above its marks. Stat rows stack label over value. Sheet buttons stack. The month keeps seven columns and caps the date numeral where two digits fit.
+
+**Words.** "No history yet" becomes "Nothing logged so far" and shows only for a habit with no logs ever.
+
+**Fixture faults found.** The year strip started at May while the stats said 28 April. The month with runs on showed a run of 2 where the marks give 3. Whether a part-done day extends a run is not written down.
+
 ## Open decisions
 
 Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
+| M2-A | Future days in the month view. The senior designer wanted the date alone. The accessibility review wants the faint dashed outline back, so a future day differs from a blank past day | The owner decides, because two reviews disagree. I'd bring the outline back | Milestone 2 |
+| M2-B | With "Show runs" on, after a gap: "Current run 0 days" above "Longest run 31 days" | Show Current run only when it is 1 or more | Milestone 2 |
+| M2-C | Rename the Progress tab. "Progress" asks to be read as a grade | "History" | Milestone 2 |
+| M2-D | Does a part-done day extend a run, or only not break it | It extends it. Something is better than nothing | Milestone 2 |
 | 3 | The usage data page | Build it in milestone 13 from the existing log fields | Milestone 13 |
 | 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
 | 5 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
