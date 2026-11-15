@@ -279,7 +279,7 @@ The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settab
 - Milestone 1 holds the Edit form and Archive. Recently Deleted and purge stay in milestone 12. Kind is locked after the first log.
 - The default tap amount is 1 when the target is 20 or less. Above that it is empty, which means a tap opens the count sheet.
 - You has one setting for which side the control sits on.
-- There are three tabs: Today, Progress, You. Tags is a row in You, on iPhone only.
+- There are three tabs: Today, History, You. Tags is a row in You, on iPhone only.
 - In the month view a future day shows its date alone. The faint dashed outline is kept for the week view.
 
 ## Milestone 1 screens, after the inclusion reviews
@@ -325,7 +325,7 @@ Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Not yet reviewed by an
 - Stats: Days done, Days logged, and a total in the user's unit, with the start date. Current run and Longest run appear only when "Show runs" is on.
 - A habit with no history shows one line and an "Add a past day" button.
 - A past day opens a sheet that names the date. A day that was not scheduled says so and still takes a log.
-- Progress is a ledger: one row per habit, seven days across.
+- History is a ledger: one row per habit, seven days across.
 - You gains "Show runs", "Show days not logged", "Export a copy" and "Import a copy".
 - Import ends on a sheet that counts what was added and what was skipped. A file that cannot be read says so and changes nothing.
 
@@ -335,7 +335,7 @@ Accessibility, UI and UX, and a combined behavioural and returning-user review l
 
 **Stats.** Order is Days logged, then the unit total, then Days done. A counted habit with no target shows the first two only. There is never a rate, a percentage or "of N days". The same stats mean the same thing in week, month and year: all time, under the label "Since 28 April 2026". The week view adds one line for the week's total, and only when the week has a log. A week with no log shows no zeros.
 
-**Place.** Habit detail keeps one anchor date per visit. Switching between week, month and year opens the period that holds it. The period title is a button that returns to the current period. Opened from Progress, detail shows the same range and period, and Back reads "Progress".
+**Place.** Habit detail keeps one anchor date per visit. Switching between week, month and year opens the period that holds it. The period title is a button that returns to the current period. Opened from History, detail shows the same range and period, and Back reads "History".
 
 **Days.** Any day up to today opens the day sheet, in week and month. The hit area is the whole cell, with or without a mark. Past days and today are buttons with the hint "Opens this day". Future days are not buttons. "Add a past day" is on every Habit detail state. It opens a date picker and then the day sheet. The month view can page back before the habit was added.
 
@@ -343,17 +343,23 @@ Accessibility, UI and UX, and a combined behavioural and returning-user review l
 
 **Year.** Each month is one button, 44 points high: its label and its block of weeks. A week belongs to the month that holds its Monday. The year starts at the month of the "Since" date. VoiceOver reads one element per month, for example "June 2026. 22 days done, 3 part done, 2 paused. Opens the month." At accessibility text sizes the grid becomes a list of months as text rows.
 
-**Progress.** A whole row is one button and one VoiceOver element. A tap on a past cell opens the day sheet. A tap on the name opens detail. Today's cell is drawn as the thin today outline at mark size, not as the Today control. An off-schedule day shows a small dot, so a habit set for three days a week does not look half empty. Owed drawings: month and year, no habits, 30 habits, the largest text size.
+**History tab.** A whole row is one button and one VoiceOver element. A tap on a past cell opens the day sheet. A tap on the name opens detail. Today's cell is drawn as the thin today outline at mark size, not as the Today control. An off-schedule day shows a small dot, so a habit set for three days a week does not look half empty. Owed drawings: month and year, no habits, 30 habits, the largest text size.
 
 **Import and export.** After a file is picked, a preview says what the file holds and what is new, with Import and Cancel. A file with nothing new ends on "Nothing new in this file". A file that is not a Habit export and a file from a newer version get separate messages. First-run Today has a second, quiet action, "Import a copy". Export and Import rows are buttons with no chevron. Owed: rules for a habit whose id exists but whose details differ, for a habit archived here and live in the file, and whether pauses and settings are in the file.
 
 **You.** Switches are the system toggle, not restyled. One line under the two History switches says what each adds.
 
-**Largest text size.** Week becomes seven rows. A Progress row puts the name above its marks. Stat rows stack label over value. Sheet buttons stack. The month keeps seven columns and caps the date numeral where two digits fit.
+**Largest text size.** Week becomes seven rows. A History row puts the name above its marks. Stat rows stack label over value. Sheet buttons stack. The month keeps seven columns and caps the date numeral where two digits fit.
+
+**Runs.** A run counts scheduled days in a row with any log. A part-done day extends it. A day whose total is zero or less after an undo counts as no log. The mark still shows whether the target was met: solid for done, hatched for part done. The help line reads "A run counts the scheduled days in a row with any log, even a small one." It sits under the "Show runs" switch. Three reviews agreed (behavioural, neurodiversity and returning user, content).
+
+**Current run row.** With "Show runs" on, the row is always there. Its value is "12 days" in a run, "Between runs" after a gap and "No run yet" before the first log. A pause keeps the number. A zero is never shown. Longest run is hidden until it is 1 or more. Note for translators: "State label. No run is active after a gap. Restructure freely. Must not name a missed day or a zero." The three reviews split at first (hide the row, "Starts with any log", "Between runs") and all accepted this course in a second round. They would revisit it if users read "Between runs" as an unwanted reminder.
+
+**Tab name.** The ledger tab is called "History". "Progress" implies a direction, so a quiet week reads as none. "Log" is already the app's word for an entry. The same three reviews agreed.
 
 **Words.** "No history yet" becomes "Nothing logged so far" and shows only for a habit with no logs ever.
 
-**Fixture faults found.** The year strip started at May while the stats said 28 April. The month with runs on showed a run of 2 where the marks give 3. Whether a part-done day extends a run is not written down.
+**Fixture faults found.** The year strip started at May while the stats said 28 April. The month with runs on showed a run of 2 where the marks give 3.
 
 ## Open decisions
 
@@ -361,9 +367,6 @@ Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
-| M2-B | With "Show runs" on, after a gap: "Current run 0 days" above "Longest run 31 days" | Show Current run only when it is 1 or more | Milestone 2 |
-| M2-C | Rename the Progress tab. "Progress" asks to be read as a grade | "History" | Milestone 2 |
-| M2-D | Does a part-done day extend a run, or only not break it | It extends it. Something is better than nothing | Milestone 2 |
 | 3 | The usage data page | Build it in milestone 13 from the existing log fields | Milestone 13 |
 | 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
 | 5 | The items marked Guess in this file | Accept as written | The milestone that first uses each |

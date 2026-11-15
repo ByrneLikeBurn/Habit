@@ -423,7 +423,7 @@ const tabIcon = n=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
 
 /* ---------- shared pieces ---------- */
 const status = ()=>`<div class="status"><span>9:41</span><span class="r"><i style="width:17px;height:11px;opacity:.9"></i><i style="width:15px;height:11px;opacity:.9"></i><i style="width:25px;height:12px;border-radius:4px"></i></span></div>`;
-const tabbar = on=>`<div class="tabbar" style="grid-template-columns:repeat(${M1?3:4},1fr)">${[["today","Today"],["progress","Progress"],["tags","Tags"],["you","You"]].filter(t=>!(M1&&t[0]==="tags")).map(([k,l])=>`<div class="${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("")}</div>`;
+const tabbar = on=>`<div class="tabbar" style="grid-template-columns:repeat(${M1?3:4},1fr)">${[["today","Today"],["progress","History"],["tags","Tags"],["you","You"]].filter(t=>!(M1&&t[0]==="tags")).map(([k,l])=>`<div class="${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("")}</div>`;
 const chev = `<svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 2 10l8 8"/></svg>`;
 const plus = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"><path d="M11 3v16M3 11h16"/></svg>`;
 let M1 = false;   // milestone 1 frames: no scene card, three tabs, Blue marks
@@ -554,7 +554,7 @@ function ax5(style, app){
   <div class="list">${[HABITS[0],HABITS[3]].map(h=>row(h,style,undefined,undefined,52)).join("")}</div>${tabbar("today")}`;
 }
 function mac(style, app){
-  const side = [["today","Today",1],["progress","Progress",0],["you","You",0]].map(([k,l,on])=>`<div class="it ${on?"on":""}">${tabIcon(k)}${l}</div>`).join("");
+  const side = [["today","Today",1],["progress","History",0],["you","You",0]].map(([k,l,on])=>`<div class="it ${on?"on":""}">${tabIcon(k)}${l}</div>`).join("");
   return `<div class="side"><div class="lights"><i></i><i></i><i></i></div>${side}</div><div class="main"><div class="page">${todayBody(style,app,5)}</div></div>`;
 }
 function watch(style){
@@ -726,7 +726,7 @@ function m2Progress(style){
   const P = [["drop","Drink water",["solid","blank","solid","blank","solid","hatched","blank"]],["book","Read",["solid","solid","solid","solid","solid","solid","blank"]],
              ["leaf","Walk outside",["solid","blank","blank","solid","solid","blank","blank"]],["pill","Take vitamins",["solid","solid","blank","solid","solid","solid","blank"]],
              ["moon","Stretch before bed",["blank","blank","solid","blank","solid","blank","blank"]]];
-  return status()+`<div class="nav"><span></span><span></span></div>${head("Progress")}
+  return status()+`<div class="nav"><span></span><span></span></div>${head("History")}
   <div class="seg"><span class="on">Week</span><span>Month</span><span>Year</span></div>
   <div class="month"><b>9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
   <div class="ledger"><div class="lh"><span></span>${"MTWTFSS".split("").map(d=>`<span>${d}</span>`).join("")}</div>
@@ -792,7 +792,7 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
   M1 = true;
   const s = "penAndInk", v = css({...vars(s,"paper"), "--accent":TOKENS.swatches.blue});
   const G = [["month","phone",m2Month,"Habit detail, month"],["month-runs","phone",m2MonthRuns,"Month, with runs and days not logged turned on"],["week","phone",m2Week,"Habit detail, week"],
-             ["year","phone",m2Year,"Habit detail, year"],["new","phone",m2New,"A habit with no history"],["progress","phone",m2Progress,"Progress"],["you","phone",m2You,"You, with history and data rows"],
+             ["year","phone",m2Year,"Habit detail, year"],["new","phone",m2New,"A habit with no history"],["progress","phone",m2Progress,"History"],["you","phone",m2You,"You, with history and data rows"],
              ["day","phone modal",m2Day,"A past day, yes or no"],["day-count","phone modal",m2DayCount,"A past day, count"],["day-off","phone modal",m2DayOff,"A past day that was not scheduled"],
              ["import","phone modal",m2Import,"Import, done"],["import-fail","phone modal",m2ImportFail,"Import, file not readable"]];
   html += `<h2 class="group">Milestone 2 screens, Pen and ink</h2><div class="sheet">`;

@@ -51,3 +51,9 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **Every addition must earn its place.** The owner set this as the test when two reviews disagree: it must add value and fit the vision and the expert reviews.
 
 **No false binaries.** When two reviews disagree, the first step is to look for a third option that meets what both are protecting, before anyone chooses a side. The owner asked for this after the run-at-zero question, where showing a zero and hiding the row both did harm and a third wording avoided both.
+
+**The Progress tab is now History.** Three reviews agreed (behavioural, neurodiversity and returning user, content). "Progress" implies a direction, so a quiet week reads as a lack of it. "Log" was ruled out because the app already uses it for an entry.
+
+**A part-done day extends a run.** The same three reviews agreed. If 5 of 8 did not count, the run would treat a small log the same as no log, which teaches that only the full target counts. The rule is now one sentence for every habit kind: any scheduled day with a log counts.
+
+**After a gap, Current run reads "Between runs".** The reviews first split three ways: hide the row, "Starts with any log", or a state phrase. In a second round all three accepted the state phrase, because it shows no zero, gives no instruction and keeps the row the user asked for. Before the first log it reads "No run yet".
