@@ -6,6 +6,8 @@ This file records decisions. Items marked **Guess** were made where the brief is
 
 **Owner**, 14 November 2026. The goal is a minimum usable app, milestones 1 to 3, with inclusion and accessibility built in from the first milestone and not added later.
 
+**Principle. Owner.** Something is better than nothing. A small log, a part-done day or a count with no target is credited, never scored as a failure.
+
 ## Status
 
 Phase 1, design. No Swift exists. The owner approved Lake variant A. No other scene is started. Review findings are in `docs/reviews/phase-1.md`.
@@ -184,7 +186,7 @@ The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settab
 
 ## Data rules
 
-All **Guess** unless marked. These came from the engineering and QA reviews. They are decided before milestone 1 because the schema is additive forever.
+**Owner** accepted these on 14 November 2026. They came from the engineering and QA reviews. They are decided before milestone 1 because the schema is additive forever.
 
 - Every model property is optional or has a default, relationships are optional, and nothing is marked unique. CloudKit needs this later.
 - `LogEvent` has a stable id. Import skips an event whose id is already in the store.
@@ -243,7 +245,7 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 |---|---|---|
 | 1 | Core loop in Pen and ink | Before it: the App Group test with free signing. Then models and data rules, Today, first run, New habit, yes-or-no and counted logging with typed numbers and the count sheet, `LogHabitIntent`, the style layer as data with Pen and ink only in Paper and Ink, the eight swatches, Light or dark, the Edit form and Archive, the control-side setting, privacy manifest. No scene card |
 | 2 | History, export and import | Heat map (week, month, year), logging a past day, JSON export and import with a round-trip test |
-| 3 | Pausing | `Pause` records, Vacation Mode, Gentle Mode, extra-credit run maths |
+| 3 | Pausing | `Pause` records, Vacation Mode, Gentle Mode, pausing one habit, run maths for days logged while paused, one Home Screen widget |
 | | Stop and report | |
 | 4 | Pencil and Watercolor | Both styles, their fonts, the style picker, the custom colour ring |
 | 5 | Scenes | The scene card, the five palettes by clock, "Follow the scene" for marks, the Lake, then each other scene through the scene gate |
@@ -270,11 +272,46 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 
 **Owner**, 14 November 2026: design, UI and UX questions follow the expert reviews.
 
-- Milestone 1 holds the Edit form and Archive. Restore, Recently Deleted and purge stay in milestone 11. Kind is locked after the first log.
+- Milestone 1 holds the Edit form and Archive. Recently Deleted and purge stay in milestone 12. Kind is locked after the first log.
 - The default tap amount is 1 when the target is 20 or less. Above that it is empty, which means a tap opens the count sheet.
 - You has one setting for which side the control sits on.
 - There are three tabs: Today, Progress, You. Tags is a row in You, on iPhone only.
 - In the month view a future day shows its date alone. The faint dashed outline is kept for the week view.
+
+## Milestone 1 screens, after the inclusion reviews
+
+The behavioural scientist, neurodiversity and returning-user lenses reviewed `docs/mockups/png/sheet-m1.png`. The owner defers to the reviews on design, so these are adopted. Items marked "to draw" are not in the mockups yet.
+
+**Reaching Edit and Archive.** Until Habit detail exists, a tap on a habit's name opens the Edit form. Touch and hold on a row opens a menu with Edit, Archive and Move. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows for a few seconds. To draw.
+
+**Order.** Manual reorder is in milestone 1, using the system list edit mode and VoiceOver move actions. Done rows stay where they are, so a row never moves under a thumb.
+
+**Not scheduled today.** Today ends with one collapsed row, "Not scheduled today". It opens to those habits with the same controls. A log there is extra credit. To draw.
+
+**New habit.** The name is the only required field. Defaults are Yes or no, every day, and the first symbol. Unit and "One tap adds" sit under one "More" row in New habit and are open in Edit. A sentence under the day circles restates the choice, for example "Every day except Thursday". Day letters use two letters where initials repeat. The name placeholder models a plan with a cue: "Stretch after brushing teeth". If Add is disabled, a line says why.
+
+**Controls that differ.** A counted control shows a small plus inside the square until the target is met, so it reads as "adds" before the tap. To draw. After a yes-or-no log is taken back, one line with Undo shows for a few seconds.
+
+**Feedback.** A mark draws in as one short stroke, under 300 ms. With Reduce Motion it swaps with no animation. The count line changes on every tap. There is no all-done banner.
+
+**Day boundary.** Between midnight and the day-start hour, Today shows "Until 04:00" under the date. The day-start setting has the caption "Logs before this time count for the day before."
+
+**Stats.** Habit detail leads with Days done, with its start date, and for a counted habit a total in the user's unit. Longest run and Current run are behind one switch, "Show runs". "Show days not logged" is a separate switch. A run row is never hidden at zero.
+
+**Pausing one habit.** Milestone 3 adds "Pause this habit" to the Edit form and the row menu, open-ended, with Resume in the same place. Gentle Mode is reachable from Today as well as from You. The Vacation form says the start can be in the past.
+
+**Year view.** It starts at the habit's first month, labels months, and a tap on a month opens it.
+
+**Words.** "Nothing set for today" replaces "Nothing is due today". The Archive caption leads with "You can bring it back at any time."
+
+## Decided on the reviews' evidence
+
+**Owner**, 14 November 2026: an expert review may override the brief when the change serves the user.
+
+- A counted habit may have no target. With no target, any log draws as done. The target field starts empty in New habit. Asked for by the behavioural scientist, the neurodiversity expert and the returning user.
+- A part-done day never breaks a run. Habit detail shows "Days logged" beside "Days done". Asked for by the behavioural scientist and the returning user.
+- One Home Screen widget is part of milestone 3, if the App Group test passes. It gives the user a cue outside the app. Asked for by the behavioural scientist.
+- The label "Extra credit" becomes "Logged while paused". Asked for by the tired daily user, the content designer and the behavioural scientist. Older sections of this file and of `docs/reviews` still say "extra credit" for the same state.
 
 ## Open decisions
 
@@ -282,7 +319,6 @@ Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
-| 2 | The data rules | Accept as written | Milestone 1 |
 | 3 | The usage data page | Build it in milestone 13 from the existing log fields | Milestone 13 |
 | 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
 | 5 | The items marked Guess in this file | Accept as written | The milestone that first uses each |

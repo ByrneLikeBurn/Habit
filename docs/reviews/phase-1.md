@@ -120,3 +120,11 @@ Status after the fix commit: 1 and 2 were decided by the owner and are applied. 
 - Count sheet: total at zero, over target, empty amount, the past-day and paused-day variants, the largest text size, Watch and Mac.
 - Habit detail: week view, year view in place, a new habit with no history, the yes-or-no variant, Show days not logged on, a day before the habit existed, the largest text size.
 - Errors: the shared store fails to open, an import file is invalid, an intent runs for an archived habit.
+
+## Fourth round: behavioural scientist, neurodiversity expert, returning user, on the milestone 1 screens
+
+Adopted findings are in `docs/spec.md` under "Milestone 1 screens, after the inclusion reviews". Four findings need the owner and are in "Open decisions" as A to D.
+
+Not adopted, with the reason:
+- Neurodiversity expert: a softer optional dark appearance, because near-white on black can glare. The contrast floor is a design rule. Recorded for the owner.
+- Returning user: a month range on each run. The start date on Days done is adopted. Ranges on runs wait for milestone 2.
