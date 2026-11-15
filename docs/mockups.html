@@ -219,6 +219,14 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .opt .val + .go{margin-left:8px}
 .penAndInk .scene{border:1px solid var(--rule2);padding:0}
 .penAndInk .scene img{outline:none}
+.left .row{grid-template-columns:44px 30px 1fr}
+.left .row .ck{order:-1}
+.left .row + .row::before{left:0}
+.tog{margin-left:auto;width:51px;height:31px;border-radius:16px;background:var(--fill);position:relative;flex:none}
+.tog::after{content:"";position:absolute;left:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sw span{display:flex;align-items:center;gap:3px}
+.sw .chk{width:12px;height:12px}
+.sw .sel{color:var(--text);font-weight:600}
 </style>
 </head>
 <body>
@@ -377,10 +385,12 @@ const tabIcon = n=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
 
 /* ---------- shared pieces ---------- */
 const status = ()=>`<div class="status"><span>9:41</span><span class="r"><i style="width:17px;height:11px;opacity:.9"></i><i style="width:15px;height:11px;opacity:.9"></i><i style="width:25px;height:12px;border-radius:4px"></i></span></div>`;
-const tabbar = on=>`<div class="tabbar">${[["today","Today"],["progress","Progress"],["tags","Tags"],["you","You"]].map(([k,l])=>`<div class="${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("")}</div>`;
+const tabbar = on=>`<div class="tabbar" style="grid-template-columns:repeat(${M1?3:4},1fr)">${[["today","Today"],["progress","Progress"],["tags","Tags"],["you","You"]].filter(t=>!(M1&&t[0]==="tags")).map(([k,l])=>`<div class="${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("")}</div>`;
 const chev = `<svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 2 10l8 8"/></svg>`;
 const plus = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"><path d="M11 3v16M3 11h16"/></svg>`;
+let M1 = false;   // milestone 1 frames: no scene card, three tabs, Blue marks
 function scene(style, app, pal){
+  if(M1) return "";
   const img=`<img src="mockups/scenes/lake-${pal||PALETTE_FOR[app]}-${app}.jpg" alt="">`;
   const frame = style==="pencil" ? `<svg width="350" height="118" viewBox="0 0 350 118" fill="none" stroke="var(--text)" stroke-linecap="round" filter="url(#pencil)" aria-hidden="true">
     <path d="M1 3.500 348.500 2.600M2.600 115.400 349 114.600M3.200 .500 2.800 117.500M347.200 1 346.600 117" stroke-width="1.400"/>
@@ -540,6 +550,59 @@ function specimen(f){
   return `<div class="spec"><p class="meta"><b>${f.name}${f.pick?" (my pick, used in the mockups)":""}</b>${f.lic} Source: ${f.src}</p>${body}</div>`;
 }
 
+/* ---------- milestone 1 screens: Pen and ink, no scene art ---------- */
+const DONE = HABITS.map(h=>({...h, state:"solid", sub:h.count?"8 of 8 glasses":undefined}));
+function todayDone(style, app){
+  return status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>${head("Today","Saturday 14 November")}<div class="list">${DONE.map(h=>row(h,style)).join("")}</div>${tabbar("today")}`;
+}
+function todayNone(style, app){
+  return status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>${head("Today","Saturday 14 November")}
+  <div class="empty"><p class="big">Nothing is due today</p><p>Your habits are set for other days.</p></div>${tabbar("today")}`;
+}
+function addYesNo(style, app){
+  const days = "MTWTFSS".split("").map(d=>`<span class="dayb on">${d}</span>`).join("");
+  const syms = Object.keys(ICONS).map((k,i)=>`<span class="symb ${i===1?"on":""}">${icon(k,26)}</span>`).join("");
+  return `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>New habit</b><span class="btn"><b>Add</b></span></div>
+  <div class="sec">Name</div><div class="field nm">Read</div>
+  <div class="sec">Symbol</div><div class="symrow">${syms}</div>
+  <div class="sec">Kind</div><div class="seg" style="margin-top:0"><span class="on">Yes or no</span><span>Count</span></div>
+  <div class="sec">Days</div><div class="dayrow">${days}</div>`;
+}
+function edit(style, app){
+  const days = "MTWTFSS".split("").map((d,i)=>`<span class="dayb ${i===3?"":"on"}">${d}</span>`).join("");
+  const syms = Object.keys(ICONS).map((k,i)=>`<span class="symb ${i===0?"on":""}">${icon(k,26)}</span>`).join("");
+  return `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>Edit habit</b><span class="btn"><b>Save</b></span></div>
+  <div class="sec">Name</div><div class="field nm">Drink water</div>
+  <div class="sec">Symbol</div><div class="symrow">${syms}</div>
+  <div class="sec">Kind</div><div class="frow"><span>Count</span><span class="val">Set when the habit has logs</span></div>
+  <div class="frow"><span>Target each day</span><b class="num typed" role="textbox">8</b></div>
+  <div class="frow"><span>Unit</span><span class="val">glasses</span></div>
+  <div class="frow"><span>One tap adds</span><b class="num typed" role="textbox">1</b></div>
+  <div class="sec">Days</div><div class="dayrow">${days}</div>
+  <p class="note hint" style="margin-top:14px">A change applies from today. Earlier days keep what they had.</p>
+  <div class="noteact" style="margin-top:18px"><span class="sysbtn ghost">Archive habit</span></div>
+  <p class="note hint">Archiving hides the habit and keeps its history. You can bring it back.</p>`;
+}
+function you(style, app){
+  return status()+`<div class="nav"><span></span><span></span></div>${head("You")}
+  <div class="sec">Look</div>
+  <div class="opt">Appearance<span class="val">Paper, Blue</span><span class="go">${chev}</span></div>
+  <div class="sec">Use</div>
+  <div class="opt">Controls on the left<span class="tog"></span></div>
+  <div class="opt">Day starts at<span class="val">04:00</span><span class="go">${chev}</span></div>
+  <div class="sec">Help</div>
+  <div class="opt">What the marks mean<span class="go">${chev}</span></div>
+  <div class="sec">Habits</div>
+  <div class="opt">Archived<span class="val">None</span><span class="go">${chev}</span></div>${tabbar("you")}`;
+}
+function appearanceM1(style, app){
+  const sws = Object.entries(TOKENS.swatches).map(([k,hex])=>`<div class="${k==="blue"?"sel":""}" style="--accent:${hex}">${mark("solid",{style,size:28})}<span>${k[0].toUpperCase()+k.slice(1)}${k==="blue"?check:""}</span></div>`).join("");
+  return status()+`<div class="nav"><span class="btn">${chev}&nbsp;You</span><span></span></div>${head("Appearance")}
+  <div class="sec">Preview</div><div class="list">${row(HABITS[0],style)}${row(HABITS[1],style)}</div>
+  <div class="sec">Light or dark</div><div class="seg" style="margin-top:0"><span>System</span><span class="on">Paper</span><span>Ink</span></div>
+  <div class="sec">Mark colour</div><div class="sw">${sws}</div>${tabbar("you")}`;
+}
+
 /* ---------- page ---------- */
 const SCREENS = {today:[today,"Today"], detail:[detail,"Habit detail"], gentle:[gentle,"Gentle Mode on Today"], appearance:[appearance,"Appearance"], marks:[marks,"Marks board"]};
 const css = v=>Object.entries(v).map(([k,x])=>`${k}:${x}`).join(";");
@@ -559,6 +622,18 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
   for(const [k,cls,fn,label] of F) html += `<figure><div class="${cls} ${s} paper" data-shot="flow-${k}" style='${v}'>${fn(s,"paper")}</div><figcaption>${label}</figcaption></figure>`;
   html += `<figure><div class="watch ${s} ink" data-shot="flow-watch" style='${vi}'>${watch(s)}</div><figcaption>Watch</figcaption></figure>`;
   html += `<figure><div class="mac ${s} paper" data-shot="flow-mac" style='${v}'>${mac(s,"paper")}</div><figcaption>Mac window. iPad uses the same sidebar and the same page width.</figcaption></figure></div>`;
+}
+{ // Milestone 1 screens, as the build will make them
+  M1 = true;
+  const s = "penAndInk", blue = TOKENS.swatches.blue;
+  const v = a=>css({...vars(s,a), "--accent":blue});
+  const G = [["today","phone","paper",today,"Today"],["today-ink","phone","ink",today,"Today, Ink"],["today-left","phone left","paper",today,"Today, controls on the left"],
+             ["today-done","phone","paper",todayDone,"Today, all done"],["today-none","phone","paper",todayNone,"Today, nothing due"],["empty","phone","paper",empty,"Today, first run"],
+             ["ax5","phone ax5","paper",ax5,"Today at the largest text size"],["add","phone modal","paper",add,"New habit, count"],["add-yesno","phone modal","paper",addYesNo,"New habit, yes or no"],
+             ["count","phone modal","paper",count,"Count sheet"],["edit","phone modal","paper",edit,"Edit habit, with Archive"],["you","phone","paper",you,"You"],["appearance","phone","paper",appearanceM1,"Appearance"]];
+  html += `<h2 class="group">Milestone 1 screens, Pen and ink. No scene art. Three tabs. Blue marks.</h2><div class="sheet">`;
+  for(const [k,cls,a,fn,label] of G) html += `<figure><div class="${cls} ${s} ${a}" data-shot="m1-${k}" style='${v(a)}'>${fn(s,a)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `</div>`; M1 = false;
 }
 for(const [style,list] of Object.entries(FONTS)){
   html += `<h2 class="group">Display fonts for ${style}</h2><div class="sheet" data-shot="fonts-${style.toLowerCase()}" style="background:#E9E6DF">${list.map(specimen).join("")}</div>`;

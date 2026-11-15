@@ -111,6 +111,7 @@ def render() -> None:
     print(f"rendered {len(ids)} frames")
     sheets(png, ids)
     flow_sheet(png)
+    m1_sheet(png, [i for i in ids if i.startswith("m1-")])
 
 
 def sheets(png: pathlib.Path, ids) -> None:
@@ -130,6 +131,21 @@ def sheets(png: pathlib.Path, ids) -> None:
         for r in rows:
             s.paste(r, (0, y)); y += r.height
         s.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG).save(png / f"sheet-{style}.png", optimize=True)
+
+
+def m1_sheet(png: pathlib.Path, ids) -> None:
+    """The milestone 1 screens in two rows, half size."""
+    ims = [Image.open(png / f"{i}.png").convert("RGB") for i in ids]
+    ims = [i.resize((i.width // 2, i.height // 2), Image.LANCZOS) for i in ims]
+    rows = [ims[:7], ims[7:]]
+    w = max(sum(i.width for i in r) + 24 * (len(r) + 1) for r in rows); hs = [max(i.height for i in r) + 48 for r in rows]
+    s = Image.new("RGB", (w, sum(hs)), (233, 230, 223)); y = 0
+    for r, h in zip(rows, hs):
+        x = 24
+        for i in r:
+            s.paste(i, (x, y + 24)); x += i.width + 24
+        y += h
+    s.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG).save(png / "sheet-m1.png", optimize=True)
 
 
 def flow_sheet(png: pathlib.Path) -> None:
