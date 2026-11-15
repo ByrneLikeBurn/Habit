@@ -73,3 +73,13 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **The signing team is not committed.** The team id lives in `Config/Local.xcconfig`, which git ignores, with an example file beside it. The repo is public and the id is tied to a person.
 
 **Screenshots are half-size JPEGs.** Thirty-seven PNGs at full size would add about 20 MB to a public repo. `tools/screenshots/m1.sh` makes them the same way each time.
+
+**A shortcut only ever logs.** The QA review found that running a yes-or-no shortcut twice took the log back, because a tap toggles. Shortcuts, Siri and NFC now mean "log", and Take away with no amount takes away one tap. In-app taps still toggle, as the spec says.
+
+**Every counted change shows Undo.** The tired daily user review found that an extra tap on a counted habit had no quick way back. Every add and take-away on a counted habit now shows its new count with Undo. A yes-or-no log shows only its mark.
+
+**The Undo line stays until the next action.** The accessibility review found five seconds too short for Switch Control and Voice Control users. The line now stays until the next log or archive, for everyone. This replaces the earlier five-second rule.
+
+**Typed numbers stop at 1,000,000.** The QA review showed that a huge number could overflow a sum and crash the app at every launch. Typing, Shortcuts and writes share one cap.
+
+**The count sheet opens full height at large text.** The accessibility review found the keyboard hid the total at AX5. At accessibility sizes the sheet opens full height and waits for a tap on the amount.
