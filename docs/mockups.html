@@ -238,6 +238,47 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .menu small{font-size:11px;color:var(--text3)}
 .undo{position:absolute;left:21px;right:21px;bottom:96px;min-height:48px;border-radius:14px;background:var(--text);color:var(--paper);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 15px/1 var(--ui)}
 .undo b{font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);margin:6px 12px 0;justify-items:center}
+.wk{display:grid;justify-items:center;align-items:center;grid-template-rows:18px 48px 18px 16px}
+.wk svg{margin:-2px 0}
+.wk span{font:500 12px/1.4 var(--ui);color:var(--text3)}
+.wk b{font-size:15px}
+.wk small{font:400 11px/1.3 var(--ui);color:var(--text2);min-height:14px}
+.ymon{display:grid;grid-template-columns:repeat(7,1fr);margin:0 21px 4px;font:500 11px/1 var(--ui);color:var(--text3)}
+.year.y29{grid-template-columns:repeat(29,1fr);gap:2.5px}
+.daystate{font-family:var(--display);font-weight:var(--dmed);font-size:calc(24px*var(--dscale));line-height:1.3;text-align:center}
+.lh,.lcs{display:grid;grid-template-columns:repeat(7,1fr);justify-items:center;align-items:center}
+.lh span{font:500 12px/1 var(--ui);color:var(--text3);height:20px}
+.lh span.now{color:var(--text);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.lr{border-top:1px solid var(--rule);padding:9px 0 0}
+.ln{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:var(--dmed);font-size:16px;line-height:1.2}
+.ln .ic{width:22px;height:22px;flex:none}
+.lc{width:44px;height:44px;display:grid;place-items:center;position:relative}
+.lc.now::after{content:"";position:absolute;inset:9px;border:1px solid var(--text);border-radius:3px}
+.yoff{position:relative}
+.yoff::after{content:"";position:absolute;left:4px;top:4px;width:3px;height:3px;border-radius:50%;background:var(--text3)}
+.ykey .yoff{width:11px;height:11px;display:block}
+.ym{min-width:44px}
+.grid .day span{color:var(--text2)}
+.grid .day.later span{color:var(--text3)}
+.sysbtn.small{min-height:44px}
+.mnav i{height:44px}
+.plink,.lnk{padding:12px 0}
+.note.links{display:flex;justify-content:center;gap:28px;margin-top:14px}
+.undo.inflow{position:static;margin:14px 21px 0}
+.ymons{display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 21px 0}
+.ym{display:grid;gap:5px;min-height:44px;align-content:start}
+.ym span{font:500 11px/1 var(--ui);color:var(--text3)}
+.ymg{display:grid;gap:2.5px}
+.ymg svg,.ymg i{width:11px;height:11px;display:block}
+.stats.tight{margin-top:4px}
+.note.since{margin-top:16px}
+.plink{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+.offdot{width:5px;height:5px;border-radius:50%;background:var(--text3);display:block}
+.sysbtn.dis{opacity:.35}
+.two-line{display:grid;justify-items:center;gap:2px}
+.two-line small{font:400 12px/1 var(--ui);color:var(--text2)}
+.ledger{margin:4px 14px 0 21px}
 </style>
 </head>
 <body>
@@ -407,7 +448,7 @@ const tabIcon = n=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
 
 /* ---------- shared pieces ---------- */
 const status = ()=>`<div class="status"><span>9:41</span><span class="r"><i style="width:17px;height:11px;opacity:.9"></i><i style="width:15px;height:11px;opacity:.9"></i><i style="width:25px;height:12px;border-radius:4px"></i></span></div>`;
-const tabbar = on=>`<div class="tabbar" style="grid-template-columns:repeat(${M1?3:4},1fr)">${[["today","Today"],["progress","Progress"],["tags","Tags"],["you","You"]].filter(t=>!(M1&&t[0]==="tags")).map(([k,l])=>`<div class="${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("")}</div>`;
+const tabbar = on=>`<div class="tabbar" style="grid-template-columns:repeat(${M1?3:4},1fr)">${[["today","Today"],["progress","History"],["tags","Tags"],["you","You"]].filter(t=>!(M1&&t[0]==="tags")).map(([k,l])=>`<div class="${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("")}</div>`;
 const chev = `<svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 2 10l8 8"/></svg>`;
 const plus = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"><path d="M11 3v16M3 11h16"/></svg>`;
 let M1 = false;   // milestone 1 frames: no scene card, three tabs, Blue marks
@@ -538,7 +579,7 @@ function ax5(style, app){
   <div class="list">${[HABITS[0],HABITS[3]].map(h=>row(h,style,undefined,undefined,52)).join("")}</div>${tabbar("today")}`;
 }
 function mac(style, app){
-  const side = [["today","Today",1],["progress","Progress",0],["you","You",0]].map(([k,l,on])=>`<div class="it ${on?"on":""}">${tabIcon(k)}${l}</div>`).join("");
+  const side = [["today","Today",1],["progress","History",0],["you","You",0]].map(([k,l,on])=>`<div class="it ${on?"on":""}">${tabIcon(k)}${l}</div>`).join("");
   return `<div class="side"><div class="lights"><i></i><i></i><i></i></div>${side}</div><div class="main"><div class="page">${todayBody(style,app,5)}</div></div>`;
 }
 function watch(style){
@@ -635,6 +676,160 @@ function appearanceM1(style, app){
   <div class="sec">Mark colour</div><div class="sw">${sws}</div>${tabbar("you")}`;
 }
 
+/* ---------- milestone 2 screens: history, a past day, export and import ---------- */
+const NOV = {1:"solid",2:"solid",3:"hatched",4:"solid",6:"paused",7:"extra",8:"paused",9:"solid",11:"solid",13:"solid",14:"hatched"};
+function monthGrid(style, showMissed, gap, cleared){
+  let cells = "";
+  for(const d of "MTWTFSS") cells += `<span class="wd">${d}</span>`;
+  for(let i=0;i<6;i++) cells += `<span></span>`;
+  for(let d=1; d<=30; d++){
+    const dow = (d+5)%7, off = dow===3;
+    const st = off ? "blank" : ((gap && d>9 ? null : NOV[d]) || (d>14 ? "blank" : (showMissed ? "missed" : "blank")));   // a future day shows its date alone
+    const st2 = cleared===d ? "paused" : st;
+    cells += `<div class="day ${d>14?"later":""}">${off && d<=14 ? offDot(30) : mark(st2,{style,size:30,today:d===14})}<span>${d}</span></div>`;
+  }
+  return `<div class="grid">${cells}</div>`;
+}
+const detailTop = (sel)=>status()+`<div class="nav"><span class="btn">${chev}&nbsp;Today</span><span class="btn">Edit</span></div>
+  ${head("Drink water","8 glasses a day. Every day except Thursday.")}
+  <div class="seg"><span class="${sel===0?"on":""}">Week</span><span class="${sel===1?"on":""}">Month</span><span class="${sel===2?"on":""}">Year</span></div>`;
+const stat = (l,v)=>`<div class="stat"><span>${l}</span><b>${v}</b></div>`;
+const marksRow = `<div class="opt" style="margin-top:14px">What the marks mean<span class="go">${chev}</span></div>`;
+const offDot = s=>`<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" aria-hidden="true"><circle cx="${s/2}" cy="${s/2}" r="2.6" fill="var(--text3)"/></svg>`;
+const HINT = `<p class="note hint">Tap a past day to add or change a log.</p>`;
+const addPast = `<div class="noteact"><span class="sysbtn ghost small">Add a past day</span></div>`;
+const since = `<p class="note hint since">Since 28 April 2026</p>`;
+const allTime = `${since}<div class="stats tight">${stat("Days logged","171")}${stat("Glasses","1,104")}${stat("Days done","142")}</div>`;
+const monthHead = `<div class="month"><b class="plink">November 2026</b><span class="mnav"><i aria-label="Previous month">${chev}</i><i class="off" aria-label="Next month">${chev}</i></span></div>`;
+function m2Month(style){
+  return detailTop(1)+monthHead+`${monthGrid(style,false)}${HINT}${addPast}${allTime}${marksRow}${tabbar("today")}`;
+}
+function m2MonthRuns(style, gap){
+  // Marks give 11, 13 and 14 November: Thursday is off, and a part-done day extends a run.
+  return detailTop(1)+monthHead+`${monthGrid(style,true,gap)}${HINT}${addPast}${since}
+  <div class="stats tight">${stat("Days logged",gap?"168":"171")}${stat("Glasses",gap?"1,085":"1,104")}${stat("Days done",gap?"140":"142")}${stat("Current run",gap?"Between runs":"3 days")}${stat("Longest run","31 days")}</div>${tabbar("today")}`;
+}
+const m2RunsGap = style=>m2MonthRuns(style,true);
+function m2Week(style){
+  const W = [["Mon","9","solid"],["Tue","10","blank"],["Wed","11","solid"],["Thu","12","off"],["Fri","13","solid"],["Sat","14","hatched"],["Sun","15","blank"]];
+  return detailTop(0)+`<div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="week">${W.map(([d,n,st])=>`<div class="wk"><span>${d} ${n}</span>${st==="off"?offDot(34):mark(st,{style,size:34,today:n==="14"})}<small>${st==="solid"?"8":st==="hatched"?"3":""}</small></div>`).join("")}</div>
+  ${HINT}<div class="stats tight">${stat("This week","27 glasses")}</div>${addPast}${allTime}${tabbar("today")}`;
+}
+function m2Year(style){
+  // Real dates. A week belongs to the month that holds its Monday. The habit was added on Tuesday 28 April 2026.
+  const start = new Date(2026,3,27), since = new Date(2026,3,28), now = new Date(2026,10,14), months = [];
+  for(let w=0; ; w++){
+    const mon = new Date(2026,3,27+w*7); if(mon > now) break;
+    let m = months[months.length-1]; if(!m || m.k !== mon.getMonth()){ m = {k:mon.getMonth(), name:mon.toLocaleString("en-GB",{month:"short"}), weeks:[]}; months.push(m); }
+    const days = [];
+    for(let d=0; d<7; d++){
+      const dt = new Date(2026,3,27+w*7+d), i = w*7+d;
+      let st = "none";
+      if(dt >= since && dt <= now){ const k = (i*7 + w*3) % 11; st = d===3 ? "off" : (w===9 ? (d===2?"extra":"paused") : (k<7?"solid":k<9?"hatched":"blank")); }
+      if(+dt === +now) st = "hatched";
+      days.push([st, +dt === +now]);
+    }
+    m.weeks.push(days);
+  }
+  const block = m=>`<div class="ym" role="button"><span>${m.name}</span><div class="ymg" style="grid-template-columns:repeat(${m.weeks.length},11px)">${
+    [0,1,2,3,4,5,6].map(d=>m.weeks.map(w=>w[d][0]==="none"?`<i></i>`:w[d][0]==="off"?`<i class="yoff"></i>`:ycell(w[d][0],style,w[d][1])).join("")).join("")}</div></div>`;
+  return detailTop(2)+`<div class="month"><b class="plink">2026</b><span class="mnav"><i class="off">${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="ymons">${months.map(block).join("")}</div>
+  <p class="note hint">Tap a month to open it.</p>
+  <div class="ykey">${[["solid","Done"],["hatched","Part done"],["paused","Paused"],["extra","Logged while paused"]].map(([st,l])=>`<div><i>${ycell(st,style)}</i>${l}</div>`).join("")}<div><i class="yoff"></i>Not scheduled</div></div>
+  ${addPast}${allTime}${tabbar("today")}`;
+}
+function m2New(style){
+  return status()+`<div class="nav"><span class="btn">${chev}&nbsp;Today</span><span class="btn">Edit</span></div>
+  ${head("Stretch before bed","Every day.")}
+  <div class="seg"><span>Week</span><span class="on">Month</span><span>Year</span></div>
+  <div class="empty"><p class="big">Nothing logged so far</p><p>Days you log will show here. You can also add a past day.</p>${sysbtn("Add a past day")}</div>${tabbar("today")}`;
+}
+const sheetTop = (habit, date)=>`<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b class="two-line"><small>${habit}</small>${date}</b><span class="btn"></span></div>`;
+function m2Day(style){
+  return sheetTop("Read","Tuesday 10 November")+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Nothing logged</b></div>
+  <div class="two">${sysbtn("Mark done")}</div>`;
+}
+function m2DayCount(style){
+  return sheetTop("Drink water","Tuesday 10 November")+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Nothing logged</b></div>
+  <div class="amt"><span>Amount to add or take away</span><b class="num typed big" role="textbox" aria-label="Amount">1</b></div>
+  <div class="two">${sysbtn("Add")}</div>`;
+}
+function m2DayLogged(style){
+  return sheetTop("Drink water","Saturday 7 November")+`<div class="bigcount"><b class="num">5</b><span>of 8 glasses that day</span></div>
+  <div class="amt"><span>Amount to add or take away</span><b class="num typed big" role="textbox" aria-label="Amount">1</b></div>
+  <div class="two">${sysbtn("Add")}</div>
+  <p class="note links"><span class="lnk">Take away</span><span class="lnk">Clear this day</span></p>`;
+}
+function m2DayDone(style){
+  return sheetTop("Read","Monday 9 November")+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Done</b></div>
+  <p class="note links"><span class="lnk">Clear this day</span></p>`;
+}
+function m2DayOff(style){
+  return sheetTop("Read","Thursday 12 November")+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Not scheduled</b></div>
+  <p class="note" style="text-align:center;margin-bottom:14px">A log here still counts.</p>
+  <div class="two">${sysbtn("Mark done")}</div>`;
+}
+function m2DayUndo(style){
+  return detailTop(1)+monthHead+`${monthGrid(style,false,false,7)}${addPast}${since}
+  <div class="stats tight">${stat("Days logged","170")}${stat("Glasses","1,099")}${stat("Days done","142")}</div>
+  <div class="undo inflow"><span>Cleared 7 November</span><b>Undo</b></div>${tabbar("today")}`;
+}
+function m2Progress(style){
+  // "off" is a day the habit is not scheduled. It shows a small dot. Sunday 15 is still to come.
+  const P = [["drop","Drink water",["solid","blank","solid","off","solid","hatched","blank"]],["book","Read",["solid","solid","solid","solid","solid","solid","blank"]],
+             ["leaf","Walk outside",["solid","off","off","solid","solid","off","off"]],["pill","Take vitamins",["solid","solid","blank","solid","solid","solid","blank"]],
+             ["moon","Stretch before bed",["blank","blank","solid","blank","solid","blank","blank"]]];
+  const cell = (x,i)=> `<span class="lc ${i===5?"now":""} ${i>5?"later":""}">${x==="off" ? offDot(20) : mark(x,{style,size:20})}</span>`;
+  return status()+`<div class="nav"><span></span><span></span></div>${head("History")}
+  <div class="seg"><span class="on">Week</span><span>Month</span><span>Year</span></div>
+  <div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="ledger"><div class="lh">${"MTWTFSS".split("").map((d,i)=>`<span class="${i===5?"now":""}">${d}</span>`).join("")}</div>
+  ${P.map(([ic,n,st])=>`<div class="lr" role="button"><span class="ln">${icon(ic,22)}${n}</span><div class="lcs">${st.map(cell).join("")}</div></div>`).join("")}</div>
+  <p class="note hint">Tap a habit to open it. Tap a day to add or change a log. A dot is a day the habit is not scheduled.</p>${tabbar("progress")}`;
+}
+function m2You(style){
+  return status()+`<div class="nav"><span></span><span></span></div>${head("You")}
+  <div class="sec">Look</div><div class="opt">Appearance<span class="val">Paper, Blue</span><span class="go">${chev}</span></div>
+  <div class="sec">History</div><div class="opt">Show runs<span class="tog"></span></div><div class="opt">Show days not logged<span class="tog"></span></div>
+  <p class="note hint">A run counts the scheduled days in a row with any log, even a small one. Days not logged adds an empty outline to past days.</p>
+  <div class="sec">Your data</div><div class="opt">Export a copy</div><div class="opt">Import a copy</div>
+  <p class="note hint">Your data lives on this device only. Export a copy now and then.</p>
+  <div class="sec">Use</div><div class="opt">Controls on the left<span class="tog"></span></div><div class="opt">Day starts at<span class="val">04:00</span><span class="go">${chev}</span></div>
+  <div class="sec">Help</div><div class="opt">What the marks mean<span class="go">${chev}</span></div>${tabbar("you")}`;
+}
+const impTop = right=>`<div class="grab"></div><div class="nav sheetnav"><span class="btn">${right?"Cancel":""}</span><b>Import</b><span class="btn">${right?"":"<b>Done</b>"}</span></div>`;
+function m2ImportPreview(style){
+  return impTop(true)+`<div class="bigcount" style="margin-top:14px"><b class="daystate">This file holds</b></div>
+  <div class="stats">${stat("Habits","7")}${stat("Logs","1,692")}${stat("New habits","2")}${stat("New logs","212")}</div>
+  <p class="note hint">1 habit has different details in this file. The version on this device is kept. Nothing here will be replaced.</p>
+  <div class="two" style="margin-top:16px">${sysbtn("Import")}</div>`;
+}
+function m2Import(style){
+  return impTop(false)+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Imported</b></div>
+  <div class="stats">${stat("Habits added","2")}${stat("Logs added","212")}${stat("Already here, skipped","1,480")}</div>
+  <p class="note hint">Nothing was replaced. Importing the same file again adds nothing.</p>`;
+}
+function m2ImportNothing(style){
+  return impTop(false)+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Nothing new in this file</b></div>
+  <p class="note" style="text-align:center">Everything in it is already here. Nothing was changed.</p>`;
+}
+function m2ImportFail(style){
+  return impTop(false)+`<div class="bigcount" style="margin-top:14px"><b class="daystate">This is not a Habit export</b></div>
+  <p class="note" style="text-align:center">Nothing was changed.</p>
+  <div class="two" style="margin-top:14px">${sysbtn("Choose another file")}</div>`;
+}
+function m2ImportNewer(style){
+  return impTop(false)+`<div class="bigcount" style="margin-top:14px"><b class="daystate">This file is from a newer version of Habit</b></div>
+  <p class="note" style="text-align:center">Update Habit on this device, then import again. Nothing was changed.</p>`;
+}
+function m2Empty(style){
+  return status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>
+  ${head("Today","Saturday 14 November")}
+  <div class="empty"><p class="big">Nothing to track yet</p><p>Add one small thing you would like to do most days.</p>${sysbtn("Add a habit")}<span class="lnk" style="margin-top:6px;font:600 15px/1.4 var(--ui)">Import a copy</span></div>${tabbar("today")}`;
+}
+
 /* ---------- page ---------- */
 const SCREENS = {today:[today,"Today"], detail:[detail,"Habit detail"], gentle:[gentle,"Gentle Mode on Today"], appearance:[appearance,"Appearance"], marks:[marks,"Marks board"]};
 const css = v=>Object.entries(v).map(([k,x])=>`${k}:${x}`).join(";");
@@ -666,6 +861,19 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
              ["count","phone modal","paper",count,"Count sheet"],["edit","phone modal","paper",edit,"Edit habit, with Archive"],["you","phone","paper",you,"You"],["appearance","phone","paper",appearanceM1,"Appearance"]];
   html += `<h2 class="group">Milestone 1 screens, Pen and ink. No scene art. Three tabs. Blue marks.</h2><div class="sheet">`;
   for(const [k,cls,a,fn,label] of G) html += `<figure><div class="${cls} ${s} ${a}" data-shot="m1-${k}" style='${v(a)}'>${fn(s,a)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `</div>`; M1 = false;
+}
+{ // Milestone 2 screens
+  M1 = true;
+  const s = "penAndInk", v = css({...vars(s,"paper"), "--accent":TOKENS.swatches.blue});
+  const G = [["month","phone",m2Month,"Habit detail, month"],["month-runs","phone",m2MonthRuns,"Month, with runs and days not logged turned on"],["runs-gap","phone",m2RunsGap,"The same, after a gap"],
+             ["week","phone",m2Week,"Habit detail, week"],["year","phone",m2Year,"Habit detail, year"],["new","phone",m2New,"A habit with nothing logged"],["progress","phone",m2Progress,"History"],
+             ["you","phone",m2You,"You"],["empty","phone",m2Empty,"Today, first run, with Import"],["day","phone modal",m2Day,"A past day, yes or no"],["day-count","phone modal",m2DayCount,"A past day, count, at zero"],
+             ["day-logged","phone modal",m2DayLogged,"A past day with a log"],["day-done","phone modal",m2DayDone,"A past day, yes or no, done"],["day-off","phone modal",m2DayOff,"A past day that was not scheduled"],["day-undo","phone",m2DayUndo,"After a past day is cleared"],
+             ["import-preview","phone modal",m2ImportPreview,"Import, before"],["import","phone modal",m2Import,"Import, done"],["import-nothing","phone modal",m2ImportNothing,"Import, nothing new"],
+             ["import-fail","phone modal",m2ImportFail,"Import, not a Habit file"],["import-newer","phone modal",m2ImportNewer,"Import, newer version"]];
+  html += `<h2 class="group">Milestone 2 screens, Pen and ink</h2><div class="sheet">`;
+  for(const [k,cls,fn,label] of G) html += `<figure><div class="${cls} ${s} paper" data-shot="m2-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
   html += `</div>`; M1 = false;
 }
 for(const [style,list] of Object.entries(FONTS)){

@@ -97,3 +97,28 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **Logging needs an unlocked device.** The security review found that Siri could read habit names and counts aloud on a locked phone. Habit names can be health details. The owner decided on 15 November 2026 that every intent needs an unlocked device, and a test checks each intent in every target.
 
 **The branch history was rewritten.** The first nine milestone 1 commits carried the owner's personal email. The owner approved a rewrite and force push on 15 November 2026. The commits now carry the GitHub noreply address, and their contents did not change.
+
+## 15 November 2026, milestone 2 design
+
+**Future days in the month view show the date alone.** The accessibility review wanted a faint dashed box so a future day differs from a blank past day. The senior designer wanted it gone because it was the loudest thing on the screen and said the least. The "Add a past day" button now gives a clear way to log a past day, so the boxes no longer earn their place.
+
+**Every addition must earn its place.** The owner set this as the test when two reviews disagree: it must add value and fit the vision and the expert reviews.
+
+**No false binaries.** When two reviews disagree, the first step is to look for a third option that meets what both are protecting, before anyone chooses a side. The owner asked for this after the run-at-zero question, where showing a zero and hiding the row both did harm and a third wording avoided both.
+
+**The Progress tab is now History.** Three reviews agreed (behavioural, neurodiversity and returning user, content). "Progress" implies a direction, so a quiet week reads as a lack of it. "Log" was ruled out because the app already uses it for an entry.
+
+**After a gap, Current run reads "Between runs".** The reviews first split three ways: hide the row, "Starts with any log", or a state phrase. In a second round all three accepted the state phrase, because it shows no zero, gives no instruction and keeps the row the user asked for. Before the first log it reads "No run yet".
+
+
+**A day that is not scheduled shows a small dot.** The brief drew it blank, the same as a day with nothing logged. The accessibility and tired-user reviews found that a returning user counts those blanks as gaps, and that the app showed "off" three different ways. One dot is now used in week, month, year and History.
+
+**A History row puts the name above its seven days.** The UI and accessibility reviews found the day cells were 23 points apart, so a thumb aimed at Wednesday could open Tuesday. Each cell is now 44 points wide.
+
+**Three reviews confirmed that a part-done day extends a run.** Milestone 1 already built it that way. The behavioural, neurodiversity and content reviews reached the same answer on their own.
+
+**Export is a plain file with no device id.** The security review wanted the device id left out, and the engineering review accepted a fixed "imported" value in its place. The owner deferred to the reviews. The export screen says the file is not encrypted.
+
+**A password on export comes after the MVP.** The reviews agree it should exist and be off by default, because a forgotten password loses that copy for good. The system password manager may offer to save it, which the owner agreed to. The app itself never stores it.
+
+**Invariant 5 names import as a second way in.** The engineering, QA and security reviews agreed that import must share the write code but cannot call the intent once per log, because a failure part way would leave half a file written. The owner approved the new wording. A source check keeps any other code from writing a log.
