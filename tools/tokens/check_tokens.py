@@ -5,14 +5,14 @@
 - no style token, swatch or palette colour is red
 
 Run: python3 tools/tokens/check_tokens.py
+Run with --table to print the measured ratios. docs/contrast.md is that output.
 """
 import colorsys, json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 T = json.loads((ROOT / "docs" / "tokens.json").read_text())
 
-FLOOR = {"paper": {"body": 17.7, "secondary": 6.8, "tertiary": 4.8},
-         "ink": {"body": 16.2, "secondary": 8.3, "tertiary": 5.1}}
+FLOOR = T["contrastFloor"]  # the floor is compared unrounded
 
 
 def rgb(h):
@@ -56,19 +56,23 @@ for style, sv in T["styles"].items():
                "secondary": contrast(over(ink, worst, p["secondaryAlpha"]), worst),
                "tertiary": contrast(over(ink, worst, p["tertiaryAlpha"]), worst)}
         for k, need in FLOOR[app].items():
-            ok = round(got[k], 1) >= need
+            ok = got[k] >= need
             rows.append((style, app, k, got[k], need, ok))
             if not ok: fails.append(f"contrast {style}/{app}/{k}: {got[k]:.2f} < {need}")
         for name in ("paper", "text"):
             if is_red(rgb(p[name])): fails.append(f"red token {style}/{app}/{name}")
 
-papers = [(s, a, worst_paper(s, a)) for s in T["styles"] for a in ("paper", "ink")]
+def base_paper(style, app): return rgb(T["styles"][style][app]["paper"])
+
+
+# a mark is checked against both the bare paper and the grained paper, whichever gives it less contrast
+papers = [(s, a, w) for s in T["styles"] for a in ("paper", "ink") for w in (base_paper(s, a), worst_paper(s, a))]
 marks = {f"swatch {k}": v for k, v in T["swatches"].items()}
 marks.update({f"accent {k}": v["accent"] for k, v in T["palettes"].items()})
 mark_rows = []
 for name, hx in marks.items():
     c = rgb(hx)
-    # a mark is measured as it is drawn: at the style's mark opacity, over that style's worst paper pixel
+    # a mark is measured as it is drawn: at the style's mark opacity, over that style's paper
     lo, where = min((contrast(over(c, w, T["markAlpha"][s]), w), f"{s}/{a}") for s, a, w in papers)
     mark_rows.append((name, hx, lo, where))
     if lo < 3.0: fails.append(f"{name} {hx}: {lo:.2f} < 3:1 on {where}")
@@ -80,7 +84,7 @@ for pname, pv in T["palettes"].items():
 
 if "--table" in sys.argv:
     print("| Style | Appearance | Text | Ratio | Floor |\n|---|---|---|---|---|")
-    for s, a, k, g, n, ok in rows: print(f"| {s} | {a} | {k} | {g:.1f}:1 | {n}:1 |")
+    for s, a, k, g, n, ok in rows: print(f"| {s} | {a} | {k} | {g:.2f}:1 | {n}:1 |")
     print("\n| Mark colour | Hex | Lowest ratio as drawn | Where |\n|---|---|---|---|")
     for n, h, lo, w in mark_rows: print(f"| {n} | `{h}` | {lo:.2f}:1 | {w} |")
 for f in fails: print("FAIL", f)

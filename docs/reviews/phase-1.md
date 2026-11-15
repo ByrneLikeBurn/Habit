@@ -1,6 +1,6 @@
 # Phase 1 reviews
 
-Run on the plan and mockups at commit bb8a2da. Four of eight lenses have reported. Typography, senior engineer, performance and security stopped on a usage limit and have not reported.
+Run on the plan and mockups at commit bb8a2da. All thirteen lenses have reported. The first four ran at commit bb8a2da. The other nine ran at commit 76f9069, after the first fixes.
 
 Status after the fix commit: 1 and 2 were decided by the owner and are applied. 3 to 17 are fixed in the mockups or written into `docs/spec.md`, except as listed here.
 
@@ -36,3 +36,46 @@ Status after the fix commit: 1 and 2 were decided by the owner and are applied. 
 - Under simulated tritanopia Sunset tests as red on 20% of pixels on Paper and 53% on Ink, and the Sunset accent tests as red. Any warm hue moves toward red in that simulation, Sunrise included. State is carried by shape. Raised by: colour vision.
 - The "ahead" mark is under 2:1 in every style. The brief asks for reduced opacity so that a future day can never look missed. Raised by: accessibility, colour vision.
 - "Extra credit" reads as grading language. It is the brief's term. Raised by: tired daily user.
+
+## Second round: nine lenses at commit 76f9069
+
+### Fixed
+
+- Senior engineer: the contrast check rounded before comparing, so two Pen and ink Paper tokens under the floor passed. The check now compares unrounded and the tokens were raised.
+- Senior engineer: the mark check used the grained paper in Ink, which flatters a mark. It now takes the lower of bare and grained paper.
+- Senior engineer: the spec's contrast tables were pasted output. They are now `docs/contrast.md`, written by the checker. The floors moved into `docs/tokens.json`.
+- Senior engineer: no test vectors existed for the Swift tint. `docs/tint-luts.json` holds them. Dead helpers in `tint.py` were deleted. Tool versions are pinned in `tools/requirements.txt`.
+- Security: the mockup render ran Chrome with no network block. Any request that is not a local file now fails the build.
+- First-day user: a counted habit had no visible way to subtract. The count line under the name now opens the count sheet.
+- First-day user: Gentle Mode had no visible way out. The Today line has a "Turn off" button.
+- First-day user: nothing said a past day can be tapped. One line under the month grid says so.
+- First-day user: the New habit sheet used a dashed circle for an unselected day, which is the drawing for "to come". It is now a solid thin circle. The key gained "Today". The Watch shows the count.
+- First-day user: "Appearance" was the name of both the page and one section. The section is now "Light or dark".
+- Content designer: VoiceOver said "Nothing logged" for a day the screen keeps silent. Such a day is now read as the date alone.
+- Content designer: the count sheet buttons were named "One less" and "One more" whatever the step. They are "Decrease" and "Increase" with the step. The hint line was removed and the number is a field.
+- Content designer: the scene card label used the palette key "bluehour". It uses the display name.
+
+### Written into the spec as rules for phase 2
+
+- Senior engineer: the data rules, the injectable clock, and the tests to add.
+- QA engineer: two-device taps, target and schedule changes against history, day-start and time-zone edges, part logs on paused days, pause edges, import twice, narrow widths.
+- Performance: baked mark geometry, one Canvas for the year view, an alpha grain tile, one tinted scene in memory, 8-bit scene layers.
+- Typographer: Bold Text weights, lining and tabular digits, slashed zero in Pencil counts, variable-font axes, no cut names at large sizes.
+- Release engineer: fixed bundle and group ids, privacy manifests, when the notification prompt appears, widget tint modes, icon variants, the 7-day limit.
+- Content designer: locale rules for week start, dates, lists and plurals.
+
+### For the owner. See "Open decisions" in `docs/spec.md`.
+
+- Product owner: milestone 1 is too large. Export is too late. Thirteen lenses per stop costs too much.
+- Release engineer: the brief forbids the `.entitlements` file that a shared store needs.
+- Senior engineer and QA engineer: the `delta` proposal and the data rules.
+
+### Not fixed, with the reason
+
+- Security: the mockup fonts came from the Google Fonts mirror, not each upstream repository. No font ships yet. The spec requires the upstream file before one does.
+- Security: the Fraunces license file says 2018 and the font says 2020. Fraunces is not a pick.
+- Typographer: Alegreya Sans ExtraBold is not in the repo. It is added when the font is picked.
+- Product owner: merge the colour-vision lens into accessibility and the typographer into the Apple designer. Not done. In this round each of those lenses found things the other did not.
+- Content designer: rename Gentle Mode and reword "Extra credit". Both are the brief's own terms. A translator note was added for "Extra credit".
+- First-day user: no key on Today. A key on Today adds noise for the daily user. The key is on Habit detail and in You.
+- Release engineer: whether a free Apple account can use App Groups could not be confirmed from Apple's pages. It is tested before milestone 1.

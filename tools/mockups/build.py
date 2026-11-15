@@ -93,6 +93,9 @@ def render() -> None:
     with sync_playwright() as pw:
         b = pw.chromium.launch(executable_path="/usr/bin/google-chrome", args=["--no-sandbox", "--force-color-profile=srgb"])
         page = b.new_page(viewport={"width": 1800, "height": 1200}, device_scale_factor=2)
+        # the build is offline: any request that is not a local file fails it
+        blocked = []
+        page.route("**/*", lambda r: r.continue_() if r.request.url.startswith(("file:", "data:")) else (blocked.append(r.request.url), r.abort()))
         page.goto((DOCS / "mockups.html").as_uri())
         page.evaluate("document.fonts.ready")
         page.wait_for_timeout(600)
@@ -100,6 +103,8 @@ def render() -> None:
         for i in ids:
             page.locator(f'[data-shot="{i}"]').screenshot(path=str(png / f"{i}.png"))
         b.close()
+    if blocked:
+        raise SystemExit(f"mockups.html tried the network: {blocked}")
     for i in ids:  # 256-colour palette keeps the repo small and is enough for a mockup
         f = png / f"{i}.png"
         Image.open(f).convert("RGB").quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG).save(f, optimize=True)

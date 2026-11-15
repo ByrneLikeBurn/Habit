@@ -79,46 +79,7 @@ Tokens are in `docs/tokens.json`. `tools/tokens/check_tokens.py` checks them. `t
 
 Labels and controls use SF in every style. System controls take the text colour as their tint, because the accent may tint marks only (**Guess**). The Appearance control offers System, Paper and Ink (**Guess**).
 
-**Text contrast**, measured against the worst pixel of each paper (the base colour with grain at full strength):
-
-| Style | Appearance | Text | Ratio | Floor |
-|---|---|---|---|---|
-| penAndInk | paper | body | 17.7:1 | 17.7:1 |
-| penAndInk | paper | secondary | 6.8:1 | 6.8:1 |
-| penAndInk | paper | tertiary | 4.8:1 | 4.8:1 |
-| penAndInk | ink | body | 16.3:1 | 16.2:1 |
-| penAndInk | ink | secondary | 8.3:1 | 8.3:1 |
-| penAndInk | ink | tertiary | 5.2:1 | 5.1:1 |
-| pencil | paper | body | 17.9:1 | 17.7:1 |
-| pencil | paper | secondary | 7.8:1 | 6.8:1 |
-| pencil | paper | tertiary | 5.4:1 | 4.8:1 |
-| pencil | ink | body | 16.7:1 | 16.2:1 |
-| pencil | ink | secondary | 8.6:1 | 8.3:1 |
-| pencil | ink | tertiary | 5.2:1 | 5.1:1 |
-| watercolor | paper | body | 18.1:1 | 17.7:1 |
-| watercolor | paper | secondary | 7.7:1 | 6.8:1 |
-| watercolor | paper | tertiary | 5.4:1 | 4.8:1 |
-| watercolor | ink | body | 16.6:1 | 16.2:1 |
-| watercolor | ink | secondary | 8.5:1 | 8.3:1 |
-| watercolor | ink | tertiary | 5.3:1 | 5.1:1 |
-
-**Mark colours**, measured as drawn: at the opacity the style draws the edge that carries state, over that style's worst paper pixel.
-
-| Mark colour | Hex | Lowest ratio as drawn | Where |
-|---|---|---|---|
-| swatch ochre | `#A47C1E` | 3.32:1 | watercolor/paper |
-| swatch moss | `#6E8B2E` | 3.37:1 | watercolor/paper |
-| swatch leaf | `#3E8A45` | 3.68:1 | watercolor/paper |
-| swatch teal | `#2A8A86` | 3.58:1 | watercolor/paper |
-| swatch blue | `#4C78C8` | 3.74:1 | watercolor/paper |
-| swatch indigo | `#6A6AD0` | 3.93:1 | watercolor/paper |
-| swatch plum | `#9A5DB0` | 3.94:1 | watercolor/paper |
-| swatch graphite | `#6F6B66` | 3.47:1 | watercolor/ink |
-| accent sunrise | `#A8802A` | 3.16:1 | watercolor/paper |
-| accent midday | `#3F8554` | 3.84:1 | watercolor/paper |
-| accent sunset | `#B26A2C` | 3.64:1 | watercolor/paper |
-| accent bluehour | `#5B72C4` | 3.87:1 | watercolor/paper |
-| accent night | `#6B6FB8` | 3.91:1 | watercolor/paper |
+**Contrast.** Text contrast against the worst pixel of each paper, and mark contrast as drawn, are in `docs/contrast.md`. That file is the output of `python3 tools/tokens/check_tokens.py --table`. The floor is compared unrounded and lives in `docs/tokens.json`.
 
 ## Marks
 
@@ -144,7 +105,9 @@ One drawing has one meaning.
 
 **Month view.** Each day shows its date under the mark. An off-schedule day shows the date alone.
 
-**VoiceOver.** A day is read as date then state, for example "Tuesday 10 November. Done." State names: Done, Part done, Paused, Extra credit, Nothing logged, Off schedule, To come. Today is read as "Today" before the date. The heat map groups by week with a summary.
+**VoiceOver.** A day is read as date then state, for example "Tuesday 10 November. Done." State names: Done, Part done, Paused, Extra credit, To come. A day with no log and an off-schedule day are read as the date alone. "Not logged" is spoken only when Show days not logged is on. Today is read as "Today" before the date. The heat map groups by week with a summary. The scene card is one element, read as scene then palette name, for example "Lake, blue hour".
+
+**Where the key lives.** Habit detail has a key. You has a row, "What the marks mean", that opens the marks board.
 
 ## Screens and behaviour
 
@@ -152,9 +115,11 @@ One drawing has one meaning.
 
 **Today rows.** A row shows a second line only when it says something about today: the count for a counted habit, or "Extra credit". Habits that are off schedule today are not listed (**Guess**).
 
-**Logging. Guess.** A tap on a yes-or-no habit logs it. A second tap takes the log back. A tap on a counted habit adds the habit's tap amount, which defaults to 1. Touch and hold opens a sheet with minus, plus and a number that can be typed. The same actions are offered to VoiceOver as adjustable actions and in a context menu, so nothing depends on touch and hold.
+**Logging. Guess.** A tap on a yes-or-no habit logs it. A second tap takes the log back. A tap on a counted habit adds the habit's tap amount, which defaults to 1. The count line under a counted habit's name ("3 of 8 glasses") is a button that opens the count sheet: minus, plus, and a number field. Touch and hold on the control opens the same sheet. VoiceOver gets adjustable actions named "Increase" and "Decrease" with the step as the value.
 
-**Past days. Guess.** In the month view of Habit detail, a tap on a past day logs or edits that day through the same intent. Future days cannot be logged.
+**Past days. Guess.** In the month view of Habit detail, a tap on a past day logs or edits that day through the same intent. A yes-or-no habit toggles. A counted habit opens the count sheet for that day. One line under the grid says "Tap a past day to change it." Future days cannot be logged.
+
+**Gentle Mode.** The switch is in You. While it is on, Today shows one line that says so, with a "Turn off" button.
 
 **Proposed change to the brief, waiting for the owner.** The brief says `LogEvent.delta` is +1 or -1. A habit with a target of 6,000 steps would need thousands of events. The proposal is that `delta` is any whole number, positive or negative. Sums still commute across devices. `Habit` gains `tapAmount`, default 1. The schema is additive forever, so this is decided before milestone 1.
 
@@ -164,11 +129,99 @@ One drawing has one meaning.
 
 **Large text.** At accessibility sizes a Today row becomes one column: symbol, name, count, then the control, which grows to 76 points. The name is never cut. The three-line limit applies only at standard sizes. On Appearance, the style tiles and the scene picker become lists. The scene card does not scale.
 
-**Watch. Guess.** The Watch shows today's habits as a list of name and control. It has no scene card. Text is the system font. Marks are drawn in the chosen style.
+**Watch. Guess.** The Watch shows today's habits as a list of name and control, with the count under the name for a counted habit. It has no scene card. Text is the system font. Marks are drawn in the chosen style. At large text sizes the control moves under the name.
+
+**Narrow widths. Guess.** The scene card is centred. At 375 points wide its side margins are 12.5 points. Below 366 points (iPad Slide Over and narrow Split View) the card scales down to the width less 16 points. This is the one case where the card is not 350 by 118. The Mac window cannot be made narrower than the sidebar plus the page.
+
+**Scene picker.** The picker lists approved scenes only. With one scene it is not shown.
 
 **First run.** Today shows the scene card, one line of text and one button, "Add a habit".
 
 **Shared store. To check in milestone 1.** Widgets, App Intents and the Watch app need the SwiftData store in an App Group container. The owner has a free Apple account. Milestone 1 checks that an App Group works with free signing, because milestone 5 depends on it.
+
+## Product, from the brief
+
+**Tabs.** Today, Progress, Tags, You. Today is the list, the check-offs and the scene card. Progress is the all-habit ledger with a heat map. Tags is the NFC walkthrough. You holds Nudges, Appearance, Gentle Mode, Vacation, Archive and Export.
+
+**Pausing.** Vacation Mode pauses with a start and end date. Gentle Mode is armed once with one switch and pauses everything with no end date until it is turned off.
+
+**Data model.** Three SwiftData models.
+
+| Model | Fields |
+|---|---|
+| `Habit` | id, name, symbol name, kind (binary or counted), target (1 for binary), unit, schedule mask (weekday bits, 127 is daily), sort index, focus flag, Gentle Mode flag, Vacation default flag, tag nickname, nudge hour (default 9), descriptor, nudge phrase, nudge text, keep-wording flag, created, archived and deleted dates, relationships to events and pauses |
+| `LogEvent` | Append-only. delta, habit, day key, source (manual, watch, widget, shortcut, siri, control), timestamp, device id |
+| `Pause` | habit, start day, end day (nil is open-ended), reason (vacation, gentle, manual) |
+
+The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settable day-start hour (default 04:00) and fixed at write time. Day totals are derived and cached in memory, never stored.
+
+## Data rules
+
+All **Guess** unless marked. These came from the engineering and QA reviews. They are decided before milestone 1 because the schema is additive forever.
+
+- Every model property is optional or has a default, relationships are optional, and nothing is marked unique. CloudKit needs this later.
+- `LogEvent` has a stable id. Import skips an event whose id is already in the store.
+- A yes-or-no habit is done when the day's total is 1 or more. Taking a log back writes minus the current total. A total below 0 is shown as 0.
+- A typed count writes the difference between the typed number and the total the device sees.
+- A log on a paused day is extra credit, whatever the count. A log on an off-schedule day is extra credit too.
+- Turning Gentle Mode off sets the end day to today, so today stays paused.
+- Pauses may start in the past. Overlapping pauses are treated as one.
+- Changing a target or schedule applies from the day of the change. Earlier days keep the old target and schedule. `Habit` keeps a short history of (first day, target, schedule mask) for this.
+- "Today" is computed from the device's current calendar, time zone and day-start hour. A day that already holds a log is drawn by its state, even if travel or a new day-start hour puts it after today.
+- If the day-start hour does not exist on a daylight-saving night, the next valid time is used. The day-start hour can be set from 00:00 to 08:00.
+
+## Rules for phase 2, from the reviews
+
+**Drawing and memory.**
+- Pencil wobble and Watercolor edges are baked into the path once, with fixed-seed noise. One cached drawing per style, state, size, accent, appearance and display scale. No filter, blur or shader runs per mark.
+- The year view is one `Canvas` with one accessibility element per week.
+- Paper grain ships as one 8-bit alpha tile per style, tinted with the token colour and tiled. It is not a full-screen bitmap.
+- Only the current tinted scene is kept in memory. Tinting runs off the main actor.
+- The two ramps are blended in gamma sRGB, as `tools/scenes/tint.py` does. `docs/tint-luts.json` holds the lookup tables for a Swift test to match.
+- Scene value layers stay 8-bit PNG. A 16-level PNG bands the sky.
+
+**Type.**
+- Display-font digits are lining and tabular. In Pencil, digits in counts and stats use the slashed zero.
+- Bold Text weights: Pen and ink medium to semibold and bold to heavy. Pencil 450 to 600 and 650 to 800. Watercolor 500 to 700 and 700 to 800, which needs Alegreya Sans ExtraBold in the bundle.
+- Variable fonts are built from a font descriptor with explicit axis values, then scaled with the text style. `Font.custom` by family name gives the wrong weight for Shantell Sans and Fraunces.
+- A habit name is never cut from the xxLarge text size upward.
+- Before a font ships, it is downloaded from its upstream repository, and that file's hash and license are recorded. The mockup files came from the Google Fonts mirror.
+
+**Words and locale.**
+- Week start, weekday order and weekday letters come from the user's calendar. Day buttons are read by VoiceOver with full weekday names.
+- Dates and lists use the system format styles, never a fixed pattern.
+- Every count is one String Catalog entry with plural forms and positional values. The user's unit is shown as typed.
+- Layout uses leading and trailing, so it mirrors in right-to-left languages. The hatch angle does not mirror.
+- "Extra credit" has a translator note: not a score or grade.
+
+**Tests.**
+- The clock, calendar, time zone and locale are one injectable value in `HabitKit`. Tests and screenshots set it from fixtures.
+- Tests cover: two devices tapping offline, a target or schedule change against history, a day-start change during a day, time-zone moves, daylight saving at the day-start hour, a part log on a paused day, export and import including importing twice, and layout at 320 and 375 points.
+- A test walks the custom hue ring and checks every hue at 3:1 on both papers of every style.
+
+**Release.**
+- Bundle ids and the App Group id are fixed in this file before any target exists. Intents live in the app target.
+- Every target has a privacy manifest. This is on the milestone 1 definition of done.
+- The notification prompt appears only when the user first turns on a nudge. If it is declined, that setting shows one line with a link to Settings, and nothing appears anywhere else.
+- Quiet Hours work by not scheduling. The Time Sensitive level is not used.
+- In tinted and clear widget modes the system sets the colour. Marks there carry state by shape alone. A system tint of red is the user's choice and is outside the app.
+- The app icon needs default, dark, clear and tinted variants.
+- A free Apple account's builds stop launching after 7 days and must be rebuilt from the Mac. Export and import are the way back if the bundle or team changes.
+
+## Open decisions
+
+Each needs the owner. The recommendation is mine.
+
+| # | Decision | Recommendation | Blocks |
+|---|---|---|---|
+| 1 | `LogEvent.delta` may be any whole number, and `Habit` gains `tapAmount` | Yes | Milestone 1 |
+| 2 | The brief forbids an `.entitlements` file. A shared store for widgets and the Watch needs one for the App Group | Allow one that holds the App Group only. Test it with free signing before milestone 1 | Milestone 1 |
+| 3 | Milestone 1 builds three styles, two downloaded fonts and five palettes before a habit can be logged | Milestone 1 builds the style layer and Pen and ink. Pencil and Watercolor get their own milestone after milestone 3 | Milestone 1 |
+| 4 | Export and import are in milestone 10. The phone holds the only copy of the data | Move both to milestone 2 | Milestone 2 |
+| 5 | Eight lenses after every milestone and thirteen at each stop is about 120 review runs. Eight at once hit the usage limit twice | After each milestone run engineer, QA and tired daily user, plus accessibility when the UI changes and security when a permission, file or dependency is added. Run all thirteen at the three stops, three at a time | Milestone 1 report |
+| 6 | The data rules above | Accept as written | Milestone 1 |
+| 7 | Display fonts for Pencil and Watercolor | Shantell Sans and Alegreya Sans | The Pencil and Watercolor milestone |
+| 8 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
 
 ## Fonts proposed
 
@@ -188,7 +241,8 @@ Whether Optima and Chalkboard SE resolve on watchOS is not checked. It is a phas
 - The Pen and ink tokens for Ink give 16.15:1 for body and 5.04:1 for tertiary by the WCAG formula. The floor in the brief is 16.2:1 and 5.1:1. The Ink text was changed from `#F2EEE5` to `#F3EFE6` and tertiary from 52% to 53% so the floor holds. The other choice is to keep the tokens and lower the floor.
 - `gh repo create` is not available in the session that ran phase 1. The owner created the repo by hand.
 - The brief's year view (opacity steps) and its default drawing of a missed day conflicted with invariants 2 and 1. The owner resolved both. See Marks.
-- `CLAUDE.md` does not hold the brief's product, design, accessibility and architecture sections. A phase 2 session needs the brief pasted again, or the brief committed to the repo.
+- `CLAUDE.md` did not hold the brief's product section or its definition of done. The product section is now in this file and the definition of done is in `CLAUDE.md`. The brief's design, accessibility and architecture sections are still only in the brief. A phase 2 session needs the brief pasted again.
+- The brief's Pen and ink Paper tokens give 6.76:1 for secondary and 4.77:1 for tertiary, under the 6.8:1 and 4.8:1 floor when compared unrounded. Secondary went from 70% to 70.5% and tertiary from 60% to 60.5%.
 
 ## Decisions log
 

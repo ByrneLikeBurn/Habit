@@ -120,13 +120,3 @@ def to_image(rgb: np.ndarray) -> Image.Image:
 
 def load_value(path: str) -> np.ndarray:
     return np.asarray(Image.open(path).convert("L")).astype(np.float64) / 255.0
-
-
-def luminance(rgb) -> float:
-    return float(srgb_to_lin(np.asarray(rgb)) @ np.array([0.2126, 0.7152, 0.0722]))
-
-
-def contrast(a, b) -> float:
-    la, lb = luminance(a), luminance(b)
-    hi, lo = max(la, lb), min(la, lb)
-    return (hi + 0.05) / (lo + 0.05)

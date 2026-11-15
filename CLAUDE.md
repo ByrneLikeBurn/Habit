@@ -85,6 +85,26 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 **Command approvals.** Before any command that needs approval, say in one plain sentence what it does and whether it is reversible. Flag `rm`, `sudo`, `git reset --hard`, force pushes and anything outside the project folder.
 
+**Definition of done.** Walk this list in each milestone report and mark each line honestly.
+
+- Builds for macOS, `generic/platform=iOS Simulator` and watchOS with no errors and no new warnings
+- `swift test` in `HabitKit` and the app tests pass, including tests added
+- Streak tests assert invariant 3 directly: paused with no log neither breaks nor extends; paused with a log extends
+- A test asserts no style token, swatch or palette colour is red
+- Contrast test: every text token on the worst pixel of each style's paper, both appearances, meets the floor
+- Palette selection by clock is tested at every boundary, with the day-start hour at 0 and at 6
+- A test asserts an unknown stored style, scene or palette falls back to Pen and ink, Lake and auto
+- Export and import round-trip test passes
+- An automated check fails if `Color("` or `.custom(` appears outside the style files
+- Screenshots of every screen, style and appearance saved with paths listed, deterministic (pinned simulator, fixture store, frozen clock, animations off)
+- Each screen checked at AX5 and with Increase Contrast
+- Scrolling Today with 30 fixture habits does not redraw grain per frame. Say how it was checked
+- Scene assets: total size listed, within budget. Each scene checked at full, half and one-third size, in all five palettes, under the four colour-vision filters
+- No scene was built that the owner had not approved
+- No new dependencies. `docs/asset-licenses.md` lists every font and texture
+- Every target has a privacy manifest
+- The reviews ran as separate subagents and their findings are in the report
+
 **Review lenses.** Each lens runs as a separate subagent that has not seen the working. It gets its brief, this file and the thing under review. It returns at most five findings, ranked, each with a file and line or a screen, and a concrete failure scenario. Valid findings are fixed. The rest are listed with the reason.
 
 The first eight run after every milestone. The last five were added on 14 November 2026 to cover the roles an app team has. They run at each stop: the end of phase 1, after milestone 3, and at the end. Run lenses two or three at a time, not all at once.

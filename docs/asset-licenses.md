@@ -29,7 +29,10 @@ All of these are drawn by code in this repo. None comes from a stock source.
 | `docs/scenes/lake/*.jpg` | `tools/scenes/sheets.py` |
 | `docs/mockups/scenes/*` | `tools/mockups/build.py` |
 | `docs/mockups/grain/*.png` | `tools/mockups/build.py` |
+| `docs/tint-luts.json` | `tools/scenes/export_luts.py` |
 
 ## Tools
 
-The Python tools need numpy, scipy, Pillow and playwright. They run offline on a developer machine. The app does not depend on them.
+The Python tools need numpy, scipy, Pillow and playwright, at the versions in `tools/requirements.txt`. They run offline on a developer machine. The app does not depend on them.
+
+Before any font ships in the app it is downloaded again from its upstream repository, and that hash is recorded here.
