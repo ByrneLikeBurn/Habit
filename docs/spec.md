@@ -439,6 +439,20 @@ Drawn in `docs/mockups/png/sheet-m3.png`, in Pen and ink. Three reviews saw the 
 
 **Still owed.** The largest text size for the Today lines and the widget, clear mode, the Mac and Watch versions, and tests for travel across a pause edge.
 
+## Largest text size, milestones 2 and 3
+
+Drawn in `docs/mockups/png/sheet-ax.png`. First draft, 15 November 2026, not yet reviewed (**Guess**).
+
+- Week, Month and Year become one "View" row that opens a list, as milestone 1 did for segmented controls.
+- Week is a list of days: mark, date and the day's count in words.
+- Year is a list of months as text.
+- Month keeps seven columns. Marks stay at 30 points and the date numerals are capped.
+- Stats stack the label over the value.
+- A History row puts the name above seven cells.
+- The day sheet stacks Add, Take away and Clear this day as full-width buttons.
+- The paused line on Today shows only its first sentence and its button.
+- The widget shows two rows.
+
 ## Open decisions
 
 Each needs the owner. The recommendation is mine.
