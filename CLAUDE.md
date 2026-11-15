@@ -18,7 +18,7 @@ This file is the project brief for every session. `docs/spec.md` records decisio
 
 The owner set this on 14 November 2026. The brief began as an idea. Development follows evidence. Where an expert review disagrees with this file on design, UI or UX, and the change serves the user, the review wins. Every such change is written in `docs/decisions.md` with the review that asked for it, and is reported to the owner with two or three sentences that say what changed and why.
 
-This does not cover privacy, what leaves the device, dependencies, the additive schema rule, or cost. Those stay with the owner. Where two reviews disagree, the owner decides.
+This does not cover privacy, what leaves the device, dependencies, the additive schema rule, or cost. Those stay with the owner. Where two reviews disagree, do not treat it as a choice between the two. First look for an option neither review considered that meets what both are protecting. Change the vantage point and widen the view: ask what each review is trying to prevent, and whether one design prevents both. Bring that option to the owner with the two positions. The owner decides. The test is that every addition adds value, earns its place, and fits the vision and the reviews.
 
 ## Invariants
 

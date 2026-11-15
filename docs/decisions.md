@@ -49,3 +49,5 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **Future days in the month view show the date alone.** The accessibility review wanted a faint dashed box so a future day differs from a blank past day. The senior designer wanted it gone because it was the loudest thing on the screen and said the least. The "Add a past day" button now gives a clear way to log a past day, so the boxes no longer earn their place.
 
 **Every addition must earn its place.** The owner set this as the test when two reviews disagree: it must add value and fit the vision and the expert reviews.
+
+**No false binaries.** When two reviews disagree, the first step is to look for a third option that meets what both are protecting, before anyone chooses a side. The owner asked for this after the run-at-zero question, where showing a zero and hiding the row both did harm and a third wording avoided both.
