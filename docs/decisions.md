@@ -120,3 +120,5 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **Export is a plain file with no device id.** The security review wanted the device id left out, and the engineering review accepted a fixed "imported" value in its place. The owner deferred to the reviews. The export screen says the file is not encrypted.
 
 **A password on export comes after the MVP.** The reviews agree it should exist and be off by default, because a forgotten password loses that copy for good. The system password manager may offer to save it, which the owner agreed to. The app itself never stores it.
+
+**Invariant 5 names import as a second way in.** The engineering, QA and security reviews agreed that import must share the write code but cannot call the intent once per log, because a failure part way would leave half a file written. The owner approved the new wording. A source check keeps any other code from writing a log.

@@ -30,7 +30,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 2. **Colour carries no meaning.** Heat-map intensity is hatching density, never hue. The user's accent tints marks only, never text, never rules. Text contrast is a fixed constant the user cannot break.
 3. **Pausing only ever helps.** A paused day with no log never breaks a run and never extends it. A paused day with a log extends it. The app calls such a day "Logged while paused". The streak function has unit tests that assert exactly this.
 4. **Every input is optional.** NFC, widgets and the Watch are shortcuts, not dependencies. Losing a tag breaks nothing.
-5. **One write path.** Every `LogEvent` is written by one App Intent, `LogHabitIntent`. Widget button, Shortcuts and NFC, Control Centre, Action button, Siri and in-app taps all route through it.
+5. **One write path.** Every `LogEvent` is created in `LogWriter`. A user log reaches it only through `LogHabitIntent`: widget button, Shortcuts and NFC, Control Centre, Action button, Siri and in-app taps all route through it. Import reaches it only through `LogWriter.importEvents`, which writes all of a file or none. The owner approved this wording on 15 November 2026.
 6. **Time of day carries no habit meaning.** Palettes follow the clock. They never react to streaks, misses, pauses, counts or completion.
 7. **Scenes are calm.** No people, animals, buildings or weather. One soft horizon. Nothing moves. No true red in any palette. Scenes appear in one framed card at the top of Today and nowhere else, never behind text, rows or marks.
 8. **System chrome stays system.** Tab bar, navigation bars, sheets, alerts and the keyboard are not restyled or covered.
