@@ -2,6 +2,10 @@
 
 This file records decisions. Items marked **Guess** were made where the brief is silent and wait for the owner's yes or no. Items marked **Owner** were decided by the owner after the brief was written.
 
+## Goal
+
+**Owner**, 14 November 2026. The goal is a minimum usable app, milestones 1 to 3, with inclusion and accessibility built in from the first milestone and not added later.
+
 ## Status
 
 Phase 1, design. No Swift exists. The owner approved Lake variant A. No other scene is started. Review findings are in `docs/reviews/phase-1.md`.
@@ -252,7 +256,7 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 | 12 | Removal | Restore, Recently Deleted, purge |
 | 13 | Polish | Accessibility audit, Dynamic Type sweep, the usage data page if approved |
 
-**Art is supplemental. Owner.** Scene art waits for milestone 5. Until then Today has no card and marks use a swatch. The default swatch is Graphite (**Guess**). Whether each style gets its own drawing of a scene is decided in milestone 5.
+**Art is supplemental. Owner.** Scene art waits for milestone 5. Until then Today has no card and marks use a swatch. The default swatch is Blue (**Owner**). Whether each style gets its own drawing of a scene is decided in milestone 5.
 
 ## Usage data
 
