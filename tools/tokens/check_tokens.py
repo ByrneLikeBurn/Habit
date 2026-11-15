@@ -1,7 +1,7 @@
 """Checks the design tokens in docs/tokens.json against the brief.
 
 - text contrast floor against the worst pixel of each style's paper, both appearances
-- every swatch and palette accent at least 3:1 against both papers of every style
+- every swatch and palette accent at least 3:1 against both papers of every style, at the opacity that style draws marks
 - no style token, swatch or palette colour is red
 
 Run: python3 tools/tokens/check_tokens.py
@@ -68,9 +68,10 @@ marks.update({f"accent {k}": v["accent"] for k, v in T["palettes"].items()})
 mark_rows = []
 for name, hx in marks.items():
     c = rgb(hx)
-    lo = min(contrast(c, w) for _, _, w in papers)
-    mark_rows.append((name, hx, lo))
-    if lo < 3.0: fails.append(f"{name} {hx}: {lo:.2f} < 3:1")
+    # a mark is measured as it is drawn: at the style's mark opacity, over that style's worst paper pixel
+    lo, where = min((contrast(over(c, w, T["markAlpha"][s]), w), f"{s}/{a}") for s, a, w in papers)
+    mark_rows.append((name, hx, lo, where))
+    if lo < 3.0: fails.append(f"{name} {hx}: {lo:.2f} < 3:1 on {where}")
     if is_red(c): fails.append(f"red: {name} {hx}")
 for pname, pv in T["palettes"].items():
     for ramp in ("top", "bottom"):
@@ -80,8 +81,8 @@ for pname, pv in T["palettes"].items():
 if "--table" in sys.argv:
     print("| Style | Appearance | Text | Ratio | Floor |\n|---|---|---|---|---|")
     for s, a, k, g, n, ok in rows: print(f"| {s} | {a} | {k} | {g:.1f}:1 | {n}:1 |")
-    print("\n| Mark colour | Hex | Lowest ratio on any paper |\n|---|---|---|")
-    for n, h, lo in mark_rows: print(f"| {n} | `{h}` | {lo:.1f}:1 |")
+    print("\n| Mark colour | Hex | Lowest ratio as drawn | Where |\n|---|---|---|---|")
+    for n, h, lo, w in mark_rows: print(f"| {n} | `{h}` | {lo:.2f}:1 | {w} |")
 for f in fails: print("FAIL", f)
 print("ok" if not fails else f"{len(fails)} failures")
 sys.exit(1 if fails else 0)

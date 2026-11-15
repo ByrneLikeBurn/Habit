@@ -10,24 +10,17 @@ from __future__ import annotations
 import numpy as np
 from PIL import Image
 
-STOPS = (0.0, 0.22, 0.50, 0.80, 1.0)  # paper, light wash, mid wash, dark pigment, darkest
+import json
+import pathlib
 
-PAPER = "#FBFAF6"
+_TOKENS = json.loads((pathlib.Path(__file__).resolve().parents[2] / "docs" / "tokens.json").read_text())
 
+STOPS = tuple(_TOKENS["densityStops"])  # paper, light wash, mid wash, dark pigment, darkest
+PAPER = _TOKENS["styles"]["penAndInk"]["paper"]["paper"]
 # name: (top ramp, bottom ramp). Each ramp is light, mid, dark, darkest. Paper is prepended.
-PALETTES = {
-    "sunrise": (("#F6D3BE", "#E9A27F", "#A56A49", "#573A2C"),      # soft coral
-                ("#F8E3B2", "#E5BA60", "#987230", "#523F1F")),     # into gold
-    "midday": (("#D5E6D0", "#84B383", "#2F6B4B", "#0D2E20"),
-               ("#DDE8C4", "#97B66B", "#44702F", "#162F0E")),
-    "sunset": (("#F0C17C", "#D58C3A", "#85501F", "#3F2510"),       # gold, denser
-               ("#EDAB8C", "#D27C55", "#864A2D", "#40241A")),      # into coral, denser
-    "bluehour": (("#CCDBF1", "#7195D1", "#2D4D90", "#13224B"),     # blue
-                 ("#DAD1EE", "#9B85CC", "#543C85", "#271A49")),    # into purple
-    "night": (("#959ABF", "#5C6294", "#2E325F", "#141631"),
-              ("#9A97C2", "#625F98", "#332F62", "#171433")),
-}
-NIGHT_PAPER = "#C6C9DF"  # at night the bare paper itself is dim
+PALETTES = {k: (tuple(v["top"]), tuple(v["bottom"])) for k, v in _TOKENS["palettes"].items()}
+NIGHT_PAPER = _TOKENS["palettes"]["night"]["paper"]  # at night the bare paper itself is dim
+_INK = _TOKENS["inkScene"]
 
 
 def hex_rgb(h: str) -> np.ndarray:
@@ -81,7 +74,7 @@ def ramp_lut(colors, paper) -> np.ndarray:
 def dim_for_ink(rgb: np.ndarray) -> np.ndarray:
     """Ink appearance: the same painting seen in low light. Order of values is kept."""
     lab = to_oklab(rgb)
-    lab[..., 0] = 0.10 + 0.64 * lab[..., 0]
+    lab[..., 0] = _INK["lightnessOffset"] + _INK["lightnessGain"] * lab[..., 0]
     return from_oklab(lab)
 
 
@@ -90,7 +83,7 @@ def luts(palette: str, appearance: str = "paper", paper: str = PAPER):
     pp = NIGHT_PAPER if palette == "night" else paper
     if appearance == "ink":
         # the unpainted paper takes the light wash colour, so the glow is coloured light and not grey
-        pt = _mix(pp, top[0], 0.35); pb = _mix(pp, bottom[0], 0.35)
+        k = _INK["paperTakesLightWash"]; pt = _mix(pp, top[0], k); pb = _mix(pp, bottom[0], k)
         return dim_for_ink(ramp_lut(top, pt)), dim_for_ink(ramp_lut(bottom, pb))
     return ramp_lut(top, pp), ramp_lut(bottom, pp)
 

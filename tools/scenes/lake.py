@@ -69,7 +69,7 @@ def variant_a() -> np.ndarray:
                      (.55, .255), (.61, .225), (.70, .29), (.82, .36), (.94, .40), (1.05, .42)],
                     wobble=0.006, wobble_sigma=30, seed=21)
     m = p.ragged(p.below(far), edge=2.5, rough=4, fine=2, seed=22) * above
-    p.wash(m, 0.30 - 0.20 * smoothstep(0.24, yw, YN), rim=0.22, rim_w=5, gran=0.064, flow=0.16, seed=23)
+    p.wash(m, 0.38 - 0.24 * smoothstep(0.24, yw, YN), rim=0.26, rim_w=5, gran=0.064, flow=0.16, seed=23)
     p.mist(yw - 0.035, 0.055, 0.62, seed=24)
 
     mid = p.profile([(-0.05, yw + .30), (.26, yw + .12), (.33, yw + .03), (.40, .50), (.50, .455), (.62, .415),

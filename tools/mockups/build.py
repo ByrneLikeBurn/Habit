@@ -105,6 +105,7 @@ def render() -> None:
         Image.open(f).convert("RGB").quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG).save(f, optimize=True)
     print(f"rendered {len(ids)} frames")
     sheets(png, ids)
+    flow_sheet(png)
 
 
 def sheets(png: pathlib.Path, ids) -> None:
@@ -124,6 +125,17 @@ def sheets(png: pathlib.Path, ids) -> None:
         for r in rows:
             s.paste(r, (0, y)); y += r.height
         s.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG).save(png / f"sheet-{style}.png", optimize=True)
+
+
+def flow_sheet(png: pathlib.Path) -> None:
+    """The layouts and flows in one row, half size."""
+    ims = [Image.open(png / f"flow-{k}.png").convert("RGB") for k in ("empty", "add", "count", "ax5", "watch", "mac")]
+    ims = [i.resize((i.width // 2, i.height // 2), Image.LANCZOS) for i in ims]
+    w = sum(i.width for i in ims) + 24 * (len(ims) + 1); h = max(i.height for i in ims) + 48
+    s = Image.new("RGB", (w, h), (233, 230, 223)); x = 24
+    for i in ims:
+        s.paste(i, (x, 24)); x += i.width + 24
+    s.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG).save(png / "sheet-flows.png", optimize=True)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,11 @@
 
 Run on the plan and mockups at commit bb8a2da. Four of eight lenses have reported. Typography, senior engineer, performance and security stopped on a usage limit and have not reported.
 
-Nothing below is fixed yet.
+Status after the fix commit: 1 and 2 were decided by the owner and are applied. 3 to 17 are fixed in the mockups or written into `docs/spec.md`, except as listed here.
+
+- 6: layouts are mocked for the largest text size, Mac and Watch. iPad is not mocked. It uses the Mac layout.
+- 15: the Pencil box is now four strokes that overshoot their corners. It was not re-reviewed.
+- 17: Increase Contrast and Reduce Transparency are specified in `docs/spec.md`. They are not drawn.
 
 ## Conflicts inside the brief. The owner decides.
 

@@ -50,7 +50,10 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 - Text contrast floor, every style, paper / ink: body 17.7:1 / 16.2:1, secondary 6.8:1 / 8.3:1, tertiary 4.8:1 / 5.1:1. Measured against the worst pixel of the style's paper.
 - State is carried by shape, never by wash colour or intensity.
-- Seven mark states: solid (full), hatched (partial), empty outline (missed), centred dash (paused), centred diamond (extra credit), blank (off schedule), dashed outline at reduced opacity (future). Today is an outline overlaid on the day's state.
+- Mark states: solid (done), hatched (part done), centred dash (paused), diamond (extra credit), blank (off schedule, or nothing logged), dashed outline at reduced opacity (to come). Today is an outline overlaid on the day's state.
+- A past day with no log draws nothing. The empty outline for such a day, and the current run, appear only when the user turns on "Show days not logged". The owner decided this on 14 November 2026.
+- The year view carries state by small shapes, never by opacity. The owner decided this on 14 November 2026.
+- The user's accent choice comes first. Following the palette is the default option, not a rule. A custom colour is picked by hue, never red, and the app sets its lightness so marks keep 3:1.
 - Scene card is 350 by 118 points. No text sits on it.
 - Views read the style from the environment. A view that computes a colour or names a font is a bug. Tokens live in the style files only.
 - Accessibility is v1: Dynamic Type to AX5, VoiceOver, Increase Contrast, Reduce Transparency, 44 by 44 targets.
@@ -66,7 +69,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 **Phases.**
 - Phase 1 is design. It ends with a stop. No Swift is written in phase 1.
 - Phase 2 milestones, in order: 1 Core loop and styles. 2 History. 3 Pausing. Stop and report. 4 Sync (skipped until the owner says). 5 Ambient. 6 Nudges. 7 Ordering. 8 NFC. 9 Obsidian. 10 Removal. 11 Polish.
-- After each milestone, run the eight reviews on the diff as separate subagents, fix what is valid, and send a report.
+- After each milestone, run the reviews on the diff as separate subagents (see Review lenses), fix what is valid, and send a report.
 - No scene is built that the owner has not approved.
 
 **Scope.**
@@ -81,6 +84,28 @@ These outrank every other instruction. Violating one is a bug, however good the 
 **Reports.** First line is the result. Then the definition-of-done list with honest pass or fail, anything guessed, anything noticed that is wrong or stale, the decisions log, and anything the brief asked for that was not done.
 
 **Command approvals.** Before any command that needs approval, say in one plain sentence what it does and whether it is reversible. Flag `rm`, `sudo`, `git reset --hard`, force pushes and anything outside the project folder.
+
+**Review lenses.** Each lens runs as a separate subagent that has not seen the working. It gets its brief, this file and the thing under review. It returns at most five findings, ranked, each with a file and line or a screen, and a concrete failure scenario. Valid findings are fixed. The rest are listed with the reason.
+
+The first eight run after every milestone. The last five were added on 14 November 2026 to cover the roles an app team has. They run at each stop: the end of phase 1, after milestone 3, and at the end. Run lenses two or three at a time, not all at once.
+
+| Lens | Team role | Brief |
+|---|---|---|
+| Accessibility expert | Accessibility specialist | WCAG 2.2 AA, Dynamic Type to AX5, VoiceOver, Increase Contrast, Reduce Transparency, Differentiate Without Colour, 3:1 non-text contrast, 44x44 targets, custom-font scaling and legibility |
+| Security and privacy expert | Security and privacy engineer | Provenance and licensing of fonts and textures, network calls, permissions, logging, anything that leaves the device |
+| Apple industrial designer | Visual and platform designer | Fit with iOS 26 and macOS 26 and the HIG, system chrome untouched, hierarchy and restraint, decoration never carries meaning, both appearances, iPhone, iPad and Mac layouts |
+| Senior software engineer | Tech lead | Single source of tokens, schema and sync safety, tests that can fail, screenshot determinism, scroll performance, scope creep, dead code |
+| Typographer | Type designer | Font pairing and hierarchy, numeral clarity (1 and l, 0 and O), long names wrapping, weight range for Bold Text, glyph coverage, license |
+| Color vision and low vision | Accessibility specialist | Protanopia, deuteranopia, tritanopia and greyscale views of every scene and palette, mark legibility beside the scene card, AX5 layout, whether any palette reads as a warning |
+| Performance and app size | Performance engineer | Scene asset size and decode cost, memory on palette change, scroll cost on Today, launch time, runtime tinting cost, caching |
+| Tired daily user | User research | Someone on a low-energy day who glances once. Is logging still one obvious tap? Any visual noise? Any state harder to read at a glance? Anything that feels like effort, judgment or guilt? |
+| Product owner | Product manager | Does the work match the brief and nothing more? Does each milestone leave something a user can use? Is every open question written down with an owner? What should be cut? |
+| First-day user | User research, onboarding | Someone who has never seen the app. Empty states, the first habit, whether each mark can be understood without a key, whether every gesture has a visible alternative, where they would get stuck |
+| Content designer | UX writer, localisation | Every string: plain, short, free of guilt and grading. Plurals, dates and numbers by locale, week start, text 40% longer in translation, right-to-left layout, VoiceOver wording |
+| QA engineer | Test engineer | Day start, midnight, daylight saving, time-zone travel, counted habits and undo, logging a past day, pause edges, export and import, the smallest and largest devices, what the tests do not cover |
+| Release engineer | Build and release | What works with a free Apple account, App Groups and the shared store, signing, privacy manifest and required-reason APIs, when the notification prompt appears, widget tint modes, app icon variants, App Review rules |
+
+Roles a typical app team has that this project leaves out, with the reason: backend and DevOps (there is no server), data analyst (there is no analytics), growth and marketing (the app is free and has no accounts), monetisation (there is no paywall).
 
 **Security and privacy.**
 - No network calls, permissions, entitlements or dependencies beyond what a feature needs and the owner approved.
