@@ -1,6 +1,6 @@
 # Phase 1 reviews
 
-Run on the plan and mockups at commit bb8a2da. All thirteen lenses have reported. The first four ran at commit bb8a2da. The other nine ran at commit 76f9069, after the first fixes.
+Run on the plan and mockups at commit bb8a2da. All sixteen lenses have reported. The first four ran at commit bb8a2da. The other nine ran at commit 76f9069, after the first fixes.
 
 Status after the fix commit: 1 and 2 were decided by the owner and are applied. 3 to 17 are fixed in the mockups or written into `docs/spec.md`, except as listed here.
 
@@ -79,3 +79,44 @@ Status after the fix commit: 1 and 2 were decided by the owner and are applied. 
 - Content designer: rename Gentle Mode and reword "Extra credit". Both are the brief's own terms. A translator note was added for "Extra credit".
 - First-day user: no key on Today. A key on Today adds noise for the daily user. The key is on Habit detail and in You.
 - Release engineer: whether a free Apple account can use App Groups could not be confirmed from Apple's pages. It is tested before milestone 1.
+
+## Third round: UI and UX, human factors, senior designer, at commit f1edcad
+
+### Fixed
+
+- UI and UX, human factors: the count sheet had two ways to finish and no rule for after Add. Add and Take away now apply and close. Cancel replaces Done. The amount starts at the tap amount. Take away never passes zero.
+- UI and UX, human factors: a counted row with nothing logged had no count line, so the typed path was hidden. Every counted row shows its count line. It is drawn as a button, without a chevron.
+- UI and UX, human factors: a single tap on a past day changed history. A tap now opens a sheet that names the day.
+- UI and UX, human factors: "Turn off" was a word inside a sentence and its result was not stated. It is a button on its own line, and the after-state is written.
+- UI and UX: no way to reach another month. The month title has previous and next controls.
+- Human factors: no hit areas were written. They are in the spec, with one haptic for a log and a take-back.
+- Senior designer: the Pen and ink scene frame was the heaviest line on Today. It is one hairline in the rule colour.
+- Senior designer: in Ink the scene was the brightest block on the screen. Its lightest value now sits below the heading.
+- Senior designer, UI and UX: the Appearance page had about 25 choices and two stacked colour lists. It is now a preview, Style, Light or dark, and two rows that open their own lists. Unapproved scenes are not shown.
+- Senior designer: the key took a quarter of Habit detail. It is one row that opens the marks board. Impossible cells were removed from the marks board.
+
+### For the owner. See "Open decisions" in `docs/spec.md`.
+
+- UI and UX: Edit and Archive belong in milestone 1. The default tap amount of 1 is wrong for large targets.
+- Human factors: add a setting for the side the control sits on.
+- Senior designer: move Tags out of the tab bar. Show future days in the month view as dates alone. Draw each scene once per style.
+
+### Written into the spec as owed work
+
+- Senior designer: Pencil reads as Pen and ink with a marker font. A design pass is owed before milestone 4.
+- Senior designer: the dark appearance has no stated material per style.
+- UI and UX: the screens and states not drawn yet.
+
+### Not fixed, with the reason
+
+- Senior designer: use an outlined state for selected days in New habit, because solid means done elsewhere. Not done. A filled day is the system convention for a weekday picker, and an outline alone is a weak signal for low vision.
+- Senior designer: render the Ink sheets in the same palette as the Paper sheets. Not done. The two palettes show that the accent follows the scene.
+- Human factors: the control at the largest text size measured about 52 points on the contact sheet, against 76 in the spec. Not checked on the single frame.
+
+### States owed for the drawn screens, from the UI and UX review
+
+- Today: habits exist but none is due, all done, counted over target, a list longer than the screen, Gentle Mode at the largest text size, after Turn off, Vacation on, the date heading between midnight and day start, iPad.
+- New habit: the yes-or-no variant, keyboard up, validation and a disabled Add, no days chosen, a long name, Cancel with changes, the largest text size, the Edit variant.
+- Count sheet: total at zero, over target, empty amount, the past-day and paused-day variants, the largest text size, Watch and Mac.
+- Habit detail: week view, year view in place, a new habit with no history, the yes-or-no variant, Show days not logged on, a day before the habit existed, the largest text size.
+- Errors: the shared store fails to open, an import file is invalid, an intent runs for an archived habit.

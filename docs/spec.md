@@ -119,11 +119,30 @@ One drawing has one meaning.
 
 **Today rows.** A row shows a second line only when it says something about today: the count for a counted habit, or "Extra credit". Habits that are off schedule today are not listed (**Guess**).
 
-**Logging. Guess.** A tap on a yes-or-no habit logs it. A second tap takes the log back. A tap on a counted habit adds the habit's tap amount, which defaults to 1. The count line under a counted habit's name ("3 of 8 glasses") is a button that opens the count sheet. In the sheet the user types an amount and chooses Add or Take away. Touch and hold on the control opens the same sheet. **Owner:** every number in the app can be typed, including the target and the tap amount in New habit. Arrows are never the only way to reach a number such as 15,000 steps or 25 minutes. VoiceOver gets adjustable actions named "Increase" and "Decrease" with the step as the value.
+**Logging. Guess.**
+- A tap on a yes-or-no habit's control logs it. A second tap takes the log back.
+- A tap on a counted habit's control adds the habit's tap amount. It only ever adds, at any count.
+- A counted row always shows its count line, "0 of 8 glasses" included, also in Gentle Mode. The line is drawn as a button and opens the count sheet. Touch and hold on the control opens the same sheet.
+- The count sheet shows the total, an amount field that starts at the tap amount, and two buttons, Take away and Add. Each button applies the change and closes the sheet. Cancel closes it with no change. Take away never takes more than the total. For a day that is not today the sheet names the date.
+- **Owner:** every number in the app can be typed, including the target and the tap amount in New habit. Arrows are never the only way to reach a number such as 15,000 steps or 25 minutes.
+- VoiceOver gets adjustable actions named "Increase" and "Decrease" with the step as the value. System undo takes back the last log.
+- One haptic confirms a log and a take-back.
 
-**Past days. Guess.** In the month view of Habit detail, a tap on a past day logs or edits that day through the same intent. A yes-or-no habit toggles. A counted habit opens the count sheet for that day. One line under the grid says "Tap a past day to change it." Future days cannot be logged.
+**Hit areas.** The control's target is the full row height by 76 points from the trailing edge. The count line's target is 44 points high. A tap on the name or symbol opens Habit detail. On the Watch the whole row logs.
 
-**Gentle Mode.** The switch is in You. While it is on, Today shows one line that says so, with a "Turn off" button.
+**Past days. Guess.** In the month view of Habit detail, a tap on a past day opens a small sheet for that day. The sheet names the date and the day's state. For a yes-or-no habit it has one action, "Mark done" or "Clear". For a counted habit it is the count sheet. A past day never changes on a single tap. An off-schedule day says "Not scheduled" and still allows a log. One line under the grid says "Tap a past day to change it." The month title has previous and next controls. Future days cannot be logged.
+
+**Gentle Mode.** The switch is in You. While it is on, Today shows one line that says so, with a "Turn off" button on its own line. After Turn off, today stays paused and the line reads "Gentle Mode ends after today." with a "Keep it on" button until the day ends.
+
+**Appearance page.** One choice per row: a preview of the scene card and one Today row, Style, Light or dark, then two rows under Colour. "Marks" opens the accent list (Follow the scene, the eight swatches, Custom colour). "Scene colours" opens the palette list (Follow the time of day, the five palettes). The scene row appears when a second scene is approved.
+
+**Habit detail.** The key is one row, "What the marks mean", that opens the marks board.
+
+**Dark material. To design.** Ink is a dark paper, and each style needs a stated material on it: light ink in Pen and ink, light and coloured pencil in Pencil, opaque paint in Watercolor. In Ink the scene's lightest value sits below the heading text. The Pen and ink frame is one hairline in the rule colour in both appearances.
+
+**Pencil. To design before milestone 4.** The senior designer review found that Pencil reads as Pen and ink with a marker font. Owed: done marks as visible strokes at 56 degrees with stroke ends showing, rules drawn by hand, paper tooth that shows on a phone, a lighter weight of the display font, and a Today control that is the four-stroke square, with the hand circle kept for today in calendars.
+
+**Screens not drawn yet.** You, Progress, Tags, Vacation, the Edit form, the accent and palette lists, the hue ring, the day sheet, export and import, Archive, week and year views in place, and the Mac and Watch versions of the sheets. Each is mocked with its states at the start of the milestone that builds it (**Guess**). States owed for the drawn screens are listed in `docs/reviews/phase-1.md`.
 
 **Counts. Owner.** `LogEvent.delta` is any whole number, positive or negative. `Habit` has `tapAmount`, default 1. Sums still commute across devices.
 
@@ -218,7 +237,7 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 
 | # | Milestone | Holds |
 |---|---|---|
-| 1 | Core loop in Pen and ink | Models and data rules, Today, New habit, yes-or-no and counted logging with typed numbers, `LogHabitIntent`, the style layer as data with Pen and ink only, the Lake card in five palettes, Follow the palette and the eight swatches, light or dark, privacy manifest |
+| 1 | Core loop in Pen and ink | Before it: the App Group test with free signing. Then models and data rules, Today, first run, New habit, yes-or-no and counted logging with typed numbers and the count sheet, `LogHabitIntent`, the style layer as data with Pen and ink only in Paper and Ink, the Lake card in five palettes, the Appearance page with Light or dark, Marks and Scene colours, privacy manifest. Proposed: the Edit form and Archive |
 | 2 | History, export and import | Heat map (week, month, year), logging a past day, JSON export and import with a round-trip test |
 | 3 | Pausing | `Pause` records, Vacation Mode, Gentle Mode, extra-credit run maths |
 | | Stop and report | |
@@ -246,10 +265,16 @@ Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
-| 1 | The data rules above | Accept as written | Milestone 1 |
-| 2 | The usage data page | Build it in milestone 12 from the existing log fields | Milestone 12 |
-| 3 | Display fonts for Pencil and Watercolor | Shantell Sans and Alegreya Sans | Milestone 4 |
-| 4 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
+| 1 | Milestone 1 also holds the Edit form and Archive (hide a habit). A habit made wrongly would otherwise stay on Today until milestone 11 | Yes. Restore, Recently Deleted and purge stay in milestone 11. Kind is locked after the first log | Milestone 1 |
+| 2 | The data rules | Accept as written | Milestone 1 |
+| 3 | The default tap amount. 1 is right for glasses and wrong for 15,000 steps | 1 when the target is 20 or less. Empty above that, which means a tap opens the count sheet | Milestone 1 |
+| 4 | A setting for which side the control sits on. A left thumb cannot reach the trailing edge | Yes, one setting in You | Milestone 1 |
+| 5 | The Tags tab. NFC is a shortcut, is iPhone only, and arrives in milestone 9 | Three tabs. Tags becomes a row in You | Milestone 1 |
+| 6 | Future days in the month view. The brief draws them as faint dashed outlines. They are the largest area of ink on the screen | Show the date alone. Keep the dashed outline for the week view | Milestone 2 |
+| 7 | One painting per scene, or one drawing per scene per style. The senior designer wants an ink Lake and a pencil Lake | Keep one painting. The owner approved it, the brief describes scenes as washes, and three drawings triple the hardest work. Revisit in milestone 4 | Milestone 1 |
+| 8 | The usage data page | Build it in milestone 12 from the existing log fields | Milestone 12 |
+| 9 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
+| 10 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
 
 Decided on 14 November 2026 and now written into this file and `CLAUDE.md`: whole-number deltas and typed numbers, the `.entitlements` file for the App Group, the milestone order, export in milestone 2, three review lenses per milestone, red allowed as a user's accent, and three more lenses (UI and UX, human factors, senior designer).
 
