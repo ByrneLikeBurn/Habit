@@ -76,9 +76,11 @@ struct SymbolPicker: View {
 
     @Binding var selection: String
     @Environment(\.style) private var style
+    /// The cell grows with the text size, so symbols never overlap. Never under 44 points.
+    @ScaledMetric(relativeTo: .body) private var cell: CGFloat = 44
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 44), spacing: 4)], spacing: 4) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: max(cell, 44)), spacing: 4)], spacing: 4) {
             ForEach(Self.symbols) { symbol in
                 let on = symbol.name == selection
                 Button {
@@ -87,7 +89,7 @@ struct SymbolPicker: View {
                     Image(systemName: symbol.name)
                         .font(style.label(.body))
                         .foregroundStyle(style.text)
-                        .frame(width: 44, height: 44)
+                        .frame(width: max(cell, 44), height: max(cell, 44))
                         .overlay {
                             if on {
                                 RoundedRectangle(cornerRadius: 8).strokeBorder(style.text, lineWidth: style.outlineWidth)

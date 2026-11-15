@@ -49,13 +49,14 @@ struct HabitRow: View {
     }
 
     private var info: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: -6) {
             nameButton
             if habit.kind == .counted {
                 countButton.padding(.leading, 36)
             }
         }
-        .padding(.vertical, 6)
+        .padding(.top, habit.kind == .counted ? 8 : 6)
+        .padding(.bottom, habit.kind == .counted ? 0 : 6)
     }
 
     private var state: DayState { habit.state(on: day, today: day) }
@@ -80,7 +81,8 @@ struct HabitRow: View {
             }
         }
         .buttonStyle(.plain)
-        .frame(minHeight: 44)
+        // A counted row's count line sits close under the name. The two targets together span the row.
+        .frame(minHeight: habit.kind == .counted && !typeSize.isAccessibilitySize ? 28 : 44)
         .contentShape(Rectangle())
         .contextMenu { menu }
         .accessibilityHint(Text("Opens Edit"))

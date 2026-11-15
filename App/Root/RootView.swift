@@ -5,15 +5,19 @@ import HabitKit
 struct RootView: View {
     @Environment(Settings.self) private var settings
     @Environment(AppModel.self) private var model
+    @Environment(\.modelContext) private var context
+    @State private var tab = LaunchOptions.current.screen?.opensYou == true ? Section.you : .today
+
+    enum Section: Hashable { case today, you }
 
     var body: some View {
         @Bindable var model = model
         StyledScreen {
-            TabView {
-                Tab("Today", systemImage: "calendar") {
+            TabView(selection: $tab) {
+                Tab("Today", systemImage: "calendar", value: Section.today) {
                     NavigationStack { TodayView() }
                 }
-                Tab("You", systemImage: "person.crop.circle") {
+                Tab("You", systemImage: "person.crop.circle", value: Section.you) {
                     YouView()
                 }
             }
@@ -34,9 +38,32 @@ struct RootView: View {
     /// Opens the screen named by `-screen`, for screenshots.
     private func openLaunchScreen() {
         guard let screen = LaunchOptions.current.screen else { return }
+        let habits = Ordering.sorted((try? context.fetch(FetchDescriptor<Habit>())) ?? [])
+        let clock = settings.clock
         switch screen {
-        case .new, .newCount: model.showNewHabit = true
-        default: break
+        case .new, .newCount:
+            model.showNewHabit = true
+        case .edit:
+            model.editing = habits.first
+        case .count:
+            if let habit = habits.first(where: { $0.kind == .counted }) {
+                model.counting = CountRequest(habit: habit, day: clock.today)
+            }
+        case .undo:
+            if let habit = habits.first(where: { $0.kind == .binary }) {
+                model.undoLine = UndoLine(message: String(localized: "\(habit.name) taken back.")) {}
+            }
+        default:
+            break
+        }
+    }
+}
+
+extension LaunchOptions.Screen {
+    var opensYou: Bool {
+        switch self {
+        case .you, .appearance, .archived, .marks: true
+        default: false
         }
     }
 }

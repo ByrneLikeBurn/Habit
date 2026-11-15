@@ -41,7 +41,7 @@ struct AppearanceView: View {
             }
         }
         .listRowBackground(style.paper)
-        .foregroundStyle(style.text)
+        .foregroundStyle(style.text, style.secondary, style.tertiary)
         .paperBackground(style)
         .navigationTitle("Appearance")
     }
@@ -65,7 +65,7 @@ private struct PreviewRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: symbol).frame(width: 24)
+            Image(systemName: symbol).frame(minWidth: 24)
             VStack(alignment: .leading, spacing: 2) {
                 Text(name).font(style.display(.body))
                 if let count {
@@ -110,7 +110,7 @@ private struct SwatchButton: View {
             }
         }
         .buttonStyle(.plain)
-        .foregroundStyle(style.text)
+        .foregroundStyle(style.text, style.secondary, style.tertiary)
         .contentShape(Rectangle())
         .accessibilityLabel(Text(swatch.displayName))
         .accessibilityAddTraits(selected ? .isSelected : [])

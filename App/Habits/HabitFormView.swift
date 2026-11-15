@@ -24,6 +24,7 @@ struct HabitFormView: View {
     @State private var showMore: Bool
     @State private var confirmDiscard = false
     @FocusState private var nameFocused: Bool
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private let original: Snapshot
 
@@ -111,22 +112,21 @@ struct HabitFormView: View {
                 Section {
                     if kindLocked {
                         LabeledContent {
-                            Text(kind == .counted ? "Count" : "Yes or no")
+                            Text("Cannot change once it has logs")
+                                .font(style.label(.footnote))
                         } label: {
-                            Text("Kind")
+                            Text(kind == .counted ? "Count" : "Yes or no")
                         }
                     } else {
-                        Picker("Kind", selection: $kind) {
-                            Text("Yes or no").tag(HabitKind.binary)
-                            Text("Count").tag(HabitKind.counted)
+                        // A segmented control does not grow with the text, so large sizes get a list.
+                        if typeSize.isAccessibilitySize {
+                            kindPicker.pickerStyle(.inline)
+                        } else {
+                            kindPicker.pickerStyle(.segmented)
                         }
-                        .pickerStyle(.segmented)
-                        .labelsHidden()
                     }
                 } header: {
                     Text("Kind")
-                } footer: {
-                    if kindLocked { Text("Cannot change once it has logs.") }
                 }
 
                 if kind == .counted {
@@ -168,14 +168,13 @@ struct HabitFormView: View {
                             dismiss()
                             model.archive(habit, context: context, clock: settings.clock)
                         }
-                        .foregroundStyle(style.text)
+                        .foregroundStyle(style.text, style.secondary, style.tertiary)
                     } footer: {
                         Text("You can bring it back at any time. Its history is kept.")
                     }
                 }
             }
-            .font(style.label(.body))
-            .foregroundStyle(style.text)
+            .foregroundStyle(style.text, style.secondary, style.tertiary)
             .paperBackground(style)
             .navigationTitle(isEdit ? String(localized: "Edit habit") : String(localized: "New habit"))
             #if os(iOS)
@@ -203,6 +202,14 @@ struct HabitFormView: View {
             }
             .onAppear { if !isEdit { nameFocused = true } }
         }
+    }
+
+    private var kindPicker: some View {
+        Picker("Kind", selection: $kind) {
+            Text("Yes or no").tag(HabitKind.binary)
+            Text("Count").tag(HabitKind.counted)
+        }
+        .labelsHidden()
     }
 
     @ViewBuilder

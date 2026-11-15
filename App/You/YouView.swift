@@ -29,7 +29,7 @@ struct YouView: View {
             List {
                 Text("You")
                     .font(style.display(.largeTitle, weight: .semibold))
-                    .foregroundStyle(style.text)
+                    .foregroundStyle(style.text, style.secondary, style.tertiary)
                     .accessibilityAddTraits(.isHeader)
                     .listRowBackground(style.paper)
                     .listRowSeparator(.hidden)
@@ -60,7 +60,7 @@ struct YouView: View {
             .frame(maxWidth: 393)
             .frame(maxWidth: .infinity)
             .paperBackground(style)
-            .foregroundStyle(style.text)
+            .foregroundStyle(style.text, style.secondary, style.tertiary)
             .navigationDestination(for: Page.self) { page in
                 switch page {
                 case .appearance: AppearanceView()
@@ -119,7 +119,7 @@ struct DayStartView: View {
             }
             .listRowBackground(style.paper)
         }
-        .foregroundStyle(style.text)
+        .foregroundStyle(style.text, style.secondary, style.tertiary)
         .paperBackground(style)
         .navigationTitle("Day starts at")
     }
@@ -155,7 +155,7 @@ struct ArchivedView: View {
             }
             .listRowBackground(style.paper)
         }
-        .foregroundStyle(style.text)
+        .foregroundStyle(style.text, style.secondary, style.tertiary)
         .paperBackground(style)
         .navigationTitle("Archived")
     }
@@ -191,7 +191,7 @@ struct MarksBoardView: View {
             }
             .listRowBackground(style.paper)
         }
-        .foregroundStyle(style.text)
+        .foregroundStyle(style.text, style.secondary, style.tertiary)
         .paperBackground(style)
         .navigationTitle("What the marks mean")
     }
