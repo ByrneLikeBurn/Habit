@@ -63,7 +63,7 @@ final class AppModel {
             }
             // A take-back and every counted change show a line with Undo. A yes-or-no log shows its mark.
             let message: String? = switch habit.kind {
-            case .binary: delta < 0 ? String(localized: "\(habit.name) taken back.") : nil
+            case .binary: delta < 0 ? String(localized: "\(habit.name) cleared") : nil
             case .counted: "\(habit.name): " + CountText.line(total: newTotal, target: habit.rule(on: logDay).target, unit: habit.unit)
             }
             if let message, let inverse = outcome.inverse {
@@ -79,7 +79,7 @@ final class AppModel {
     func archive(_ habit: Habit, context: ModelContext, clock: HabitClock) {
         habit.archivedAt = clock.now()
         try? context.save()
-        show(UndoLine(message: String(localized: "\(habit.name) archived.")) {
+        show(UndoLine(message: String(localized: "\(habit.name) archived")) {
             habit.archivedAt = nil
             try? context.save()
         })

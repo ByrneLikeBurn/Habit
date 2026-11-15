@@ -113,8 +113,8 @@ struct HabitRow: View {
     @ViewBuilder
     private var menu: some View {
         Button("Edit", systemImage: "pencil", action: actions.edit)
-        Button("Archive", systemImage: "archivebox", action: actions.archive)
         Button("Move", systemImage: "arrow.up.arrow.down", action: actions.move)
+        Button("Archive", systemImage: "archivebox", action: actions.archive)
     }
 
     @ViewBuilder

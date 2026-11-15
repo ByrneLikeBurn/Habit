@@ -25,7 +25,7 @@ final class TodayUITests: XCTestCase {
         XCTAssertEqual(walk.value as? String ?? "", "")
         let undo = app.buttons["Undo"]
         XCTAssertTrue(undo.waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Walk outside taken back."].exists)
+        XCTAssertTrue(app.staticTexts["Walk outside cleared"].exists)
         undo.tap()
         XCTAssertEqual(walk.value as? String, "Done")
     }

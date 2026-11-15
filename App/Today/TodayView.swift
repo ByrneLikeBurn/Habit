@@ -76,11 +76,22 @@ struct TodayView: View {
                         Ordering.move(split.notScheduled, from: source, to: destination, all: active)
                         try? context.save()
                     }
-                } label: {
-                    Text("Not scheduled today")
-                        .font(style.label(.body))
+                    Text("A log here still counts.")
+                        .font(style.label(.footnote))
                         .foregroundStyle(style.secondary)
-                        .frame(minHeight: 44)
+                        .padding(.vertical, 8)
+                        .plainRow(style)
+                } label: {
+                    HStack {
+                        Text("Not scheduled today")
+                        Spacer(minLength: 12)
+                        Text(split.notScheduled.count.formatted())
+                            .monospacedDigit()
+                    }
+                    .font(style.label(.body))
+                    .foregroundStyle(style.secondary)
+                    .frame(minHeight: 44)
+                    .accessibilityElement(children: .combine)
                 }
                 .listRowBackground(style.paper)
                 .listRowSeparatorTint(style.rule)
@@ -226,7 +237,8 @@ struct FirstRunView: View {
     }
 }
 
-/// One line with Undo. It stays until the next action, so no one has to beat a timer to reach it.
+/// One line with Undo, drawn as a capsule in reversed ink and paper. It stays until the next
+/// action, so no one has to beat a timer to reach it.
 struct UndoLineView: View {
     let line: UndoLine
     @Environment(AppModel.self) private var model
@@ -236,23 +248,27 @@ struct UndoLineView: View {
         HStack(spacing: 12) {
             Text(line.message)
                 .font(style.label(.subheadline))
-                .foregroundStyle(style.text)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if let undo = line.undo {
-                Button("Undo") {
+                Button {
                     undo()
                     model.undoLine = nil
+                } label: {
+                    Text("Undo").underline()
                 }
+                .buttonStyle(.plain)
                 .font(style.label(.subheadline, weight: .semibold))
                 .frame(minWidth: 44, minHeight: 44)
             }
         }
+        // Reversed text and paper keep the fixed text contrast in both appearances.
+        .foregroundStyle(style.paper)
+        .padding(.leading, 20)
+        .padding(.trailing, 12)
+        .padding(.vertical, 2)
+        .background(style.text, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .padding(.horizontal, 16)
-        .padding(.vertical, 4)
-        .background(style.paper)
-        .overlay(alignment: .top) {
-            Rectangle().fill(style.rule).frame(height: style.ruleWidth)
-        }
+        .padding(.bottom, 8)
         .frame(maxWidth: 393)
     }
 }
