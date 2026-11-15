@@ -200,6 +200,11 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .note.hint{font-size:13px;margin-top:8px;color:var(--text3)}
 .fieldnum{border-bottom:1.5px solid var(--text3);padding:0 14px 2px}
 .wrow small{display:block;font:400 12px/1.3 var(--ui);color:var(--text2)}
+.typed{font-size:20px;min-width:64px;text-align:right;border-bottom:1.5px solid var(--text3);padding:2px 4px}
+.amt{display:grid;justify-items:center;gap:6px;margin:4px 0 18px;font:400 13px/1 var(--ui);color:var(--text2)}
+.typed.big{font-size:34px;text-align:center;min-width:120px;color:var(--text)}
+.two{display:flex;justify-content:center;gap:12px}
+.sysbtn.ghost{background:transparent;color:var(--text);border:1.5px solid var(--text)}
 </style>
 </head>
 <body>
@@ -473,15 +478,17 @@ function add(style, app){
   <div class="sec">Name</div><div class="field nm">Drink water</div>
   <div class="sec">Symbol</div><div class="symrow">${syms}</div>
   <div class="sec">Kind</div><div class="seg" style="margin-top:0"><span>Yes or no</span><span class="on">Count</span></div>
-  <div class="frow"><span>Target each day</span><span class="stepper"><b class="num">8</b><i>&minus;</i><i>+</i></span></div>
+  <div class="frow"><span>Target each day</span><b class="num typed" role="textbox">8</b></div>
   <div class="frow"><span>Unit</span><span class="val">glasses</span></div>
-  <div class="frow"><span>One tap adds</span><span class="stepper"><b class="num">1</b><i>&minus;</i><i>+</i></span></div>
+  <div class="frow"><span>One tap adds</span><b class="num typed" role="textbox">1</b></div>
   <div class="sec">Days</div><div class="dayrow">${days}</div>`;
 }
 function count(style, app){
+  // The user types an amount and adds it or takes it away. No arrows are needed to reach a number.
   return `<div class="grab"></div><div class="nav sheetnav"><span class="btn"></span><b>Drink water</b><span class="btn"><b>Done</b></span></div>
-  <div class="bigcount"><b class="num fieldnum" role="textbox" aria-label="Glasses today">3</b><span>of 8 glasses today</span></div>
-  <div class="pm"><span aria-label="Decrease by 1">&minus;</span><span aria-label="Increase by 1">+</span></div>`;
+  <div class="bigcount"><b class="num">3</b><span>of 8 glasses today</span></div>
+  <div class="amt"><span>Amount</span><b class="num typed big" role="textbox" aria-label="Amount">2</b></div>
+  <div class="two"><span class="sysbtn ghost">Take away</span>${sysbtn("Add")}</div>`;
 }
 function ax5(style, app){
   return status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>

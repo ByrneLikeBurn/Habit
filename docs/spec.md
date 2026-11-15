@@ -58,7 +58,11 @@ Any time before the day-start hour shows Night. With day start at 06:00, Sunrise
 - One of eight swatches.
 - Custom colour.
 
-**Custom colour. Guess, and a disagreement with a plain colour picker.** The system colour picker lets the user pick red, white or black. Red breaks invariant 1. White and black break the 3:1 rule for marks. The custom control is a hue ring with the red arc left out. The user picks the hue. The app sets lightness and chroma for each appearance so the mark always measures 3:1 or more.
+**Custom colour. Owner.** The custom control is a hue ring. Every hue is on it, red included. Some cultures read red as lucky, so the choice is the user's. The user picks the hue. The app sets lightness and chroma for each appearance so the mark always measures 3:1 or more. This is why the control is not the system colour picker, which also offers white and black.
+
+The app's own palettes and swatches still never use red. The red test covers what the app ships, not what the user picks.
+
+**What 3:1 means.** It is a contrast ratio between a mark and the paper behind it. WCAG 2.2 sets 3:1 as the least a shape needs when it carries information, so that people with low vision can see it. Pale yellow on white paper is about 1.2:1.
 
 The palette also has a manual override: the user can pin one of the five palettes.
 
@@ -115,13 +119,13 @@ One drawing has one meaning.
 
 **Today rows.** A row shows a second line only when it says something about today: the count for a counted habit, or "Extra credit". Habits that are off schedule today are not listed (**Guess**).
 
-**Logging. Guess.** A tap on a yes-or-no habit logs it. A second tap takes the log back. A tap on a counted habit adds the habit's tap amount, which defaults to 1. The count line under a counted habit's name ("3 of 8 glasses") is a button that opens the count sheet: minus, plus, and a number field. Touch and hold on the control opens the same sheet. VoiceOver gets adjustable actions named "Increase" and "Decrease" with the step as the value.
+**Logging. Guess.** A tap on a yes-or-no habit logs it. A second tap takes the log back. A tap on a counted habit adds the habit's tap amount, which defaults to 1. The count line under a counted habit's name ("3 of 8 glasses") is a button that opens the count sheet. In the sheet the user types an amount and chooses Add or Take away. Touch and hold on the control opens the same sheet. **Owner:** every number in the app can be typed, including the target and the tap amount in New habit. Arrows are never the only way to reach a number such as 15,000 steps or 25 minutes. VoiceOver gets adjustable actions named "Increase" and "Decrease" with the step as the value.
 
 **Past days. Guess.** In the month view of Habit detail, a tap on a past day logs or edits that day through the same intent. A yes-or-no habit toggles. A counted habit opens the count sheet for that day. One line under the grid says "Tap a past day to change it." Future days cannot be logged.
 
 **Gentle Mode.** The switch is in You. While it is on, Today shows one line that says so, with a "Turn off" button.
 
-**Proposed change to the brief, waiting for the owner.** The brief says `LogEvent.delta` is +1 or -1. A habit with a target of 6,000 steps would need thousands of events. The proposal is that `delta` is any whole number, positive or negative. Sums still commute across devices. `Habit` gains `tapAmount`, default 1. The schema is additive forever, so this is decided before milestone 1.
+**Counts. Owner.** `LogEvent.delta` is any whole number, positive or negative. `Habit` has `tapAmount`, default 1. Sums still commute across devices.
 
 **Page width. Guess.** On iPad and Mac the content is one page, 393 points wide, centred in the window. The scene card stays 350 by 118 points. Tabs become the system sidebar. A mark is never more than a page width from its habit name.
 
@@ -137,7 +141,7 @@ One drawing has one meaning.
 
 **First run.** Today shows the scene card, one line of text and one button, "Add a habit".
 
-**Shared store. To check in milestone 1.** Widgets, App Intents and the Watch app need the SwiftData store in an App Group container. The owner has a free Apple account. Milestone 1 checks that an App Group works with free signing, because milestone 5 depends on it.
+**Shared store.** Widgets, App Intents and the Watch app need the SwiftData store in an App Group container. An `.entitlements` file is allowed for the App Group only (**Owner**). The owner has a free Apple account. Before milestone 1, a throwaway project checks that an App Group works with free signing.
 
 ## Product, from the brief
 
@@ -162,7 +166,7 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 - Every model property is optional or has a default, relationships are optional, and nothing is marked unique. CloudKit needs this later.
 - `LogEvent` has a stable id. Import skips an event whose id is already in the store.
 - A yes-or-no habit is done when the day's total is 1 or more. Taking a log back writes minus the current total. A total below 0 is shown as 0.
-- A typed count writes the difference between the typed number and the total the device sees.
+- A typed amount is written as the delta itself, positive for Add and negative for Take away. No event stores a total.
 - A log on a paused day is extra credit, whatever the count. A log on an off-schedule day is extra credit too.
 - Turning Gentle Mode off sets the end day to today, so today stays paused.
 - Pauses may start in the past. Overlapping pauses are treated as one.
@@ -208,20 +212,56 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 - The app icon needs default, dark, clear and tinted variants.
 - A free Apple account's builds stop launching after 7 days and must be rebuilt from the Mac. Export and import are the way back if the bundle or team changes.
 
+## Milestones
+
+**Owner**, 14 November 2026.
+
+| # | Milestone | Holds |
+|---|---|---|
+| 1 | Core loop in Pen and ink | Models and data rules, Today, New habit, yes-or-no and counted logging with typed numbers, `LogHabitIntent`, the style layer as data with Pen and ink only, the Lake card in five palettes, Follow the palette and the eight swatches, light or dark, privacy manifest |
+| 2 | History, export and import | Heat map (week, month, year), logging a past day, JSON export and import with a round-trip test |
+| 3 | Pausing | `Pause` records, Vacation Mode, Gentle Mode, extra-credit run maths |
+| | Stop and report | |
+| 4 | Pencil and Watercolor | Both styles, their fonts, the style picker, the custom colour ring |
+| 5 | Sync | Skipped until the owner says |
+| 6 | Ambient | Widgets, App Intents surfaces, Watch app and complication |
+| 7 | Nudges | Scheduling engine, wording tones, settings |
+| 8 | Ordering | Focus, manual, by time, then learned |
+| 9 | NFC | Tag writing and the Shortcuts walkthrough |
+| 10 | Obsidian | Append to our own file, then the daily-note option |
+| 11 | Removal | Archive, restore, Recently Deleted, purge |
+| 12 | Polish | Accessibility audit, Dynamic Type sweep |
+
+## Usage data
+
+**Proposed, waiting for the owner.** The brief says no analytics, no telemetry and no server. Nothing here sends data anywhere.
+
+- **From the user's own log, on the device.** `LogEvent` already stores source, timestamp and delta. From those alone the app can show: which inputs are used (tap, widget, Watch, tag, Siri), how often a log is taken back within a minute, what time of day each habit is logged against its nudge hour, and how often the count sheet is needed. A page in You shows these to the user. They are also in the JSON export. No new event is recorded.
+- **From Apple, later.** After the owner joins the Developer Program and ships through the App Store or TestFlight, App Store Connect reports crashes, hangs, launch time and energy for users who opted in at the system level. It needs no code and no SDK.
+- **Not proposed.** A third-party analytics SDK or a server. Either one breaks three locked decisions and the "Data not collected" privacy label.
+
 ## Open decisions
 
 Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
-| 1 | `LogEvent.delta` may be any whole number, and `Habit` gains `tapAmount` | Yes | Milestone 1 |
-| 2 | The brief forbids an `.entitlements` file. A shared store for widgets and the Watch needs one for the App Group | Allow one that holds the App Group only. Test it with free signing before milestone 1 | Milestone 1 |
-| 3 | Milestone 1 builds three styles, two downloaded fonts and five palettes before a habit can be logged | Milestone 1 builds the style layer and Pen and ink. Pencil and Watercolor get their own milestone after milestone 3 | Milestone 1 |
-| 4 | Export and import are in milestone 10. The phone holds the only copy of the data | Move both to milestone 2 | Milestone 2 |
-| 5 | Eight lenses after every milestone and thirteen at each stop is about 120 review runs. Eight at once hit the usage limit twice | After each milestone run engineer, QA and tired daily user, plus accessibility when the UI changes and security when a permission, file or dependency is added. Run all thirteen at the three stops, three at a time | Milestone 1 report |
-| 6 | The data rules above | Accept as written | Milestone 1 |
-| 7 | Display fonts for Pencil and Watercolor | Shantell Sans and Alegreya Sans | The Pencil and Watercolor milestone |
-| 8 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
+| 1 | The data rules above | Accept as written | Milestone 1 |
+| 2 | The usage data page | Build it in milestone 12 from the existing log fields | Milestone 12 |
+| 3 | Display fonts for Pencil and Watercolor | Shantell Sans and Alegreya Sans | Milestone 4 |
+| 4 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
+
+Decided on 14 November 2026 and now written into this file and `CLAUDE.md`: whole-number deltas and typed numbers, the `.entitlements` file for the App Group, the milestone order, export in milestone 2, three review lenses per milestone, red allowed as a user's accent, and three more lenses (UI and UX, human factors, senior designer).
+
+## Scenes, from the brief
+
+**Rules.** The card is 350 by 118 points, short and wide, with one soft horizon. Value runs from bare paper through light and mid washes to dark pigment. A scene with one flat opacity fails. It must read in all five palettes, at half and one-third size, and in greyscale, protanopia, deuteranopia and tritanopia. The palette changes colour only, never composition. Scenes: Lake, Redwoods, Desert, Coast, Mountains. Each is shown to the owner as three variants, one scene at a time. A scene rejected twice is dropped.
+
+**What failed before, for the Redwoods.** Straight tapered trunks in a row read as a barcode. A corridor of trunks with drooping boughs was eerie. Foliage as round dabs read as camouflage. Sticks for trunks with loose needle lines over blobs read as sickly pines with needles attached to nothing. A mix of all of these was a pastiche. Wanted: tall trunks, a canopy, a pine-needle feel, calm, not muddy, not eerie.
+
+**What worked.** A lake in washes: ragged edges, a wet rim where a wash pools, granulation, glazing with multiply, bare paper kept as highlights, graded gradients, tapered ripples, paper-coloured mist between layers.
+
+**Styles.** Pencil is a coloured-pencil feel: visible hatching, varying line weight, paper tooth, playful and slightly whimsical. Watercolor is transparent washes with no outline: paint is the shape, layers are transparent, water density varies inside a wash, edges bleed and pool at the rim, bare paper is the highlight. Calm never means slower or sparser. Logging stays one obvious tap. The three styles must not look alike.
 
 ## Fonts proposed
 
@@ -241,7 +281,7 @@ Whether Optima and Chalkboard SE resolve on watchOS is not checked. It is a phas
 - The Pen and ink tokens for Ink give 16.15:1 for body and 5.04:1 for tertiary by the WCAG formula. The floor in the brief is 16.2:1 and 5.1:1. The Ink text was changed from `#F2EEE5` to `#F3EFE6` and tertiary from 52% to 53% so the floor holds. The other choice is to keep the tokens and lower the floor.
 - `gh repo create` is not available in the session that ran phase 1. The owner created the repo by hand.
 - The brief's year view (opacity steps) and its default drawing of a missed day conflicted with invariants 2 and 1. The owner resolved both. See Marks.
-- `CLAUDE.md` did not hold the brief's product section or its definition of done. The product section is now in this file and the definition of done is in `CLAUDE.md`. The brief's design, accessibility and architecture sections are still only in the brief. A phase 2 session needs the brief pasted again.
+- "The brief" is the owner's first prompt, `habit-build-prompt.md`. It is not in the repo. Its rules now live in `CLAUDE.md` and this file, with the owner's later changes applied. Where they differ from the brief, the repo is right.
 - The brief's Pen and ink Paper tokens give 6.76:1 for secondary and 4.77:1 for tertiary, under the 6.8:1 and 4.8:1 floor when compared unrounded. Secondary went from 70% to 70.5% and tertiary from 60% to 60.5%.
 
 ## Decisions log
