@@ -458,12 +458,25 @@ Drawn in `docs/mockups/png/sheet-ax.png`. The accessibility and low-vision revie
 
 ## Mac window, milestones 2 and 3
 
-Drawn in `docs/mockups/png/sheet-mac.png`. First draft, 15 November 2026, not yet reviewed (**Guess**). The Watch app is milestone 7, so no Watch screens are owed for milestones 2 and 3.
+Drawn in `docs/mockups/png/sheet-mac.png`. The Apple platform designer and the accessibility reviewer saw the first draft on 15 November 2026 and found it read as a phone app in a window. These are the rules after their findings. The Watch app is milestone 7, so no Watch screens are owed for milestones 2 and 3.
 
-- The sidebar takes the place of the tab bar: Today, History, You. The page keeps the phone's width, centred.
-- A past day and the forms open as sheets on the window.
-- Every action has a menu bar command. Habit menu: New Habit, Log Selected Habit, Add an Amount, Take Back Last Log, Details, Edit, Pause This Habit, Archive, Pause Everything, Pause for Dates, Add a Past Day. View menu: Today, History, You, Week, Month, Year, Previous Period, Next Period, Go to Today. File menu: Export a Copy, Import a Copy.
-- The shortcuts in the drawing are proposals.
+**Window.** The sidebar holds Today and History. Back, New Habit and Edit sit in the window toolbar, not in the page. Content may grow to about 720 points. A History row puts the name and its seven days on one line. A past day and the forms open as sheets on the window. Hints say "Click", not "Tap".
+
+**Settings.** You is not in the Mac sidebar. Appearance, Show runs, Show days not logged and Day starts at are in a Settings window, opened with Command-comma. Pausing is in the Habit menu and on Today. Export and Import are in the File menu. This changes the milestone 1 Mac build if it put You in the sidebar.
+
+**Selection and keys.** Today rows can be selected, with a visible ring. Up and Down move the selection. Space logs the focused row as its own activation, and is not a menu shortcut. In the month, arrow keys move through days and Return opens the day. In a sheet, Return adds and Escape cancels. "Undo pause" and the "Not scheduled today" row take keyboard focus.
+
+**Menus.**
+
+| Menu | Commands |
+|---|---|
+| Habit (app) | Settings, Command-comma |
+| File | New Habit, Command-N. Export a Copy, Shift-Command-E. Import a Copy, Shift-Command-I |
+| Edit | Undo Log, Command-Z, through the undo manager, so the amount field keeps its own undo |
+| Habit | Log, Command-Return. Add an Amount, Command-L. Details, Command-I. Edit, Command-E. Pause This Habit. Archive, Command-Delete. Pause Everything, Shift-Command-P, which reads Resume Everything while paused. Pause for Dates. Add a Past Day, Shift-Command-D |
+| View | Today, Command-1. History, Command-2. Week, Month, Year, Option-Command-1 to 3. Back, Command-[. Previous Period, Command-Left. Next Period, Command-Right. Go to Today, Command-T, with window tabbing off |
+
+**Can wait until after the MVP.** Habit detail in two columns, with the month beside the stats. A popover in place of the day sheet.
 
 ## Open decisions
 
