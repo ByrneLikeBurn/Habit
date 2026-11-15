@@ -49,7 +49,7 @@ def tile(seed: int, sigmas, weights, size: int = 512) -> np.ndarray:
 def grain_tiles() -> None:
     """Paper grain. Alpha never exceeds the maxAlpha in tokens.json, which is what the contrast check assumes."""
     d = OUT / "grain"; d.mkdir(parents=True, exist_ok=True)
-    recipes = {"pencil": ((0.7, 1.6, 5.0), (0.6, 0.5, 0.25), 1.6),      # fine tooth
+    recipes = {"pencil": ((1.3, 3.2, 10.0), (0.45, 0.6, 0.55), 1.25),      # fine tooth
                "watercolor": ((1.4, 3.2, 9.0), (0.35, 0.6, 0.35), 2.2)}  # cold-press dimples
     for style, (sig, wts, power) in recipes.items():
         n = tile(11 if style == "pencil" else 23, sig, wts) ** power
@@ -137,7 +137,7 @@ def m1_sheet(png: pathlib.Path, ids) -> None:
     """The milestone 1 screens in two rows, half size."""
     ims = [Image.open(png / f"{i}.png").convert("RGB") for i in ids]
     ims = [i.resize((i.width // 2, i.height // 2), Image.LANCZOS) for i in ims]
-    rows = [ims[:7], ims[7:]]
+    rows = [ims[:8], ims[8:]]
     w = max(sum(i.width for i in r) + 24 * (len(r) + 1) for r in rows); hs = [max(i.height for i in r) + 48 for r in rows]
     s = Image.new("RGB", (w, sum(hs)), (233, 230, 223)); y = 0
     for r, h in zip(rows, hs):

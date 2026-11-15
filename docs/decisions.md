@@ -38,6 +38,14 @@ One entry per decision that changed the brief. Each says what changed and why, i
 
 **Data rules accepted.** Ten rules for how logs are stored, from the engineering and QA reviews. They are fixed before milestone 1 because stored data can only be added to later.
 
+**Pencil marks redrawn.** The senior designer found that Pencil read as Pen and ink with a marker font. Done is now cross-hatched and part done is hatched one way, so the two differ by shape and each stroke shows. The font is lighter and the paper tooth is coarser.
+
+**Pencil marks, second pass.** A review measured done and part done at 1.2:1 apart once blurred, which is state carried by tone. Part done now covers half the square on the diagonal and done covers all of it, so they differ by outline. Strokes are drawn at full strength because the pencil texture had pulled them under 3:1.
+
+## 15 November 2026
+
+**The Pencil control square stays dark.** The senior designer wanted it in soft grey so empty rows go quiet. The accessibility review wanted it easy to find. Accessibility wins, because the square is the thing the user taps and the goal is inclusion from the first milestone. The line gets thinner, which answers the designer's point about weight.
+
 ## 15 November 2026, milestone 1
 
 **The shared store works with free signing.** A throwaway project with an app and a widget shared one App Group on the owner's iPhone. The widget read what the app wrote in shared settings, a file and a SwiftData store. Milestone 1 builds on that store.
