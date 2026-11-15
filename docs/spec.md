@@ -10,7 +10,7 @@ This file records decisions. Items marked **Guess** were made where the brief is
 
 ## Status
 
-Phase 1, design. No Swift exists. The owner approved Lake variant A. No other scene is started. Review findings are in `docs/reviews/phase-1.md`.
+Phase 2. Milestone 1, the core loop in Pen and ink, is on `feat/core-loop`. The owner approved Lake variant A. No other scene is started. Phase 1 review findings are in `docs/reviews/phase-1.md`.
 
 ## Creative direction
 
@@ -134,7 +134,7 @@ One drawing has one meaning.
 - VoiceOver gets adjustable actions named "Increase" and "Decrease" with the step as the value. System undo takes back the last log.
 - One haptic confirms a log and a take-back.
 
-**Hit areas.** The control's target is the full row height by 76 points from the trailing edge. The count line's target is 44 points high. A tap on the name or symbol opens Habit detail. On the Watch the whole row logs.
+**Hit areas.** The control's target is the full row height by 76 points from the trailing edge. The count line's target is 44 points high. A tap on the name or symbol logs, the same as the control. The owner decided this on 15 November 2026. Habit detail opens from the row menu. On the Watch the whole row logs.
 
 **Past days. Guess.** In the month view of Habit detail, a tap on a past day opens a small sheet for that day. The sheet names the date and the day's state. For a yes-or-no habit it has one action, "Mark done" or "Clear". For a counted habit it is the count sheet. A past day never changes on a single tap. An off-schedule day says "Not scheduled" and still allows a log. One line under the grid says "Tap a past day to change it." The month title has previous and next controls. Future days cannot be logged.
 
@@ -170,6 +170,19 @@ One drawing has one meaning.
 
 **Shared store.** Widgets, App Intents and the Watch app need the SwiftData store in an App Group container. An `.entitlements` file is allowed for the App Group only (**Owner**). The owner has a free Apple account. Before milestone 1, a throwaway project checks that an App Group works with free signing.
 
+**Shared-store test.** Run on 15 November 2026 with Xcode 27.2. Free signing gave both the app and a widget extension a profile with the App Group. On an iPhone, a value written by the app in shared UserDefaults, a file and a SwiftData store was read by the widget. It works. The profiles expire after 7 days. SwiftData logs errors if `Library/Application Support` does not exist in the group container, so the app creates that folder before it opens the store.
+
+**Identifiers. Owner**, 15 November 2026.
+
+| | Id |
+|---|---|
+| App | `dev.byrnelikeburn.Habit` |
+| Widget | `dev.byrnelikeburn.Habit.Widget` |
+| Watch | `dev.byrnelikeburn.Habit.Watch` |
+| App Group | `group.dev.byrnelikeburn.Habit` |
+
+The signing team is not committed. It lives in `Config/Local.xcconfig`, which git ignores.
+
 ## Product, from the brief
 
 **Tabs.** The brief had four: Today, Progress, Tags, You. There are now three, with Tags inside You. Today is the list, the check-offs and the scene card. Progress is the all-habit ledger with a heat map. Tags is the NFC walkthrough. You holds Nudges, Appearance, Gentle Mode, Vacation, Archive and Export.
@@ -183,6 +196,8 @@ One drawing has one meaning.
 | `Habit` | id, name, symbol name, kind (binary or counted), target (1 for binary), unit, schedule mask (weekday bits, 127 is daily), sort index, focus flag, Gentle Mode flag, Vacation default flag, tag nickname, nudge hour (default 9), descriptor, nudge phrase, nudge text, keep-wording flag, created, archived and deleted dates, relationships to events and pauses |
 | `LogEvent` | Append-only. delta, habit, day key, source (manual, watch, widget, shortcut, siri, control), timestamp, device id |
 | `Pause` | habit, start day, end day (nil is open-ended), reason (vacation, gentle, manual) |
+
+**Frozen shapes.** `Habit.rules` stores `[HabitRule]`, a struct of first day, target and schedule mask. SwiftData stores it as one composite attribute, so the struct's shape is frozen like any other stored type. A later per-rule value goes in a new field beside it, never inside it. `rules` is the source of truth for history, and `Habit.target` and `Habit.scheduleMask` hold the current values. Both are written only through `setRule`.
 
 The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settable day-start hour (default 04:00) and fixed at write time. Day totals are derived and cached in memory, never stored.
 
@@ -284,7 +299,7 @@ The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settab
 
 The behavioural scientist, neurodiversity and returning-user lenses reviewed `docs/mockups/png/sheet-m1.png`. The owner defers to the reviews on design, so these are adopted. All four items that were owed are now drawn.
 
-**Reaching Edit and Archive.** Until Habit detail exists, a tap on a habit's name opens the Edit form. Touch and hold on a row opens a menu with Edit, Archive and Move. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows for a few seconds. Drawn in `sheet-m1.png`.
+**Reaching Edit and Archive.** A tap on a habit's name logs. A swipe left on a row shows Edit and Archive. Touch and hold on the name opens a menu with Edit, Archive and Move. VoiceOver offers the same three as actions on the row. The owner decided this on 15 November 2026. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows until the next action. The menu is drawn in `sheet-m1.png`.
 
 **Order.** Manual reorder is in milestone 1, using the system list edit mode and VoiceOver move actions. Done rows stay where they are, so a row never moves under a thumb.
 
@@ -292,7 +307,7 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 
 **New habit.** The name is the only required field. Defaults are Yes or no, every day, and the first symbol. Unit and "One tap adds" sit under one "More" row in New habit and are open in Edit. A sentence under the day circles restates the choice, for example "Every day except Thursday". Day letters use two letters where initials repeat. The name placeholder models a plan with a cue: "Stretch after brushing teeth". If Add is disabled, a line says why.
 
-**Controls that differ.** A counted control shows a small plus inside the square until the target is met, so it reads as "adds" before the tap. Drawn in `sheet-m1.png`. After a yes-or-no log is taken back, one line with Undo shows for a few seconds.
+**Controls that differ.** A counted control shows a small plus inside the square until the target is met, so it reads as "adds" before the tap. Drawn in `sheet-m1.png`. After a yes-or-no log is taken back, one line with Undo shows until the next action.
 
 **Feedback.** A mark draws in as one short stroke, under 300 ms. With Reduce Motion it swaps with no animation. The count line changes on every tap. There is no all-done banner.
 

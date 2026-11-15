@@ -1,0 +1,3 @@
+// Shared build settings. The signing team is not committed.
+// Copy Local.xcconfig.example to Local.xcconfig and set DEVELOPMENT_TEAM there.
+#include? "Local.xcconfig"
