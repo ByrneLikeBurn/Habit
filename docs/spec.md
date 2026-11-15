@@ -6,6 +6,8 @@ This file records decisions. Items marked **Guess** were made where the brief is
 
 **Owner**, 14 November 2026. The goal is a minimum usable app, milestones 1 to 3, with inclusion and accessibility built in from the first milestone and not added later.
 
+**Principle. Owner.** Every addition must add value, earn its place, and fit the vision and the expert reviews. When two reviews disagree, this is the test.
+
 **Principle. Owner.** Something is better than nothing. A small log, a part-done day or a count with no target is credited, never scored as a failure.
 
 ## Status
@@ -359,7 +361,6 @@ Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
-| M2-A | Future days in the month view. The senior designer wanted the date alone. The accessibility review wants the faint dashed outline back, so a future day differs from a blank past day | The owner decides, because two reviews disagree. I'd bring the outline back | Milestone 2 |
 | M2-B | With "Show runs" on, after a gap: "Current run 0 days" above "Longest run 31 days" | Show Current run only when it is 1 or more | Milestone 2 |
 | M2-C | Rename the Progress tab. "Progress" asks to be read as a grade | "History" | Milestone 2 |
 | M2-D | Does a part-done day extend a run, or only not break it | It extends it. Something is better than nothing | Milestone 2 |

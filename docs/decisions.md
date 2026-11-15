@@ -45,3 +45,7 @@ One entry per decision that changed the brief. Each says what changed and why, i
 ## 15 November 2026
 
 **The Pencil control square stays dark.** The senior designer wanted it in soft grey so empty rows go quiet. The accessibility review wanted it easy to find. Accessibility wins, because the square is the thing the user taps and the goal is inclusion from the first milestone. The line gets thinner, which answers the designer's point about weight.
+
+**Future days in the month view show the date alone.** The accessibility review wanted a faint dashed box so a future day differs from a blank past day. The senior designer wanted it gone because it was the loudest thing on the screen and said the least. The "Add a past day" button now gives a clear way to log a past day, so the boxes no longer earn their place.
+
+**Every addition must earn its place.** The owner set this as the test when two reviews disagree: it must add value and fit the vision and the expert reviews.
