@@ -415,6 +415,18 @@ Not adopted: filling the past-day amount with what is left to the target. A past
 
 **Fixture faults found.** The year strip started at May while the stats said 28 April. The month with runs on showed a run of 2 where the marks give 3.
 
+## Milestone 3 screens
+
+Drawn in `docs/mockups/png/sheet-m3.png`, in Pen and ink. First draft, 15 November 2026. Every item here is a **Guess** until the reviews have seen it.
+
+- Today in Gentle Mode, after Turn off, and during a vacation. Each shows one line and one button. Rows draw the paused dash, and a log draws the diamond with "Logged while paused".
+- One habit paused: its row stays in place, draws the dash and says "Paused".
+- The row menu holds Details, Edit, Move, Pause this habit or Resume this habit, and Archive.
+- You gains a Pausing section: the Gentle Mode switch and a Vacation row.
+- The Vacation form has a start and an end date. The start can be in the past. A planned vacation can be removed.
+- Edit gains a Pause section, with the date the pause began and Resume.
+- One Home Screen widget, small and medium. Rows keep Today's order. A tap logs through `LogHabitIntent`. States: part done, all done, paused, no habits, nothing scheduled, and tinted mode.
+
 ## Open decisions
 
 Each needs the owner. The recommendation is mine.

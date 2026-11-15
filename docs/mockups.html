@@ -266,6 +266,22 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .plink,.lnk{padding:12px 0}
 .note.links{display:flex;justify-content:center;gap:28px;margin-top:14px}
 .undo.inflow{position:static;margin:14px 21px 0}
+.widget{width:170px;height:170px;border-radius:22px;background:var(--paper);color:var(--text);padding:14px 14px 0;overflow:hidden;font-family:var(--ui);box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.widget.med{width:364px}
+.wtitle{font-family:var(--display);font-weight:var(--dmed);font-size:15px;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.wtitle span{font:400 11px/1 var(--ui);color:var(--text2)}
+.wr{display:flex;align-items:center;justify-content:space-between;min-height:42px;gap:6px}
+.wr + .wr{border-top:1px solid var(--rule)}
+.wn{display:flex;align-items:center;gap:6px;min-width:0}
+.wn b{font:500 13px/1.2 var(--ui);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.wn .ic{width:20px;height:20px;flex:none}
+.wcols{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+.wcols .wr:nth-child(2){border-top:0}
+.wnote{font:400 13px/1.35 var(--ui);color:var(--text2);margin:6px 0 0}
+.wnote b{color:var(--text);font-weight:600}
+.tog.on{background:var(--text)}
+.tog.on::after{left:22px}
+.datev{border:1px solid var(--rule2);border-radius:8px;padding:6px 10px}
 .ymons{display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 21px 0}
 .ym{display:grid;gap:5px;min-height:44px;align-content:start}
 .ym span{font:500 11px/1 var(--ui);color:var(--text3)}
@@ -830,6 +846,72 @@ function m2Empty(style){
   <div class="empty"><p class="big">Nothing to track yet</p><p>Add one small thing you would like to do most days.</p>${sysbtn("Add a habit")}<span class="lnk" style="margin-top:6px;font:600 15px/1.4 var(--ui)">Import a copy</span></div>${tabbar("today")}`;
 }
 
+/* ---------- milestone 3 screens: pausing and one Home Screen widget ---------- */
+const PAUSED_ALL = ["paused","extra","paused","paused","paused","paused"];
+const pausedRows = style=>`<div class="list">${HABITS.map((h,i)=>row(i===0?{...h,sub:"0 of 8 glasses"}:h,style,PAUSED_ALL[i],i===0?undefined:(i===1?"Logged while paused":""))).join("")}</div>`;
+function m3Gentle(style){
+  return m1Head()+`<p class="note"><b>Gentle Mode is on.</b> Everything is paused. Anything you log still counts.</p>
+  <div class="noteact"><span class="sysbtn ghost small">Turn off</span></div>${pausedRows(style)}${tabbar("today")}`;
+}
+function m3GentleEnding(style){
+  return m1Head()+`<p class="note"><b>Gentle Mode ends after today.</b> Today stays paused.</p>
+  <div class="noteact"><span class="sysbtn ghost small">Keep it on</span></div>${pausedRows(style)}${tabbar("today")}`;
+}
+function m3Vacation(style){
+  return m1Head()+`<p class="note"><b>Vacation until 27 November.</b> Everything is paused. Anything you log still counts.</p>
+  <div class="noteact"><span class="sysbtn ghost small">End it today</span></div>${pausedRows(style)}${tabbar("today")}`;
+}
+function m3OnePaused(style){
+  return m1Head()+`<div class="list">${HABITS.map((h,i)=>i===2?row(h,style,"paused","Paused"):row(h,style)).join("")}</div>${nst(false)}${tabbar("today")}`;
+}
+function m3Menu(style){
+  return m1Head()+`<div class="list dim">${HABITS.map(h=>row(h,style)).join("")}</div>
+  <div class="menu" role="menu"><div>Details</div><div>Edit</div><div>Move</div><div>Pause this habit</div><div>Archive</div></div>${tabbar("today")}`;
+}
+function m3MenuPaused(style){
+  return m1Head()+`<div class="list dim">${HABITS.map((h,i)=>i===2?row(h,style,"paused","Paused"):row(h,style)).join("")}</div>
+  <div class="menu" role="menu"><div>Details</div><div>Edit</div><div>Move</div><div>Resume this habit</div><div>Archive</div></div>${tabbar("today")}`;
+}
+function m3You(style, state){
+  return status()+`<div class="nav"><span></span><span></span></div>${head("You")}
+  <div class="sec">Look</div><div class="opt">Appearance<span class="val">Paper, Blue</span><span class="go">${chev}</span></div>
+  <div class="sec">Pausing</div><div class="opt">Gentle Mode<span class="tog ${state==="gentle"?"on":""}"></span></div>
+  <div class="opt">Vacation<span class="val">${state==="vac"?"20 to 27 November":"None planned"}</span><span class="go">${chev}</span></div>
+  <p class="note hint">A paused day never counts against you. Anything you log while paused still counts.</p>
+  <div class="sec">History</div><div class="opt">Show runs<span class="tog"></span></div><div class="opt">Show days not logged<span class="tog"></span></div>
+  <div class="sec">Your data</div><div class="opt">Export a copy</div><div class="opt">Import a copy</div>
+  <div class="sec">Use</div><div class="opt">Controls on the left<span class="tog"></span></div><div class="opt">Day starts at<span class="val">04:00</span><span class="go">${chev}</span></div>${tabbar("you")}`;
+}
+const m3YouGentle = s=>m3You(s,"gentle"), m3YouVac = s=>m3You(s,"vac");
+function m3VacForm(style, set){
+  return `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>Vacation</b><span class="btn"><b>Save</b></span></div>
+  <div class="frow"><span>Starts</span><span class="val datev">${set?"Fri 20 Nov 2026":"Today"}</span></div>
+  <div class="frow"><span>Ends</span><span class="val datev">${set?"Fri 27 Nov 2026":"Choose a date"}</span></div>
+  <p class="note hint">Every habit is paused on these days, the first and the last included. The start can be in the past.</p>
+  ${set?`<div class="noteact" style="margin-top:18px"><span class="sysbtn ghost">Remove this vacation</span></div><p class="note hint">Days already logged keep their logs.</p>`:""}`;
+}
+const m3VacSet = s=>m3VacForm(s,true);
+function m3EditPause(style, paused){
+  return `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>Edit habit</b><span class="btn"><b>Save</b></span></div>
+  <div class="sec">Name</div><div class="field nm">Walk outside</div>
+  <div class="sec">Days</div><div class="dayrow">${"MTWTFSS".split("").map(d=>`<span class="dayb on">${d}</span>`).join("")}</div><p class="note hint">Every day</p>
+  <div class="sec">Pause</div>
+  ${paused?`<div class="frow"><span>Paused since</span><span class="val">Tue 10 Nov</span></div><div class="noteact" style="margin-top:14px"><span class="sysbtn ghost">Resume this habit</span></div>`
+          :`<div class="noteact"><span class="sysbtn ghost">Pause this habit</span></div>`}
+  <p class="note hint">${paused?"It starts again today. The paused days stay paused.":"It stays paused until you resume it. Anything you log still counts."}</p>
+  <div class="noteact" style="margin-top:18px"><span class="sysbtn ghost">Archive habit</span></div>`;
+}
+const m3EditPaused = s=>m3EditPause(s,true);
+// The widget. Rows keep Today's order. A tap on a row logs through LogHabitIntent.
+const wrow = (h,style,st)=>`<div class="wr"><span class="wn">${icon(h.icon,20)}<b>${h.name}</b></span>${mark(st||h.state,{style,size:24,today:true,ctl:true,plus:h.count&&(st||h.state)!=="solid"})}</div>`;
+const WH = HABITS.filter((h,i)=>i!==3);
+function m3WidgetSmall(style){ return `<div class="wtitle">Today</div>${WH.slice(0,3).map(h=>wrow(h,style)).join("")}`; }
+function m3WidgetMed(style){ return `<div class="wtitle">Today<span>Saturday 14 November</span></div><div class="wcols">${WH.slice(0,4).map(h=>wrow(h,style)).join("")}</div>`; }
+function m3WidgetDone(style){ return `<div class="wtitle">Today</div>${WH.slice(0,3).map(h=>wrow(h,style,"solid")).join("")}`; }
+function m3WidgetPaused(style){ return `<div class="wtitle">Today<span>Gentle Mode</span></div>${WH.slice(0,3).map((h,i)=>wrow(h,style,i===1?"extra":"paused")).join("")}`; }
+function m3WidgetEmpty(style){ return `<div class="wtitle">Today</div><p class="wnote">Nothing to track yet.</p><p class="wnote"><b>Add a habit</b></p>`; }
+function m3WidgetNone(style){ return `<div class="wtitle">Today</div><p class="wnote">Nothing scheduled today.</p>`; }
+
 /* ---------- page ---------- */
 const SCREENS = {today:[today,"Today"], detail:[detail,"Habit detail"], gentle:[gentle,"Gentle Mode on Today"], appearance:[appearance,"Appearance"], marks:[marks,"Marks board"]};
 const css = v=>Object.entries(v).map(([k,x])=>`${k}:${x}`).join(";");
@@ -874,6 +956,20 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
              ["import-fail","phone modal",m2ImportFail,"Import, not a Habit file"],["import-newer","phone modal",m2ImportNewer,"Import, newer version"]];
   html += `<h2 class="group">Milestone 2 screens, Pen and ink</h2><div class="sheet">`;
   for(const [k,cls,fn,label] of G) html += `<figure><div class="${cls} ${s} paper" data-shot="m2-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `</div>`; M1 = false;
+}
+{ // Milestone 3 screens
+  M1 = true;
+  const s = "penAndInk", v = css({...vars(s,"paper"), "--accent":TOKENS.swatches.blue}), vt = css({...vars(s,"ink"), "--accent":"#F3EFE6", "--paper":"#3A3A3C"});
+  const G = [["gentle","phone",m3Gentle,"Today, Gentle Mode on"],["gentle-ending","phone",m3GentleEnding,"Today, after Turn off"],["vacation","phone",m3Vacation,"Today, during a vacation"],
+             ["one-paused","phone",m3OnePaused,"Today, one habit paused"],["menu","phone",m3Menu,"Row menu"],["menu-paused","phone",m3MenuPaused,"Row menu, paused habit"],
+             ["you","phone",m3You,"You, with Pausing"],["you-gentle","phone",m3YouGentle,"You, Gentle Mode on"],["you-vac","phone",m3YouVac,"You, a vacation planned"],
+             ["vac-form","phone modal",m3VacForm,"Vacation, new"],["vac-set","phone modal",m3VacSet,"Vacation, planned"],["edit-pause","phone modal",m3EditPause,"Edit, pause one habit"],["edit-paused","phone modal",m3EditPaused,"Edit, a paused habit"],
+             ["w-small","widget",m3WidgetSmall,"Widget, small"],["w-done","widget",m3WidgetDone,"Widget, all done"],["w-paused","widget",m3WidgetPaused,"Widget, paused"],["w-empty","widget",m3WidgetEmpty,"Widget, no habits"],["w-none","widget",m3WidgetNone,"Widget, nothing scheduled"],
+             ["w-med","widget med",m3WidgetMed,"Widget, medium"]];
+  html += `<h2 class="group">Milestone 3 screens, Pen and ink</h2><div class="sheet">`;
+  for(const [k,cls,fn,label] of G) html += `<figure><div class="${cls} ${s} paper" data-shot="m3-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `<figure><div class="widget ${s} ink" data-shot="m3-w-tinted" style='${vt}'>${m3WidgetSmall(s)}</div><figcaption>Widget, tinted mode. The system sets the colour</figcaption></figure>`;
   html += `</div>`; M1 = false;
 }
 for(const [style,list] of Object.entries(FONTS)){
