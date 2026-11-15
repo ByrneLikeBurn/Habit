@@ -81,10 +81,10 @@ Tokens are in `docs/tokens.json`. `tools/tokens/check_tokens.py` checks them. `t
 | Display font | New York | Shantell Sans (proposed) | Alegreya Sans (proposed) |
 | Paper | Flat paper white | Cream with fine tooth | Bright white with cold-press dimples |
 | Rules | Hairline ink | Pencil line | None |
-| Mark shape | Square | Square of four strokes that overshoot their corners | Round wash |
-| Done | Filled square | Dense graphite hatching | Wash with a full-strength rim |
-| Part done | Five ink lines | Five loose strokes | Three brush strokes |
-| Today | Outer square outline | The day is circled by hand | Outer brushed ring |
+| Mark shape | Square | Strokes that run past the edge of a square | Round wash |
+| Done | Filled square | Tight strokes over the whole square | Wash with a full-strength rim |
+| Part done | Five ink lines | The same strokes over the lower half, cut on the diagonal | Three brush strokes |
+| Today | Outer square outline | A hand-drawn square on Today, a hand circle in calendars | Outer brushed ring |
 | Scene frame | Ruled double border | Hand-ruled border | Deckled edge, no line |
 
 Labels and controls use SF in every style. System controls take the text colour as their tint, because the accent may tint marks only (**Guess**). The Appearance control offers System, Paper and Ink (**Guess**).
@@ -146,7 +146,9 @@ One drawing has one meaning.
 
 **Dark material. To design.** Ink is a dark paper, and each style needs a stated material on it: light ink in Pen and ink, light and coloured pencil in Pencil, opaque paint in Watercolor. In Ink the scene's lightest value sits below the heading text. The Pen and ink frame is one hairline in the rule colour in both appearances.
 
-**Pencil. To design before milestone 4.** The senior designer review found that Pencil reads as Pen and ink with a marker font. Owed: done marks as visible strokes at 56 degrees with stroke ends showing, rules drawn by hand, paper tooth that shows on a phone, a lighter weight of the display font, and a Today control that is the four-stroke square, with the hand circle kept for today in calendars.
+**Pencil, second pass done.** Done is tight strokes over the whole square, running past its edge. Part done is the same strokes over the lower half, cut on the diagonal, so the two differ by silhouette and stay apart when blurred. Strokes are drawn at full strength with small breaks, to hold 3:1. The Today control is a square of four strokes, and the hand circle is kept for today in calendars. Rules are pencil lines, the paper tooth is coarser, and the display font is lighter (weight 380, was 450). Still owed: the dark version, the marks board for this style, hand-drawn dashes for "to come", and a contrast measurement on a simulator screenshot. The control square stays dark, at 4.5:1 or more, with a thinner line.
+
+**Pencil, the finding that started it.** The senior designer review found that Pencil reads as Pen and ink with a marker font. Owed: done marks as visible strokes at 56 degrees with stroke ends showing, rules drawn by hand, paper tooth that shows on a phone, a lighter weight of the display font, and a Today control that is the four-stroke square, with the hand circle kept for today in calendars.
 
 **Screens not drawn yet.** You, Progress, Tags, Vacation, the Edit form, the accent and palette lists, the hue ring, the day sheet, export and import, Archive, week and year views in place, and the Mac and Watch versions of the sheets. Each is mocked with its states at the start of the milestone that builds it (**Guess**). States owed for the drawn screens are listed in `docs/reviews/phase-1.md`.
 
