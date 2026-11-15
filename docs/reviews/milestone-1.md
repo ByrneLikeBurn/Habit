@@ -46,4 +46,9 @@ Five lenses ran as separate subagents on branch `feat/core-loop`, two at a time.
 
 ## Security and privacy
 
-Pending.
+| # | Finding | Result |
+|---|---|---|
+| 1 | The branch commits carry the owner's personal email as author and committer. `main` uses the GitHub noreply address | Not fixed. Removing it needs a history rewrite and a force push, which the owner must approve. Later commits pass the noreply address on each commit. The cause is the global git config |
+| 2 | `LogHabitIntent` runs on a locked device, so Siri can list habit names and read counts aloud | Not fixed. Requiring unlock is a privacy decision for the owner, and it may stop an automation that runs while the phone is locked |
+| 3 | Deleted habits would still be offered in Shortcuts and Siri | Fixed. Deleted habits are never offered. Archived habits are listed after active ones |
+| 4 | The comment said the device id never leaves the device, but export and sync will carry it | Fixed. The comment is corrected. Milestone 2 decides whether export keeps the id |

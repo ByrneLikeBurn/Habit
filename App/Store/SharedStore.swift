@@ -58,7 +58,8 @@ enum SharedStore {
         }
     }
 
-    /// A random id for this install, stored in the shared settings. It never leaves the device.
+    /// A random id for this install, stored in the shared settings and on every LogEvent.
+    /// The app sends it nowhere. Export (milestone 2) and sync would carry it; whether export keeps it is decided there.
     static var deviceID: String {
         if let id = defaults.string(forKey: SettingKey.deviceID) { return id }
         let id = UUID().uuidString

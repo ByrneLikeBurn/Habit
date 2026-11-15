@@ -19,7 +19,10 @@ struct HabitQuery: EntityStringQuery {
     @MainActor
     private func habits() throws -> [Habit] {
         let context = try SharedStore.container.get().mainContext
-        return Ordering.sorted(try context.fetch(FetchDescriptor<Habit>()))
+        // Archived habits stay listed, so a shortcut keeps working. Deleted habits are never offered.
+        return try context.fetch(FetchDescriptor<Habit>())
+            .filter { $0.deletedAt == nil }
+            .sorted { ($0.isArchived ? 1 : 0, $0.sortIndex) < ($1.isArchived ? 1 : 0, $1.sortIndex) }
     }
 
     @MainActor
