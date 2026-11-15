@@ -116,3 +116,7 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **A History row puts the name above its seven days.** The UI and accessibility reviews found the day cells were 23 points apart, so a thumb aimed at Wednesday could open Tuesday. Each cell is now 44 points wide.
 
 **Three reviews confirmed that a part-done day extends a run.** Milestone 1 already built it that way. The behavioural, neurodiversity and content reviews reached the same answer on their own.
+
+**Export is a plain file with no device id.** The security review wanted the device id left out, and the engineering review accepted a fixed "imported" value in its place. The owner deferred to the reviews. The export screen says the file is not encrypted.
+
+**A password on export comes after the MVP.** The reviews agree it should exist and be off by default, because a forgotten password loses that copy for good. The system password manager may offer to save it, which the owner agreed to. The app itself never stores it.

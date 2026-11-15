@@ -393,7 +393,23 @@ Not adopted: filling the past-day amount with what is left to the target. A past
 
 **A log on a day off.** It draws the diamond and reads "Logged on a day off", as milestone 1 built it. The day sheet for such a day shows that after a log.
 
-**Export needs the owner.** A file of the user's habits leaves the app when the user shares it. That is a privacy matter, so the reviews cannot approve it. Also owed before the build, for the engineering and QA reviews: a habit archived here and live in the file, whether pauses and settings are in the file, and whether the file keeps the device id.
+**Export.** The owner deferred to the reviews on 15 November 2026, and the security, engineering and QA reviews approve it on these conditions.
+
+- The file is made only when the user taps "Export a copy" and goes only to the system share sheet. The app makes no network call.
+- Plain JSON. The header holds the format name, one whole-number version, the app build, the export time and a count per record type.
+- It holds habits, logs and pauses. It holds no settings and no device id. On import each log gets the fixed device value "imported".
+- `Pause` gets a stable id, so import can skip a pause that is already here.
+- The file name is "Habit export" and the date. No habit name and no device name.
+- The export screen says: "This copy is not encrypted. Anyone who has it can read your habits."
+- The temporary file is written to the app's own temporary folder with complete file protection, deleted when the share sheet closes, and swept at launch.
+- Import checks the whole file, then writes all of it or none of it. It refuses a file over the size and count limits, a newer version, an unknown kind, a bad day key, an amount over the typed-number cap, and a log whose habit is missing. Unknown keys are ignored. An older version imports with defaults. The limits are set at the build (**Guess**).
+- A habit archived here stays archived when the file has it live. Its logs still import. It counts in the preview's "differ" number.
+- Parse errors never log file content. Test files are made up.
+- Round-trip test: export, import into an empty store and export again gives the same file apart from the export time. Day totals and runs match, across pauses. A second import adds nothing. Negative and zero amounts survive. Day keys do not change under another time zone or day-start hour. A cut-off file and a newer file write nothing.
+
+**Import and the one write path. Open, for the owner.** Invariant 5 says every `LogEvent` is written by `LogHabitIntent`. Import writes many at once. The security review asks whether import may use the same write code without going through the intent.
+
+**Password on export. Later, not in the MVP.** The reviews agree it should exist, off by default, in milestone 13 or sooner if testing asks for it. One switch on the export screen, "Protect with a password". The password is typed once and shown, with a hide button. The field is marked as a new password so the system password manager may offer to save it. The owner agreed to that on 15 November 2026. The app never stores, reads back or logs the password and calls no keychain API. There is no hint and no recovery. The screen keeps the line "Habit cannot recover this password. Save it somewhere you will find it later." and does not promise a save offer. The file name ends in "-protected". Built with Apple's frameworks only: PBKDF2 for the key, AES-GCM for the file, a fresh salt and nonce each time. To check on a device: whether the system offers to save a password with no account or domain.
 
 **Words.** "No history yet" becomes "Nothing logged so far" and shows only for a habit with no logs ever.
 
