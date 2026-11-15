@@ -319,7 +319,7 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 
 ## Milestone 2 screens
 
-Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Not yet reviewed by any lens.
+Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Redrawn on 15 November to the rules below. Still owed: History in month and year, History with no habits and with 30, the largest text size, and the Mac and Watch versions.
 
 - Habit detail in month, week and year views. A future day shows its date alone. The year starts in the month the habit was added and labels its months.
 - Stats: Days done, Days logged, and a total in the user's unit, with the start date. Current run and Longest run appear only when "Show runs" is on.
