@@ -315,6 +315,18 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 - One Home Screen widget is part of milestone 3, if the App Group test passes. It gives the user a cue outside the app. Asked for by the behavioural scientist.
 - The label "Extra credit" becomes "Logged while paused". Asked for by the tired daily user, the content designer and the behavioural scientist. Older sections of this file and of `docs/reviews` still say "extra credit" for the same state.
 
+## Milestone 2 screens
+
+Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Not yet reviewed by any lens.
+
+- Habit detail in month, week and year views. A future day shows its date alone. The year starts in the month the habit was added and labels its months.
+- Stats: Days done, Days logged, and a total in the user's unit, with the start date. Current run and Longest run appear only when "Show runs" is on.
+- A habit with no history shows one line and an "Add a past day" button.
+- A past day opens a sheet that names the date. A day that was not scheduled says so and still takes a log.
+- Progress is a ledger: one row per habit, seven days across.
+- You gains "Show runs", "Show days not logged", "Export a copy" and "Import a copy".
+- Import ends on a sheet that counts what was added and what was skipped. A file that cannot be read says so and changes nothing.
+
 ## Open decisions
 
 Each needs the owner. The recommendation is mine.
