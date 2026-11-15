@@ -17,6 +17,7 @@ struct CountSheet: View {
     @State private var amountText: String
     @State private var selection: TextSelection?
     @FocusState private var amountFocused: Bool
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     init(habit: Habit, day: DayKey) {
         self.habit = habit
@@ -89,9 +90,12 @@ struct CountSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        // At accessibility sizes the sheet opens full height and the keyboard waits for a tap,
+        // so the total is never hidden.
+        .presentationDetents(typeSize.isAccessibilitySize ? [.large] : [.medium, .large])
         .task {
             // The amount starts selected, so typing replaces it and Add works at once.
+            guard !typeSize.isAccessibilitySize else { return }
             try? await Task.sleep(for: .milliseconds(350))
             amountFocused = true
         }
@@ -109,10 +113,15 @@ struct CountSheet: View {
         Button {
             apply(.takeAway(amount ?? 0), clock: clock)
         } label: {
-            Text("Take away").frame(minWidth: 96, minHeight: 32)
+            Text("Take away")
+                .foregroundStyle(style.text)
+                .frame(minWidth: 96, minHeight: 32)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
+                .overlay(Capsule().strokeBorder(style.text, lineWidth: style.outlineWidth))
+                .contentShape(Capsule())
         }
-        .buttonStyle(.bordered)
-        .buttonBorderShape(.capsule)
+        .buttonStyle(.plain)
         .disabled(amount == nil || total == 0)
 
         Button {

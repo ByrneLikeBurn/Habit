@@ -51,14 +51,14 @@ struct HabitRow: View {
     }
 
     private var info: some View {
-        VStack(alignment: .leading, spacing: -6) {
+        // Name and count line each keep a 44-point target. They do not overlap.
+        VStack(alignment: .leading, spacing: 0) {
             nameButton
             if habit.kind == .counted {
                 countButton.padding(.leading, 36)
             }
         }
-        .padding(.top, habit.kind == .counted ? 8 : 6)
-        .padding(.bottom, habit.kind == .counted ? 0 : 6)
+        .padding(.vertical, habit.kind == .counted ? 0 : 6)
     }
 
     private var shown: Int { max(0, total) }
@@ -83,8 +83,8 @@ struct HabitRow: View {
             }
         }
         .buttonStyle(.plain)
-        // A counted row's count line sits close under the name. The two targets together span the row.
-        .frame(minHeight: habit.kind == .counted && !typeSize.isAccessibilitySize ? 28 : 44)
+        // On a counted row the name sits low in its target, so the count line reads as part of it.
+        .frame(minHeight: 44, alignment: habit.kind == .counted && !typeSize.isAccessibilitySize ? .bottomLeading : .leading)
         .contentShape(Rectangle())
         .contextMenu { menu }
         .accessibilityHint(Text("Opens Edit"))
@@ -129,8 +129,10 @@ struct HabitRow: View {
                 .foregroundStyle(style.secondary)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 3)
-                .overlay(Capsule().strokeBorder(style.rule, lineWidth: style.ruleWidth * 2))
-                .frame(minHeight: 44)
+                // The outline says "button". Tertiary text measures over 4.8:1, above the 3:1 for shapes.
+                .overlay(Capsule().strokeBorder(style.tertiary, lineWidth: 1))
+                .padding(.top, 4)
+                .frame(minHeight: 44, alignment: .topLeading)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

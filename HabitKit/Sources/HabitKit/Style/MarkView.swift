@@ -32,14 +32,16 @@ public struct MarkView: View {
                 .frame(width: inner, height: inner)
                 .transition(reduceMotion ? .identity : .drawIn)
             if showsPlus && state != .done {
-                PlusShape()
-                    .stroke(style.text, style: StrokeStyle(lineWidth: style.markLineWidth, lineCap: .round))
-                    .frame(width: size * 0.32, height: size * 0.32)
-                    .background {
-                        if state == .partDone {
-                            Circle().fill(style.paper).frame(width: size * 0.5, height: size * 0.5)
-                        }
+                // A thin paper halo keeps the plus readable over hatching without hiding it.
+                ZStack {
+                    if state == .partDone {
+                        PlusShape()
+                            .stroke(style.paper, style: StrokeStyle(lineWidth: style.markLineWidth + 2.5, lineCap: .round))
                     }
+                    PlusShape()
+                        .stroke(style.text, style: StrokeStyle(lineWidth: style.markLineWidth, lineCap: .round))
+                }
+                .frame(width: size * 0.28, height: size * 0.28)
             }
         }
         .frame(width: size, height: size)

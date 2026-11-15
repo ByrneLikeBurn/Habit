@@ -50,7 +50,7 @@ final class AppModel {
             counting = CountRequest(habit: habit, day: day ?? clock.today)
         case .unchanged:
             break
-        case .wrote(let delta, _):
+        case .wrote(let delta, let newTotal):
             feedback += 1
             let logDay = day ?? clock.today
             if let inverse = outcome.inverse {
@@ -61,8 +61,13 @@ final class AppModel {
                 }
                 undoManager?.setActionName(String(localized: "Log"))
             }
-            if habit.kind == .binary, delta < 0, let inverse = outcome.inverse {
-                show(UndoLine(message: String(localized: "\(habit.name) taken back.")) { [weak self] in
+            // A take-back and every counted change show a line with Undo. A yes-or-no log shows its mark.
+            let message: String? = switch habit.kind {
+            case .binary: delta < 0 ? String(localized: "\(habit.name) taken back.") : nil
+            case .counted: "\(habit.name): " + CountText.line(total: newTotal, target: habit.rule(on: logDay).target, unit: habit.unit)
+            }
+            if let message, let inverse = outcome.inverse {
+                show(UndoLine(message: message) { [weak self] in
                     self?.log(inverse, habit: habit, day: logDay, context: context, clock: clock, undoManager: undoManager)
                 })
             } else {

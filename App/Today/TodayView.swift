@@ -222,12 +222,11 @@ struct FirstRunView: View {
     }
 }
 
-/// One line with Undo for a few seconds. With VoiceOver on it stays until the next action.
+/// One line with Undo. It stays until the next action, so no one has to beat a timer to reach it.
 struct UndoLineView: View {
     let line: UndoLine
     @Environment(AppModel.self) private var model
     @Environment(\.style) private var style
-    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
 
     var body: some View {
         HStack(spacing: 12) {
@@ -251,11 +250,6 @@ struct UndoLineView: View {
             Rectangle().fill(style.rule).frame(height: style.ruleWidth)
         }
         .frame(maxWidth: 393)
-        .task(id: line.id) {
-            guard !voiceOver else { return }
-            try? await Task.sleep(for: .seconds(5))
-            if model.undoLine?.id == line.id { model.undoLine = nil }
-        }
     }
 }
 

@@ -50,8 +50,9 @@ struct RootView: View {
                 model.counting = CountRequest(habit: habit, day: clock.today)
             }
         case .undo:
-            if let habit = habits.first(where: { $0.kind == .binary }) {
-                model.undoLine = UndoLine(message: String(localized: "\(habit.name) taken back.")) {}
+            // A real take-back, so the mark and the line agree.
+            if let habit = habits.first(where: { $0.kind == .binary && $0.total(on: clock.today) > 0 }) {
+                model.log(.tap, habit: habit, day: clock.today, context: context, clock: clock, undoManager: nil)
             }
         default:
             break

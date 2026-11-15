@@ -96,6 +96,7 @@ struct HabitFormView: View {
             Form {
                 Section {
                     TextField("Stretch after brushing teeth", text: $name, axis: .vertical)
+                        .lineLimit(1...4)
                         .font(style.display(.body))
                         .focused($nameFocused)
                         .submitLabel(.done)
