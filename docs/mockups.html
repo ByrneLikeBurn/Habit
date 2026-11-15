@@ -427,9 +427,9 @@ function gentle(style, app){
   const st = ["paused","extra","paused","paused","paused","paused"];
   return status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>
   ${head("Today","Saturday 14 November")}${scene(style,app)}
-  <p class="note"><b>Gentle Mode is on.</b> Everything is paused. Anything you log is extra credit.</p>
+  <p class="note"><b>Gentle Mode is on.</b> Everything is paused. Anything you log still counts.</p>
   <div class="noteact"><span class="sysbtn ghost small">Turn off</span></div>
-  <div class="list">${HABITS.map((h,i)=>row(i===0?{...h,sub:"0 of 8 glasses"}:h,style,st[i],i===0?undefined:(i===1?"Extra credit":""))).join("")}</div>${tabbar("today")}`;
+  <div class="list">${HABITS.map((h,i)=>row(i===0?{...h,sub:"0 of 8 glasses"}:h,style,st[i],i===0?undefined:(i===1?"Logged while paused":""))).join("")}</div>${tabbar("today")}`;
 }
 function detail(style, app){
   // November 2026, weeks start on Monday. The habit is scheduled every day except Thursday.
@@ -449,7 +449,7 @@ function detail(style, app){
   <div class="month"><b>November 2026</b><span class="mnav"><i aria-label="Previous month">${chev}</i><i class="off" aria-label="Next month">${chev}</i></span></div>
   <div class="grid">${cells}</div>
   <p class="note hint">Tap a past day to change it.</p>
-  <div class="stats"><div class="stat"><span>Days done</span><b>142</b></div><div class="stat"><span>Longest run</span><b>31 days</b></div><div class="stat"><span>Extra credit</span><b>4 days</b></div></div>
+  <div class="stats"><div class="stat"><span>Days done</span><b>142</b></div><div class="stat"><span>Longest run</span><b>31 days</b></div><div class="stat"><span>Logged while paused</span><b>4 days</b></div></div>
   <div class="opt" style="margin-top:14px">What the marks mean<span class="go">${chev}</span></div>${tabbar("today")}`;
 }
 function appearance(style, app){
@@ -469,13 +469,13 @@ function appearance(style, app){
   <div class="opt">Scene colours<span class="val">Follow the time of day</span><span class="go">${chev}</span></div>${tabbar("you")}`;
 }
 function marks(style, app){
-  const R = [["solid","Done","Solid"],["hatched","Part done","Hatched"],["paused","Paused","Centred dash"],["extra","Extra credit","Diamond"],
+  const R = [["solid","Done","Solid"],["hatched","Part done","Hatched"],["paused","Paused","Centred dash"],["extra","Logged while paused","Diamond"],
              ["blank","Nothing to show","Off schedule, or no log"],["future","To come","Dashed outline, faint"],["missed","Not logged","Empty outline. Only when you turn on Show days not logged"]];
   // 26 weeks of fixture days: mostly done, some part done, one paused week with one log, blanks elsewhere
   const pat = i=>{ const w = Math.floor(i/7), d = i%7; if(w===9) return d===3?"extra":"paused"; if(w>=24 && (w>24 || d>4)) return "blank";
     const k = (i*7 + w*3) % 11; return k<6?"solid":k<8?"hatched":"blank"; };
   let yr = ""; for(let d=0; d<7; d++) for(let w=0; w<26; w++){ const i = w*7+d; yr += ycell(pat(i), style, w===24 && d===4); }
-  const L = [["solid","Done"],["hatched","Part done"],["paused","Paused"],["extra","Extra credit"]];
+  const L = [["solid","Done"],["hatched","Part done"],["paused","Paused"],["extra","Logged while paused"]];
   return `<div class="title" style="padding-top:22px"><h1 style="font-size:calc(26px*var(--dscale))">Marks</h1><p>${STYLE_NAMES[style]}, ${app==="paper"?"Paper":"Ink"}. State is carried by shape.</p></div>
   <div class="mk hd" style="margin-top:14px"><span>State</span><span>Large</span><span>Small</span><span>On today</span></div>
   ${R.map(([s,l,d])=>`<div class="mk"><span>${l}<small>${d}</small></span>${mark(s,{style,size:30})}${mark(s,{style,size:22})}${(s==="future"||s==="missed")?"<span></span>":mark(s,{style,size:30,today:true})}</div>`).join("")}

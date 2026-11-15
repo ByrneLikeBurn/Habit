@@ -243,7 +243,7 @@ All **Guess** unless marked. These came from the engineering and QA reviews. The
 |---|---|---|
 | 1 | Core loop in Pen and ink | Before it: the App Group test with free signing. Then models and data rules, Today, first run, New habit, yes-or-no and counted logging with typed numbers and the count sheet, `LogHabitIntent`, the style layer as data with Pen and ink only in Paper and Ink, the eight swatches, Light or dark, the Edit form and Archive, the control-side setting, privacy manifest. No scene card |
 | 2 | History, export and import | Heat map (week, month, year), logging a past day, JSON export and import with a round-trip test |
-| 3 | Pausing | `Pause` records, Vacation Mode, Gentle Mode, extra-credit run maths |
+| 3 | Pausing | `Pause` records, Vacation Mode, Gentle Mode, pausing one habit, run maths for days logged while paused, one Home Screen widget |
 | | Stop and report | |
 | 4 | Pencil and Watercolor | Both styles, their fonts, the style picker, the custom colour ring |
 | 5 | Scenes | The scene card, the five palettes by clock, "Follow the scene" for marks, the Lake, then each other scene through the scene gate |
@@ -302,16 +302,21 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 
 **Words.** "Nothing set for today" replaces "Nothing is due today". The Archive caption leads with "You can bring it back at any time."
 
+## Decided on the reviews' evidence
+
+**Owner**, 14 November 2026: an expert review may override the brief when the change serves the user.
+
+- A counted habit may have no target. With no target, any log draws as done. The target field starts empty in New habit. Asked for by the behavioural scientist, the neurodiversity expert and the returning user.
+- A part-done day never breaks a run. Habit detail shows "Days logged" beside "Days done". Asked for by the behavioural scientist and the returning user.
+- One Home Screen widget is part of milestone 3, if the App Group test passes. It gives the user a cue outside the app. Asked for by the behavioural scientist.
+- The label "Extra credit" becomes "Logged while paused". Asked for by the tired daily user, the content designer and the behavioural scientist. Older sections of this file and of `docs/reviews` still say "extra credit" for the same state.
+
 ## Open decisions
 
 Each needs the owner. The recommendation is mine.
 
 | # | Decision | Recommendation | Blocks |
 |---|---|---|---|
-| A | A counted habit may have no target. Any log then draws as done. Three reviews say a required target turns a count into a pass or fail test | Yes. It changes the locked "Habit kinds" row, and it is additive in the schema | Milestone 1 |
-| B | A part-done day never breaks a run, and Habit detail counts "Days logged" beside "Days done" | Yes | Milestone 1 |
-| C | One Home Screen widget inside the minimum app. Without one, milestones 1 to 3 give the user no cue to open the app | Yes, in milestone 3, if the App Group test passes | Milestone 3 |
-| D | Rename "Extra credit". Three reviews read it as grading language | "Logged while paused" | Milestone 3 |
 | 2 | The data rules | Accept as written | Milestone 1 |
 | 3 | The usage data page | Build it in milestone 13 from the existing log fields | Milestone 13 |
 | 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |

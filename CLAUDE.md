@@ -14,13 +14,19 @@ This file is the project brief for every session. `docs/spec.md` records decisio
 | Scene | A painted landscape in a framed card at the top of Today |
 | Palette | The colour set a scene is painted in, set by time of day |
 
+## Who decides
+
+The owner set this on 14 November 2026. The brief began as an idea. Development follows evidence. Where an expert review disagrees with this file on design, UI or UX, and the change serves the user, the review wins. Every such change is written in `docs/spec.md` with the review that asked for it, and is reported to the owner.
+
+This does not cover privacy, what leaves the device, dependencies, the additive schema rule, or cost. Those stay with the owner. Where two reviews disagree, the owner decides.
+
 ## Invariants
 
 These outrank every other instruction. Violating one is a bug, however good the reason sounds. If an instruction would break one, stop and tell the owner.
 
 1. **No guilt mechanics.** No streak-loss alarms, no red chosen by the app, no "you're falling behind", no mention of a missed day unless the user opted in. Missing a day produces silence. The user may pick red as their own accent. The owner decided this on 14 November 2026.
 2. **Colour carries no meaning.** Heat-map intensity is hatching density, never hue. The user's accent tints marks only, never text, never rules. Text contrast is a fixed constant the user cannot break.
-3. **Pausing only ever helps.** A paused day with no log never breaks a run and never extends it. A paused day with a log is extra credit and extends it. The streak function has unit tests that assert exactly this.
+3. **Pausing only ever helps.** A paused day with no log never breaks a run and never extends it. A paused day with a log extends it. The app calls such a day "Logged while paused". The streak function has unit tests that assert exactly this.
 4. **Every input is optional.** NFC, widgets and the Watch are shortcuts, not dependencies. Losing a tag breaks nothing.
 5. **One write path.** Every `LogEvent` is written by one App Intent, `LogHabitIntent`. Widget button, Shortcuts and NFC, Control Centre, Action button, Siri and in-app taps all route through it.
 6. **Time of day carries no habit meaning.** Palettes follow the clock. They never react to streaks, misses, pauses, counts or completion.
@@ -35,7 +41,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 | Persistence | SwiftData. CloudKit private database later. No Core Data |
 | Accounts | None. No Sign in with Apple, no login screen, no backend |
 | Price | Free forever. No ads, no analytics, no telemetry, no paywall surface |
-| Habit kinds | `.binary` and `.counted` (target and optional unit) |
+| Habit kinds | `.binary` and `.counted` (optional target and optional unit). With no target, any log is done |
 | NFC | Shortcuts automations matched on tag UID. No domain, no universal links, no server |
 | Journalling | Obsidian only, through the built-in `obsidian://` URI |
 | Mac | Native SwiftUI, not Catalyst |
@@ -51,7 +57,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 - Text contrast floor, every style, paper / ink: body 17.7:1 / 16.2:1, secondary 6.8:1 / 8.3:1, tertiary 4.8:1 / 5.1:1. Measured against the worst pixel of the style's paper.
 - State is carried by shape, never by wash colour or intensity.
-- Mark states: solid (done), hatched (part done), centred dash (paused), diamond (extra credit), blank (off schedule, or nothing logged), dashed outline at reduced opacity (to come). Today is an outline overlaid on the day's state.
+- Mark states: solid (done), hatched (part done), centred dash (paused), diamond (logged while paused), blank (off schedule, or nothing logged), dashed outline at reduced opacity (to come). Today is an outline overlaid on the day's state.
 - A past day with no log draws nothing. The empty outline for such a day, and the current run, appear only when the user turns on "Show days not logged". The owner decided this on 14 November 2026.
 - The year view carries state by small shapes, never by opacity. The owner decided this on 14 November 2026.
 - The user's accent choice comes first. Following the palette is the default option, not a rule. A custom colour is picked by hue. Any hue is allowed, red included. The app sets its lightness so marks keep 3:1. The app's own tokens, swatches and palettes never use red.
@@ -69,7 +75,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 **Phases.**
 - Phase 1 is design. It ends with a stop. No Swift is written in phase 1.
-- Phase 2 milestones, in order, as the owner changed them on 14 November 2026: 1 Core loop in Pen and ink. 2 History, export and import. 3 Pausing. Stop and report. 4 Pencil and Watercolor. 5 Scenes. 6 Sync (skipped until the owner says). 7 Ambient. 8 Nudges. 9 Ordering. 10 NFC. 11 Obsidian. 12 Removal. 13 Polish. Scene art is supplemental. No scene card or palette is built before milestone 5. What each holds is in `docs/spec.md`.
+- Phase 2 milestones, in order, as the owner changed them on 14 November 2026: 1 Core loop in Pen and ink. 2 History, export and import. 3 Pausing and one Home Screen widget. Stop and report. 4 Pencil and Watercolor. 5 Scenes. 6 Sync (skipped until the owner says). 7 Ambient. 8 Nudges. 9 Ordering. 10 NFC. 11 Obsidian. 12 Removal. 13 Polish. Scene art is supplemental. No scene card or palette is built before milestone 5. What each holds is in `docs/spec.md`.
 - After each milestone, run the reviews on the diff as separate subagents (see Review lenses), fix what is valid, and send a report.
 - No scene is built that the owner has not approved.
 
