@@ -228,6 +228,16 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .sw .chk{width:12px;height:12px}
 .sw .sel{color:var(--text);font-weight:600}
 .pencil .row + .row::before,.pencil .stat + .stat::before{height:1.4px;filter:url(#pencil);background:var(--text);opacity:.3;transform:rotate(-.2deg)}
+.opt.nst{margin-top:6px;border-top:1px solid var(--rule);color:var(--text2);font-size:15px}
+.opt.nst .go.down svg{transform:rotate(-90deg)}
+.opt.nst .go.up svg{transform:rotate(90deg)}
+.list.dim{opacity:.35}
+.menu{position:absolute;left:60px;top:300px;width:250px;border-radius:14px;background:var(--paper);box-shadow:0 10px 40px rgba(0,0,0,.28);border:.5px solid var(--rule2);font:400 17px/1 var(--ui);overflow:hidden}
+.menu div{min-height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.menu div + div{border-top:.5px solid var(--rule2)}
+.menu small{font-size:11px;color:var(--text3)}
+.undo{position:absolute;left:21px;right:21px;bottom:96px;min-height:48px;border-radius:14px;background:var(--text);color:var(--paper);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 15px/1 var(--ui)}
+.undo b{font-weight:600;text-decoration:underline;text-underline-offset:3px}
 </style>
 </head>
 <body>
@@ -362,7 +372,9 @@ function mark(state, o){
     ring=`<circle cx="${c}" cy="${c}" r="${r+5}" fill="none" stroke="${K}" stroke-width="1.5" opacity=".92"/>`;
     g=`<g filter="url(#wet)">${g}</g>`; ring=`<g filter="url(#wet)">${ring}</g>`;
   }
-  return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" style="display:block;overflow:visible" role="img" aria-label="${state}${o.today?", today":""}">${g}${o.today?ring:""}</svg>`;
+  // A counted control shows a small plus until its target is met, so it reads as "adds" before the tap.
+  const plusG = o.plus ? `<path d="M${c-4.5} ${c}H${c+4.5}M${c} ${c-4.5}V${c+4.5}" stroke="var(--paper)" stroke-width="5.5" stroke-linecap="round"/><path d="M${c-4.5} ${c}H${c+4.5}M${c} ${c-4.5}V${c+4.5}" stroke="${K}" stroke-width="1.7" stroke-linecap="round"/>` : "";
+  return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" style="display:block;overflow:visible" role="img" aria-label="${state}${o.today?", today":""}">${g}${o.today?ring:""}${plusG}</svg>`;
 }
 // Year view. Cells are too small to hatch, so each state is a small shape. Nothing is carried by opacity.
 function ycell(state, style, today){
@@ -419,7 +431,7 @@ const HABITS = [
 ];
 // A row shows a second line only when it says something about today.
 const row = (h,style,state,sub,size)=>{ const s = sub!==undefined ? sub : h.sub;
-  return `<div class="row">${icon(h.icon)}<div><div class="nm">${h.name}</div>${s?`<div class="sb">${h.count&&sub===undefined?`<span class="pill">${s}</span>`:s}</div>`:""}</div><div class="ck">${mark(state||h.state,{style,size:size||30,today:true,ctl:true})}</div></div>`; };
+  return `<div class="row">${icon(h.icon)}<div><div class="nm">${h.name}</div>${s?`<div class="sb">${h.count&&sub===undefined?`<span class="pill">${s}</span>`:s}</div>`:""}</div><div class="ck">${mark(state||h.state,{style,size:size||30,today:true,ctl:true,plus:M1&&h.count&&(state||h.state)!=="solid"})}</div></div>`; };
 const check = `<svg class="chk" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round" aria-label="Selected"><path d="M3.500 9.500 7.500 13.500 14.500 5"/></svg>`;
 // A counted habit's second line opens the count sheet. It is the visible way to subtract or type a number.
 const more = `<svg class="more" width="7" height="11" viewBox="0 0 7 11" fill="none" stroke="currentColor" stroke-width="1.600" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.500 1 6 5.500 1.500 10"/></svg>`;
@@ -563,6 +575,15 @@ function specimen(f){
 
 /* ---------- milestone 1 screens: Pen and ink, no scene art ---------- */
 const DONE = HABITS.map(h=>({...h, state:"solid", sub:h.count?"8 of 8 glasses":undefined}));
+const OFF = [{icon:"leaf", name:"Long run", state:"blank"},{icon:"book", name:"Call home", state:"blank"}];
+const nst = open=>`<div class="opt nst">Not scheduled today<span class="val">2</span><span class="go ${open?"up":"down"}">${chev}</span></div>`;
+const m1Head = ()=>status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>${head("Today","Saturday 14 November")}`;
+function todayM1(style, app){ return m1Head()+`<div class="list">${HABITS.map(h=>row(h,style)).join("")}</div>${nst(false)}${tabbar("today")}`; }
+function todayNst(style, app){ return m1Head()+`<div class="list">${HABITS.slice(0,4).map(h=>row(h,style)).join("")}</div>${nst(true)}<div class="list">${OFF.map(h=>row(h,style)).join("")}</div><p class="note hint">A log here still counts.</p>${tabbar("today")}`; }
+function todayMenu(style, app){ return m1Head()+`<div class="list dim">${HABITS.map(h=>row(h,style)).join("")}</div>
+  <div class="menu" role="menu"><div>Edit</div><div>Move</div><div>Pause this habit<small>Milestone 3</small></div><div>Archive</div></div>${tabbar("today")}`; }
+function todayUndo(style, app){ return m1Head()+`<div class="list">${HABITS.map((h,i)=>row(h,style,i===1?"blank":undefined)).join("")}</div>${nst(false)}
+  <div class="undo"><span>Read cleared</span><b>Undo</b></div>${tabbar("today")}`; }
 function todayDone(style, app){
   return status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>${head("Today","Saturday 14 November")}<div class="list">${DONE.map(h=>row(h,style)).join("")}</div>${tabbar("today")}`;
 }
@@ -638,7 +659,8 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
   M1 = true;
   const s = "penAndInk", blue = TOKENS.swatches.blue;
   const v = a=>css({...vars(s,a), "--accent":blue});
-  const G = [["today","phone","paper",today,"Today"],["today-ink","phone","ink",today,"Today, Ink"],["today-left","phone left","paper",today,"Today, controls on the left"],
+  const G = [["today","phone","paper",todayM1,"Today"],["today-ink","phone","ink",todayM1,"Today, Ink"],["today-left","phone left","paper",todayM1,"Today, controls on the left"],
+             ["today-nst","phone","paper",todayNst,"Not scheduled today, open"],["today-menu","phone","paper",todayMenu,"Touch and hold on a row"],["today-undo","phone","paper",todayUndo,"After a log is taken back"],
              ["today-done","phone","paper",todayDone,"Today, all done"],["today-none","phone","paper",todayNone,"Today, nothing due"],["empty","phone","paper",empty,"Today, first run"],
              ["ax5","phone ax5","paper",ax5,"Today at the largest text size"],["add","phone modal","paper",add,"New habit, count"],["add-yesno","phone modal","paper",addYesNo,"New habit, yes or no"],
              ["count","phone modal","paper",count,"Count sheet"],["edit","phone modal","paper",edit,"Edit habit, with Archive"],["you","phone","paper",you,"You"],["appearance","phone","paper",appearanceM1,"Appearance"]];

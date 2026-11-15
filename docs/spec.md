@@ -282,17 +282,17 @@ The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settab
 
 ## Milestone 1 screens, after the inclusion reviews
 
-The behavioural scientist, neurodiversity and returning-user lenses reviewed `docs/mockups/png/sheet-m1.png`. The owner defers to the reviews on design, so these are adopted. Items marked "to draw" are not in the mockups yet.
+The behavioural scientist, neurodiversity and returning-user lenses reviewed `docs/mockups/png/sheet-m1.png`. The owner defers to the reviews on design, so these are adopted. All four items that were owed are now drawn.
 
-**Reaching Edit and Archive.** Until Habit detail exists, a tap on a habit's name opens the Edit form. Touch and hold on a row opens a menu with Edit, Archive and Move. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows for a few seconds. To draw.
+**Reaching Edit and Archive.** Until Habit detail exists, a tap on a habit's name opens the Edit form. Touch and hold on a row opens a menu with Edit, Archive and Move. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows for a few seconds. Drawn in `sheet-m1.png`.
 
 **Order.** Manual reorder is in milestone 1, using the system list edit mode and VoiceOver move actions. Done rows stay where they are, so a row never moves under a thumb.
 
-**Not scheduled today.** Today ends with one collapsed row, "Not scheduled today". It opens to those habits with the same controls. A log there is extra credit. To draw.
+**Not scheduled today.** Today ends with one collapsed row, "Not scheduled today". It opens to those habits with the same controls. A log there is extra credit. Drawn in `sheet-m1.png`.
 
 **New habit.** The name is the only required field. Defaults are Yes or no, every day, and the first symbol. Unit and "One tap adds" sit under one "More" row in New habit and are open in Edit. A sentence under the day circles restates the choice, for example "Every day except Thursday". Day letters use two letters where initials repeat. The name placeholder models a plan with a cue: "Stretch after brushing teeth". If Add is disabled, a line says why.
 
-**Controls that differ.** A counted control shows a small plus inside the square until the target is met, so it reads as "adds" before the tap. To draw. After a yes-or-no log is taken back, one line with Undo shows for a few seconds.
+**Controls that differ.** A counted control shows a small plus inside the square until the target is met, so it reads as "adds" before the tap. Drawn in `sheet-m1.png`. After a yes-or-no log is taken back, one line with Undo shows for a few seconds.
 
 **Feedback.** A mark draws in as one short stroke, under 300 ms. With Reduce Motion it swaps with no animation. The count line changes on every tap. There is no all-done banner.
 

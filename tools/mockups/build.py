@@ -137,7 +137,7 @@ def m1_sheet(png: pathlib.Path, ids) -> None:
     """The milestone 1 screens in two rows, half size."""
     ims = [Image.open(png / f"{i}.png").convert("RGB") for i in ids]
     ims = [i.resize((i.width // 2, i.height // 2), Image.LANCZOS) for i in ims]
-    rows = [ims[:7], ims[7:]]
+    rows = [ims[:8], ims[8:]]
     w = max(sum(i.width for i in r) + 24 * (len(r) + 1) for r in rows); hs = [max(i.height for i in r) + 48 for r in rows]
     s = Image.new("RGB", (w, sum(hs)), (233, 230, 223)); y = 0
     for r, h in zip(rows, hs):
