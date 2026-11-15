@@ -74,12 +74,27 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(control("Floss").waitForExistence(timeout: 2))
     }
 
+    func testATapOnTheNameLogs() {
+        let walk = control("Walk outside")
+        XCTAssertTrue(walk.waitForExistence(timeout: 5))
+        XCTAssertEqual(walk.value as? String ?? "", "")
+        app.descendants(matching: .any)["name-Walk outside"].tap()
+        XCTAssertEqual(walk.value as? String, "Done")
+    }
+
+    func testSwipeReachesEdit() {
+        let read = control("Read")
+        XCTAssertTrue(read.waitForExistence(timeout: 5))
+        read.swipeLeft()
+        app.buttons["Edit"].tap()
+        XCTAssertTrue(app.buttons["Cancel"].waitForExistence(timeout: 2))
+    }
+
     func testArchiveShowsUndoAndBringsTheHabitBack() {
-        app.buttons["Read"].firstMatch.tap()
-        let archive = app.buttons["Archive habit"]
-        if !archive.waitForExistence(timeout: 2) { app.swipeUp() }
-        app.swipeUp()
-        archive.tap()
+        let read = control("Read")
+        XCTAssertTrue(read.waitForExistence(timeout: 5))
+        read.swipeLeft()
+        app.buttons["Archive"].tap()
         XCTAssertFalse(control("Read").waitForExistence(timeout: 1))
         app.buttons["Undo"].tap()
         XCTAssertTrue(control("Read").waitForExistence(timeout: 2))

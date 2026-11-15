@@ -83,3 +83,9 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **Typed numbers stop at 1,000,000.** The QA review showed that a huge number could overflow a sum and crash the app at every launch. Typing, Shortcuts and writes share one cap.
 
 **The count sheet opens full height at large text.** The accessibility review found the keyboard hid the total at AX5. At accessibility sizes the sheet opens full height and waits for a tap on the amount.
+
+**A tap on the name logs.** The tired daily user review found most of a row opened Edit, so a tired tap on the name did nothing useful. The spec had the name open Edit, from the inclusion and human factors reviews. The owner chose the log on 15 November 2026. Edit and Archive are in swipe actions and the touch-and-hold menu, and a wrong log has Undo.
+
+**Logging needs an unlocked device.** The security review found that Siri could read habit names and counts aloud on a locked phone. Habit names can be health details. The owner decided on 15 November 2026 that every intent needs an unlocked device, and a test checks each intent in every target.
+
+**The branch history was rewritten.** The first nine milestone 1 commits carried the owner's personal email. The owner approved a rewrite and force push on 15 November 2026. The commits now carry the GitHub noreply address, and their contents did not change.

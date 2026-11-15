@@ -134,7 +134,7 @@ One drawing has one meaning.
 - VoiceOver gets adjustable actions named "Increase" and "Decrease" with the step as the value. System undo takes back the last log.
 - One haptic confirms a log and a take-back.
 
-**Hit areas.** The control's target is the full row height by 76 points from the trailing edge. The count line's target is 44 points high. A tap on the name or symbol opens Habit detail. On the Watch the whole row logs.
+**Hit areas.** The control's target is the full row height by 76 points from the trailing edge. The count line's target is 44 points high. A tap on the name or symbol logs, the same as the control. The owner decided this on 15 November 2026. Habit detail opens from the row menu. On the Watch the whole row logs.
 
 **Past days. Guess.** In the month view of Habit detail, a tap on a past day opens a small sheet for that day. The sheet names the date and the day's state. For a yes-or-no habit it has one action, "Mark done" or "Clear". For a counted habit it is the count sheet. A past day never changes on a single tap. An off-schedule day says "Not scheduled" and still allows a log. One line under the grid says "Tap a past day to change it." The month title has previous and next controls. Future days cannot be logged.
 
@@ -297,7 +297,7 @@ The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settab
 
 The behavioural scientist, neurodiversity and returning-user lenses reviewed `docs/mockups/png/sheet-m1.png`. The owner defers to the reviews on design, so these are adopted. Items marked "to draw" are not in the mockups yet.
 
-**Reaching Edit and Archive.** Until Habit detail exists, a tap on a habit's name opens the Edit form. Touch and hold on a row opens a menu with Edit, Archive and Move. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows for a few seconds. To draw.
+**Reaching Edit and Archive.** A tap on a habit's name logs. A swipe to the leading edge shows Edit and Archive. Touch and hold on the name opens a menu with Edit, Archive and Move. VoiceOver offers the same three as actions on the row. The owner decided this on 15 November 2026. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows for a few seconds. To draw.
 
 **Order.** Manual reorder is in milestone 1, using the system list edit mode and VoiceOver move actions. Done rows stay where they are, so a row never moves under a thumb.
 

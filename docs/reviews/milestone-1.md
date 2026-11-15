@@ -29,7 +29,7 @@ Five lenses ran as separate subagents on branch `feat/core-loop`, two at a time.
 | 1 | A wrong tap on a counted habit had no Undo, and a done counted mark looks like a tick that can be untapped | Fixed. Every counted change shows its count with Undo |
 | 2 | The Undo screenshot showed "Read taken back." with Read still done | Fixed. The screenshot runs a real take-back |
 | 3 | The plus hid the part-done hatching | Fixed with accessibility 2 |
-| 4 | Most of the row opens Edit, not a log | Not changed. The spec sets the name tap to open Edit, from the inclusion and human factors reviews. Two reviews disagree, so the owner decides |
+| 4 | Most of the row opens Edit, not a log | Fixed after the owner decided. A tap on the name logs. Edit and Archive are in swipe actions and the menu. UI tests cover the name tap, Edit and Archive |
 | 5 | Take away looked disabled | Fixed. It is an outlined button |
 
 ## Accessibility expert
@@ -48,7 +48,7 @@ Five lenses ran as separate subagents on branch `feat/core-loop`, two at a time.
 
 | # | Finding | Result |
 |---|---|---|
-| 1 | The branch commits carry the owner's personal email as author and committer. `main` uses the GitHub noreply address | Not fixed. Removing it needs a history rewrite and a force push, which the owner must approve. Later commits pass the noreply address on each commit. The cause is the global git config |
-| 2 | `LogHabitIntent` runs on a locked device, so Siri can list habit names and read counts aloud | Not fixed. Requiring unlock is a privacy decision for the owner, and it may stop an automation that runs while the phone is locked |
+| 1 | The branch commits carry the owner's personal email as author and committer. `main` uses the GitHub noreply address | Fixed after the owner approved. The branch was rewritten and force pushed with the noreply address. Old commits may stay reachable on GitHub by id. The global git config still holds the personal address |
+| 2 | `LogHabitIntent` runs on a locked device, so Siri can list habit names and read counts aloud | Fixed after the owner decided. Every intent needs an unlocked device. A source check tests each intent |
 | 3 | Deleted habits would still be offered in Shortcuts and Siri | Fixed. Deleted habits are never offered. Archived habits are listed after active ones |
 | 4 | The comment said the device id never leaves the device, but export and sync will carry it | Fixed. The comment is corrected. Milestone 2 decides whether export keeps the id |

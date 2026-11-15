@@ -57,6 +57,16 @@ struct SourceChecks {
         #expect(!"style.swatchColor(swatch)".contains(pattern))
     }
 
+    /// Habit names can be health details. Every intent, in any target, needs an unlocked device.
+    @Test func everyIntentNeedsAnUnlockedDevice() throws {
+        let intent = try Regex<Substring>(#":\s*(?:[A-Za-z]+,\s*)*(?:AppIntent|AudioPlaybackIntent|SetValueIntent|ControlConfigurationIntent|WidgetConfigurationIntent)\b"#)
+        let files = try swiftFiles().filter { $0.text.contains(intent) }
+        #expect(files.contains { $0.path == Self.intentFile }, "No intents were found")
+        for file in files {
+            #expect(file.text.contains("authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication"), "\(file.path)")
+        }
+    }
+
     /// Invariant 5: every LogEvent is written by LogHabitIntent, in any target.
     static var writePatterns: [Regex<Substring>] { [
         try! Regex(#"LogWriter\.log\("#),

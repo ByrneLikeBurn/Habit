@@ -67,9 +67,10 @@ struct HabitRow: View {
 
     // MARK: Name
 
-    /// A tap on the name or symbol opens Edit, until Habit detail exists. Touch and hold opens the row menu.
+    /// A tap on the name or symbol logs, the same as the control. Edit, Archive and Move are in the
+    /// row's menu and its swipe actions. For VoiceOver the name and the control both log and both carry the menu.
     private var nameButton: some View {
-        Button(action: actions.edit) {
+        Button { actions.log(.tap) } label: {
             if typeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 8) {
                     symbol
@@ -84,15 +85,12 @@ struct HabitRow: View {
         }
         .buttonStyle(.plain)
         // On a counted row the name sits low in its target, so the count line reads as part of it.
-        .frame(minHeight: 44, alignment: habit.kind == .counted && !typeSize.isAccessibilitySize ? .bottomLeading : .leading)
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: habit.kind == .counted && !typeSize.isAccessibilitySize ? .bottomLeading : .leading)
         .contentShape(Rectangle())
         .contextMenu { menu }
-        .accessibilityHint(Text("Opens Edit"))
-        .accessibilityActions {
-            menu
-            if let up = actions.moveUp { Button("Move up", action: up) }
-            if let down = actions.moveDown { Button("Move down", action: down) }
-        }
+        .accessibilityHint(Text(accessibilityHint))
+        .accessibilityIdentifier("name-\(habit.name)")
+        .accessibilityActions { rowActions }
     }
 
     private var symbol: some View {
@@ -117,6 +115,13 @@ struct HabitRow: View {
         Button("Edit", systemImage: "pencil", action: actions.edit)
         Button("Archive", systemImage: "archivebox", action: actions.archive)
         Button("Move", systemImage: "arrow.up.arrow.down", action: actions.move)
+    }
+
+    @ViewBuilder
+    private var rowActions: some View {
+        menu
+        if let up = actions.moveUp { Button("Move up", action: up) }
+        if let down = actions.moveDown { Button("Move down", action: down) }
     }
 
     // MARK: Count line
@@ -170,6 +175,7 @@ struct HabitRow: View {
         .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier("control-\(habit.name)")
         .accessibilityAction { actions.log(.tap) }
+        .accessibilityActions { rowActions }
         .modifier(CountAdjustable(habit: habit, log: actions.log, openCount: actions.openCount))
     }
 

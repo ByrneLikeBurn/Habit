@@ -54,8 +54,10 @@ struct TodayView: View {
             }
 
             ForEach(split.scheduled) { habit in
-                HabitRow(habit: habit, day: today, total: totals[habit.id] ?? 0, actions: actions(for: habit, in: split.scheduled, day: today, clock: clock))
+                let rowActions = actions(for: habit, in: split.scheduled, day: today, clock: clock)
+                HabitRow(habit: habit, day: today, total: totals[habit.id] ?? 0, actions: rowActions)
                     .habitRow(style, leading: settings.controlsLeading)
+                    .rowSwipeActions(rowActions)
             }
             .onMove { source, destination in
                 Ordering.move(split.scheduled, from: source, to: destination, all: active)
@@ -65,8 +67,10 @@ struct TodayView: View {
             if !split.notScheduled.isEmpty {
                 DisclosureGroup(isExpanded: $showNotScheduled) {
                     ForEach(split.notScheduled) { habit in
-                        HabitRow(habit: habit, day: today, total: totals[habit.id] ?? 0, actions: actions(for: habit, in: split.notScheduled, day: today, clock: clock))
+                        let rowActions = actions(for: habit, in: split.notScheduled, day: today, clock: clock)
+                        HabitRow(habit: habit, day: today, total: totals[habit.id] ?? 0, actions: rowActions)
                             .habitRow(style, leading: settings.controlsLeading)
+                            .rowSwipeActions(rowActions)
                     }
                     .onMove { source, destination in
                         Ordering.move(split.notScheduled, from: source, to: destination, all: active)
@@ -258,6 +262,15 @@ extension View {
         listRowBackground(style.paper)
             .listRowSeparator(.hidden)
             .moveDisabled(true)
+    }
+
+    /// Edit and Archive, the visible way to reach them now that a tap on the name logs.
+    /// Neither uses the destructive role: the app never picks red, and Archive can be undone.
+    func rowSwipeActions(_ actions: HabitRow.Actions) -> some View {
+        swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button("Archive", systemImage: "archivebox", action: actions.archive)
+            Button("Edit", systemImage: "pencil", action: actions.edit)
+        }
     }
 
     func habitRow(_ style: ResolvedStyle, leading: Bool) -> some View {
