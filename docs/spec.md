@@ -6,6 +6,8 @@ This file records decisions. Items marked **Guess** were made where the brief is
 
 **Owner**, 14 November 2026. The goal is a minimum usable app, milestones 1 to 3, with inclusion and accessibility built in from the first milestone and not added later.
 
+**Principle. Owner.** Something is better than nothing. A small log, a part-done day or a count with no target is credited, never scored as a failure.
+
 ## Status
 
 Phase 1, design. No Swift exists. The owner approved Lake variant A. No other scene is started. Review findings are in `docs/reviews/phase-1.md`.
