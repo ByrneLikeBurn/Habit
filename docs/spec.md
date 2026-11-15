@@ -168,6 +168,19 @@ One drawing has one meaning.
 
 **Shared store.** Widgets, App Intents and the Watch app need the SwiftData store in an App Group container. An `.entitlements` file is allowed for the App Group only (**Owner**). The owner has a free Apple account. Before milestone 1, a throwaway project checks that an App Group works with free signing.
 
+**Shared-store test.** Run on 15 November 2026 with Xcode 27.2. Free signing gave both the app and a widget extension a profile with the App Group. On an iPhone, a value written by the app in shared UserDefaults, a file and a SwiftData store was read by the widget. It works. The profiles expire after 7 days. SwiftData logs errors if `Library/Application Support` does not exist in the group container, so the app creates that folder before it opens the store.
+
+**Identifiers. Owner**, 15 November 2026.
+
+| | Id |
+|---|---|
+| App | `dev.byrnelikeburn.Habit` |
+| Widget | `dev.byrnelikeburn.Habit.Widget` |
+| Watch | `dev.byrnelikeburn.Habit.Watch` |
+| App Group | `group.dev.byrnelikeburn.Habit` |
+
+The signing team is not committed. It lives in `Config/Local.xcconfig`, which git ignores.
+
 ## Product, from the brief
 
 **Tabs.** The brief had four: Today, Progress, Tags, You. There are now three, with Tags inside You. Today is the list, the check-offs and the scene card. Progress is the all-habit ledger with a heat map. Tags is the NFC walkthrough. You holds Nudges, Appearance, Gentle Mode, Vacation, Archive and Export.
