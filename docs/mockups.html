@@ -246,7 +246,7 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
       <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="4" result="w"/>
       <feDisplacementMap in="SourceGraphic" in2="w" scale="2.4" xChannelSelector="R" yChannelSelector="G" result="d"/>
       <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="9" result="t"/>
-      <feColorMatrix in="t" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.7 0 0 0 0.02" result="ta"/>
+      <feColorMatrix in="t" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.1 0 0 0 0.5" result="ta"/>
       <feComposite in="d" in2="ta" operator="in"/>
     </filter>
     <!-- Watercolor: edges bleed and the shape is slightly uneven -->
@@ -268,7 +268,7 @@ const TOKENS = /*TOKENS*/{"note":"Phase 1 design tokens. The Swift style files w
 const STYLE_NAMES = {penAndInk:"Pen and ink", pencil:"Pencil", watercolor:"Watercolor"};
 const DISPLAY = {
   penAndInk: {stack:'ui-serif,"New York","Charter","Bitstream Charter",Georgia,serif', scale:1, med:500, bold:700, track:"-0.005em", vari:"normal"},
-  pencil:    {stack:'"Shantell Sans","Chalkboard SE",sans-serif', scale:.95, med:380, bold:560, track:"0", vari:'"INFM" 30, "BNCE" 10'},
+  pencil:    {stack:'"Shantell Sans","Chalkboard SE",sans-serif', scale:.95, med:380, bold:500, track:"0", vari:'"INFM" 30, "BNCE" 10'},
   watercolor:{stack:'"Alegreya Sans","Optima",sans-serif', scale:1.08, med:500, bold:700, track:"0", vari:"normal"},
 };
 // Fixture: the clock is frozen at Saturday 14 November 2026. Paper frames show 11:00, Ink frames show 20:30.
@@ -332,13 +332,16 @@ function mark(state, o){
     const strokes=(n,wd,scale)=>{ const dx=Math.cos(TH), dy=-Math.sin(TH), nx=Math.sin(TH), ny=Math.cos(TH); let t="";
       for(let k=0;k<n;k++){ const o=(k-(n-1)/2)*(a*scale*.92/n), half=a*scale*(.50-.5*Math.abs(o)/(a*scale*.8))+((k*5)%3-1)*.7, sl=((k*3)%4-1.5)*.5;
         const x=c+nx*o+dx*sl, y=c+ny*o+dy*sl;
-        t+=`<line x1="${(x-dx*half).toFixed(2)}" y1="${(y-dy*half).toFixed(2)}" x2="${(x+dx*half).toFixed(2)}" y2="${(y+dy*half).toFixed(2)}" stroke="${A}" stroke-width="${(wd*(k%3===1?.8:1)).toFixed(2)}" stroke-linecap="round" opacity="${k%2?.95:.82}"/>`; }
+        t+=`<line x1="${(x-dx*half).toFixed(2)}" y1="${(y-dy*half).toFixed(2)}" x2="${(x+dx*half).toFixed(2)}" y2="${(y+dy*half).toFixed(2)}" stroke="${A}" stroke-width="${(wd*(k%3===1?.8:1)).toFixed(2)}" stroke-linecap="round" opacity="1"/>`; }
       return t; };
-    if(state==="solid") g=strokes(6,a/9.5,1.04)+`<g transform="rotate(90 ${c} ${c})" opacity=".75">${strokes(4,a/11,.96)}</g>`+outline;   // done is cross-hatched, part done is hatched one way
-    if(state==="hatched") g=strokes(3,a/7,1)+outline;
-    if(state==="missed") g=outline;
+    // Done covers the whole square with tight strokes that run past its edge. Part done covers the lower half, cut on the diagonal.
+    // The two differ by silhouette, so they stay apart when blurred. On Today the control square is the only frame.
+    const box = o.ctl ? "" : "";
+    if(state==="solid") g=strokes(8,a/8,1.16);
+    if(state==="hatched") g=`<clipPath id="${id}"><path d="M${x0-2} ${x0-2}V${x0+a+2}H${x0+a+2}Z"/></clipPath><g clip-path="url(#${id})">${strokes(8,a/8,1.16)}</g>`;
+    if(state==="missed") g=pbox(x0,a,K,sw*.8,.9);
     if(state==="paused") g=`<path d="M${c-a*.32} ${c+.7}L${c+a*.32} ${c-.9}M${c-a*.27} ${c-1}L${c+a*.3} ${c+1}" stroke="${A}" stroke-width="${sw+.5}" stroke-linecap="round" fill="none"/>`;
-    if(state==="extra") g=`<clipPath id="${id}"><path d="${dia}"/></clipPath><g clip-path="url(#${id})">${strokes(6,a/9.5,1.04)}</g><path d="${dia}" fill="none" stroke="${A}" stroke-width="${sw}" stroke-linejoin="round" opacity=".85"/>`;
+    if(state==="extra") g=`<clipPath id="${id}"><path d="${dia}"/></clipPath><g clip-path="url(#${id})">${strokes(8,a/8,1.16)}</g>`;
     if(state==="future") g=`<rect x="${x0}" y="${x0}" width="${a}" height="${a}" rx="${a*.1}" transform="rotate(-1 ${c} ${c})" fill="none" stroke="${A}" stroke-width="${sw-.2}" stroke-dasharray="3 3.4" stroke-linecap="round" opacity=".5"/>`;
     if(o.ctl){ const q=a+10, q0=c-q/2; ring=pbox(q0,q,K,1.5,1); }       // on Today the control is a hand-drawn square
     else { const rr=a*.5+6.5;                                            // in a calendar, today is circled by hand
