@@ -10,7 +10,7 @@ This file records decisions. Items marked **Guess** were made where the brief is
 
 ## Status
 
-Phase 1, design. No Swift exists. The owner approved Lake variant A. No other scene is started. Review findings are in `docs/reviews/phase-1.md`.
+Phase 2. Milestone 1, the core loop in Pen and ink, is on `feat/core-loop`. The owner approved Lake variant A. No other scene is started. Phase 1 review findings are in `docs/reviews/phase-1.md`.
 
 ## Creative direction
 
