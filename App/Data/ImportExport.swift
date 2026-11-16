@@ -159,8 +159,10 @@ struct ImportSheet: View {
                 if !plan.newPauses.isEmpty {
                     StatRow(label: String(localized: "Pauses"), value: plan.newPauses.count.formatted())
                 }
-                StatRow(label: String(localized: "Already here, skipped"), value: plan.skippedLogs.formatted())
             }
+            // Set apart, because these logs are not added.
+            StatRow(label: String(localized: "Already here"), value: plan.skippedLogs.formatted())
+                .padding(.top, 8)
             if plan.differing > 0 {
                 caption(plan.differing == 1
                     ? String(localized: "1 habit has different details in this file. The version on this device is kept. Nothing here will be replaced.")

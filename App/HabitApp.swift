@@ -5,6 +5,10 @@ import HabitKit
 @main
 struct HabitApp: App {
     @State private var settings = Settings()
+    #if os(macOS)
+    /// The Settings window's own model, kept across redraws.
+    @State private var settingsModel = AppModel()
+    #endif
 
     init() {
         #if os(iOS)
@@ -43,7 +47,7 @@ struct HabitApp: App {
                 }
             }
             .environment(settings)
-            .environment(AppModel())
+            .environment(settingsModel)
             .preferredColorScheme(settings.preferredColorScheme)
             .frame(minWidth: 460, minHeight: 520)
         }
