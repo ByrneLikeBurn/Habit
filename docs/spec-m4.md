@@ -200,3 +200,18 @@ Owed, round two spent. Each fix below is the lens's own and is applied. No lens 
 - The Pencil row line averaged 1.87:1 and 2.30:1 across its width against 3:1. Fix: drawn flat at half strength across the full point.
 
 These three, and the human factors gate above, are copied into `docs/findings.md` when this branch is merged. That file is being edited on `feat/history` now.
+
+## Step 5: fonts. The twelve-names gate passed
+
+`docs/mockups/png/m4-twelve-names.png`, from `tools/marks/twelve_names.py`. Twelve habit names at the body size in each display font, beside the system font, on Paper and Ink. Tired daily user and neurodiversity expert, two rounds each, 16 November 2026.
+
+- Pencil passed in round one. Habit names use Shantell Sans at weight 380, at the body size, with `tnum` and `zero` on.
+- Watercolor failed at 17 points and passed in round two. Habit names use Alegreya Sans Medium at 1.15 times the body size (19.5 points at the default size), with 2% tracking, word spaces a quarter wider, and `lnum` and `tnum` on. The larger size makes its lowercase the same height as the system font's.
+- Habit names keep the display font in both styles. The fallback to the system font is not needed.
+- Measured: `lnum` and `tnum` combine in Alegreya Sans. Its lining figures reach 85% of capital height. That is the font's design.
+
+Not adopted, not blocking: Shantell's digits lean and sit larger than its letters, so rows with a number pull the eye first (tired daily user).
+
+Gates for the in-app screens: both fonts at the largest text size and with Bold Text, the slashed zero at the largest size, and a 58-character name in four lines (font condition 6).
+
+Still to do in step 5: the Bold Text weight pair for each style, the upstream file hashes for `docs/asset-licenses.md`, and ExtraBold for Alegreya Sans, which is not in the repo yet.
