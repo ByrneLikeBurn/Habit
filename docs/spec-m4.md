@@ -79,20 +79,49 @@ The stale rule: `docs/spec.md` gives Pencil Bold Text as 450 to 600, but the dis
 
 **Plain text. Proposed by the typographer, not yet settled.** One setting that swaps the display font for SF and keeps the style's marks and paper. A hand font at 17 points in a list of twelve names adds reading load for tired and dyslexic users, and some adults will find it childish.
 
-## Step 1: the material rules. Draft, for the reviews
+## Step 1: the material rules. Second draft, after the first review
 
-**Pencil.** The tool is one blunt coloured pencil. A mark is a set of parallel strokes at 56 degrees with no outline and no fill. Stroke ends show and run 1 to 2 points past the square. Nothing is ruler straight. Paper is cream with a fine tooth that shows through the strokes. Rules between rows are one pencil line drawn by hand. In Ink the paper is charcoal with the same tooth, the rules and the today square are drawn in a white pencil, and the marks are the accent as a lighter pencil. Strokes stay strokes. Nothing glows.
+Both reviews failed the first draft on 15 November 2026. It could be drawn two ways in several places. This is the draft with their changes.
 
-**Watercolor.** The tool is one round brush. A mark is one wash with no outline. The colour pools at the rim, so the rim is the darkest part and carries the 3:1. The inside is lighter and shows the paper. Paper is bright white cold-press with dimples that show inside the wash. There are no rules between rows, only space. In Ink the paper is a dark wash-stained sheet and the paint is opaque, like gouache: flat, light, with a soft edge and no rim. The today mark is a brushed ring with a visible start and end, not a hairline.
+**Pencil.** The tool is one blunt coloured pencil. A mark is a set of parallel strokes at 56 degrees with no outline and no fill. Each stroke has a solid core at least 1.5 points wide. The paper's tooth erodes the edges of a stroke only, never its core. The gap between strokes is no wider than a stroke, so a done mark blurs to a solid. Stroke ends show and run 1 to 2 points past the square. Nothing is ruler straight. Paper is cream with a fine tooth. Rules between rows are one pencil line drawn by hand.
 
-**Small shapes, 12 points and under.** A stroke or a rim cannot be drawn this small, so each style has its own silhouette for each state.
+- Done: strokes over the whole square.
+- Part done: the same strokes over the lower half, cut on the diagonal.
+- Paused: one stroke, tilted 10 degrees.
+- Logged while paused: a diamond filled with the same strokes.
+- To come: a square of short hand-drawn dashes, in a thinner stroke.
+- Not logged, when the user has turned it on: a hand-drawn empty square.
+- Today: a hand-drawn square around the mark.
+
+In Ink the paper is charcoal with the same tooth. The pigment sits on the tooth, so charcoal specks show at the edges of each stroke and between strokes. The core stays solid and the stroke geometry is unchanged. Rules and the today square are drawn in a white pencil. Nothing glows.
+
+**Watercolor.** The tool is one round brush. A mark is one wash with no outline. The colour pools at the rim. The rim darkens over 1.5 to 2 points with no inner line, and it carries the 3:1. The inside is a wash at 60% of the rim's strength or more, and is never bare paper. Paper is bright white cold-press with dimples that show inside the wash. There are no rules between rows, only space.
+
+- Done: one round wash.
+- Part done: three brush strokes at full strength throughout.
+- Paused: one round-ended dab.
+- Logged while paused: a diamond-shaped wash.
+- To come: a ring of short brush dabs, thinner than the rim.
+- Not logged, when the user has turned it on: one thin brushed ring.
+- Today: a brushed ring around the mark, with a visible start and end. The gap is at most 1 point.
+
+In Ink the paper is near-black cold-press with the same dimples and no stains. The paint is opaque, like gouache: flat and light, with no rim. Its edge is uneven from the brush, not blurred, and falls off within 1 point. Contrast is measured on the flat inside.
+
+**Small shapes, 12 points and under.** A stroke or a rim cannot be drawn this small. Each shape is flat, at full strength. To come and not logged are not drawn under 12 points.
 
 | State | Pen and ink | Pencil | Watercolor |
 |---|---|---|---|
-| Done | Square | A block that leans at 56 degrees | Disc at three quarters of the cell |
-| Part done | Half square, cut on the diagonal | The same lean at half the width | Half disc, split top to bottom |
-| Paused | Flat bar, square ends | One stroke with tapered ends, tilted a little | A round-ended dab |
-| Logged while paused | Diamond | Diamond drawn in three strokes, with ragged ends | Open question below |
+| Done | Square | A block that leans at 56 degrees, at three quarters of the cell | Disc at three quarters of the cell |
+| Part done | Half square, cut on the diagonal | The lower half of the leaning block, cut on the diagonal | Half disc, split top to bottom |
+| Paused | Flat bar, square ends | One stroke with tapered ends, tilted 10 degrees | A round-ended dab |
+| Logged while paused | Diamond | A pointed diamond that leans at 56 degrees, at the full cell | A diamond at the full cell. Its sides are settled by test, below |
 | Not scheduled | Dot | Dot | Dot |
+| Today | Square outline | Hand-drawn square outline | Brushed ring |
 
-**Open question for the reviews.** In Watercolor at small sizes the disc and the diamond look alike. Options: a sharp diamond that reaches the full cell while the disc stays at three quarters, or a teardrop with its point up, or something better.
+The dot is the same in every style. It is exempt from the rule that no style's small shapes match another's.
+
+The paused bar is as wide as the done shape and at least 2 points thick. The accessibility review asked for the full cell. An earlier check found that a full-width bar joins the diamond beside it in a strip, so the width stays at the done shape's width and the blur test in step 2 decides.
+
+**Settled by test in step 2, not by debate.** The two reviews chose different Watercolor diamonds: straight sides, or sides that curve inward. Both are drawn at 6, 12 and 24 points and put through the blur test against the disc. The one that separates better is used.
+
+**Plain text is not a setting.** The product owner would not add a flag. It becomes a gate in step 5: twelve habit names at 17 points are shown to the tired user and neurodiversity lenses. If the hand font fails, habit names use SF in that style, and only headings keep the display font.
