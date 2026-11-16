@@ -114,7 +114,7 @@ In Ink the paper is near-black cold-press with the same dimples and no stains. T
 | Done | Square | A block that leans at 56 degrees, at three quarters of the cell | Disc at three quarters of the cell |
 | Part done | Half square, cut on the diagonal | The lower half of the leaning block, cut on the diagonal | Half disc, split top to bottom |
 | Paused | Flat bar, square ends | One stroke with tapered ends, tilted 10 degrees | A round-ended dab |
-| Logged while paused | Diamond | A pointed diamond that leans at 56 degrees, at the full cell | A diamond at the full cell. Its sides are settled by test, below |
+| Logged while paused | A diamond at the full cell, split by a flat gap of 2.5 units | The same diamond, upright, with the gap tilted 10 degrees | The same diamond with barely curved sides and a flat gap |
 | Not scheduled | Dot | Dot | Dot |
 | Today | Square outline | A square of four strokes whose ends cross and overshoot each corner by 1 point | Brushed ring |
 
@@ -122,7 +122,9 @@ The dot is the same in every style. It is exempt from the rule that no style's s
 
 The paused bar is as wide as the done shape and at least 2 points thick. The accessibility review asked for the full cell. An earlier check found that a full-width bar joins the diamond beside it in a strip, so the width stays at the done shape's width and the blur test in step 2 decides.
 
-**Settled by test in step 2, not by debate.** The two reviews chose different Watercolor diamonds: straight sides, or sides that curve inward. Both are drawn at 6, 12 and 24 points and put through the blur test against the disc. The one that separates better is used.
+**Step 2, small shapes: tested.** The blur test found the diamond was the weakest shape in every style, Pen and ink included. It is now a split diamond. The numbers and what was ruled out are in `docs/m4-blur-test.md`. The pass mark is 0.25 and every pair in every style is at 0.29 or more. The diamond and the paused shape are exempt from the rule that no style's small shapes match another's.
+
+**This reaches milestone 2.** Pen and ink's small diamond is in the year view and the History month strip, which are being built now. The product owner set it as a gate on the milestone 2 merge: the small diamond is drawn split before that PR merges.
 
 **Plain text is not a setting.** The product owner would not add a flag. It becomes a gate in step 5: twelve habit names at 17 points are shown to the tired user and neurodiversity lenses. If the hand font fails, habit names use SF in that style, and only headings keep the display font.
 

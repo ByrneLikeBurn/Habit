@@ -41,3 +41,29 @@ Tried for Watercolor at 6 points and weaker than the star: a triangle (0.20), a 
 | Diamond | 0.19 | 0.00 | 0.19 |
 
 **Finding.** The paused shape is nearly the same in all three styles. The straight diamond is identical in Pen and ink and Watercolor.
+
+## Outcome
+
+Settled on 15 November 2026 by the accessibility, low-vision and senior designer reviews, after two rounds.
+
+**Pass mark: 0.25.** At 0.16 a blurred pair looks the same and at 0.33 it looks distinct. The mark sits between those two. It is a calibration, not a measure of sight, and is confirmed by eye at real size.
+
+**"Logged while paused" becomes a split diamond.** It is a diamond at the full cell with a gap of 2.5 units across its middle. The designer wanted to keep the diamond, so the word and the large mark stay true. The accessibility review wanted a slot, because it was the only idea that passed. A diamond with a gap does both.
+
+| Style | Shape | Lowest distance to any other state |
+|---|---|---|
+| Pen and ink | Straight diamond, flat gap | 0.38 |
+| Pencil | Straight diamond, gap tilted 10 degrees | 0.32 |
+| Watercolor | Diamond with barely curved sides, flat gap | 0.29 |
+
+What the tests ruled out:
+- A gap of 2 units fails in Watercolor (0.24). A gap of 3 units passes, but the halves start to read as two marks: the blur keeps 43% of peak darkness in the gap, against 52% at 2.5 units.
+- A Pencil diamond that leans fails against the leaning block (0.16 to 0.22). The Pencil diamond stays upright, and this state is exempt from the rule that no style's small shapes match another's. Done and part done carry the style.
+- A Watercolor diamond with straight sides fails (0.23). Deeply curved sides blur to two faint blobs.
+
+**In a year grid the two halves stay together.** With done cells above and below, the blur keeps 38% to 44% of peak darkness inside the mark and 7% to 13% between it and its neighbours.
+
+**The paused shape is exempt** from the cross-style rule, like the dot. A dash is a dash in any material.
+
+**Still open for the full-size marks.** Whether the large diamond carries the same gap, so there is one drawing for one meaning. The diamond is also used for a log on a day off, which is not a pause, so the key calls it a diamond and does not say the gap means paused. Sharp, at 12 points, the mark can look like a pair of stepper arrows, so the key shows it beside the large diamond.
+

@@ -1,6 +1,6 @@
 """Small mark shapes for each style, with the blur test from docs/spec-m4.md.
 
-Draws every state at 6 and 12 points in a 12-unit cell, sharp and blurred, and
+Draws every state at 12 and 6 points in a 12-unit cell, sharp and blurred, and
 prints how far apart each pair of states is after a Gaussian blur of one eighth
 of the mark's width, in greyscale.
 
@@ -8,7 +8,7 @@ of the mark's width, in greyscale.
 """
 import math, sys
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 from scipy.ndimage import gaussian_filter
 
 S = 20                      # pixels per unit; a cell is 12 units
@@ -22,6 +22,23 @@ def canvas():
 def poly(pts):
     im, d = canvas(); d.polygon([(x * S, y * S) for x, y in pts], fill=255); return im
 
+SLOT = 2.5                  # the gap through the diamond, in units. Set by the blur test on 15 November 2026
+
+def diamond(curve=0.0, tilt=0.0):
+    """A diamond at the full cell, split by a gap across its middle.
+
+    curve pulls the sides inward. tilt turns the gap, in degrees.
+    """
+    tips = [(6, 0), (12, 6), (6, 12), (0, 6)]; pts = []
+    for i in range(4):
+        (x0, y0), (x1, y1) = tips[i], tips[(i + 1) % 4]
+        cx, cy = (x0 + x1) / 2 + (6 - (x0 + x1) / 2) * curve * 2, (y0 + y1) / 2 + (6 - (y0 + y1) / 2) * curve * 2
+        for k in range(16):
+            u = k / 16; pts.append(((1-u)**2*x0 + 2*u*(1-u)*cx + u*u*x1, (1-u)**2*y0 + 2*u*(1-u)*cy + u*u*y1))
+    a = math.radians(-tilt); c, s = math.cos(a), math.sin(a); t = SLOT / 2
+    gap = poly([(6 + x * c - y * s, 6 + x * s + y * c) for x, y in [(-9, -t), (9, -t), (9, t), (-9, t)]])
+    return ImageChops.subtract(poly(pts), gap)
+
 def bar_thickness(size):    # at least 2 points, in units of a 12-unit cell
     return max(2.5, 2 * 12 / size)
 
@@ -34,7 +51,7 @@ def pen(state, size):
     if state == "part": return poly([(1, 1), (1, 11), (11, 11)])
     if state == "paused":
         t = bar_thickness(size) / 2; return poly([(1, 6 - t), (11, 6 - t), (11, 6 + t), (1, 6 + t)])
-    if state == "diamond": return poly([(6, 0), (12, 6), (6, 12), (0, 6)])
+    if state == "diamond": return diamond()
     return dot(size)
 
 def pencil(state, size):
@@ -45,29 +62,20 @@ def pencil(state, size):
         t = bar_thickness(size) / 2; a = math.radians(-10); c, s = math.cos(a), math.sin(a)
         pts = [(-5, 0), (-3.5, -t), (3.5, -t), (5, 0), (3.5, t), (-3.5, t)]     # tapered ends
         return poly([(6 + x * c - y * s, 6 + x * s + y * c) for x, y in pts])
-    if state == "diamond":
-        dx = 6 / math.tan(math.radians(56)); return poly([(6 + dx, 0), (12, 6), (6 - dx, 12), (0, 6)])
+    if state == "diamond": return diamond(tilt=10)     # upright: a leaning diamond blurs into the leaning block
     return dot(size)
 
-def water(state, size, curved=False):
+def water(state, size):
     im, d = canvas()
     if state == "done": d.ellipse([1.5 * S, 1.5 * S, 10.5 * S, 10.5 * S], fill=255); return im
     if state == "part": d.pieslice([1.5 * S, 1.5 * S, 10.5 * S, 10.5 * S], 90, 270, fill=255); return im
     if state == "paused":
         t = bar_thickness(size) / 2
         d.rounded_rectangle([1.5 * S, (6 - t) * S, 10.5 * S, (6 + t) * S], radius=t * S, fill=255); return im
-    if state == "diamond":
-        if not curved: return poly([(6, 0), (12, 6), (6, 12), (0, 6)])
-        pts = []; tips = [(6, 0), (12, 6), (6, 12), (0, 6)]
-        for i in range(4):                       # sides that curve inward
-            (x0, y0), (x1, y1) = tips[i], tips[(i + 1) % 4]
-            cx, cy = 6 + (x0 + x1 - 12) * 0.28, 6 + (y0 + y1 - 12) * 0.28
-            for k in range(24):
-                u = k / 24; pts.append(((1-u)**2*x0 + 2*u*(1-u)*cx + u*u*x1, (1-u)**2*y0 + 2*u*(1-u)*cy + u*u*y1))
-        return poly(pts)
+    if state == "diamond": return diamond(curve=0.1)   # barely curved: deeper curves blur to two faint blobs
     return dot(size)
 
-STYLES = [("Pen and ink", pen), ("Pencil", pencil), ("Watercolor", lambda s, z: water(s, z)), ("Watercolor, curved", lambda s, z: water(s, z, True))]
+STYLES = [("Pen and ink", pen), ("Pencil", pencil), ("Watercolor", water)]
 STATES = ["done", "part", "paused", "diamond", "dot"]
 PAIRS = [("done", "part"), ("done", "diamond"), ("paused", "dot"), ("part", "paused"), ("part", "dot"), ("diamond", "paused")]
 
@@ -105,8 +113,6 @@ def main(out):
     for st in STATES[:4]:
         B = {name: blurred(fn(st, 6)) for name, fn in STYLES[:3]}
         print(f"  {st:8} pen/pencil {apart(B['Pen and ink'], B['Pencil']):.2f}   pen/water {apart(B['Pen and ink'], B['Watercolor']):.2f}   pencil/water {apart(B['Pencil'], B['Watercolor']):.2f}")
-    a, b = blurred(water("diamond", 6)), blurred(water("diamond", 6, True)); disc = blurred(water("done", 6))
-    print(f"\nWatercolor diamond against the disc, 6 points: straight {apart(a, disc):.2f}, curved {apart(b, disc):.2f}")
 
 if __name__ == "__main__":
     main(sys.argv[1] if len(sys.argv) > 1 else "small-shapes.png")
