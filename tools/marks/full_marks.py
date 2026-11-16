@@ -204,6 +204,7 @@ def render(style, ap, state, accent, outline=False, ic=False):
         GAPX, AMP = 1.9, 0.045; CUT = 1.25 + 0.5 + 0.5                              # drawn a point wider, because the heavier strokes take half a point back
         try: a, _ = fn(state)
         finally: CUT, GAPX, AMP = 1.25, 0.0, 0.035
+        if style == "pencil": a = gaussian_filter((np.asarray(a, float) > 0.5).astype(float), 0.6 * S)      # the stroke ends are smoothed: hard black saw-teeth read as scratchy
         a = heavier(a)
         if style == "watercolor": field = np.ones_like(field) * hexrgb(TOK["styles"][style][ap]["paper"])
         img = field * (1 - a[..., None]) + text * a[..., None]

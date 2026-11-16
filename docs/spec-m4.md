@@ -215,3 +215,5 @@ Not adopted, not blocking: Shantell's digits lean and sit larger than its letter
 Gates for the in-app screens: both fonts at the largest text size and with Bold Text, the slashed zero at the largest size, and a 58-character name in four lines (font condition 6).
 
 Still to do in step 5: the Bold Text weight pair for each style, the upstream file hashes for `docs/asset-licenses.md`, and ExtraBold for Alegreya Sans, which is not in the repo yet.
+
+Owner feedback, 16 November 2026, on the Pencil rows under Increase Contrast: the marks look scratchy. Cause: the flat black render turned each stroke end into a hard saw-tooth. Change: under Increase Contrast the Pencil mark's edge is smoothed, so the stroke ends show as a soft scallop. `docs/mockups/png/m4-pencil-ic-smooth.png`. Accessibility and low vision has not measured this version. The owner also said the control does not read as a radio button to them. The human factors gate stays, because the reviewer's radio button finding was about the Watercolor ring.
