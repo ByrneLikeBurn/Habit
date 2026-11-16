@@ -144,3 +144,27 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **The History tab has Week and Month, and no Year.** The brief gave it all three. Four reviews found that a year row for every habit needs one cell per week, which sums up seven days and reads as a grade. Year stays in Habit detail, one tap away.
 
 **Reviews are sized by what a change touches and how hard it is to undo.** The owner asked for a logic with fewer reviews and no unchecked work moving forward. Twelve rules and a routing table are now in `CLAUDE.md`, tested by a tech lead, QA and product review. Open findings, gates and guesses live in one list, `docs/findings.md`.
+
+## 15 November 2026, milestone 2 build
+
+**The Mac app may read and write a file the user picks.** Export and import on the Mac use the system save and open panels, which the sandbox blocks without the user-selected files entitlement. The owner approved it. The app gets no other file access.
+
+**Days to come draw nothing.** The brief drew a scheduled future day as a faint dashed outline. Week and Month already drew nothing for those days after the low-vision review, so the state was removed. A future day that holds a log draws by its state.
+
+**Weeks, months and years are Gregorian.** Day keys are Gregorian dates, so each period holds whole stored days. Weeks start on the user's first weekday, and names follow the user's locale.
+
+**The year view starts at the week of the first day.** A week belongs to the month that holds its Monday, so every day appears once. The first week can begin in the month or year before.
+
+**A yes-or-no habit shows Days logged, not a unit total.** A count of one per day says nothing more. Counted habits show both.
+
+**A deleted habit is not exported.** Export holds what the user can see, including archived habits. Import skips logs and pauses for a habit deleted on this device, so a deletion is not undone by an old file.
+
+**Import has limits.** 64 MB, 1,000 habits, 300,000 logs, 10,000 pauses and 500 characters of text. A file over any of them is refused with nothing written. This meets the import gate set by the security and QA reviews.
+
+**A day's total stops at 1,000,000.** Adds stop at the cap, so Clear and take-back stay within it, and every day the app can write is one import accepts.
+
+**A past-day log says which day.** The Undo line reads "Logged 7 November" or "Cleared 7 November", and VoiceOver adds "Undo available".
+
+**The off-schedule dot is in the tertiary text colour.** It measures 4.87:1 on Paper and 5.22:1 on Ink, so it meets 3:1 without drawing attention.
+
+**Habit detail opens from "Details".** It is in the row menu and the swipe actions on Today, and a tap on a row in History. The name is still a guess for the content designer.

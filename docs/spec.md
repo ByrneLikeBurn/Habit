@@ -12,7 +12,7 @@ This file records decisions. Items marked **Guess** were made where the brief is
 
 ## Status
 
-Phase 2. Milestone 1, the core loop in Pen and ink, is on `feat/core-loop`. The owner approved Lake variant A. No other scene is started. Phase 1 review findings are in `docs/reviews/phase-1.md`.
+Phase 2. Milestone 1, the core loop in Pen and ink, is merged. Milestone 2, History, Habit detail, export and import, is on `feat/history`. The owner approved Lake variant A. No other scene is started. Phase 1 review findings are in `docs/reviews/phase-1.md`.
 
 ## Creative direction
 
@@ -105,7 +105,6 @@ One drawing has one meaning.
 | Extra credit | Diamond, as large as a done mark | The day is paused and has a log |
 | Dot | A small dot | The habit is not scheduled that day |
 | Blank | Nothing | The day has no log |
-| To come | Dashed outline, faint | The day is in the future and scheduled |
 | Not logged | Empty outline | A past scheduled day with no log, and only when Show days not logged is on |
 
 **Today** is an outline in the text colour around the day's mark. On the Today screen every control has it, so the control is visible in every state, including paused. A today with nothing logged is the outline alone.
@@ -118,7 +117,7 @@ One drawing has one meaning.
 
 **Month view.** Each day shows its date under the mark. An off-schedule day shows the date alone.
 
-**VoiceOver.** A day is read as date then state, for example "Tuesday 10 November. Done." State names: Done, Part done, Paused, Extra credit, To come. A day with no log and an off-schedule day are read as the date alone. "Not logged" is spoken only when Show days not logged is on. Today is read as "Today" before the date. The heat map groups by week with a summary. The scene card is one element, read as scene then palette name, for example "Lake, blue hour".
+**VoiceOver.** A day is read as date then state, for example "Tuesday 10 November. Done." State names: Done, Part done, Paused, Logged while paused. A day with no log and an off-schedule day are read as the date alone. "Not logged" is spoken only when Show days not logged is on. Today is read as "Today" before the date. The heat map groups by week with a summary. The scene card is one element, read as scene then palette name, for example "Lake, blue hour".
 
 **Where the key lives.** Habit detail has a key. You has a row, "What the marks mean", that opens the marks board.
 
@@ -171,7 +170,7 @@ One drawing has one meaning.
 
 **First run.** Today shows the scene card, one line of text and one button, "Add a habit".
 
-**Shared store.** Widgets, App Intents and the Watch app need the SwiftData store in an App Group container. An `.entitlements` file is allowed for the App Group only (**Owner**). The owner has a free Apple account. Before milestone 1, a throwaway project checks that an App Group works with free signing.
+**Shared store.** Widgets, App Intents and the Watch app need the SwiftData store in an App Group container. An `.entitlements` file is allowed for the App Group, and on the Mac for files the user picks in a save or open panel (**Owner**, 15 November 2026). The owner has a free Apple account. Before milestone 1, a throwaway project checks that an App Group works with free signing.
 
 **Shared-store test.** Run on 15 November 2026 with Xcode 27.2. Free signing gave both the app and a widget extension a profile with the App Group. On an iPhone, a value written by the app in shared UserDefaults, a file and a SwiftData store was read by the widget. It works. The profiles expire after 7 days. SwiftData logs errors if `Library/Application Support` does not exist in the group container, so the app creates that folder before it opens the store.
 
@@ -463,7 +462,7 @@ Drawn in `docs/mockups/png/sheet-ax.png`. The accessibility and low-vision revie
 
 - Week, Month and Year become one row, "View: Month", that opens a list. The whole row is the target.
 - Month is a list of weeks at accessibility sizes, each with its counts in words. The grid stays up to the largest standard size. The two reviews disagreed on keeping the grid and both accepted this.
-- Week is a list of all seven days: mark, date and the day's count in words. The mark sits in a column of fixed width. A day to come shows the dashed outline.
+- Week is a list of all seven days: mark, date and the day's count in words. The mark sits in a column of fixed width. A day to come shows no mark.
 - Year is a list of months as text.
 - Marks, symbols and arrows are sized from the text style. The dot for a day not scheduled is at least 8 points.
 - Stats stack the label over the value.
