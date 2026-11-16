@@ -117,7 +117,7 @@ def pencil(state):
     return np.zeros((N, N)), np.zeros((N, N))
 
 def pencil_today():                                         # four strokes whose ends cross and overshoot each corner by 1 point
-    q = H + 4.5; m = np.zeros((N, N))
+    q = H + 5.5; m = np.zeros((N, N))      # 3 points clear of the mark, stroke ends included
     for x0, y0, x1, y1 in [(-q - 1, -q, q + 1, -q + 0.5), (q, -q - 1, q - 0.4, q + 1), (q + 1, q, -q - 1, q - 0.5), (-q, q + 1, -q + 0.4, -q - 1)]:
         m = np.maximum(m, mask(lambda d: stamp(d, bowed(x0, y0, x1, y1, (rng.random() - 0.5) * 1.6), taper(1.5, 0.75, 0.06))))
     return m
@@ -188,12 +188,12 @@ def papers(style, ap):
     field = paper * (1 - g["maxAlpha"] * tex) + grain * g["maxAlpha"] * tex
     return field, worst, hexrgb(t["text"])
 
-def render(style, ap, state, accent):
+def render(style, ap, state, accent, outline=False):
     field, worst, text = papers(style, ap); ink = ap == "ink"
     fn = pencil if style == "pencil" else (lambda s: water(s, ink))
     strength = TOK["markAlpha"][style] if not (style == "watercolor" and ink) else 1.0
-    if state == "today": a, core = fn("done"); ring = pencil_today() if style == "pencil" else water_today()
-    else: a, core = fn(state); ring = None
+    if state == "today": state, outline = "done", True
+    a, core = fn(state); ring = (pencil_today() if style == "pencil" else water_today()) if outline else None
     a = a * strength
     if style == "pencil" and ink:
         accent = accent + (1 - accent) * 0.22                                   # the same hue as a lighter pencil
@@ -201,7 +201,6 @@ def render(style, ap, state, accent):
     img = field * (1 - a[..., None]) + accent * a[..., None]
     if ring is not None: img = img * (1 - ring[..., None]) + text * ring[..., None]
     core = np.asarray(core) > 0.5
-    px = accent * strength + worst * (1 - strength) if state not in ("today",) else None
     if core.any():
         drawn = worst * (1 - a[core][:, None]) + accent * a[core][:, None]          # the mark as drawn, over the worst paper pixel
         ls = lum(drawn); lw = float(lum(worst[None])[0]); cr = min(ratio(float(l), lw) for l in (ls.min(), ls.max()))
