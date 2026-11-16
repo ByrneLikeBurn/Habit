@@ -33,6 +33,16 @@ def snow(p, prof, m, depth, seed, lit=1.0):
     p.lift(0.66 * cap * shade)
 
 
+def haze(p, y0, tilt, height, strength, seed):
+    """Mist that lies along a valley: its line tilts and wanders, its depth varies, and it thins out in places."""
+    n = noise(seed, 3.0, sigma_x=120.0); n = n[H // 2][None, :] if n.ndim == 2 else n
+    w = noise(seed + 1, 3.0, sigma_x=80.0); w = w[H // 3][None, :]
+    yc = y0 + tilt * (XN - 0.5) + 0.018 * n
+    hh = height * (1.0 + 0.45 * w)
+    thin = smoothstep(-1.2, 0.4, noise(seed + 2, 3.0, sigma_x=150.0)[H // 4][None, :])
+    p.lift(strength * np.exp(-((YN - yc) / np.maximum(hh, 0.02)) ** 2) * (0.35 + 0.65 * thin))
+
+
 def variant_a() -> np.ndarray:
     """Massif. One broad snow peak right of centre, a lower shoulder to the left, mist in the valley, a dark wooded spur."""
     p = Painting(paper_seed=17)
@@ -68,16 +78,20 @@ def variant_b() -> np.ndarray:
     above = np.ones_like(YN)
     sky(p, above, top=0.26, reach=0.30, seed=411)
     rows = [
-        ([(-0.05, .34), (.12, .30), (.24, .22), (.33, .26), (.46, .31), (.60, .24), (.70, .20), (.82, .27), (1.05, .33)], 0.24, .30),
+        ([(-0.05, .34), (.12, .30), (.24, .22), (.33, .26), (.46, .31), (.60, .23), (.70, .16), (.745, .125), (.80, .20), (.88, .27), (1.05, .33)], 0.24, .30),
         ([(-0.05, .40), (.10, .43), (.25, .38), (.40, .33), (.52, .39), (.68, .43), (.84, .36), (1.05, .40)], 0.32, .42),
         ([(-0.05, .56), (.14, .50), (.28, .46), (.42, .52), (.58, .57), (.74, .52), (.90, .47), (1.05, .50)], 0.42, .55),
         ([(-0.05, .62), (.18, .66), (.36, .70), (.52, .66), (.66, .61), (.82, .65), (1.05, .72)], 0.56, .70),
         ([(-0.05, .86), (.16, .80), (.32, .77), (.50, .82), (.70, .88), (.86, .84), (1.05, .80)], 0.80, .88),
     ]
     for i, (pts, d, base) in enumerate(rows):
-        ridge(p, pts, d, above, 421 + 20 * i, edge=2.4 - 0.25 * i, gran=0.060 + 0.005 * i, sigma=22 - 3 * i,
-              fade=(d * 0.55, base - 0.06, base + 0.10))
-        if i < 4: p.mist(base + 0.06, 0.035, 0.55 - 0.05 * i, seed=430 + 20 * i)
+        prof, m = ridge(p, pts, d, above, 421 + 20 * i, edge=2.4 - 0.25 * i, gran=0.060 + 0.005 * i, sigma=22 - 3 * i,
+                        fade=(d * 0.55, base - 0.06, base + 0.10))
+        if i == 0:                                             # one small cap of bare paper on the far summit, on the side toward the light
+            yy = np.arange(H)[:, None] * np.ones((1, W))
+            cap = smoothstep(0.05 * H, 0.008 * H, yy - prof[None, :]) * m * np.exp(-((XN - 0.728) / 0.022) ** 2) * smoothstep(0.75, 0.73, XN)
+            p.lift(0.92 * cap)
+        if i < 4: haze(p, base + (0.05, 0.07, 0.045, 0.065)[i], (0.03, -0.04, 0.05, -0.025)[i], (0.034, 0.048, 0.032, 0.040)[i], 0.58 - 0.09 * i, 430 + 20 * i)
     return p.finish()
 
 
