@@ -388,7 +388,13 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .dayc svg{display:block;width:10px;height:8px}
 .dayc.on b{font-size:12px}
 .note.setlinks{display:flex;gap:26px;margin-top:6px;font-size:15px}
-.symrow2{display:flex;gap:2px;margin:0 21px;flex-wrap:nowrap}
+.symrow2{display:flex;gap:0;margin:0 21px;flex-wrap:nowrap;justify-content:space-between}
+.lnk.dim{opacity:.4;text-decoration:none}
+.mactitle{font:600 15px/1 var(--ui);margin:16px 21px 0}
+.macbtns{display:flex;justify-content:flex-end;gap:10px;margin:22px 21px 0}
+.symgrid .symb{width:44px;height:44px}
+.symgrid .symb.ph{width:36px;height:36px}
+.chip{min-height:34px}
 .symb.txt{width:auto;padding:0 9px;font:500 14px/1 var(--ui)}
 .symb.txt.more{color:var(--text);text-decoration:underline;text-underline-offset:3px}
 .symb.ph{background:var(--fill);border-radius:10px;width:36px;height:36px;margin:4px}
@@ -1177,13 +1183,13 @@ const dayBtn = (d,on)=>`<span class="dayc ${on?"on":""}" role="switch" aria-chec
 const repeats = (off)=>{ const n = off.length;
   const line = n===0 ? "Every day. Choose a day to leave it out." : n===7 ? "No days yet. Choose a day to add it." : "Every day except Thursday";
   return `<div class="sec">Repeats on</div><div class="dayrow2">${DAYS2.map((d,i)=>dayBtn(d,!off.includes(i))).join("")}</div>
-  <p class="note hint">${line}</p><p class="note setlinks"><span class="lnk">Set every day</span><span class="lnk">Set weekdays</span></p>`; };
-const symRow = (sel)=>`<div class="sec">Symbol</div><div class="symrow2"><span class="symb txt ${sel===-1?"on":""}">None</span>${["drop","book","moon","dice","walk","people"].map((k,i)=>`<span class="symb ${i===sel?"on":""}">${icon(k,26)}</span>`).join("")}<span class="symb txt more">More…</span></div>`;
+  <p class="note hint">${line}</p><p class="note setlinks"><span class="lnk ${n===0?"dim":""}" ${n===0?'aria-disabled="true"':""}>Set every day</span><span class="lnk">Set weekdays</span></p>`; };
+const symRow = (sel)=>`<div class="sec">Symbol</div><div class="symrow2"><span class="symb txt ${sel===-1?"on":""}">None</span>${["drop","book","moon","dice","walk"].map((k,i)=>`<span class="symb ${i===sel?"on":""}">${icon(k,26)}</span>`).join("")}<span class="symb txt more">More…</span></div>`;
 const logging = (count)=>`<div class="sec">Logging</div><div class="seg" style="margin-top:0"><span class="${count?"":"on"}">Mark done</span><span class="${count?"on":""}">Count</span></div>
-  <p class="note hint">${count?"Each tap adds to the day's total.":"One tap marks the day done."}</p>`;
+  <p class="note hint">${count?"Each log adds to the day's total.":"Log once and the day is done."}</p>`;
 const nhTop = `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>New habit</b><span class="btn"><b>Add</b></span></div>`;
 function nhMark(style){
-  return nhTop+`<div class="sec">Name</div><div class="field nm ph">Stretch after brushing teeth</div>${symRow(-1)}${logging(false)}${repeats([])}`;
+  return nhTop+`<div class="sec">Name</div><div class="field nm ph">For example, stretch after brushing teeth</div>${symRow(-1)}${logging(false)}${repeats([])}`;
 }
 function nhCount(style){
   return nhTop+`<div class="sec">Name</div><div class="field nm">Drink water</div>${symRow(0)}${logging(true)}
@@ -1194,17 +1200,17 @@ function nhNoDays(style){
   return nhTop+`<div class="sec">Name</div><div class="field nm">Read</div>${symRow(1)}${logging(false)}${repeats([0,1,2,3,4,5,6])}`;
 }
 const GROUPS = ["Body","Food and drink","Home","Making","Mind","Movement","Outdoors","People","Play","Rest","Work and study"];
-const GLY = {Body:["pill","drop"],"Food and drink":["drop","leaf"],Home:["book"],Making:["pen"],Mind:["book","moon"],Movement:["walk"],Outdoors:["tree","leaf"],People:["people"],Play:["dice"],Rest:["moon"],"Work and study":["book","pen"]};
-const tile = (g,i)=>{ const k = GLY[g][i]; return `<span class="symb ${k?"":"ph"}">${k?icon(k,26):""}</span>`; };
+const GLY = {Body:["pill"],"Food and drink":["drop"],Home:[],Making:["pen"],Mind:[],Movement:["walk"],Outdoors:["tree","leaf"],People:["people"],Play:["dice"],Rest:["moon"],"Work and study":["book"]};   // one group per symbol
+const tile = (g,i,on)=>{ const k = GLY[g][i]; return `<span class="symb ${k?"":"ph"} ${on?"on":""}">${k?icon(k,26):""}</span>`; };
 const chips = (sel, from=0)=>`<div class="chips">${["All",...GROUPS].slice(from).map(g=>`<span class="chip ${g===sel?"on":""}" role="button" aria-pressed="${g===sel}">${g===sel?tick:""}${g}</span>`).join("")}</div>`;
 const symTop = `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>Symbol</b><span class="btn"><b>Done</b></span></div><div class="search">Search symbols</div>`;
 function nhSymbols(style){
   return symTop+chips("All")+GROUPS.slice(0,4).map(g=>`<div class="sec gh">${g}</div><div class="symgrid">${Array.from({length:12},(_,i)=>tile(g,i)).join("")}</div>`).join("");
 }
 function nhSymbolsPlay(style){
-  return symTop+chips("Play",7)+`<div class="symgrid" style="margin-top:14px">${Array.from({length:12},(_,i)=>tile("Play",i)).join("")}</div><p class="note hint">12 symbols</p>`;
+  return symTop+chips("Play",7)+`<div class="symgrid" style="margin-top:14px">${Array.from({length:12},(_,i)=>tile("Play",i,i===0)).join("")}</div><p class="note hint">12 symbols</p>`;
 }
-const nhMac = s=>`<div class="macform">${nhCount(s)}</div>`;
+const nhMac = s=>`<div class="macform"><div class="mactitle">New habit</div>${nhCount(s).replace(nhTop,"")}<div class="macbtns"><span class="sysbtn ghost small">Cancel</span><span class="sysbtn small">Add</span></div></div>`;
 
 /* ---------- page ---------- */
 const SCREENS = {today:[today,"Today"], detail:[detail,"Habit detail"], gentle:[gentle,"Gentle Mode on Today"], appearance:[appearance,"Appearance"], marks:[marks,"Marks board"]};
