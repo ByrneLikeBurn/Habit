@@ -6,6 +6,8 @@ This file records decisions. Items marked **Guess** were made where the brief is
 
 **Owner**, 14 November 2026. The goal is a minimum usable app, milestones 1 to 3, with inclusion and accessibility built in from the first milestone and not added later.
 
+**Principle. Owner.** Every addition must add value, earn its place, and fit the vision and the expert reviews. When two reviews disagree, this is the test.
+
 **Principle. Owner.** Something is better than nothing. A small log, a part-done day or a count with no target is credited, never scored as a failure.
 
 ## Status
@@ -101,7 +103,8 @@ One drawing has one meaning.
 | Part done | Hatched | A counted habit has some logs and is under target |
 | Paused | Centred dash | The day is paused and has no log |
 | Extra credit | Diamond, as large as a done mark | The day is paused and has a log |
-| Blank | Nothing | The day is off schedule, or it has no log |
+| Dot | A small dot | The habit is not scheduled that day |
+| Blank | Nothing | The day has no log |
 | To come | Dashed outline, faint | The day is in the future and scheduled |
 | Not logged | Empty outline | A past scheduled day with no log, and only when Show days not logged is on |
 
@@ -292,7 +295,7 @@ The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settab
 - Milestone 1 holds the Edit form and Archive. Recently Deleted and purge stay in milestone 12. Kind is locked after the first log.
 - The default tap amount is 1 when the target is 20 or less. Above that it is empty, which means a tap opens the count sheet.
 - You has one setting for which side the control sits on.
-- There are three tabs: Today, Progress, You. Tags is a row in You, on iPhone only.
+- There are three tabs: Today, History, You. Tags is a row in You, on iPhone only.
 - In the month view a future day shows its date alone. The faint dashed outline is kept for the week view.
 
 ## Milestone 1 screens, after the inclusion reviews
@@ -329,6 +332,169 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 - A part-done day never breaks a run. Habit detail shows "Days logged" beside "Days done". Asked for by the behavioural scientist and the returning user.
 - One Home Screen widget is part of milestone 3, if the App Group test passes. It gives the user a cue outside the app. Asked for by the behavioural scientist.
 - The label "Extra credit" becomes "Logged while paused". Asked for by the tired daily user, the content designer and the behavioural scientist. Older sections of this file and of `docs/reviews` still say "extra credit" for the same state.
+
+## Milestone 2 screens
+
+Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Redrawn on 15 November to the rules below. Still owed: History in month and year, History with no habits and with 30, the largest text size, and the Mac and Watch versions.
+
+- Habit detail in month, week and year views. A future day shows its date alone. The year starts in the month the habit was added and labels its months.
+- Stats: Days done, Days logged, and a total in the user's unit, with the start date. Current run and Longest run appear only when "Show runs" is on.
+- A habit with no history shows one line and an "Add a past day" button.
+- A past day opens a sheet that names the date. A day that was not scheduled says so and still takes a log.
+- History is a ledger: one row per habit, seven days across.
+- You gains "Show runs", "Show days not logged", "Export a copy" and "Import a copy".
+- Import ends on a sheet that counts what was added and what was skipped. A file that cannot be read says so and changes nothing.
+
+## Milestone 2 rules, from the reviews
+
+Accessibility, UI and UX, and a combined behavioural and returning-user review looked at `sheet-m2.png`. These are adopted. The drawings do not show them all yet.
+
+**Stats.** Order is Days logged, then the unit total, then Days done. A counted habit with no target shows the first two only. There is never a rate, a percentage or "of N days". The same stats mean the same thing in week, month and year: all time, under the label "Since 28 April 2026". The week view adds one line for the week's total, and only when the week has a log. A week with no log shows no zeros.
+
+**Place.** Habit detail keeps one anchor date per visit. Switching between week, month and year opens the period that holds it. The period title is a button that returns to the current period. Opened from History, detail shows the same range and period, and Back reads "History".
+
+**Days.** Any day up to today opens the day sheet, in week and month. The hit area is the whole cell, with or without a mark. Past days and today are buttons with the hint "Opens this day". Future days are not buttons. "Add a past day" is on every Habit detail state. It opens a date picker and then the day sheet. The month view can page back before the habit was added.
+
+**Day sheet.** It names the habit and the date. At zero a count reads "Nothing logged", like a yes-or-no habit, with the amount field and Add below. "of 8 glasses" shows once the day has a log. Take away is off at zero. A day with a log has "Clear this day", which writes minus the total. After any change to a past day, the Undo line shows. The hint under the grid reads "Tap a past day to add or change a log."
+
+**Year.** Each month is one button, 44 points high: its label and its block of weeks. A week belongs to the month that holds its Monday. The year starts at the month of the "Since" date. VoiceOver reads one element per month, for example "June 2026. 22 days done, 3 part done, 2 paused. Opens the month." At accessibility text sizes the grid becomes a list of months as text rows.
+
+**History tab.** A whole row is one button and one VoiceOver element. A tap on a past cell opens the day sheet. A tap on the name opens Habit detail. History is not a place to log today, so the name does not log here as it does on Today. Today's cell is drawn as the thin today outline at mark size, not as the Today control. An off-schedule day shows a small dot, so a habit set for three days a week does not look half empty. Owed drawings: month and year, no habits, 30 habits, the largest text size.
+
+**Import and export.** After a file is picked, a preview says what the file holds and what is new, with Import and Cancel. A file with nothing new ends on "Nothing new in this file". A file that is not a Habit export and a file from a newer version get separate messages. First-run Today has a second, quiet action, "Import a copy". Export and Import rows are buttons with no chevron. Owed: rules for a habit whose id exists but whose details differ, for a habit archived here and live in the file, and whether pauses and settings are in the file.
+
+**You.** Switches are the system toggle, not restyled. One line under the two History switches says what each adds.
+
+**Largest text size.** Week becomes seven rows. A History row puts the name above its marks. Stat rows stack label over value. Sheet buttons stack. The month keeps seven columns and caps the date numeral where two digits fit.
+
+**Runs.** A run counts scheduled days in a row with any log. A part-done day extends it. A day whose total is zero or less after an undo counts as no log. The mark still shows whether the target was met: solid for done, hatched for part done. The help line reads "A run counts the scheduled days in a row with any log, even a small one." It sits under the "Show runs" switch. Three reviews agreed (behavioural, neurodiversity and returning user, content).
+
+**Current run row.** With "Show runs" on, the row is always there. Its value is "12 days" in a run, "Between runs" after a gap and "No run yet" before the first log. A pause keeps the number. A zero is never shown. Longest run is hidden until it is 1 or more. Note for translators: "State label. No run is active after a gap. Restructure freely. Must not name a missed day or a zero." The three reviews split at first (hide the row, "Starts with any log", "Between runs") and all accepted this course in a second round. They would revisit it if users read "Between runs" as an unwanted reminder.
+
+**Tab name.** The ledger tab is called "History". "Progress" implies a direction, so a quiet week reads as none. "Log" is already the app's word for an entry. The same three reviews agreed.
+
+**Second review, 15 November.** Accessibility, UI and UX, and the tired daily user looked at the redrawn sheet. Adopted:
+
+- A day the habit is not scheduled shows a small dot in week, month, year and History. It was blank in month, "Off" in week and a dot in History. The dot is in "What the marks mean".
+- Dates a user can tap are drawn in secondary text. Future dates are tertiary and are not buttons.
+- A History row puts the name above seven equal cells, each 44 points. Today is marked once in the header and by a thin outline in the cell. VoiceOver reads the row as one element with one action per day, for example "Open Tuesday 10 November". Cells take keyboard focus.
+- In the year view a month button is at least 44 points wide.
+- "Since" and the first month of the year view use the earlier of the day the habit was added and its first log. The previous-year arrow is on when that falls in an earlier year.
+- The week view puts the date beside the weekday, so the only number under a mark is the count.
+- Day sheet: Add and Mark done write, close the sheet and show the Undo line. "Take away" and "Clear this day" are text buttons under Add. Take away cannot go below zero. A yes-or-no day that is done shows "Done" and "Clear this day".
+- The Undo line sits above the tab bar and covers nothing. It is announced ("Cleared 7 November. Undo available"). It stays until the next action, for everyone, as milestone 1 built it.
+- Import: a habit whose id is here with different details keeps this device's version. The preview says how many differ (**Guess**, to be checked by the engineering and QA reviews).
+- "Add a past day", the period arrows, the period title and text buttons have a 44 point hit area.
+- The year grid has an `AXChartDescriptor`.
+
+Not adopted: filling the past-day amount with what is left to the target. A past-day fix is as often small as full, and the field already takes any typed number.
+
+**Reaching Habit detail from Today.** The row menu and the swipe actions gain "Details", beside Edit and Archive. VoiceOver gets the same action. The word is not "History", because that is now the tab (**Guess**, for the content review at the milestone 2 build). A name tap on Today still logs.
+
+**A log on a day off.** It draws the diamond and reads "Logged on a day off", as milestone 1 built it. The day sheet for such a day shows that after a log.
+
+**Export.** The owner deferred to the reviews on 15 November 2026, and the security, engineering and QA reviews approve it on these conditions.
+
+- The file is made only when the user taps "Export a copy" and goes only to the system share sheet. The app makes no network call.
+- Plain JSON. The header holds the format name, one whole-number version, the app build, the export time and a count per record type.
+- It holds habits, logs and pauses. It holds no settings and no device id. On import each log gets the fixed device value "imported".
+- `Pause` gets a stable id, so import can skip a pause that is already here.
+- The file name is "Habit export" and the date. No habit name and no device name.
+- The export screen says: "This copy is not encrypted. Anyone who has it can read your habits."
+- The temporary file is written to the app's own temporary folder with complete file protection, deleted when the share sheet closes, and swept at launch.
+- Import checks the whole file, then writes all of it or none of it. It refuses a file over the size and count limits, a newer version, an unknown kind, a bad day key, an amount over the typed-number cap, and a log whose habit is missing. Unknown keys are ignored. An older version imports with defaults. The limits are set at the build (**Guess**).
+- A habit archived here stays archived when the file has it live. Its logs still import. It counts in the preview's "differ" number.
+- Parse errors never log file content. Test files are made up.
+- Round-trip test: export, import into an empty store and export again gives the same file apart from the export time. Day totals and runs match, across pauses. A second import adds nothing. Negative and zero amounts survive. Day keys do not change under another time zone or day-start hour. A cut-off file and a newer file write nothing.
+
+**Import and the one write path.** The engineering, QA and security reviews agree. Import does not call the intent once per log, because each call saves on its own and a failure part way would leave half a file written. Import gets one named function in `LogWriter`, `importEvents`, which checks every log, inserts them all and saves once. It shares the amount cap, the habit check and the day-key check with live logging. It keeps each log's id, day key, timestamp and source, and sets the device value to "imported". It never alters a value: one bad log refuses the whole file. It gives no haptic and no Undo line, and reloads widgets once at the end. The source check gains a pattern so only the import file may call it. The owner approved the new wording of invariant 5 on 15 November 2026, and it is in `CLAUDE.md`.
+
+**Password on export. Later, not in the MVP.** The reviews agree it should exist, off by default, in milestone 13 or sooner if testing asks for it. One switch on the export screen, "Protect with a password". The password is typed once and shown, with a hide button. The field is marked as a new password so the system password manager may offer to save it. The owner agreed to that on 15 November 2026: a saved password may sync through iCloud Keychain, because it is the user's own Apple account and not a server run for this app. The app never stores, reads back or logs the password and calls no keychain API. There is no hint and no recovery. The screen keeps the line "Habit cannot recover this password. Save it somewhere you will find it later." and does not promise a save offer. The file name ends in "-protected". Built with Apple's frameworks only: PBKDF2 for the key, AES-GCM for the file, a fresh salt and nonce each time. To check on a device: whether the system offers to save a password with no account or domain.
+
+**Words.** "No history yet" becomes "Nothing logged so far" and shows only for a habit with no logs ever.
+
+**Fixture faults found.** The year strip started at May while the stats said 28 April. The month with runs on showed a run of 2 where the marks give 3.
+
+## Milestone 3 screens
+
+Drawn in `docs/mockups/png/sheet-m3.png`, in Pen and ink. Three reviews saw the first draft on 15 November 2026: neurodiversity with behavioural and returning user, accessibility, and UI and UX with QA. They disagreed on how a pause ends and settled on one rule in a second round. These rules replace the earlier Gentle Mode and Vacation paragraphs where they differ.
+
+**Names.** "Gentle Mode" is the name of the whole feature. It appears as the section header in You and in the help page, with the pause symbol, and nowhere else. Under it are two rows named for what they do, each with one line of description: "Pause everything. Until you turn it off." and "Pause for dates. Choose a first and last day. Dates can be in the past." "Vacation" is gone, because someone ill is not on vacation and will not look there. A single habit has "Pause this habit". The pause symbol also marks the Today button and the widget header. Note for translators on the header: "Feature name. Translate as a concept (rest, easy days). Do not translate 'Mode' literally." The owner asked to keep the name. The content review wanted action labels and the neurodiversity review wanted the name kept as permission to rest. Both accepted this course.
+
+**Reaching it.** Today has a quiet text button under its last row, "Pause everything". It asks for no confirmation. You has the same switch and a "Pause for dates" row. The row menu and Edit have "Pause this habit".
+
+**One ending rule.** Ending any pause sets its last day to today. Today stays paused and the habit starts again tomorrow. The button reads "Resume tomorrow". After it, Today reads "Resumes tomorrow." with "Keep paused". A pause whose first day is today is removed whole, and its button reads "Undo pause", so a slip leaves no trace and today's logs draw as normal marks. After a tap on "Pause everything", that button becomes "Undo pause" in place, and the line at the top of Today shows the same.
+
+**Words.** Today reads "Everything is paused." or "Paused until 27 November." The helper is "Paused days leave your runs as they are. You can still log." It replaces "never counts against you", which implied that other days do. In Edit a paused habit reads "It starts again tomorrow. You can still log today."
+
+**Rows while paused.** A counted row shows "0 glasses", then "3 glasses" after a log, with no target. The control shows the dash until the first log. This changes the rule that a counted row always shows "0 of 8".
+
+**Pause for dates.** The row opens a list of dated pauses, coming and earlier, and "Pause everything" pauses that have ended. Each can be opened and changed. Save is off until the last day is set and is not before the first. A pause that has started offers "Resume tomorrow". One that has not started offers "Remove". The form says how many logged days will change mark, and how many days gain or lose a pause.
+
+**Storage.** "Pause everything" and "Pause for dates" are each one `Pause` record with no habit. A day is paused if any pause covers it. A habit added during a pause is paused too. "Pause everything" outranks dates in the line on Today. The "today" in the form is the habit day, built from the day-start hour.
+
+**Edit.** Archive sits in its own section, away from Pause, to prevent a slip.
+
+**Widget.** Small and medium. Rows keep Today's order. The whole row is the button, 44 points high, and logs through `LogHabitIntent`. Text uses text styles, and a row is dropped before text shrinks. The header reads "Paused" during a pause. VoiceOver reads one element per row: "Drink water, 3 of 8 glasses, button, adds 1", "Read, logged while paused", "Walk outside, paused, button". Marks draw from the store only, never ahead of a write, so a tap on a locked device changes nothing until it is unlocked. The timeline has an entry at each day start and each pause edge. The intent carries the day the widget showed and the state it wanted. On a mismatch it reloads and writes nothing. In tinted and clear modes marks are full opacity and marked accentable, with no row rules.
+
+**Still owed.** The largest text size for the Today lines and the widget, clear mode, the Mac and Watch versions, and tests for travel across a pause edge.
+
+## History tab: month, no habits, many habits
+
+Drawn in `m2-hist-month.png`, `m2-hist-many.png` and `m2-hist-empty.png`. The product owner, senior designer, tired daily user and returning user settled this on 15 November 2026.
+
+**History has Week and Month. Year is cut from the History tab.** A year row would need one cell per week, which has to sum up seven days. That is a new mark and reads as a grade. Year stays in Habit detail. The product owner wanted Month cut too, and the returning user wanted both. They agreed on Month only, because it reuses the year view's small shapes and adds no screen. The product owner would still cut Month if the strip cannot be read in Pencil or Watercolor.
+
+**Month.** One row per habit: the name above one strip of the month's days. Each day is a small shape from the year view, with a little extra space before each Monday. A header shows the date above each Monday. A day with no log draws nothing. Today has the thin outline. The row is at least 56 points high and is one button. It opens Habit detail in Month, on the same month, and Back reads "History". Days are not targets in Month. VoiceOver reads one element per row: "Read. November 2026. 12 days done, 2 part done, 1 paused. Opens the month." It gives no count of days without a log. At accessibility sizes the strip becomes that sentence as text. History opens on Week, on the current week.
+
+**No habits.** "No habits yet", "Add a habit and its days will show here.", and an "Add a habit" button that opens the add sheet. The Week and Month control, the arrows and the header are hidden. A period with habits and no logs shows the rows and no message.
+
+**Many habits.** The list scrolls in Today's order. The control, the period title and the weekday or date header stay pinned. There is no totals row, no search and no filter. The hint sits once, after the last row. An archived habit is off the list. It appears under a plain "Archived" heading at the end only in a period where it has a log (**Guess**).
+
+**After the low-vision and tired-user check.** The month strip stays. Its dash is thicker and as wide as the cell, the diamond fills the cell, and the dot is 4 points. The same shapes are used in the year view. Month shows the year view's key under the hint, because part done is a triangle here and hatching in Week. Days to come draw nothing in Week and in Month. An archived row has no today outline, because it cannot be logged. Not drawn: Month with many rows.
+
+**The product owner's test, run on 15 November.** The product owner had said to cut Month if the strip cannot be read in Pencil or Watercolor. The strip was drawn in all three styles, light and dark, in `sheet-hist-month.png`, and measured. Marks are 4.1:1 to 4.4:1 and the dot is 4.9:1 to 5.4:1 in all six. Pen and ink and Pencil keep all five states apart. Watercolor was weakest: its part-done shape was a low half-round that sat beside the paused dash. It is now a half-disc split top to bottom, at full mark height, here and in the year view. Verdict: Month stays, because it is the only screen that shows every habit across a month. Conditions for milestone 4: check the strip at the largest text size and with a blur test in all three styles. If either fails, Month moves to milestone 13 and History becomes Week only, with no control. Measured again against the worst grain pixel in an empty band of each frame: marks are 3.96:1 or better and the dot is 4.85:1 or better in all six, against a floor of 3:1. These are drawings at twice size with 256 colours, so the build measures again on a simulator. The low-vision reviewer measured the new Watercolor part-done shape: 4.24:1 on paper and 4.37:1 on ink, and it stays apart from done and from the dash under a blur test. Its nearest neighbour under heavy blur is the 4 point dot, told apart mainly by blue against grey. The dash is now the width of the square, so a dash, a diamond and a dash in a row do not join.
+
+**Widget, clear mode.** Drawn in `m3-w-clear.png`. The drawing fails contrast on its wallpaper: text and marks measure between 1.8:1 and 2.9:1. In the build the system's vibrant foreground and glass backing draw the text and marks, and the widget is tested on the lightest wallpaper. No widget row draws the plus, in any mode, because it hid the part-done hatching and the whole row is the button.
+
+## Largest text size, milestones 2 and 3
+
+Drawn in `docs/mockups/png/sheet-ax.png`. The accessibility and low-vision reviews saw the first draft on 15 November 2026. These are the rules after their findings.
+
+- Week, Month and Year become one row, "View: Month", that opens a list. The whole row is the target.
+- Month is a list of weeks at accessibility sizes, each with its counts in words. The grid stays up to the largest standard size. The two reviews disagreed on keeping the grid and both accepted this.
+- Week is a list of all seven days: mark, date and the day's count in words. The mark sits in a column of fixed width. A day to come shows the dashed outline.
+- Year is a list of months as text.
+- Marks, symbols and arrows are sized from the text style. The dot for a day not scheduled is at least 8 points.
+- Stats stack the label over the value.
+- A History row puts the name above seven cells.
+- The day sheet stacks Add, Take away and Clear this day as full-width buttons.
+- A switch sits on its own line at full size, with "On" or "Off" in words beside it.
+- The paused line on Today shows only its first sentence and its button.
+- The widget shows two rows, with no symbol and no plus. The whole row is the button.
+- Not checked: a phone smaller than 393 by 852 points.
+
+## Mac window, milestones 2 and 3
+
+Drawn in `docs/mockups/png/sheet-mac.png`. The Apple platform designer and the accessibility reviewer saw the first draft on 15 November 2026 and found it read as a phone app in a window. These are the rules after their findings. The Watch app is milestone 7, so no Watch screens are owed for milestones 2 and 3.
+
+**Window.** The sidebar holds Today and History. Back, New Habit and Edit sit in the window toolbar, not in the page. Content may grow to about 720 points. A History row puts the name and its seven days on one line. A past day and the forms open as sheets on the window. Hints say "Click", not "Tap".
+
+**Settings.** You is not in the Mac sidebar. Appearance, Show runs, Show days not logged and Day starts at are in a Settings window, opened with Command-comma. Pausing is in the Habit menu and on Today. Export and Import are in the File menu. This changes the milestone 1 Mac build if it put You in the sidebar.
+
+**Selection and keys.** Today rows can be selected, with a visible ring. Up and Down move the selection. Space logs the focused row as its own activation, and is not a menu shortcut. In the month, arrow keys move through days and Return opens the day. In a sheet, Return adds and Escape cancels. "Undo pause" and the "Not scheduled today" row take keyboard focus.
+
+**Menus.**
+
+| Menu | Commands |
+|---|---|
+| Habit (app) | Settings, Command-comma |
+| File | New Habit, Command-N. Export a Copy, Shift-Command-E. Import a Copy, Shift-Command-I |
+| Edit | Undo Log, Command-Z, through the undo manager, so the amount field keeps its own undo |
+| Habit | Log, Command-Return. Add an Amount, Command-L. Details, Command-I. Edit, Command-E. Pause This Habit. Archive, Command-Delete. Pause Everything, Shift-Command-P, which reads Resume Everything while paused. Pause for Dates. Add a Past Day, Shift-Command-D |
+| View | Today, Command-1. History, Command-2. Week, Month, Year, Option-Command-1 to 3. Back, Command-[. Previous Period, Command-Left. Next Period, Command-Right. Go to Today, Command-T, with window tabbing off |
+
+**Can wait until after the MVP.** Habit detail in two columns, with the month beside the stats. A popover in place of the day sheet.
 
 ## Open decisions
 

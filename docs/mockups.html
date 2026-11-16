@@ -238,6 +238,161 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .menu small{font-size:11px;color:var(--text3)}
 .undo{position:absolute;left:21px;right:21px;bottom:96px;min-height:48px;border-radius:14px;background:var(--text);color:var(--paper);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 15px/1 var(--ui)}
 .undo b{font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);margin:6px 12px 0;justify-items:center}
+.wk{display:grid;justify-items:center;align-items:center;grid-template-rows:18px 48px 18px 16px}
+.wk svg{margin:-2px 0}
+.wk span{font:500 12px/1.4 var(--ui);color:var(--text3)}
+.wk b{font-size:15px}
+.wk small{font:400 11px/1.3 var(--ui);color:var(--text2);min-height:14px}
+.ymon{display:grid;grid-template-columns:repeat(7,1fr);margin:0 21px 4px;font:500 11px/1 var(--ui);color:var(--text3)}
+.year.y29{grid-template-columns:repeat(29,1fr);gap:2.5px}
+.daystate{font-family:var(--display);font-weight:var(--dmed);font-size:calc(24px*var(--dscale));line-height:1.3;text-align:center}
+.lh,.lcs{display:grid;grid-template-columns:repeat(7,1fr);justify-items:center;align-items:center}
+.lh span{font:500 12px/1 var(--ui);color:var(--text3);height:20px}
+.lh span.now{color:var(--text);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.lr{border-top:1px solid var(--rule);padding:9px 0 0}
+.ln{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:var(--dmed);font-size:16px;line-height:1.2}
+.ln .ic{width:22px;height:22px;flex:none}
+.lc{width:44px;height:44px;display:grid;place-items:center;position:relative}
+.lc.now::after{content:"";position:absolute;inset:9px;border:1px solid var(--text);border-radius:3px}
+.yoff{position:relative}
+.yoff::after{content:"";position:absolute;left:3.5px;top:3.5px;width:4px;height:4px;border-radius:50%;background:var(--text3)}
+.ykey .yoff{width:11px;height:11px;display:block}
+.ym{min-width:44px}
+.grid .day span{color:var(--text2)}
+.grid .day.later span{color:var(--text3)}
+.sysbtn.small{min-height:44px}
+.mnav i{height:44px}
+.plink,.lnk{padding:12px 0}
+.note.links{display:flex;justify-content:center;gap:28px;margin-top:14px}
+.undo.inflow{position:static;margin:14px 21px 0}
+.widget{width:170px;height:170px;border-radius:22px;background:var(--paper);color:var(--text);padding:14px 14px 0;overflow:hidden;font-family:var(--ui);box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.widget.med{width:364px}
+.wtitle{font-family:var(--display);font-weight:var(--dmed);font-size:15px;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.wtitle span{font:400 11px/1 var(--ui);color:var(--text2)}
+.wr{display:flex;align-items:center;justify-content:space-between;min-height:42px;gap:6px}
+.wr + .wr{border-top:1px solid var(--rule)}
+.wn{display:flex;align-items:center;gap:6px;min-width:0}
+.wn b{font:500 13px/1.2 var(--ui);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.wn .ic{width:20px;height:20px;flex:none}
+.wcols{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+.wcols .wr:nth-child(2){border-top:0}
+.wnote{font:400 13px/1.35 var(--ui);color:var(--text2);margin:6px 0 0}
+.wnote b{color:var(--text);font-weight:600}
+.tog.on{background:var(--text)}
+.tog.on::after{left:22px}
+.datev{border:1px solid var(--rule2);border-radius:8px;padding:6px 10px}
+.wr{min-height:44px}
+.widget{padding-top:10px}
+.wtitle{margin-bottom:2px}
+.wtitle span{font-size:12px}
+.note.quiet{margin-top:18px}
+.sheetnav b.dis{opacity:.35}
+.opt.desc{min-height:60px}
+.ol{display:grid;gap:3px}
+.ol small{font:400 13px/1.3 var(--ui);color:var(--text2)}
+.pg{vertical-align:-2px;margin-right:5px}
+.ax5 .opt{font-size:44px;line-height:1.15;flex-wrap:wrap;padding:16px 0;gap:6px 16px}
+.ax5 .opt .val{font-size:44px;margin-left:0;width:100%;color:var(--text2)}
+.ax5 .opt .go{position:absolute;right:0;top:26px}
+.ax5 .sec{font-size:30px}
+.ax5 .note,.ax5 .note.hint{font-size:38px;line-height:1.2}
+.ax5 .month b{font-size:44px;line-height:1.15}
+.ax5 .nav .btn{font-size:34px}
+.ax5 .sysbtn,.ax5 .sysbtn.small{font-size:40px;min-height:76px;border-radius:38px;padding:0 30px}
+.ax5 .stat{display:grid;gap:4px;padding:16px 0}
+.ax5 .stat span{font-size:38px}
+.ax5 .stat b{font-size:56px}
+.ax5 .grid .day span{font-size:20px;margin-top:0}
+.ax5 .axnav{margin:8px 21px 14px;gap:40px}
+.ax5 .axnav i{width:76px;height:60px}
+.ax5 .axnav i svg{width:16px;height:28px}
+.axlist{margin:10px 21px 0}
+.axr{display:flex;align-items:center;gap:20px;padding:18px 0;border-top:1px solid var(--rule)}
+.axr span{display:grid;gap:4px}
+.axr b{font:500 46px/1.12 var(--ui)}
+.axr small{font:400 38px/1.15 var(--ui);color:var(--text2)}
+.ax5 .ln{font-size:46px}
+.ax5 .lr{padding-top:16px}
+.ax5 .lc{height:60px}
+.ax5 .lc.now::after{inset:8px 3px}
+.ax5 .lh span{font-size:24px;height:34px}
+.ax5 .bigcount .num{font-size:120px}
+.ax5 .bigcount span,.ax5 .amt span{font-size:38px;line-height:1.15;text-align:center}
+.ax5 .amt .num{font-size:64px}
+.axbtns{display:grid;gap:14px;margin:0 21px}
+.ax5 .ol small{font-size:36px}
+.ax5 .ol{gap:8px}
+.axtog{margin:0 21px 10px;transform-origin:left;transform:scale(1.5);height:50px}
+.ax5 .pill{font-size:38px}
+.ax5 .pg{width:26px;height:26px}
+.widget.axw .wn b{font-size:19px}
+.widget.axw .wtitle{font-size:19px}
+.widget.axw .wr{min-height:62px}
+.ax5 .opt.axview{padding:10px 0}
+.ax5 .opt .go{top:50%;margin-top:-14px}
+.ax5 .opt .go svg{width:16px;height:28px;opacity:1}
+.ax5 .nav .btn svg{width:30px;height:30px}
+.axm{width:60px;flex:none;display:grid;place-items:center}
+.axtog{display:flex;align-items:center;gap:18px;margin:4px 21px 16px;transform:none;height:auto}
+.axtog .tog{margin-left:0;width:92px;height:56px;border-radius:28px;background:var(--fill);border:1.5px solid var(--text3)}
+.axtog .tog::after{width:48px;height:48px;left:3px;top:2.5px}
+.axtog b{font:500 40px/1 var(--ui)}
+.mac .status,.mac .tabbar,.mac .page .nav{display:none}
+.mac .main{position:relative;display:block}
+.mtool{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 16px;border-bottom:1px solid var(--rule)}
+.tbi{width:28px;height:28px;display:grid;place-items:center;border-radius:6px}
+.tbi svg{width:16px;height:16px}
+.tbt{font:500 13px/1 var(--ui)}
+.mac .page{overflow:hidden;margin:0 auto;padding-top:12px}
+.mac .page.widepage{width:680px}
+.mac .page.sel .list .row:nth-child(3){outline:2.5px solid var(--text);outline-offset:-1px;border-radius:8px}
+.ledger.wide .lr{display:grid;grid-template-columns:1fr 330px;align-items:center;padding:0}
+.ledger.wide .lhr{border-top:0}
+.macsheet{position:absolute;left:50%;top:70px;width:393px;transform:translateX(-50%);background:var(--paper);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3);border:.5px solid var(--rule2);padding-bottom:24px}
+.macsheet .grab{display:none}
+.mac .main:has(.macsheet) .page{opacity:.45}
+.macset{width:480px;height:420px;background:var(--paper);color:var(--text);border:1px solid rgba(0,0,0,.2);border-radius:12px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.16);position:relative}
+.stitle{height:44px;display:grid;place-items:center;border-bottom:1px solid var(--rule);position:relative;font:600 13px/1 var(--ui)}
+.stitle .lights{position:absolute;left:16px;top:16px;display:flex;gap:8px}
+.stitle .lights i{width:12px;height:12px;border-radius:50%;background:rgba(0,0,0,.2);display:block}
+.macmenus{width:940px;height:440px;position:relative;background:var(--paper);color:var(--text);font:400 13px/1 var(--ui);border:1px solid rgba(0,0,0,.2);border-radius:12px;overflow:hidden}
+.menubar{display:flex;gap:18px;align-items:center;height:28px;padding:0 16px;background:rgba(120,115,105,.14);border-bottom:1px solid var(--rule2)}
+.mmenu{position:absolute;top:40px;width:260px;background:var(--paper);border:.5px solid var(--rule2);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:5px}
+.mmenu.c0{left:20px}
+.mmenu.c0.r2{top:118px}
+.mmenu.c0.r3{top:268px}
+.mmenu.c1{left:330px}
+.mmenu.c2{left:640px}
+.mmenu b{display:block;padding:6px 10px;color:var(--text2);font-weight:600}
+.mmenu div{display:flex;justify-content:space-between;padding:6px 10px}
+.mmenu kbd{font:400 13px/1 var(--ui);color:var(--text2)}
+.mmenu hr{border:0;border-top:1px solid var(--rule);margin:4px 8px}
+.hstrip{display:flex;align-items:center;height:22px}
+.hs{width:11px;height:11px;flex:none;display:grid;place-items:center;position:relative}
+.hs.mon{margin-left:3px}
+.hs svg{width:9.5px;height:9.5px;display:block}
+.hs.yoff::after{left:3.5px;top:3.5px}
+.hh{height:16px}
+.hh b{font:500 10px/1 var(--ui);color:var(--text3);position:absolute;left:0;top:0;white-space:nowrap}
+.lr.hm{min-height:56px;padding:8px 0 4px}
+.pinned{position:sticky;top:0;background:var(--paper);padding-top:6px;border-bottom:1px solid var(--rule2)}
+.wclear{padding:22px;border-radius:26px;background:linear-gradient(135deg,#5b6f8a,#a9806f 55%,#d9b98a)}
+.widget.clear{background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);backdrop-filter:blur(8px)}
+.widget.clear .wr + .wr{border-top:0}
+.ymons{display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 21px 0}
+.ym{display:grid;gap:5px;min-height:44px;align-content:start}
+.ym span{font:500 11px/1 var(--ui);color:var(--text3)}
+.ymg{display:grid;gap:2.5px}
+.ymg svg,.ymg i{width:11px;height:11px;display:block}
+.stats.tight{margin-top:4px}
+.note.since{margin-top:16px}
+.plink{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+.offdot{width:5px;height:5px;border-radius:50%;background:var(--text3);display:block}
+.sysbtn.dis{opacity:.35}
+.two-line{display:grid;justify-items:center;gap:2px}
+.two-line small{font:400 12px/1 var(--ui);color:var(--text2)}
+.ledger{margin:4px 14px 0 21px}
 </style>
 </head>
 <body>
@@ -380,9 +535,9 @@ function mark(state, o){
 function ycell(state, style, today){
   const A="var(--accent)", K="var(--text)", round = style==="watercolor"; let g="";
   if(state==="solid") g = round?`<circle cx="6" cy="6" r="5" fill="${A}"/>`:`<rect x="1" y="1" width="10" height="10" rx="1" fill="${A}"/>`;
-  if(state==="hatched") g = round?`<path d="M1 6A5 5 0 0 0 11 6Z" fill="${A}"/>`:`<path d="M1 1V11H11Z" fill="${A}"/>`;
-  if(state==="paused") g = `<path d="M3 6H9" stroke="${A}" stroke-width="1.7" stroke-linecap="round"/>`;
-  if(state==="extra") g = `<path d="M6 1 11 6 6 11 1 6Z" fill="${A}"/>`;
+  if(state==="hatched") g = round?`<path d="M6 1A5 5 0 0 0 6 11Z" fill="${A}"/>`:`<path d="M1 1V11H11Z" fill="${A}"/>`;
+  if(state==="paused") g = `<path d="M3 6H9" stroke="${A}" stroke-width="2.5" stroke-linecap="round"/>`;
+  if(state==="extra") g = `<path d="M6 0 12 6 6 12 0 6Z" fill="${A}"/>`;
   const t = today?`<rect x="-.6" y="-.6" width="13.2" height="13.2" rx="${round?6.6:2}" fill="none" stroke="${K}" stroke-width="1.1"/>`:"";
   return `<svg viewBox="0 0 12 12" style="display:block;overflow:visible" aria-hidden="true">${g}${t}</svg>`;
 }
@@ -407,7 +562,7 @@ const tabIcon = n=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
 
 /* ---------- shared pieces ---------- */
 const status = ()=>`<div class="status"><span>9:41</span><span class="r"><i style="width:17px;height:11px;opacity:.9"></i><i style="width:15px;height:11px;opacity:.9"></i><i style="width:25px;height:12px;border-radius:4px"></i></span></div>`;
-const tabbar = on=>`<div class="tabbar" style="grid-template-columns:repeat(${M1?3:4},1fr)">${[["today","Today"],["progress","Progress"],["tags","Tags"],["you","You"]].filter(t=>!(M1&&t[0]==="tags")).map(([k,l])=>`<div class="${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("")}</div>`;
+const tabbar = on=>`<div class="tabbar" style="grid-template-columns:repeat(${M1?3:4},1fr)">${[["today","Today"],["progress","History"],["tags","Tags"],["you","You"]].filter(t=>!(M1&&t[0]==="tags")).map(([k,l])=>`<div class="${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("")}</div>`;
 const chev = `<svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 2 10l8 8"/></svg>`;
 const plus = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"><path d="M11 3v16M3 11h16"/></svg>`;
 let M1 = false;   // milestone 1 frames: no scene card, three tabs, Blue marks
@@ -538,7 +693,7 @@ function ax5(style, app){
   <div class="list">${[HABITS[0],HABITS[3]].map(h=>row(h,style,undefined,undefined,52)).join("")}</div>${tabbar("today")}`;
 }
 function mac(style, app){
-  const side = [["today","Today",1],["progress","Progress",0],["you","You",0]].map(([k,l,on])=>`<div class="it ${on?"on":""}">${tabIcon(k)}${l}</div>`).join("");
+  const side = [["today","Today",1],["progress","History",0],["you","You",0]].map(([k,l,on])=>`<div class="it ${on?"on":""}">${tabIcon(k)}${l}</div>`).join("");
   return `<div class="side"><div class="lights"><i></i><i></i><i></i></div>${side}</div><div class="main"><div class="page">${todayBody(style,app,5)}</div></div>`;
 }
 function watch(style){
@@ -635,6 +790,355 @@ function appearanceM1(style, app){
   <div class="sec">Mark colour</div><div class="sw">${sws}</div>${tabbar("you")}`;
 }
 
+/* ---------- milestone 2 screens: history, a past day, export and import ---------- */
+const NOV = {1:"solid",2:"solid",3:"hatched",4:"solid",6:"paused",7:"extra",8:"paused",9:"solid",11:"solid",13:"solid",14:"hatched"};
+function monthGrid(style, showMissed, gap, cleared){
+  let cells = "";
+  for(const d of "MTWTFSS") cells += `<span class="wd">${d}</span>`;
+  for(let i=0;i<6;i++) cells += `<span></span>`;
+  for(let d=1; d<=30; d++){
+    const dow = (d+5)%7, off = dow===3;
+    const st = off ? "blank" : ((gap && d>9 ? null : NOV[d]) || (d>14 ? "blank" : (showMissed ? "missed" : "blank")));   // a future day shows its date alone
+    const st2 = cleared===d ? "paused" : st;
+    cells += `<div class="day ${d>14?"later":""}">${off && d<=14 ? offDot(30) : mark(st2,{style,size:30,today:d===14})}<span>${d}</span></div>`;
+  }
+  return `<div class="grid">${cells}</div>`;
+}
+const detailTop = (sel)=>status()+`<div class="nav"><span class="btn">${chev}&nbsp;Today</span><span class="btn">Edit</span></div>
+  ${head("Drink water","8 glasses a day. Every day except Thursday.")}
+  <div class="seg"><span class="${sel===0?"on":""}">Week</span><span class="${sel===1?"on":""}">Month</span><span class="${sel===2?"on":""}">Year</span></div>`;
+const stat = (l,v)=>`<div class="stat"><span>${l}</span><b>${v}</b></div>`;
+const marksRow = `<div class="opt" style="margin-top:14px">What the marks mean<span class="go">${chev}</span></div>`;
+const offDot = s=>`<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" aria-hidden="true"><circle cx="${s/2}" cy="${s/2}" r="${Math.max(2.6,s*0.11).toFixed(1)}" fill="var(--text3)"/></svg>`;
+const HINT = `<p class="note hint">Tap a past day to add or change a log.</p>`;
+const addPast = `<div class="noteact"><span class="sysbtn ghost small">Add a past day</span></div>`;
+const since = `<p class="note hint since">Since 28 April 2026</p>`;
+const allTime = `${since}<div class="stats tight">${stat("Days logged","171")}${stat("Glasses","1,104")}${stat("Days done","142")}</div>`;
+const monthHead = `<div class="month"><b class="plink">November 2026</b><span class="mnav"><i aria-label="Previous month">${chev}</i><i class="off" aria-label="Next month">${chev}</i></span></div>`;
+function m2Month(style){
+  return detailTop(1)+monthHead+`${monthGrid(style,false)}${HINT}${addPast}${allTime}${marksRow}${tabbar("today")}`;
+}
+function m2MonthRuns(style, gap){
+  // Marks give 11, 13 and 14 November: Thursday is off, and a part-done day extends a run.
+  return detailTop(1)+monthHead+`${monthGrid(style,true,gap)}${HINT}${addPast}${since}
+  <div class="stats tight">${stat("Days logged",gap?"168":"171")}${stat("Glasses",gap?"1,085":"1,104")}${stat("Days done",gap?"140":"142")}${stat("Current run",gap?"Between runs":"3 days")}${stat("Longest run","31 days")}</div>${tabbar("today")}`;
+}
+const m2RunsGap = style=>m2MonthRuns(style,true);
+function m2Week(style){
+  const W = [["Mon","9","solid"],["Tue","10","blank"],["Wed","11","solid"],["Thu","12","off"],["Fri","13","solid"],["Sat","14","hatched"],["Sun","15","blank"]];
+  return detailTop(0)+`<div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="week">${W.map(([d,n,st])=>`<div class="wk"><span>${d} ${n}</span>${st==="off"?offDot(34):mark(st,{style,size:34,today:n==="14"})}<small>${st==="solid"?"8":st==="hatched"?"3":""}</small></div>`).join("")}</div>
+  ${HINT}<div class="stats tight">${stat("This week","27 glasses")}</div>${addPast}${allTime}${tabbar("today")}`;
+}
+function m2Year(style){
+  // Real dates. A week belongs to the month that holds its Monday. The habit was added on Tuesday 28 April 2026.
+  const start = new Date(2026,3,27), since = new Date(2026,3,28), now = new Date(2026,10,14), months = [];
+  for(let w=0; ; w++){
+    const mon = new Date(2026,3,27+w*7); if(mon > now) break;
+    let m = months[months.length-1]; if(!m || m.k !== mon.getMonth()){ m = {k:mon.getMonth(), name:mon.toLocaleString("en-GB",{month:"short"}), weeks:[]}; months.push(m); }
+    const days = [];
+    for(let d=0; d<7; d++){
+      const dt = new Date(2026,3,27+w*7+d), i = w*7+d;
+      let st = "none";
+      if(dt >= since && dt <= now){ const k = (i*7 + w*3) % 11; st = d===3 ? "off" : (w===9 ? (d===2?"extra":"paused") : (k<7?"solid":k<9?"hatched":"blank")); }
+      if(+dt === +now) st = "hatched";
+      days.push([st, +dt === +now]);
+    }
+    m.weeks.push(days);
+  }
+  const block = m=>`<div class="ym" role="button"><span>${m.name}</span><div class="ymg" style="grid-template-columns:repeat(${m.weeks.length},11px)">${
+    [0,1,2,3,4,5,6].map(d=>m.weeks.map(w=>w[d][0]==="none"?`<i></i>`:w[d][0]==="off"?`<i class="yoff"></i>`:ycell(w[d][0],style,w[d][1])).join("")).join("")}</div></div>`;
+  return detailTop(2)+`<div class="month"><b class="plink">2026</b><span class="mnav"><i class="off">${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="ymons">${months.map(block).join("")}</div>
+  <p class="note hint">Tap a month to open it.</p>
+  <div class="ykey">${[["solid","Done"],["hatched","Part done"],["paused","Paused"],["extra","Logged while paused"]].map(([st,l])=>`<div><i>${ycell(st,style)}</i>${l}</div>`).join("")}<div><i class="yoff"></i>Not scheduled</div></div>
+  ${addPast}${allTime}${tabbar("today")}`;
+}
+function m2New(style){
+  return status()+`<div class="nav"><span class="btn">${chev}&nbsp;Today</span><span class="btn">Edit</span></div>
+  ${head("Stretch before bed","Every day.")}
+  <div class="seg"><span>Week</span><span class="on">Month</span><span>Year</span></div>
+  <div class="empty"><p class="big">Nothing logged so far</p><p>Days you log will show here. You can also add a past day.</p>${sysbtn("Add a past day")}</div>${tabbar("today")}`;
+}
+const sheetTop = (habit, date)=>`<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b class="two-line"><small>${habit}</small>${date}</b><span class="btn"></span></div>`;
+function m2Day(style){
+  return sheetTop("Read","Tuesday 10 November")+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Nothing logged</b></div>
+  <div class="two">${sysbtn("Mark done")}</div>`;
+}
+function m2DayCount(style){
+  return sheetTop("Drink water","Tuesday 10 November")+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Nothing logged</b></div>
+  <div class="amt"><span>Amount to add or take away</span><b class="num typed big" role="textbox" aria-label="Amount">1</b></div>
+  <div class="two">${sysbtn("Add")}</div>`;
+}
+function m2DayLogged(style){
+  return sheetTop("Drink water","Saturday 7 November")+`<div class="bigcount"><b class="num">5</b><span>of 8 glasses that day</span></div>
+  <div class="amt"><span>Amount to add or take away</span><b class="num typed big" role="textbox" aria-label="Amount">1</b></div>
+  <div class="two">${sysbtn("Add")}</div>
+  <p class="note links"><span class="lnk">Take away</span><span class="lnk">Clear this day</span></p>`;
+}
+function m2DayDone(style){
+  return sheetTop("Read","Monday 9 November")+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Done</b></div>
+  <p class="note links"><span class="lnk">Clear this day</span></p>`;
+}
+function m2DayOff(style){
+  return sheetTop("Read","Thursday 12 November")+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Not scheduled</b></div>
+  <p class="note" style="text-align:center;margin-bottom:14px">A log here still counts.</p>
+  <div class="two">${sysbtn("Mark done")}</div>`;
+}
+function m2DayUndo(style){
+  return detailTop(1)+monthHead+`${monthGrid(style,false,false,7)}${addPast}${since}
+  <div class="stats tight">${stat("Days logged","170")}${stat("Glasses","1,099")}${stat("Days done","142")}</div>
+  <div class="undo inflow"><span>Cleared 7 November</span><b>Undo</b></div>${tabbar("today")}`;
+}
+function m2Progress(style){
+  // "off" is a day the habit is not scheduled. It shows a small dot. Sunday 15 is still to come.
+  const P = [["drop","Drink water",["solid","blank","solid","off","solid","hatched","blank"]],["book","Read",["solid","solid","solid","solid","solid","solid","blank"]],
+             ["leaf","Walk outside",["solid","off","off","solid","solid","off","off"]],["pill","Take vitamins",["solid","solid","blank","solid","solid","solid","blank"]],
+             ["moon","Stretch before bed",["blank","blank","solid","blank","solid","blank","blank"]]];
+  const cell = (x,i)=> `<span class="lc ${i===5?"now":""} ${i>5?"later":""}">${i>5 ? "" : x==="off" ? offDot(20) : mark(x,{style,size:20})}</span>`;
+  return status()+`<div class="nav"><span></span><span></span></div>${head("History")}
+  <div class="seg"><span class="on">Week</span><span>Month</span></div>
+  <div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="ledger"><div class="lh">${"MTWTFSS".split("").map((d,i)=>`<span class="${i===5?"now":""}">${d}</span>`).join("")}</div>
+  ${P.map(([ic,n,st])=>`<div class="lr" role="button"><span class="ln">${icon(ic,22)}${n}</span><div class="lcs">${st.map(cell).join("")}</div></div>`).join("")}</div>
+  <p class="note hint">Tap a habit to open it. Tap a day to add or change a log. A dot is a day the habit is not scheduled.</p>${tabbar("progress")}`;
+}
+function m2You(style){
+  return status()+`<div class="nav"><span></span><span></span></div>${head("You")}
+  <div class="sec">Look</div><div class="opt">Appearance<span class="val">Paper, Blue</span><span class="go">${chev}</span></div>
+  <div class="sec">History</div><div class="opt">Show runs<span class="tog"></span></div><div class="opt">Show days not logged<span class="tog"></span></div>
+  <p class="note hint">A run counts the scheduled days in a row with any log, even a small one. Days not logged adds an empty outline to past days.</p>
+  <div class="sec">Your data</div><div class="opt">Export a copy</div><div class="opt">Import a copy</div>
+  <p class="note hint">Your data lives on this device only. Export a copy now and then.</p>
+  <div class="sec">Use</div><div class="opt">Controls on the left<span class="tog"></span></div><div class="opt">Day starts at<span class="val">04:00</span><span class="go">${chev}</span></div>
+  <div class="sec">Help</div><div class="opt">What the marks mean<span class="go">${chev}</span></div>${tabbar("you")}`;
+}
+const impTop = right=>`<div class="grab"></div><div class="nav sheetnav"><span class="btn">${right?"Cancel":""}</span><b>Import</b><span class="btn">${right?"":"<b>Done</b>"}</span></div>`;
+function m2ImportPreview(style){
+  return impTop(true)+`<div class="bigcount" style="margin-top:14px"><b class="daystate">This file holds</b></div>
+  <div class="stats">${stat("Habits","7")}${stat("Logs","1,692")}${stat("New habits","2")}${stat("New logs","212")}</div>
+  <p class="note hint">1 habit has different details in this file. The version on this device is kept. Nothing here will be replaced.</p>
+  <div class="two" style="margin-top:16px">${sysbtn("Import")}</div>`;
+}
+function m2Import(style){
+  return impTop(false)+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Imported</b></div>
+  <div class="stats">${stat("Habits added","2")}${stat("Logs added","212")}${stat("Already here, skipped","1,480")}</div>
+  <p class="note hint">Nothing was replaced. Importing the same file again adds nothing.</p>`;
+}
+function m2ImportNothing(style){
+  return impTop(false)+`<div class="bigcount" style="margin-top:14px"><b class="daystate">Nothing new in this file</b></div>
+  <p class="note" style="text-align:center">Everything in it is already here. Nothing was changed.</p>`;
+}
+function m2ImportFail(style){
+  return impTop(false)+`<div class="bigcount" style="margin-top:14px"><b class="daystate">This is not a Habit export</b></div>
+  <p class="note" style="text-align:center">Nothing was changed.</p>
+  <div class="two" style="margin-top:14px">${sysbtn("Choose another file")}</div>`;
+}
+function m2ImportNewer(style){
+  return impTop(false)+`<div class="bigcount" style="margin-top:14px"><b class="daystate">This file is from a newer version of Habit</b></div>
+  <p class="note" style="text-align:center">Update Habit on this device, then import again. Nothing was changed.</p>`;
+}
+function m2Empty(style){
+  return status()+`<div class="nav"><span></span><span class="btn" aria-label="Add habit">${plus}</span></div>
+  ${head("Today","Saturday 14 November")}
+  <div class="empty"><p class="big">Nothing to track yet</p><p>Add one small thing you would like to do most days.</p>${sysbtn("Add a habit")}<span class="lnk" style="margin-top:6px;font:600 15px/1.4 var(--ui)">Import a copy</span></div>${tabbar("today")}`;
+}
+
+/* ---------- milestone 3 screens: pausing and one Home Screen widget ---------- */
+const PAUSED_ALL = ["paused","extra","paused","paused","paused","paused"];
+const pill = t=>`<span class="pill">${t}</span>`;
+const pausedRows = style=>`<div class="list">${HABITS.map((h,i)=>row(i===0?{...h,count:false}:h,style,PAUSED_ALL[i],i===0?pill("0 glasses"):(i===1?"Logged while paused":""))).join("")}</div>`;
+const pauseGlyph = `<svg class="pg" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="6"/><path d="M5.4 4.6v4.8M8.6 4.6v4.8"/></svg>`;
+const HELP = "Paused days leave your runs as they are. You can still log.";
+const banner = (b, rest, btn)=>`<p class="note"><b>${b}</b> ${rest}</p><div class="noteact"><span class="sysbtn ghost small">${btn}</span></div>`;
+const quiet = t=>`<p class="note quiet"><span class="lnk">${pauseGlyph}${t}</span></p>`;
+function m3Today(style){ return m1Head()+`<div class="list">${HABITS.map(h=>row(h,style)).join("")}</div>${nst(false)}${quiet("Pause everything")}${tabbar("today")}`; }
+function m3PausedNew(style){ return m1Head()+banner("Everything is paused.",HELP,"Undo pause")+pausedRows(style)+quiet("Undo pause")+tabbar("today"); }
+function m3Paused(style){ return m1Head()+banner("Everything is paused.",HELP,"Resume tomorrow")+pausedRows(style)+tabbar("today"); }
+function m3Ending(style){ return m1Head()+banner("Resumes tomorrow.","Today stays paused. You can still log.","Keep paused")+pausedRows(style)+tabbar("today"); }
+function m3Dates(style){ return m1Head()+banner("Paused until 27 November.",HELP,"Resume tomorrow")+pausedRows(style)+tabbar("today"); }
+function m3OnePaused(style){
+  return m1Head()+`<div class="list">${HABITS.map((h,i)=>i===2?row(h,style,"paused","Paused"):row(h,style)).join("")}</div>${nst(false)}${quiet("Pause everything")}${tabbar("today")}`;
+}
+function m3Menu(style){
+  return m1Head()+`<div class="list dim">${HABITS.map(h=>row(h,style)).join("")}</div>
+  <div class="menu" role="menu"><div>Details</div><div>Edit</div><div>Move</div><div>Pause this habit</div><div>Archive</div></div>${tabbar("today")}`;
+}
+function m3MenuPaused(style){
+  return m1Head()+`<div class="list dim">${HABITS.map((h,i)=>i===2?row(h,style,"paused","Paused"):row(h,style)).join("")}</div>
+  <div class="menu" role="menu"><div>Details</div><div>Edit</div><div>Move</div><div>Resume tomorrow</div><div>Archive</div></div>${tabbar("today")}`;
+}
+function m3You(style, state){
+  return status()+`<div class="nav"><span></span><span></span></div>${head("You")}
+  <div class="sec">Look</div><div class="opt">Appearance<span class="val">Paper, Blue</span><span class="go">${chev}</span></div>
+  <div class="sec">${pauseGlyph}Gentle Mode</div>
+  <div class="opt desc"><span class="ol">Pause everything<small>Until you turn it off.</small></span><span class="tog ${state==="all"?"on":""}"></span></div>
+  <div class="opt desc"><span class="ol">Pause for dates<small>${state==="dates"?"20 to 27 November":"Choose a first and last day. Dates can be in the past."}</small></span><span class="go">${chev}</span></div>
+  <p class="note hint">${HELP}</p>
+  <div class="sec">History</div><div class="opt">Show runs<span class="tog"></span></div><div class="opt">Show days not logged<span class="tog"></span></div>
+  <div class="sec">Your data</div><div class="opt">Export a copy</div><div class="opt">Import a copy</div>
+  <div class="sec">Use</div><div class="opt">Controls on the left<span class="tog"></span></div><div class="opt">Day starts at<span class="val">04:00</span><span class="go">${chev}</span></div>${tabbar("you")}`;
+}
+const m3YouAll = s=>m3You(s,"all"), m3YouDates = s=>m3You(s,"dates");
+function m3PauseList(style){
+  return status()+`<div class="nav"><span class="btn">${chev}&nbsp;You</span><span class="btn" aria-label="Add dates">${plus}</span></div>${head("Pause for dates")}
+  <div class="sec">Coming</div><div class="opt">20 to 27 November<span class="go">${chev}</span></div>
+  <div class="sec">Earlier</div><div class="opt">3 to 5 October<span class="val">Everything</span><span class="go">${chev}</span></div>
+  <div class="opt">14 to 22 August<span class="go">${chev}</span></div>
+  <p class="note hint">Open one to change its dates. ${HELP}</p>${tabbar("you")}`;
+}
+function m3Form(style, mode){
+  const set = mode!=="new";
+  return `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>Pause for dates</b><span class="btn"><b class="${set?"":"dis"}">Save</b></span></div>
+  <div class="frow"><span>First day</span><span class="val datev">${mode==="past"?"Sat 3 Oct 2026":set?"Fri 20 Nov 2026":"Today"}</span></div>
+  <div class="frow"><span>Last day</span><span class="val datev">${mode==="past"?"Mon 5 Oct 2026":set?"Fri 27 Nov 2026":"Choose a date"}</span></div>
+  <p class="note hint">Every habit is paused on these days. The dates can be in the past.</p>
+  ${mode==="past"?`<p class="note hint">With these dates, 2 logged days will show as logged while paused.</p>`:""}
+  ${mode==="future"?`<div class="noteact" style="margin-top:18px"><span class="sysbtn ghost">Remove</span></div>`:""}`;
+}
+const m3FormFuture = s=>m3Form(s,"future"), m3FormPast = s=>m3Form(s,"past"), m3FormNew = s=>m3Form(s,"new");
+function m3EditPause(style, paused){
+  return `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>Edit habit</b><span class="btn"><b>Save</b></span></div>
+  <div class="sec">Name</div><div class="field nm">Walk outside</div>
+  <div class="sec">Days</div><div class="dayrow">${"MTWTFSS".split("").map(d=>`<span class="dayb on">${d}</span>`).join("")}</div><p class="note hint">Every day</p>
+  <div class="sec">Pause</div>
+  ${paused?`<div class="frow"><span>Paused since</span><span class="val">Tue 10 Nov</span></div><div class="noteact" style="margin-top:14px"><span class="sysbtn ghost">Resume tomorrow</span></div>`
+          :`<div class="noteact"><span class="sysbtn ghost">Pause this habit</span></div>`}
+  <p class="note hint">${paused?"It starts again tomorrow. You can still log today.":"It stays paused until you resume it. "+HELP}</p>
+  <div class="sec" style="margin-top:44px">Archive</div><div class="noteact"><span class="sysbtn ghost">Archive habit</span></div>
+  <p class="note hint">You can bring it back at any time. Its history is kept.</p>`;
+}
+const m3EditPaused = s=>m3EditPause(s,true);
+// The widget. Rows keep Today's order. The whole row is the button and logs through LogHabitIntent.
+const wrow = (h,style,st)=>`<div class="wr" role="button"><span class="wn">${icon(h.icon,20)}<b>${h.name}</b></span>${mark(st||h.state,{style,size:24,today:true,ctl:true,plus:false})}</div>`;
+const WH = [HABITS[0],HABITS[1],HABITS[3],HABITS[2],HABITS[4]];
+function m3WidgetSmall(style){ return `<div class="wtitle">Today</div>${WH.slice(0,3).map(h=>wrow(h,style)).join("")}`; }
+function m3WidgetMed(style){ return `<div class="wtitle">Today<span>Saturday 14 November</span></div><div class="wcols">${WH.slice(0,4).map(h=>wrow(h,style)).join("")}</div>`; }
+function m3WidgetDone(style){ return `<div class="wtitle">Today</div>${WH.slice(0,3).map(h=>wrow(h,style,"solid")).join("")}`; }
+function m3WidgetPaused(style){ return `<div class="wtitle">Today<span>${pauseGlyph}Paused</span></div>${WH.slice(0,3).map((h,i)=>wrow(h,style,i===1?"extra":"paused")).join("")}`; }
+function m3WidgetEmpty(style){ return `<div class="wtitle">Today</div><p class="wnote">Nothing to track yet.</p><p class="wnote"><b>Add a habit</b></p>`; }
+function m3WidgetNone(style){ return `<div class="wtitle">Today</div><p class="wnote">Nothing scheduled today.</p>`; }
+
+/* ---------- largest text size (AX5), milestones 2 and 3 ---------- */
+const axView = v=>`<div class="opt axview" role="button">View: ${v}<span class="go">${chev}</span></div>`;
+const axDetailTop = v=>status()+`<div class="nav"><span class="btn">${chev}&nbsp;Today</span><span class="btn">Edit</span></div>${head("Drink water")}${axView(v)}`;
+function axMonth(style){
+  const W = [["9 to 15 November","3 done, 1 part done"],["2 to 8 November","3 done, 1 part done, 2 paused"],["26 October to 1 November","6 done"]];
+  return axDetailTop("Month")+`<div class="month"><b class="plink">November 2026</b></div><div class="mnav axnav"><i>${chev}</i><i class="off">${chev}</i></div>
+  <div class="axlist">${W.map(([m,t])=>`<div class="axr" role="button"><span><b>${m}</b><small>${t}</small></span></div>`).join("")}</div>${addPast}`;
+}
+function axWeek(style){
+  const W = [["Mon 9","solid","8 glasses"],["Tue 10","blank","Nothing logged"],["Wed 11","solid","8 glasses"],["Thu 12","off","Not scheduled"],["Fri 13","solid","8 glasses"],["Sat 14","hatched","3 glasses"],["Sun 15","future","To come"]];
+  return axDetailTop("Week")+`<div class="month"><b class="plink">9 to 15 November</b></div>
+  <div class="axlist">${W.map(([d,st,t],i)=>`<div class="axr" role="button"><i class="axm">${st==="off"?offDot(52):mark(st,{style,size:52,today:i===5})}</i><span><b>${d}</b><small>${t}</small></span></div>`).join("")}</div>`;
+}
+function axYear(style){
+  const M = [["November","9 done, 2 part done, 2 paused"],["October","24 done, 2 part done"],["September","19 done, 4 part done, 3 paused"],["August","22 done, 1 part done"]];
+  return axDetailTop("Year")+`<div class="month"><b class="plink">2026</b></div>
+  <div class="axlist">${M.map(([m,t])=>`<div class="axr" role="button"><span><b>${m}</b><small>${t}</small></span></div>`).join("")}</div>`;
+}
+function axHistory(style){
+  const P = [["drop","Drink water",["solid","blank","solid","off","solid","hatched","blank"]],["book","Read",["solid","solid","solid","solid","solid","solid","blank"]],["leaf","Walk outside",["solid","off","off","solid","solid","off","off"]]];
+  const cell = (x,i)=> `<span class="lc ${i===5?"now":""}">${i>5 ? "" : x==="off" ? offDot(30) : mark(x,{style,size:30})}</span>`;
+  return status()+`<div class="nav"><span></span><span></span></div>${head("History")}${axView("Week")}
+  <div class="month"><b class="plink">9 to 15 November</b></div>
+  <div class="ledger"><div class="lh">${"MTWTFSS".split("").map((d,i)=>`<span class="${i===5?"now":""}">${d}</span>`).join("")}</div>
+  ${P.map(([ic,n,st])=>`<div class="lr" role="button"><span class="ln">${n}</span><div class="lcs">${st.map(cell).join("")}</div></div>`).join("")}</div>`;
+}
+function axDay(style){
+  return `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><span></span><span class="btn"></span></div>
+  ${head("Sat 7 Nov","Drink water")}
+  <div class="bigcount"><b class="num">5</b><span>of 8 glasses that day</span></div>
+  <div class="amt"><span>Amount</span><b class="num typed big" role="textbox" aria-label="Amount">1</b></div>
+  <div class="axbtns">${sysbtn("Add")}<span class="sysbtn ghost">Take away</span><span class="sysbtn ghost">Clear this day</span></div>`;
+}
+function axPaused(style){
+  return m1Head()+`<p class="note"><b>Everything is paused.</b></p><div class="noteact"><span class="sysbtn ghost">Undo pause</span></div>
+  <div class="list">${[{...HABITS[0],count:false},HABITS[1]].map((h,i)=>row(h,style,i?"extra":"paused",i?"Logged while paused":pill("0 glasses"),52)).join("")}</div>`;
+}
+function axYou(style){
+  return status()+`<div class="nav"><span></span><span></span></div>${head("You")}
+  <div class="sec">${pauseGlyph}Gentle Mode</div>
+  <div class="opt desc"><span class="ol">Pause everything<small>Until you turn it off.</small></span></div><div class="axtog"><span class="tog"></span><b>Off</b></div>
+  <div class="opt desc"><span class="ol">Pause for dates<small>Choose a first and last day. Dates can be in the past.</small></span></div>
+  <p class="note hint">${HELP}</p>`;
+}
+function axWidget(style){ return `<div class="wtitle">Today</div>${WH.slice(0,2).map(h=>`<div class="wr" role="button"><span class="wn"><b>${h.name}</b></span>${mark(h.state,{style,size:34,today:true,ctl:true})}</div>`).join("")}`; }
+
+/* ---------- Mac window, milestones 2 and 3 ---------- */
+// The sidebar takes the place of the tab bar. Back, Add and Edit sit in the window toolbar. Settings is its own window.
+const macWin = (on, tb, body, over, cls)=>{ const side = [["today","Today"],["progress","History"]].map(([k,l])=>`<div class="it ${k===on?"on":""}">${tabIcon(k)}${l}</div>`).join("");
+  return `<div class="side"><div class="lights"><i></i><i></i><i></i></div>${side}</div><div class="main"><div class="mtool">${tb}</div><div class="page ${cls||""}">${body}</div>${over?`<div class="macsheet">${over}</div>`:""}</div>`; };
+const tbAdd = `<span></span><span class="tbi" aria-label="New habit">${plus}</span>`;
+const tbDetail = `<span class="tbi" aria-label="Back">${chev}</span><span class="tbt">Edit</span>`;
+const click = t=>t.replace(/Tap a /g,"Click a ").replace(/Tap a/g,"Click a");
+const macToday = s=>macWin("today", tbAdd, m3Today(s), "", "sel");
+const macPaused = s=>macWin("today", tbAdd, m3PausedNew(s));
+const macDetail = s=>macWin("today", tbDetail, click(m2MonthRuns(s)));
+const macDay = s=>macWin("today", tbDetail, click(m2Month(s)), m2DayLogged(s));
+function macHistory(style){
+  const P = [["drop","Drink water",["solid","blank","solid","off","solid","hatched","blank"]],["book","Read",["solid","solid","solid","solid","solid","solid","blank"]],
+             ["leaf","Walk outside",["solid","off","off","solid","solid","off","off"]],["pill","Take vitamins",["solid","solid","blank","solid","solid","solid","blank"]],
+             ["moon","Stretch before bed",["blank","blank","solid","blank","solid","blank","blank"]]];
+  const cell = (x,i)=> `<span class="lc ${i===5?"now":""}">${i>5 ? "" : x==="off" ? offDot(20) : mark(x,{style,size:20})}</span>`;
+  return macWin("progress", `<span></span><span></span>`, `${head("History")}
+  <div class="seg"><span class="on">Week</span><span>Month</span></div>
+  <div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="ledger wide"><div class="lr lhr"><span></span><div class="lh">${"MTWTFSS".split("").map((d,i)=>`<span class="${i===5?"now":""}">${d}</span>`).join("")}</div></div>
+  ${P.map(([ic,n,st])=>`<div class="lr" role="button"><span class="ln">${icon(ic,22)}${n}</span><div class="lcs">${st.map(cell).join("")}</div></div>`).join("")}</div>
+  <p class="note hint">Click a habit to open it. Click a day to add or change a log. A dot is a day the habit is not scheduled.</p>`, "", "widepage");
+}
+const macSettings = s=>`<div class="stitle"><div class="lights"><i></i><i></i><i></i></div><b>Settings</b></div>
+  <div class="sec">Look</div><div class="opt">Appearance<span class="val">Paper, Blue</span><span class="go">${chev}</span></div>
+  <div class="sec">History</div><div class="opt">Show runs<span class="tog"></span></div><div class="opt">Show days not logged<span class="tog"></span></div>
+  <p class="note hint">A run counts the scheduled days in a row with any log, even a small one. Days not logged adds an empty outline to past days.</p>
+  <div class="sec">Use</div><div class="opt">Day starts at<span class="val">04:00</span><span class="go">${chev}</span></div>`;
+const mm = (title, items, cls)=>`<div class="mmenu ${cls}"><b>${title}</b>${items.map(x=>x?`<div><span>${x[0]}</span><kbd>${x[1]}</kbd></div>`:`<hr>`).join("")}</div>`;
+const macMenu = s=>`<div class="menubar"><b>Habit</b><span>File</span><span>Edit</span><span>Habit</span><span>View</span><span>Window</span><span>Help</span></div>
+  ${mm("Habit (app)",[["Settings…","⌘,"]],"c0")}
+  ${mm("File",[["New Habit","⌘N"],null,["Export a Copy…","⇧⌘E"],["Import a Copy…","⇧⌘I"]],"c0 r2")}
+  ${mm("Edit",[["Undo Log","⌘Z"],["Redo","⇧⌘Z"]],"c0 r3")}
+  ${mm("Habit",[["Log","⌘↩"],["Add an Amount…","⌘L"],null,["Details","⌘I"],["Edit…","⌘E"],["Pause This Habit",""],["Archive","⌘⌫"],null,["Pause Everything","⇧⌘P"],["Pause for Dates…",""],null,["Add a Past Day…","⇧⌘D"]],"c1")}
+  ${mm("View",[["Today","⌘1"],["History","⌘2"],null,["Week","⌥⌘1"],["Month","⌥⌘2"],["Year","⌥⌘3"],null,["Back","⌘["],["Previous Period","⌘←"],["Next Period","⌘→"],["Go to Today","⌘T"]],"c2")}`;
+
+/* ---------- History: month, no habits, many habits ---------- */
+const HP = [["drop","Drink water",3],["book","Read",-1],["leaf","Walk outside",1],["pill","Take vitamins",-1],["moon","Stretch before bed",-1]];
+function histStrip(style, hi, offDow){
+  // November 2026 starts on a Sunday. Days after the 14th are still to come and draw nothing.
+  let out = "";
+  for(let d=1; d<=30; d++){
+    const dow = (d+5)%7, k = (d*7 + hi*5) % 11;
+    let st = d>14 ? "none" : dow===offDow ? "off" : (hi===0 && d>=5 && d<=8 ? (d===7?"extra":"paused") : k<6?"solid":k<8?"hatched":"blank");
+    out += `<i class="hs ${dow===0?"mon":""} ${st==="off"?"yoff":""}">${st==="none"||st==="off"?"":ycell(st,style,d===14)}</i>`;
+  }
+  return out;
+}
+function m2HistMonth(style){
+  const hdr = Array.from({length:30},(_,i)=>{ const d=i+1, dow=(d+5)%7; return `<i class="hs ${dow===0?"mon":""}">${dow===0?`<b>${d}</b>`:""}</i>`; }).join("");
+  return status()+`<div class="nav"><span></span><span></span></div>${head("History")}
+  <div class="seg"><span>Week</span><span class="on">Month</span></div>
+  <div class="month"><b class="plink">November 2026</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="ledger"><div class="hstrip hh">${hdr}</div>
+  ${HP.map(([ic,n,off],i)=>`<div class="lr hm" role="button"><span class="ln">${icon(ic,22)}${n}</span><div class="hstrip">${histStrip(style,i,off)}</div></div>`).join("")}</div>
+  <p class="note hint">Tap a habit to open its month.</p>
+  <div class="ykey">${[["solid","Done"],["hatched","Part done"],["paused","Paused"],["extra","Logged while paused"]].map(([st,l])=>`<div><i>${ycell(st,style)}</i>${l}</div>`).join("")}<div><i class="yoff"></i>Not scheduled</div></div>${tabbar("progress")}`;
+}
+function m2HistEmpty(style){
+  return status()+`<div class="nav"><span></span><span></span></div>${head("History")}
+  <div class="empty"><p class="big">No habits yet</p><p>Add a habit and its days will show here.</p>${sysbtn("Add a habit")}</div>${tabbar("progress")}`;
+}
+function m2HistMany(style){
+  const names = ["Stretch before bed","Floss","Call a friend","Tidy the desk","Practise guitar","Take a break outside","Plan tomorrow"];
+  const cell = (x,i)=> `<span class="lc ${i===5?"now":""}">${i>5 ? "" : x==="off" ? offDot(20) : mark(x,{style,size:20})}</span>`;
+  const st = i=>[0,1,2,3,4,5,6].map(d=>d===6?"blank":((i*3+d*5)%7<4?"solid":(i+d)%5===0?"off":"blank"));
+  return status()+`<div class="pinned"><div class="seg"><span class="on">Week</span><span>Month</span></div>
+  <div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="ledger"><div class="lh">${"MTWTFSS".split("").map((d,i)=>`<span class="${i===5?"now":""}">${d}</span>`).join("")}</div></div></div>
+  <div class="ledger">${names.map((n,i)=>`<div class="lr" role="button"><span class="ln">${n}</span><div class="lcs">${st(i).map(cell).join("")}</div></div>`).join("")}
+  <div class="sec" style="margin:18px 0 0">Archived</div><div class="lr" role="button"><span class="ln">Morning pages</span><div class="lcs">${["solid","solid","blank","blank","blank","blank","blank"].map((x,i)=>`<span class="lc">${mark(x,{style,size:20})}</span>`).join("")}</div></div></div>
+  <p class="note hint">Tap a habit to open it. Tap a day to add or change a log. A dot is a day the habit is not scheduled.</p>${tabbar("progress")}`;
+}
+
 /* ---------- page ---------- */
 const SCREENS = {today:[today,"Today"], detail:[detail,"Habit detail"], gentle:[gentle,"Gentle Mode on Today"], appearance:[appearance,"Appearance"], marks:[marks,"Marks board"]};
 const css = v=>Object.entries(v).map(([k,x])=>`${k}:${x}`).join(";");
@@ -666,6 +1170,64 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
              ["count","phone modal","paper",count,"Count sheet"],["edit","phone modal","paper",edit,"Edit habit, with Archive"],["you","phone","paper",you,"You"],["appearance","phone","paper",appearanceM1,"Appearance"]];
   html += `<h2 class="group">Milestone 1 screens, Pen and ink. No scene art. Three tabs. Blue marks.</h2><div class="sheet">`;
   for(const [k,cls,a,fn,label] of G) html += `<figure><div class="${cls} ${s} ${a}" data-shot="m1-${k}" style='${v(a)}'>${fn(s,a)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `</div>`; M1 = false;
+}
+{ // Milestone 2 screens
+  M1 = true;
+  const s = "penAndInk", v = css({...vars(s,"paper"), "--accent":TOKENS.swatches.blue});
+  const G = [["month","phone",m2Month,"Habit detail, month"],["month-runs","phone",m2MonthRuns,"Month, with runs and days not logged turned on"],["runs-gap","phone",m2RunsGap,"The same, after a gap"],
+             ["week","phone",m2Week,"Habit detail, week"],["year","phone",m2Year,"Habit detail, year"],["new","phone",m2New,"A habit with nothing logged"],["progress","phone",m2Progress,"History"],
+             ["hist-month","phone",m2HistMonth,"History, month"],["hist-many","phone",m2HistMany,"History, scrolled, 30 habits"],["hist-empty","phone",m2HistEmpty,"History, no habits"],["you","phone",m2You,"You"],["empty","phone",m2Empty,"Today, first run, with Import"],["day","phone modal",m2Day,"A past day, yes or no"],["day-count","phone modal",m2DayCount,"A past day, count, at zero"],
+             ["day-logged","phone modal",m2DayLogged,"A past day with a log"],["day-done","phone modal",m2DayDone,"A past day, yes or no, done"],["day-off","phone modal",m2DayOff,"A past day that was not scheduled"],["day-undo","phone",m2DayUndo,"After a past day is cleared"],
+             ["import-preview","phone modal",m2ImportPreview,"Import, before"],["import","phone modal",m2Import,"Import, done"],["import-nothing","phone modal",m2ImportNothing,"Import, nothing new"],
+             ["import-fail","phone modal",m2ImportFail,"Import, not a Habit file"],["import-newer","phone modal",m2ImportNewer,"Import, newer version"]];
+  html += `<h2 class="group">Milestone 2 screens, Pen and ink</h2><div class="sheet">`;
+  for(const [k,cls,fn,label] of G) html += `<figure><div class="${cls} ${s} paper" data-shot="m2-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `</div>`; M1 = false;
+}
+{ // History month in every style and appearance, to test whether the strip can be read
+  M1 = true;
+  html += `<h2 class="group">History month, every style</h2><div class="sheet">`;
+  for(const s of ["penAndInk","pencil","watercolor"]) for(const ap of ["paper","ink"]){
+    const v = css({...vars(s,ap), "--accent":TOKENS.swatches.blue});
+    html += `<figure><div class="phone ${s} ${ap}" data-shot="hm-${s}-${ap}" style='${v}'>${m2HistMonth(s)}</div><figcaption>${s}, ${ap}</figcaption></figure>`;
+  }
+  html += `</div>`; M1 = false;
+}
+{ // Milestone 3 screens
+  M1 = true;
+  const s = "penAndInk", v = css({...vars(s,"paper"), "--accent":TOKENS.swatches.blue}), vt = css({...vars(s,"ink"), "--accent":"#F3EFE6", "--paper":"#3A3A3C"});
+  const G = [["today","phone",m3Today,"Today, with Pause everything"],["paused-new","phone",m3PausedNew,"Paused today"],["paused","phone",m3Paused,"Paused since an earlier day"],
+             ["ending","phone",m3Ending,"After Resume tomorrow"],["dates","phone",m3Dates,"Paused for dates"],["one-paused","phone",m3OnePaused,"One habit paused"],["menu","phone",m3Menu,"Row menu"],
+             ["menu-paused","phone",m3MenuPaused,"Row menu, paused habit"],["you","phone",m3You,"You, with Pausing"],["you-all","phone",m3YouAll,"You, everything paused"],["you-dates","phone",m3YouDates,"You, dates set"],
+             ["list","phone",m3PauseList,"Pause for dates, list"],["form-new","phone modal",m3FormNew,"Dates, new"],["form-future","phone modal",m3FormFuture,"Dates, coming"],
+             ["form-past","phone modal",m3FormPast,"Dates, in the past"],["edit-pause","phone modal",m3EditPause,"Edit, pause one habit"],["edit-paused","phone modal",m3EditPaused,"Edit, a paused habit"],
+             ["w-small","widget",m3WidgetSmall,"Widget, small"],["w-done","widget",m3WidgetDone,"Widget, all done"],["w-paused","widget",m3WidgetPaused,"Widget, paused"],["w-empty","widget",m3WidgetEmpty,"Widget, no habits"],
+             ["w-none","widget",m3WidgetNone,"Widget, nothing scheduled"],["w-med","widget med",m3WidgetMed,"Widget, medium"]];
+  html += `<h2 class="group">Milestone 3 screens, Pen and ink</h2><div class="sheet">`;
+  for(const [k,cls,fn,label] of G) html += `<figure><div class="${cls} ${s} paper" data-shot="m3-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `<figure><div class="widget ${s} ink" data-shot="m3-w-tinted" style='${vt}'>${m3WidgetSmall(s)}</div><figcaption>Widget, tinted mode. The system sets the colour</figcaption></figure>`;
+  html += `<figure><div class="wclear"><div class="widget ${s} ink clear" data-shot="m3-w-clear" style='${vt}'>${m3WidgetSmall(s)}</div></div><figcaption>Widget, clear mode, over a wallpaper</figcaption></figure>`;
+  html += `</div>`; M1 = false;
+}
+{ // Largest text size, milestones 2 and 3
+  M1 = true;
+  const s = "penAndInk", v = css({...vars(s,"paper"), "--accent":TOKENS.swatches.blue});
+  const G = [["month","phone ax5",axMonth,"Habit detail, month"],["week","phone ax5",axWeek,"Habit detail, week as rows"],["year","phone ax5",axYear,"Habit detail, year as a list"],
+             ["history","phone ax5",axHistory,"History"],["day","phone modal ax5",axDay,"A past day with a log"],["paused","phone ax5",axPaused,"Today, paused"],["you","phone ax5",axYou,"You, Gentle Mode"],
+             ["widget","widget axw",axWidget,"Widget at its largest text"]];
+  html += `<h2 class="group">Largest text size (AX5), milestones 2 and 3</h2><div class="sheet">`;
+  for(const [k,cls,fn,label] of G) html += `<figure><div class="${cls} ${s} paper" data-shot="ax-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `</div>`; M1 = false;
+}
+{ // Mac window, milestones 2 and 3
+  M1 = true;
+  const s = "penAndInk", v = css({...vars(s,"paper"), "--accent":TOKENS.swatches.blue});
+  const G = [["today",macToday,"Mac, Today, with a row selected"],["paused",macPaused,"Mac, Today paused"],["detail",macDetail,"Mac, Habit detail"],["history",macHistory,"Mac, History"],["day",macDay,"Mac, a past day as a sheet"]];
+  html += `<h2 class="group">Mac window, milestones 2 and 3</h2><div class="sheet">`;
+  for(const [k,fn,label] of G) html += `<figure><div class="mac ${s} paper" data-shot="mac-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `<figure><div class="macset ${s} paper" data-shot="mac-settings" style='${v}'>${macSettings(s)}</div><figcaption>Mac, Settings window</figcaption></figure>`;
+  html += `<figure><div class="macmenus ${s} paper" data-shot="mac-menus" style='${v}'>${macMenu(s)}</div><figcaption>Mac, menu bar commands</figcaption></figure>`;
   html += `</div>`; M1 = false;
 }
 for(const [style,list] of Object.entries(FONTS)){

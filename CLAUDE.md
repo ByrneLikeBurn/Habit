@@ -18,7 +18,9 @@ This file is the project brief for every session. `docs/spec.md` records decisio
 
 The owner set this on 14 November 2026. The brief began as an idea. Development follows evidence. Where an expert review disagrees with this file on design, UI or UX, and the change serves the user, the review wins. Every such change is written in `docs/decisions.md` with the review that asked for it, and is reported to the owner with two or three sentences that say what changed and why.
 
-This does not cover privacy, what leaves the device, dependencies, the additive schema rule, or cost. Those stay with the owner. Where two reviews disagree, the owner decides.
+This does not cover privacy, what leaves the device, dependencies, the additive schema rule, or cost. Those stay with the owner. Where two reviews disagree, do not treat it as a choice between the two. First look for an option neither review considered that meets what both are protecting. Change the vantage point and widen the view: ask what each review is trying to prevent, and whether one design prevents both. Then put the options, the third one included, back to the reviews that disagreed and have them test it against each other's concern. If they land on one course, take it, record it and report it. Bring it to the owner only when no clear course comes out.
+
+Nothing goes to the owner for review until the expert reviews have seen it. The owner set this on 15 November 2026, to cut delays and misdirection from the human step. Reports to the owner say what was decided and why, in two or three sentences each. They ask a question only when the reviews could not settle it, or when the matter is one of those listed above as the owner's. The test is that every addition adds value, earns its place, and fits the vision and the reviews.
 
 ## Invariants
 
@@ -28,7 +30,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 2. **Colour carries no meaning.** Heat-map intensity is hatching density, never hue. The user's accent tints marks only, never text, never rules. Text contrast is a fixed constant the user cannot break.
 3. **Pausing only ever helps.** A paused day with no log never breaks a run and never extends it. A paused day with a log extends it. The app calls such a day "Logged while paused". The streak function has unit tests that assert exactly this.
 4. **Every input is optional.** NFC, widgets and the Watch are shortcuts, not dependencies. Losing a tag breaks nothing.
-5. **One write path.** Every `LogEvent` is written by one App Intent, `LogHabitIntent`. Widget button, Shortcuts and NFC, Control Centre, Action button, Siri and in-app taps all route through it.
+5. **One write path.** Every `LogEvent` is created in `LogWriter`. A user log reaches it only through `LogHabitIntent`: widget button, Shortcuts and NFC, Control Centre, Action button, Siri and in-app taps all route through it. Import reaches it only through `LogWriter.importEvents`, which writes all of a file or none. The owner approved this wording on 15 November 2026.
 6. **Time of day carries no habit meaning.** Palettes follow the clock. They never react to streaks, misses, pauses, counts or completion.
 7. **Scenes are calm.** No people, animals, buildings or weather. One soft horizon. Nothing moves. No true red in any palette. Scenes appear in one framed card at the top of Today and nowhere else, never behind text, rows or marks.
 8. **System chrome stays system.** Tab bar, navigation bars, sheets, alerts and the keyboard are not restyled or covered.
@@ -57,7 +59,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 - Text contrast floor, every style, paper / ink: body 17.7:1 / 16.2:1, secondary 6.8:1 / 8.3:1, tertiary 4.8:1 / 5.1:1. Measured against the worst pixel of the style's paper.
 - State is carried by shape, never by wash colour or intensity.
-- Mark states: solid (done), hatched (part done), centred dash (paused), diamond (logged while paused), blank (off schedule, or nothing logged), dashed outline at reduced opacity (to come). Today is an outline overlaid on the day's state.
+- Mark states: solid (done), hatched (part done), centred dash (paused), diamond (logged while paused), small dot (off schedule), blank (nothing logged), dashed outline at reduced opacity (to come). Today is an outline overlaid on the day's state.
 - A past day with no log draws nothing. The empty outline for such a day, and the current run, appear only when the user turns on "Show days not logged". The owner decided this on 14 November 2026.
 - The year view carries state by small shapes, never by opacity. The owner decided this on 14 November 2026.
 - The user's accent choice comes first. Following the palette is the default option, not a rule. A custom colour is picked by hue. Any hue is allowed, red included. The app sets its lightness so marks keep 3:1. The app's own tokens, swatches and palettes never use red.
@@ -113,6 +115,36 @@ These outrank every other instruction. Violating one is a bug, however good the 
 - The reviews ran as separate subagents and their findings are in the report
 
 **Review lenses.** Each lens runs as a separate subagent that has not seen the working. It gets its brief, this file and the thing under review. It returns at most five findings, ranked, each with a file and line or a screen, and a concrete failure scenario. Valid findings are fixed. The rest are listed with the reason.
+
+**How much review a change gets.** The owner set this on 15 November 2026, after three reviewers tested it. It keeps reviews few and stops unchecked work from moving forward.
+
+1. Tag every change with the areas it touches. Only the lenses listed for those areas run. A change that touches two areas gets both sets.
+2. Easy to undo, such as a wording or drawing fix a lens asked for: that lens checks the fix, and nothing else runs.
+3. Later work builds on it, such as a written rule, a data rule, a mark's shape or how screens connect: every lens for that area passes it before the merge.
+4. Hard to undo, meaning the schema, anything that leaves the device, a dependency, cost or an invariant: those lenses, and then the owner.
+5. When the size is unclear, use the larger one. The size comes from what the change touches, not from how small it feels.
+6. Review the written rule first, then the drawing, then the build. Before anything is drawn, each lens says what it needs to see to pass.
+7. When a rule is written, compare it with what `main` already does. Compare again at the merge only if `main` has moved.
+8. A condition a lens sets is tested now, or it becomes a named gate in `docs/findings.md` for a later milestone, with the test and what happens if it fails. It is never left as a sentence in a report.
+9. Two rounds per lens per change. After that, an easy-to-undo item is recorded as owed. Anything larger stays unmerged, goes back to the lenses that disagree, and then to the owner.
+10. `docs/findings.md` is the one list of findings, each with a status: fixed, confirmed fixed, not adopted with the reason, or owed to a milestone. Every lens is given the list. Every finding names the frame, or the file and line, where it was seen, and the author looks there before acting on it.
+11. Read the gates and owed items at the start of each milestone.
+12. At each stop, record what the routed lenses missed and correct the table below.
+
+The PR body lists the areas touched, which lenses saw the final version, and what is still unchecked.
+
+| Area a change touches | Lenses that run |
+|---|---|
+| Wording and strings | Content designer, Neurodiversity expert, Tired daily user |
+| Layout, navigation and flows | UI and UX designer, Human factors, Accessibility expert, First-day user |
+| Marks, colour, contrast and type | Accessibility expert, Color vision and low vision, Typographer, Senior designer |
+| Behaviour: runs, pausing, nudges, targets | Behavioural scientist, Neurodiversity expert, Returning user |
+| Adding or cutting a screen or feature | Product owner, Senior designer |
+| Platform conventions: Mac, iPad, Watch, widgets | Apple industrial designer, Accessibility expert, Release engineer |
+| Data rules, schema and sync | Senior software engineer, QA engineer, then the owner for the schema |
+| Files, permissions, dependencies, anything leaving the device | Security and privacy expert, Release engineer, then the owner |
+| Code | Senior software engineer, QA engineer. Performance and app size when scrolling, launch or assets change |
+| Scenes | Illustrator, Color vision and low vision, Performance and app size, then the owner |
 
 After each milestone three lenses run: senior software engineer, QA engineer and tired daily user. Accessibility is added when the diff changes the UI. Security and privacy is added when the diff adds a permission, a file or a dependency. All twenty run at each stop: the end of phase 1, after milestone 3, and at the end. Run lenses two or three at a time, not all at once. The owner set this on 14 November 2026.
 
