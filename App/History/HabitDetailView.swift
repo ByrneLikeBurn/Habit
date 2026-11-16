@@ -184,7 +184,7 @@ private struct HabitDetailPage: View {
         let schedule = WeekdayText.sentence(for: habit.schedule, calendar: clock.calendar)
         guard habit.kind == .counted, let target = habit.target else { return schedule + "." }
         let amount = CountText.line(total: target, target: nil, unit: habit.unit)
-        return String(localized: "\(amount) a day. \(schedule).")
+        return String(localized: "\(amount) a day. \(schedule).", comment: "Habit detail subtitle. The daily target with its unit, then the schedule, for example: 8 glasses a day. Every day except Thursday.")
     }
 }
 
@@ -548,14 +548,16 @@ private struct StatsBlock: View {
             if habit.kind == .counted {
                 StatRow(label: String(localized: "Total"), value: unitValue)
             }
-            // Days done beside Days logged reads as a pass rate. It is a result, so it comes with Show runs.
-            if showRuns && habit.kind == .counted && habit.target != nil {
-                StatRow(label: String(localized: "Days done"), value: stats.daysDone.formatted())
-            }
             if showRuns {
                 StatRow(label: String(localized: "Current run"), value: runText)
                 if stats.longestRun > 0 {
-                    StatRow(label: String(localized: "Longest run"), value: Self.days(stats.longestRun))
+                    // After a gap the best-ever run stays, but quieter, so it is not the headline.
+                    StatRow(label: String(localized: "Longest run"), value: Self.days(stats.longestRun), quiet: isBetweenRuns)
+                }
+                // Days done beside Days logged reads as a pass rate. It is a result, so it comes with Show runs,
+                // after the runs.
+                if habit.kind == .counted && habit.target != nil {
+                    StatRow(label: String(localized: "Days done"), value: stats.daysDone.formatted())
                 }
             }
         }
@@ -568,6 +570,10 @@ private struct StatsBlock: View {
     /// The total with the unit exactly as typed, so "ml" never becomes "Ml".
     private var unitValue: String {
         CountText.line(total: stats.unitTotal, target: nil, unit: habit.unit)
+    }
+
+    private var isBetweenRuns: Bool {
+        if case .betweenRuns = stats.run { true } else { false }
     }
 
     private var runText: String {

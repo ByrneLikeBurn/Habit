@@ -204,3 +204,5 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **The run help line matches the run maths.** It now says a run counts the days in a row with any log, and days off don't break it. The old line said only scheduled days count, which could stop someone logging on a day off. Asked for by the behavioural scientist.
 
 **Counts have plural forms in a String Catalog,** and dates, week ranges and lists follow the locale. The past-day Undo line names the habit. The day sheet buttons read "Add 1, total 9". "Already here" became "Logs already here". "Details" stays as the row menu name. Asked for by the content designer.
+
+**While the current run is "Between runs", Longest run stays, second and quieter.** The neurodiversity review found the best-ever run under "Between runs" read as "you used to be better". The behavioural review wanted it kept, because a past best shows it can be done again. Both accepted it shown after Current run, smaller, in the secondary colour and with no rule. Days done moves after the runs.

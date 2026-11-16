@@ -96,7 +96,9 @@ final class AppModel {
             if logDay != clock.today {
                 let date = clock.date(for: logDay).formatted(Date.FormatStyle(timeZone: clock.calendar.timeZone).day().month(.wide).locale(clock.calendar.locale ?? .autoupdatingCurrent))
                 message = switch habit.kind {
-                case .binary: delta < 0 ? String(localized: "\(habit.name) cleared, \(date)") : String(localized: "\(habit.name) logged, \(date)")
+                case .binary: delta < 0
+                    ? String(localized: "\(habit.name) cleared, \(date)", comment: "Undo line. The habit's name, then the past day whose log was cleared, for example: Read cleared, 7 November.")
+                    : String(localized: "\(habit.name) logged, \(date)", comment: "Undo line. The habit's name, then the past day it was logged for, for example: Read logged, 7 November.")
                 case .counted: "\(date): " + CountText.line(total: newTotal, target: habit.rule(on: logDay).target, unit: habit.unit)
                 }
             } else {

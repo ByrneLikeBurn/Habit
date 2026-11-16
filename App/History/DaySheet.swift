@@ -139,13 +139,14 @@ struct DaySheet: View {
         }
         // Each button says what it makes, so a correction needs no sum.
         if let amount {
-            // The first number is the amount typed; the second is the day's new total.
-            primaryButton("Add \(amount.formatted()), total\u{00A0}\(min(total + amount, CountText.maximumAmount).formatted())") { apply(.add(amount)) }
+            primaryButton(verbatim: String(localized: "Add \(amount.formatted()), total\u{00A0}\(min(total + amount, CountText.maximumAmount).formatted())",
+                                 comment: "Day sheet button. The first number is the amount typed; the second is the day's total after adding it.")) { apply(.add(amount)) }
         } else {
             primaryButton("Add") {}.disabled(true)
         }
         if let amount, total > 0 {
-            textButton("Take away \(amount.formatted()), total\u{00A0}\(max(total - amount, 0).formatted())") { apply(.takeAway(amount)) }
+            textButton(verbatim: String(localized: "Take away \(amount.formatted()), total\u{00A0}\(max(total - amount, 0).formatted())",
+                              comment: "Day sheet button. The first number is the amount typed; the second is the day's total after taking it away.")) { apply(.takeAway(amount)) }
         } else {
             textButton("Take away") {}.disabled(true)
         }
@@ -182,8 +183,25 @@ struct DaySheet: View {
     }
 
     private func primaryButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
+        primaryButton(Text(title), action: action)
+    }
+
+    /// A label already localized with its translator comment, shown as it is.
+    private func primaryButton(verbatim title: String, action: @escaping () -> Void) -> some View {
+        primaryButton(Text(verbatim: title), action: action)
+    }
+
+    private func textButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
+        textButton(Text(title), action: action)
+    }
+
+    private func textButton(verbatim title: String, action: @escaping () -> Void) -> some View {
+        textButton(Text(verbatim: title), action: action)
+    }
+
+    private func primaryButton(_ title: Text, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(title).frame(minWidth: 96, maxWidth: typeSize.isAccessibilitySize ? .infinity : nil, minHeight: 32)
+            title.frame(minWidth: 96, maxWidth: typeSize.isAccessibilitySize ? .infinity : nil, minHeight: 32)
         }
         .buttonStyle(.borderedProminent)
         .buttonBorderShape(.capsule)
@@ -192,9 +210,9 @@ struct DaySheet: View {
         .keyboardShortcut(.defaultAction)
     }
 
-    private func textButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
+    private func textButton(_ title: Text, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(title)
+            title
                 .underline()
                 .font(style.label(.subheadline, weight: .semibold))
                 .foregroundStyle(style.text)

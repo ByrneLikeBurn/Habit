@@ -40,12 +40,6 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 4 | Pencil dark version, Pencil marks board, hand-drawn dashes for days to come | `docs/spec.md`, Pencil |
 | After MVP | Habit detail in two columns on the Mac, and a popover for a past day | `docs/spec.md`, Mac window |
 
-## Open between lenses
-
-| Question | Lenses | Where |
-|---|---|---|
-| Should Longest run hide, or come second, while the current run is "Between runs"? The neurodiversity review says the pair invites "you used to be better". The behavioural review says the pairing was settled and would reopen it only on evidence | Neurodiversity, Behavioural scientist, Returning user | `detail-runs-paper.jpg`, `HabitDetailView.swift` StatsBlock |
-
 ## Not adopted
 
 | Finding | Reason |

@@ -442,6 +442,8 @@ struct ImportPresenter: ViewModifier {
 struct StatRow: View {
     let label: String
     let value: String
+    /// Smaller and in the secondary colour, with no rule, for a figure that should not lead.
+    var quiet = false
     @Environment(\.style) private var style
     @Environment(\.dynamicTypeSize) private var typeSize
 
@@ -453,13 +455,13 @@ struct StatRow: View {
                 .foregroundStyle(style.secondary)
             if !typeSize.isAccessibilitySize { Spacer(minLength: 12) }
             Text(value)
-                .font(style.count(.body))
-                .foregroundStyle(style.text)
+                .font(style.count(quiet ? .subheadline : .body))
+                .foregroundStyle(quiet ? style.secondary : style.text)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 10)
+        .padding(.vertical, quiet ? 6 : 10)
         .overlay(alignment: .bottom) {
-            Rectangle().fill(style.rule).frame(height: style.ruleWidth)
+            if !quiet { Rectangle().fill(style.rule).frame(height: style.ruleWidth) }
         }
         .accessibilityElement(children: .combine)
     }
