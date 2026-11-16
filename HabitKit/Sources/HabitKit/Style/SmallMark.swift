@@ -10,6 +10,8 @@ public enum SmallMark {
 
     /// The gap across a small diamond, as a share of the cell: 2.5 units in a 12-unit cell.
     /// Blurred, a whole diamond is too close to the done square (0.16). Split, it measures 0.38. See `docs/m4-blur-test.md`.
+    /// The gap inside a mark is close to the space between marks, so grouping rests on the shape.
+    /// Re-run the neighbour blur check if this or the mark inset changes.
     public static let diamondGap: CGFloat = 2.5 / 12
 
     /// A diamond at the full cell with a flat gap across its middle: two triangles, point up and point down.

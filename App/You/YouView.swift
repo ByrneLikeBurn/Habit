@@ -229,7 +229,15 @@ struct MarksBoardView: View {
             ForEach(rows.indices, id: \.self) { index in
                 let row = rows[index]
                 HStack(spacing: 16) {
-                    MarkView(state: row.0, isToday: row.1, showsPlus: row.2)
+                    HStack(spacing: 6) {
+                        MarkView(state: row.0, isToday: row.1, showsPlus: row.2)
+                        // The year view and History month draw this mark smaller and split, so both are shown.
+                        // Every row keeps the column, so the labels stay aligned.
+                        Group {
+                            if row.0 == .loggedOffSchedule { SmallMarkView(state: row.0, size: 12) } else { Color.clear }
+                        }
+                        .frame(width: 16, height: 16)
+                    }
                     VStack(alignment: .leading, spacing: 2) {
                         Text(row.3).font(style.label(.body, weight: .semibold))
                         Text(row.4).font(style.label(.subheadline)).foregroundStyle(style.secondary)

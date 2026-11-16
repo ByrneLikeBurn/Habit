@@ -214,3 +214,5 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **The screenshot flags for Show runs and Show days not logged work only in debug builds.** Asked for by the product owner.
 
 **The Mac Settings window clears its Undo line when it closes,** so an Undo from an earlier visit never acts on a habit used since. Asked for by the Apple industrial designer.
+
+**The small "logged" diamond is split by a flat gap of 2.5 units in a 12-unit cell.** A whole diamond blurred too close to done (0.16 against a pass mark of 0.25). Split, it measures 0.38. Measured in `docs/m4-blur-test.md` on `docs/milestone-4-design`. The full-size diamond is unchanged. The marks board shows the small split diamond beside the large one, so the two read as one state. The senior designer and the colour vision and low vision reviews asked for that. Whether the large diamond takes the gap is decided in milestone 4.
