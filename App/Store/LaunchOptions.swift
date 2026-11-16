@@ -11,7 +11,7 @@ struct LaunchOptions: Sendable {
     }
 
     enum Screen: String, Sendable {
-        case new, newCount, count, edit, you, appearance, archived, marks, notScheduled, undo, undoLong
+        case new, newCount, count, edit, you, appearance, archived, marks, notScheduled, undo, undoLong, undoLongPast, undoCount
         case history, historyMonth, detailWeek, detailMonth, detailYear, detailEmpty, detailRuns
         case day, dayCount, dayOff, dayDone, export, importPreview, importDone, importNothing, importNotHabit, importNewer, contrast
     }

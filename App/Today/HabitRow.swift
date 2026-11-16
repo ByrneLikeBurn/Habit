@@ -68,7 +68,7 @@ struct HabitRow: View {
 
     // MARK: Name
 
-    /// A tap on the name or symbol logs, the same as the control. Edit, Archive and Move are in the
+    /// A tap on the name or symbol logs, the same as the control. Details, Edit, Move and Archive are in the
     /// row's menu and its swipe actions. For VoiceOver the name and the control both log and both carry the menu.
     private var nameButton: some View {
         Button { actions.log(.tap) } label: {

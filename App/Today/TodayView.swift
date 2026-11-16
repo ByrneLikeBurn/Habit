@@ -92,6 +92,8 @@ struct TodayView: View {
                     .foregroundStyle(style.secondary)
                     .frame(minHeight: 44)
                     .accessibilityElement(children: .ignore)
+                    // Voice Control matches the words on screen.
+                    .accessibilityInputLabels([Text("Not scheduled today")])
                     .accessibilityLabel(Text("Not scheduled today, \(split.notScheduled.count) habits", comment: "VoiceOver label for the group of habits not set for today. The number is how many."))
                 }
                 .listRowBackground(style.paper)
@@ -255,31 +257,39 @@ struct UndoLineView: View {
     @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
-        // At accessibility sizes Undo sits under the message, so a long name keeps rows in view.
-        let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 0)) : AnyLayout(HStackLayout(spacing: 12))
-        layout {
-            // Three lines at most. The middle is cut, so the name's start and the status word stay.
-            // VoiceOver reads the whole line.
-            Text(line.message)
-                .font(style.label(.subheadline))
-                .lineLimit(3)
-                .truncationMode(.middle)
-                .padding(.top, typeSize.isAccessibilitySize ? 10 : 0)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            if let undo = line.undo {
-                Button {
-                    undo()
-                    model.undoLine = nil
-                } label: {
-                    // The frame sits inside the label, so the whole 44-point square takes the tap.
-                    Text("Undo").underline()
-                        .frame(minWidth: 44, minHeight: 44)
-                        .contentShape(Rectangle())
+        Group {
+            if typeSize.isAccessibilitySize, let name = line.name {
+                // The name takes one line and loses its end if it must. The status and Undo share
+                // the next line, so the capsule stays short and what happened always shows in full.
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(name)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .padding(.top, 10)
+                        .accessibilityHidden(true)
+                    // Undo sits beside the status when both fit on one line, and under it when not,
+                    // so the status is never squeezed into a narrow column.
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 12) {
+                            status.fixedSize(horizontal: true, vertical: false)
+                            Spacer(minLength: 0)
+                            undoButton
+                        }
+                        VStack(alignment: .leading, spacing: 0) {
+                            status.padding(.top, 4)
+                            undoButton
+                        }
+                    }
                 }
-                .buttonStyle(.plain)
-                .font(style.label(.subheadline, weight: .semibold))
+            } else {
+                HStack(spacing: 12) {
+                    Text(line.message)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    undoButton
+                }
             }
         }
+        .font(style.label(.subheadline))
         // Reversed text and paper keep the fixed text contrast in both appearances.
         .foregroundStyle(style.paper)
         .padding(.leading, 20)
@@ -290,6 +300,29 @@ struct UndoLineView: View {
         .padding(.bottom, 8)
         .frame(maxWidth: 393)
     }
+
+    private var status: some View {
+        Text(line.status)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityLabel(Text(verbatim: line.message))
+    }
+
+    @ViewBuilder
+    private var undoButton: some View {
+        if let undo = line.undo {
+            Button {
+                    undo()
+                model.undoLine = nil
+            } label: {
+                // The frame sits inside the label, so the whole 44-point square takes the tap.
+                Text("Undo").underline()
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .font(style.label(.subheadline, weight: .semibold))
+        }
+    }
 }
 
 extension View {
@@ -299,7 +332,7 @@ extension View {
             .moveDisabled(true)
     }
 
-    /// Edit and Archive, the visible way to reach them now that a tap on the name logs.
+    /// Details, Edit and Archive, the visible way to reach them now that a tap on the name logs.
     /// Neither uses the destructive role: the app never picks red, and Archive can be undone.
     func rowSwipeActions(_ actions: HabitRow.Actions) -> some View {
         swipeActions(edge: .trailing, allowsFullSwipe: false) {

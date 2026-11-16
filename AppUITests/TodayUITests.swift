@@ -104,6 +104,33 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(control("Read").waitForExistence(timeout: 2))
     }
 
+    func testCountedUndoLineShowsTheNewTotalAndTakesItBack() {
+        let water = control("Drink water")
+        XCTAssertTrue(water.waitForExistence(timeout: 5))
+        water.tap()
+        XCTAssertTrue(app.staticTexts["Drink water: 4 of 8 glasses"].waitForExistence(timeout: 2))
+        app.buttons["Undo"].tap()
+        XCTAssertTrue((water.value as? String ?? "").hasPrefix("3 of 8 glasses"))
+    }
+
+    /// At the largest text size the line splits into name and status, and Undo keeps its square.
+    /// The longest name cleared on a past day gives the longest status.
+    func testAtTheLargestSizeTheStatusShowsAndUndoKeepsItsTarget() {
+        app.terminate()
+        app.launchArguments = ["-fixture", "today", "-screen", "undoLongPast",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        let undo = app.buttons["Undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 5))
+        let line = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@",
+                                                        "Write three lines in the journal before the day gets going cleared, ", "November")).firstMatch
+        XCTAssertTrue(line.exists, "VoiceOver should read the whole line")
+        XCTAssertGreaterThanOrEqual(undo.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(undo.frame.width, 44)
+        undo.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.06)).tap()
+        XCTAssertFalse(undo.waitForExistence(timeout: 1))
+    }
+
     /// The fixture's today is a Saturday, so the weekdays-only habit is not scheduled.
     func testTheNotScheduledGroupReadsItsCountAndOpens() {
         // A button holding the system disclosure triangle. XCUITest does not expose the open state,

@@ -301,7 +301,7 @@ The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settab
 
 The behavioural scientist, neurodiversity and returning-user lenses reviewed `docs/mockups/png/sheet-m1.png`. The owner defers to the reviews on design, so these are adopted. All four items that were owed are now drawn.
 
-**Reaching Edit and Archive.** A tap on a habit's name logs. A swipe left on a row shows Edit and Archive. Touch and hold on the name opens a menu with Details, Edit, Move and Archive, in that order. VoiceOver offers the same four as actions on the row, with Move up and Move down. The owner decided this on 15 November 2026. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows until the next action. The menu is drawn in `sheet-m1.png`.
+**Reaching Edit and Archive.** A tap on a habit's name logs. A swipe left on a row shows Details, Edit and Archive. Touch and hold on the name opens a menu with Details, Edit, Move and Archive, in that order. VoiceOver offers the same four as actions on the row, with Move up and Move down. The owner decided this on 15 November 2026. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows until the next action. The menu is drawn in `sheet-m1.png`.
 
 **Order.** Manual reorder is in milestone 1, using the system list edit mode and VoiceOver move actions. Done rows stay where they are, so a row never moves under a thumb.
 

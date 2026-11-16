@@ -65,6 +65,19 @@ struct SourceChecks {
         #expect(checked > 3, "Too few MarkView calls were found")
     }
 
+    /// The plural VoiceOver label for the "Not scheduled today" group has both English forms.
+    /// The UI test reaches only "one", on the fixture's Saturday.
+    @Test func theNotScheduledLabelHasBothPluralForms() throws {
+        let data = try Data(contentsOf: repoRoot.appending(path: "App/Localizable.xcstrings"))
+        let catalog = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let strings = try #require(catalog["strings"] as? [String: Any])
+        let entry = try #require(strings["Not scheduled today, %lld habits"] as? [String: Any])
+        let plural = try #require(((((entry["localizations"] as? [String: Any])?["en"] as? [String: Any])?["variations"] as? [String: Any])?["plural"]) as? [String: Any])
+        func value(_ form: String) -> String? { ((plural[form] as? [String: Any])?["stringUnit"] as? [String: Any])?["value"] as? String }
+        #expect(value("one") == "Not scheduled today, %lld habit")
+        #expect(value("other") == "Not scheduled today, %lld habits")
+    }
+
     /// Tokens live in the style files only. A view that computes a colour or names a font is a bug.
     @Test func coloursAndFontsAreNamedOnlyInTheStyleFiles() throws {
         // `Color(` as a call, not as the end of a name such as `swatchColor(`.
