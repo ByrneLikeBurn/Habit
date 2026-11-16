@@ -477,6 +477,9 @@ function mark(state, o){
   let g="", ring="";
   const id="c"+(uid++);
   const dia = `M${c} ${c-a*.5}L${c+a*.5} ${c}L${c} ${c+a*.5}L${c-a*.5} ${c}Z`;   // extra credit is as large as a done mark
+  // The diamond has a cut across its middle: a fifth of its width up to 12 points, and 1.25 points above that.
+  const cut = size<=12 ? a/5 : 1.25, hh = a*.5, hw = hh-cut/2;
+  const diaCut = `M${c} ${c-hh}L${c+hw} ${c-cut/2}H${c-hw}ZM${c} ${c+hh}L${c+hw} ${c+cut/2}H${c-hw}Z`;
   if(o.style==="penAndInk"){
     const box=(extra)=>`<rect x="${x0}" y="${x0}" width="${a}" height="${a}" rx="${a*.07}" ${extra}/>`;
     const clip=`<clipPath id="${id}">${box("")}</clipPath>`;
@@ -484,7 +487,7 @@ function mark(state, o){
     if(state==="hatched") g=clip+`<g clip-path="url(#${id})">${hatch(c,c,a,5,()=>`stroke="${A}" stroke-width="${sw}"`)}</g>`+box(`fill="none" stroke="${A}" stroke-width="${sw}"`);
     if(state==="missed") g=box(`fill="none" stroke="${A}" stroke-width="${sw}"`);
     if(state==="paused") g=`<line x1="${c-a*.3}" y1="${c}" x2="${c+a*.3}" y2="${c}" stroke="${A}" stroke-width="${sw+1}" stroke-linecap="round"/>`;
-    if(state==="extra") g=`<path d="${dia}" fill="${A}"/>`;
+    if(state==="extra") g=`<path d="${diaCut}" fill="${A}"/>`;
     if(state==="future") g=box(`fill="none" stroke="${A}" stroke-width="${sw-.25}" stroke-dasharray="2.6 2.6" opacity=".45"`);
     const q=a+9, q0=c-q/2;
     ring=`<rect x="${q0}" y="${q0}" width="${q}" height="${q}" rx="${q*.12}" fill="none" stroke="${K}" stroke-width="1.5"/>`;
@@ -537,7 +540,7 @@ function ycell(state, style, today){
   if(state==="solid") g = round?`<circle cx="6" cy="6" r="5" fill="${A}"/>`:`<rect x="1" y="1" width="10" height="10" rx="1" fill="${A}"/>`;
   if(state==="hatched") g = round?`<path d="M6 1A5 5 0 0 0 6 11Z" fill="${A}"/>`:`<path d="M1 1V11H11Z" fill="${A}"/>`;
   if(state==="paused") g = `<path d="M3 6H9" stroke="${A}" stroke-width="2.5" stroke-linecap="round"/>`;
-  if(state==="extra") g = `<path d="M6 0 12 6 6 12 0 6Z" fill="${A}"/>`;
+  if(state==="extra") g = `<path d="M6 0 10.75 4.75H1.25ZM6 12 10.75 7.25H1.25Z" fill="${A}"/>`;   // split by a gap of 2.5 units
   const t = today?`<rect x="-.6" y="-.6" width="13.2" height="13.2" rx="${round?6.6:2}" fill="none" stroke="${K}" stroke-width="1.1"/>`:"";
   return `<svg viewBox="0 0 12 12" style="display:block;overflow:visible" aria-hidden="true">${g}${t}</svg>`;
 }

@@ -38,7 +38,7 @@ The reviews set this on 15 November 2026. Each step waits for the one before it.
 2. Wobble moves the silhouette by at most 10% of the mark's width. A break in a stroke is at most 1 point and never opens the outline.
 3. Strokes are at least 1.5 points. The paused dash is at least 2 points thick and half the mark wide. The dot is at most a quarter of the mark.
 4. The Watercolor rim is at least 1.5 points at full strength. The bleed stays inside the cell.
-5. "Told apart" means a different silhouette in greyscale after a Gaussian blur of one eighth of the mark's width. Tested at 24, 12 and 6 points for: done and part done, done and diamond, dash and dot, to come and not logged, today with and without a mark.
+5. "Told apart" is tested in greyscale after a Gaussian blur of 0.75 points, at 24, 12 and 6 points, for: done and part done, done and diamond, dash and dot, to come and not logged, today with and without a mark. At 12 points and under the pass mark is 0.25 on the distance in `docs/m4-blur-test.md`. Above 12 points the two blurred marks must differ over a patch at least 3 points across, confirmed by eye. The first wording used a blur of one eighth of the mark's width, which gave the same score at every size.
 6. Ink is a light material on dark paper, at the same ratios, with no glow.
 7. Increase Contrast: marks in the text colour, strokes half a point heavier, a flat wash, at least 7:1.
 8. "To come" is 3:1. It is fainter through dash gaps and a thinner stroke, not through opacity. This changes the words "reduced opacity" in `CLAUDE.md`, and is recorded when this file is merged.
@@ -88,7 +88,7 @@ Both reviews failed the first draft on 15 November 2026, because it could be dra
 - Done: strokes over the whole square.
 - Part done: the same strokes over the lower half, cut on the diagonal.
 - Paused: one stroke, tilted 10 degrees.
-- Logged while paused: a diamond filled with the same strokes.
+- Logged on a paused day or a day off: a diamond filled with the same strokes, with a cut of 1.25 points across its middle.
 - To come: a square of short hand-drawn dashes, in a stroke thinner than a mark stroke and never under 1.5 points, with gaps of at least 2 points.
 - Not logged, when the user has turned it on: a hand-drawn empty square.
 - Today: a square of four strokes around the mark, whose ends cross and overshoot each corner by 1 point.
@@ -100,7 +100,7 @@ In Ink the paper is charcoal with the same tooth. The pigment sits on the tooth,
 - Done: one round wash.
 - Part done: three brush strokes at full strength throughout.
 - Paused: one round-ended dab.
-- Logged while paused: a diamond-shaped wash.
+- Logged on a paused day or a day off: a diamond-shaped wash, with a cut of 1.25 points across its middle.
 - To come: a ring of short brush dabs, thinner than the rim and never under 1.5 points, with gaps of at least 2 points.
 - Not logged, when the user has turned it on: one thin closed ring at the done mark's size, in the accent, never under 1.5 points.
 - Today: a brushed ring around the mark, with a visible start and end. The gap is at most 1 point.
@@ -114,7 +114,7 @@ In Ink the paper is near-black cold-press with the same dimples and no stains. T
 | Done | Square | A block that leans at 56 degrees, at three quarters of the cell | Disc at three quarters of the cell |
 | Part done | Half square, cut on the diagonal | The lower half of the leaning block, cut on the diagonal | Half disc, split top to bottom |
 | Paused | Flat bar, square ends | One stroke with tapered ends, tilted 10 degrees | A round-ended dab |
-| Logged while paused | A diamond at the full cell, split by a flat gap of 2.5 units | The same diamond, upright, with the gap tilted 10 degrees | The same diamond with barely curved sides and a flat gap |
+| Logged on a paused day or a day off | A diamond at the full cell, split by a flat gap of 2.5 units | The same diamond, upright, with the gap tilted 10 degrees | The same diamond with barely curved sides and a flat gap |
 | Not scheduled | Dot | Dot | Dot |
 | Today | Square outline | A square of four strokes whose ends cross and overshoot each corner by 1 point | Brushed ring |
 

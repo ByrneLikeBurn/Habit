@@ -65,5 +65,25 @@ What the tests ruled out:
 
 **The paused shape is exempt** from the cross-style rule, like the dot. A dash is a dash in any material.
 
-**Still open for the full-size marks.** Whether the large diamond carries the same gap, so there is one drawing for one meaning. The diamond is also used for a log on a day off, which is not a pause, so the key calls it a diamond and does not say the gap means paused. Sharp, at 12 points, the mark can look like a pair of stepper arrows, so the key shows it beside the large diamond.
+## The diamond at full size
 
+Settled on 16 November 2026, after two rounds. Drawn in `docs/mockups/png/m4-diamond-cut.png`.
+
+**One rule for every size: a diamond with a cut across its middle.** Up to 12 points the cut is a fifth of the mark's width, which is the 2.5-unit gap above. Above 12 points the cut is 1.25 points, so a large diamond is one diamond with a hairline through it, not two triangles.
+
+The three reviews first split. Accessibility and low vision wanted the gap at every size, so a user who learns the mark large knows it small. The senior designer and product owner wanted the large diamond left solid, because a wide gap puts two arrows inside a tap control. The first-day user said they would not connect a solid large diamond to a split small one, and proposed the hairline. Both other reviews accepted it.
+
+**The test was wrong for large marks, and is corrected.** The first blur grew with the mark, so every size scored the same and a sharp large diamond failed. Sight blurs by a fixed amount, not by a share of the mark. Condition 5 now reads: the blur is 0.75 points at every size. The 0.25 pass mark applies at 12 points and under. Above that, two blurred marks must differ over a patch at least 3 points across, confirmed by eye in greyscale.
+
+With the corrected blur and the rule above, lowest distance to any other state:
+
+| Size | Pen and ink | Pencil | Watercolor |
+|---|---|---|---|
+| 6 points | 0.38 | 0.32 | 0.29 |
+| 24 points, cut of 1.25 points | 0.25 | 0.36 | 0.15 |
+
+Watercolor at 24 points is the weak one. The disc against the diamond is checked by eye first when the Watercolor marks are drawn.
+
+**The key.** "Logged on a paused day or a day off". The diamond is used for both, so the cut is part of the diamond and does not mean paused.
+
+**This changes one drawing in milestones 1 and 2.** The full-size diamond gains the hairline cut.
