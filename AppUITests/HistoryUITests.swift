@@ -61,6 +61,18 @@ final class HistoryUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars.buttons["History"].exists)
     }
 
+    func testAQuietLongestRunIsReadLastAmongTheStats() {
+        // Drink water's current run is 5 days and its longest 14, so Longest run is quiet.
+        let app = launch(["-screen", "detailRuns", "-showRuns"])
+        XCTAssertTrue(app.staticTexts["Days logged"].waitForExistence(timeout: 5))
+        let labels = app.descendants(matching: .any).allElementsBoundByAccessibilityElement.map { $0.label }.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+        // The combined rows, as VoiceOver reads them, are labelled "Longest run, 14 days".
+        guard let longest = labels.firstIndex(where: { $0.hasPrefix("Longest run, ") }) else { return XCTFail("No Longest run") }
+        // Days done comes before it, and the next thing read is the marks link, not another stat.
+        XCTAssertTrue(labels[..<longest].last?.hasPrefix("Days done, ") ?? false)
+        XCTAssertTrue(labels.indices.contains(longest + 1) && labels[longest + 1].hasPrefix("What the marks mean"))
+    }
+
     func testHistoryShowsEveryHabitAndArchivedOnlyWithALog() {
         let app = launch(["-screen", "history"])
         XCTAssertTrue(app.staticTexts["History"].waitForExistence(timeout: 5))

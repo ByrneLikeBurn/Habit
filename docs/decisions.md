@@ -209,6 +209,8 @@ One entry per decision that changed the brief. Each says what changed and why, i
 
 **History and Habit detail use about 720 points on iPad and Mac,** and a History week row puts the name and its seven days on one line there. Mac sheets have a width in place of detents, Return exports, and the Mac Settings window drops "Controls on the left". Asked for by the Apple industrial designer, under the Mac window rules.
 
-**Longest run is full weight only while the current run is the longest.** Otherwise it is quieter, so a restart reads "1 day" without a full-weight "14 days" beside it. VoiceOver reads it last. Asked for by the returning user, within the treatment the neurodiversity and behavioural reviews accepted.
+**Longest run is full weight only while the current run is the longest.** Otherwise it is quieter, so a restart reads "1 day" without a full-weight "14 days" beside it. It is the last stat, after Days done, on screen and in VoiceOver. Asked for by the returning user. The behavioural and neurodiversity reviews checked this wider rule before the merge.
 
 **The screenshot flags for Show runs and Show days not logged work only in debug builds.** Asked for by the product owner.
+
+**The Mac Settings window clears its Undo line when it closes,** so an Undo from an earlier visit never acts on a habit used since. Asked for by the Apple industrial designer.

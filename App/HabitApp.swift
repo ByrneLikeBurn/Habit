@@ -43,7 +43,12 @@ struct HabitApp: App {
             Group {
                 if case .success(let container) = SharedStore.container {
                     // Bring back in Archived shows its Undo line here.
-                    StyledScreen { YouView(isMacSettings: true).undoLineInset(.today) }
+                    StyledScreen {
+                        YouView(isMacSettings: true)
+                            .undoLineInset(.today)
+                            // An Undo left from an earlier visit would act on a habit used since.
+                            .onDisappear { settingsModel.undoLine = nil }
+                    }
                         .modelContainer(container)
                 }
             }

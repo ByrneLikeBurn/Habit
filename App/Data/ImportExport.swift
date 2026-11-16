@@ -345,11 +345,7 @@ struct ExportSheet: View {
                 shareURL = nil
                 if error { failed = true } else if completed { dismiss() }
             }
-                #if os(iOS)
                 .presentationDetents([.medium, .large])
-                #else
-                .frame(minWidth: 440, idealWidth: 480, minHeight: 360)
-                #endif
         }
         #else
         .fileExporter(isPresented: Binding(get: { exporting != nil }, set: { if !$0 { exporting = nil } }),
@@ -477,6 +473,5 @@ struct StatRow: View {
             if !quiet { Rectangle().fill(style.rule).frame(height: style.ruleWidth) }
         }
         .accessibilityElement(children: .combine)
-        .accessibilitySortPriority(quiet ? -1 : 0)
     }
 }

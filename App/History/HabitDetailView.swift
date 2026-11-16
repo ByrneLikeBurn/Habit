@@ -550,17 +550,19 @@ private struct StatsBlock: View {
             }
             if showRuns {
                 StatRow(label: String(localized: "Current run"), value: runText)
-                if stats.longestRun > 0 {
-                    // After a gap the best-ever run stays, but quieter, so it is not the headline.
-                    StatRow(label: String(localized: "Longest run"), value: Self.days(stats.longestRun), quiet: !isOnLongestRun)
-                }
-                // Days done beside Days logged reads as a pass rate. It is a result, so it comes with Show runs,
-                // after the runs.
+                // Days done beside Days logged reads as a pass rate. It is a result, so it comes with Show runs.
                 if habit.kind == .counted && habit.target != nil {
                     StatRow(label: String(localized: "Days done"), value: stats.daysDone.formatted())
                 }
+                // The best-ever run comes last, and is quieter unless the current run is the longest, so it is
+                // never the headline after a gap. It is last in reading order too.
+                if stats.longestRun > 0 {
+                    StatRow(label: String(localized: "Longest run"), value: Self.days(stats.longestRun), quiet: !isOnLongestRun)
+                }
             }
         }
+        // One container, so a quiet row is read last among the stats, not after the page.
+        .accessibilityElement(children: .contain)
     }
 
     static func days(_ n: Int) -> String {
