@@ -98,7 +98,9 @@ private struct HabitDetailPage: View {
                         Text(Verb.tapMonth).font(style.label(.footnote)).foregroundStyle(style.secondary)
                         SmallMarkKey()
                     } else {
-                        Text(Verb.tapPastDay).font(style.label(.footnote)).foregroundStyle(style.secondary)
+                        if !habit.isArchived {
+                            Text(Verb.tapPastDay).font(style.label(.footnote)).foregroundStyle(style.secondary)
+                        }
                     }
                     if kind == .week {
                         WeekTotalLine(habit: habit, days: Periods.week(of: anchor, firstWeekday: clock.calendar.firstWeekday), totals: totals)
@@ -219,7 +221,7 @@ private struct WeekGrid: View {
                 ForEach(days.indices, id: \.self) { i in
                     dayButton(days[i], state: states[i], words: words) {
                         HStack(spacing: 12) {
-                            MarkView(state: states[i], isToday: days[i] == today, size: 36).frame(width: 52)
+                            MarkView(state: states[i], isToday: days[i] == today && !habit.isArchived, size: 36).frame(width: 52)
                             VStack(alignment: .leading) {
                                 Text(words.long(days[i])).foregroundStyle(days[i] > today ? style.tertiary : style.text)
                                 if let count = countWords(days[i]) { Text(count).foregroundStyle(style.secondary) }
@@ -241,7 +243,7 @@ private struct WeekGrid: View {
                                 .foregroundStyle(days[i] > today ? style.tertiary : style.secondary)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.8)
-                            MarkView(state: states[i], isToday: days[i] == today, size: 28)
+                            MarkView(state: states[i], isToday: days[i] == today && !habit.isArchived, size: 28)
                             Text(countNumber(days[i]) ?? " ")
                                 .font(style.count(.caption))
                                 .foregroundStyle(style.secondary)
@@ -375,7 +377,7 @@ private struct MonthGrid: View {
     @ViewBuilder
     private func cell(_ day: DayKey, state: DayState, words: DayWords) -> some View {
         let content = VStack(spacing: 3) {
-            MarkView(state: state, isToday: day == today, size: 24)
+            MarkView(state: state, isToday: day == today && !habit.isArchived, size: 24)
             Text(day.day.formatted())
                 .font(style.label(.caption2).monospacedDigit())
                 .foregroundStyle(day > today ? style.tertiary : style.secondary)
@@ -384,7 +386,8 @@ private struct MonthGrid: View {
         .frame(maxWidth: .infinity, minHeight: 52)
         .contentShape(Rectangle())
         let spoken = [words.long(day), DayWords.state(state)].compactMap { $0 }.joined(separator: ". ")
-        if day > today && (totals[day.rawValue] ?? 0) <= 0 {
+        // An archived habit takes no logs, as in History.
+        if (day > today && (totals[day.rawValue] ?? 0) <= 0) || habit.isArchived {
             content.accessibilityElement(children: .ignore).accessibilityLabel(Text(spoken))
         } else {
             Button { model.daySheet = DayRequest(habit: habit, day: day) } label: { content }
@@ -472,7 +475,7 @@ private struct YearGrid: View {
                                 for (r, week) in weeks.enumerated() {
                                     for (c, day) in week.enumerated() {
                                         let rect = CGRect(x: CGFloat(c) * cell, y: CGFloat(r) * cell, width: cell, height: cell).insetBy(dx: 0.75, dy: 0.75)
-                                        SmallMark.draw(states[r][c], isToday: day == today, in: rect, context: &context, style: style)
+                                        SmallMark.draw(states[r][c], isToday: day == today && !habit.isArchived, in: rect, context: &context, style: style)
                                     }
                                 }
                             }

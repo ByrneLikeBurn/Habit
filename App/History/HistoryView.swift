@@ -46,7 +46,7 @@ struct HistoryView: View {
                 } else {
                     Section {
                         // How to use the rows, above them, so it is seen before the list runs under the tab bar.
-                        Text(kind == .week ? Verb.tapHabitOrDay : Verb.tapHabitMonth)
+                        Text(kind == .week ? Verb.tapHabitOrDay + " " + String(localized: "A dot is a day the habit is not scheduled.") : Verb.tapHabitMonth)
                             .font(style.label(.footnote))
                             .foregroundStyle(style.secondary)
                             .padding(.vertical, 4)

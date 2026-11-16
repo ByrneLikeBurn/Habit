@@ -52,6 +52,16 @@ final class HistoryUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Friday 13 November"].waitForExistence(timeout: 3))
     }
 
+    func testBackFromDetailOpenedInHistoryReadsHistory() {
+        let app = launch(["-screen", "history"])
+        // The row is one element. Its name sits at the top, above the day cells.
+        let row = app.buttons["Drink water"].firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.15)).tap()
+        XCTAssertTrue(app.staticTexts["Days logged"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.navigationBars.buttons["History"].exists)
+    }
+
     func testHistoryShowsEveryHabitAndArchivedOnlyWithALog() {
         let app = launch(["-screen", "history"])
         XCTAssertTrue(app.staticTexts["History"].waitForExistence(timeout: 5))

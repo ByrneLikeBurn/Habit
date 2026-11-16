@@ -173,7 +173,7 @@ One entry per decision that changed the brief. Each says what changed and why, i
 
 **The import preview leads with what changes.** It showed the file's totals first, so the reader had to subtract. It now shows the habits, logs and pauses it adds and the logs already here, in the same rows as the result. Asked for by the tired daily user.
 
-**An archived habit takes no logs in Habit detail either.** History already drew an archived habit's days as plain marks, while detail let them be logged. Detail now matches: its days are not buttons, and "Add a past day" becomes "Bring back". Asked for by the UI and UX designer.
+**An archived habit takes no logs in Habit detail either.** History already drew an archived habit's days as plain marks, while detail let them be logged. Detail now matches in Week, Month and Year: its days are not buttons, there is no today outline, and "Add a past day" becomes "Bring back", which shows an Undo line. Asked for by the UI and UX designer.
 
 **The Undo line shows only in the tab where the action was made.** A line made in History also showed on Today, where Undo would change a day out of sight. Asked for by the UI and UX designer.
 

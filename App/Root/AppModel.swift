@@ -125,9 +125,15 @@ final class AppModel {
     }
 
     func bringBack(_ habit: Habit, context: ModelContext, all: [Habit]) {
+        let archivedAt = habit.archivedAt, sortIndex = habit.sortIndex
         habit.archivedAt = nil
         habit.sortIndex = Ordering.nextIndex(all)
         try? context.save()
+        show(UndoLine(message: String(localized: "\(habit.name) brought back")) {
+            habit.archivedAt = archivedAt
+            habit.sortIndex = sortIndex
+            try? context.save()
+        })
     }
 
     func show(_ line: UndoLine) {

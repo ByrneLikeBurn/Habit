@@ -66,7 +66,8 @@ struct DaySheet: View {
             .navigationBarTitleDisplayMode(.inline)
             #endif
         }
-        .presentationDetents(typeSize.isAccessibilitySize ? [.large] : [.medium, .large])
+        // A count has the amount, its result line and three buttons, which do not fit at medium height.
+        .presentationDetents(typeSize.isAccessibilitySize || habit.kind == .counted ? [.large] : [.medium, .large])
     }
 
     // MARK: Yes or no
