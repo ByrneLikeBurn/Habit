@@ -269,8 +269,24 @@ struct UndoLineView: View {
                 sentence
             }
         }
-        // A new line is measured afresh.
-        .onChange(of: line.id) { sentenceHeight = 0 }
+        // Not drawn. Measures the sentence and three lines at the width the sentence would get,
+        // whichever form is showing, so a line that fits again goes back to one sentence.
+        .background {
+            HStack(spacing: 12) {
+                ZStack {
+                    Text(line.message).fixedSize(horizontal: false, vertical: true)
+                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { sentenceHeight = $0 }
+                    Text(verbatim: "A\nA\nA").fixedSize(horizontal: false, vertical: true)
+                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { threeLines = $0 }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                if line.undo != nil {
+                    Text("Undo").font(style.label(.subheadline, weight: .semibold)).frame(minWidth: 44)
+                }
+            }
+            .hidden()
+            .accessibilityHidden(true)
+        }
         .font(style.label(.subheadline))
         // Reversed text and paper keep the fixed text contrast in both appearances.
         .foregroundStyle(style.paper)
@@ -287,17 +303,6 @@ struct UndoLineView: View {
         HStack(spacing: 12) {
             Text(line.message)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background {
-                    // Not drawn. Measures the whole sentence and three lines at this width.
-                    ZStack {
-                        Text(line.message).fixedSize(horizontal: false, vertical: true)
-                            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { sentenceHeight = $0 }
-                        Text(verbatim: "A\nA\nA").fixedSize(horizontal: false, vertical: true)
-                            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { threeLines = $0 }
-                    }
-                    .hidden()
-                    .accessibilityHidden(true)
-                }
             undoButton
         }
     }
