@@ -50,7 +50,7 @@ struct YouView: View {
                 } header: {
                     Text("History")
                 } footer: {
-                    Text("A run counts the scheduled days in a row with any log, even a small one. Days not logged adds an empty outline to past days.")
+                    Text("A run counts the days in a row with any log, even a small one. Days off don't break it. Days not logged adds an empty outline to past days.")
                 }
                 if !isMacSettings {
                     Section {

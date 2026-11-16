@@ -142,7 +142,7 @@ private struct HabitDetailPage: View {
                 .buttonStyle(.plain)
 
                 if hasLogs {
-                    StatsBlock(habit: habit, stats: stats, words: words, showRuns: settings.showRuns)
+                    StatsBlock(habit: habit, stats: stats, words: words, showRuns: settings.showRuns, showDaysNotLogged: settings.showDaysNotLogged)
                 }
                 if hasLogs && kind != .year {
                     NavigationLink {
@@ -302,9 +302,10 @@ private struct WeekTotalLine: View {
         let values = days.map { max(0, totals[$0.rawValue] ?? 0) }
         let logged = values.filter { $0 > 0 }.count
         if logged > 0 {
-            let value = habit.kind == .counted
+            // A weekly sum beside a daily target invites a sum of the shortfall, so a habit with a target counts days.
+            let value = habit.kind == .counted && habit.target == nil
                 ? CountText.line(total: values.reduce(0, +), target: nil, unit: habit.unit)
-                : (logged == 1 ? String(localized: "1 day logged") : String(localized: "\(logged) days logged"))
+                : String(localized: "\(logged) days logged", comment: "Plural variations in the String Catalog.")
             StatRow(label: String(localized: "This week"), value: value)
         }
     }
@@ -414,10 +415,10 @@ enum MonthWords {
         let paused = states.filter { $0 == .paused }.count
         let credited = states.filter { $0 == .loggedWhilePaused || $0 == .loggedOffSchedule }.count
         var parts: [String] = []
-        if done > 0 { parts.append(done == 1 ? String(localized: "1 day done") : String(localized: "\(done) days done")) }
-        if part > 0 { parts.append(String(localized: "\(part) part done")) }
-        if credited > 0 { parts.append(String(localized: "\(credited) logged on a paused day or a day off")) }
-        if paused > 0 { parts.append(String(localized: "\(paused) paused")) }
+        if done > 0 { parts.append(String(localized: "\(done) days done")) }
+        if part > 0 { parts.append(String(localized: "\(part) days part done")) }
+        if credited > 0 { parts.append(String(localized: "\(credited) days logged on a paused day or a day off")) }
+        if paused > 0 { parts.append(String(localized: "\(paused) days paused")) }
         return parts.isEmpty ? String(localized: "Nothing logged") : parts.formatted(.list(type: .and))
     }
 }
@@ -530,20 +531,26 @@ private struct StatsBlock: View {
     let stats: HabitStats
     let words: DayWords
     let showRuns: Bool
+    let showDaysNotLogged: Bool
     @Environment(\.style) private var style
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Since \(words.full(stats.since))")
-                .font(style.label(.footnote))
-                .foregroundStyle(style.secondary)
-                .padding(.bottom, 4)
+            // A start date beside a count of days logged lets the days not logged be counted, so it
+            // shows only when the user asked to see those days.
+            if showDaysNotLogged {
+                Text("Since \(words.full(stats.since))")
+                    .font(style.label(.footnote))
+                    .foregroundStyle(style.secondary)
+                    .padding(.bottom, 4)
+            }
             StatRow(label: String(localized: "Days logged"), value: stats.daysLogged.formatted())
             if habit.kind == .counted {
                 StatRow(label: String(localized: "Total"), value: unitValue)
-                if habit.target != nil {
-                    StatRow(label: String(localized: "Days done"), value: stats.daysDone.formatted())
-                }
+            }
+            // Days done beside Days logged reads as a pass rate. It is a result, so it comes with Show runs.
+            if showRuns && habit.kind == .counted && habit.target != nil {
+                StatRow(label: String(localized: "Days done"), value: stats.daysDone.formatted())
             }
             if showRuns {
                 StatRow(label: String(localized: "Current run"), value: runText)
@@ -555,7 +562,7 @@ private struct StatsBlock: View {
     }
 
     static func days(_ n: Int) -> String {
-        n == 1 ? String(localized: "1 day") : String(localized: "\(n) days")
+        String(localized: "\(n) days", comment: "A length of time in days. Plural variations in the String Catalog.")
     }
 
     /// The total with the unit exactly as typed, so "ml" never becomes "Ml".

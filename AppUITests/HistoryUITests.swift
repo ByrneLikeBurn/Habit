@@ -19,8 +19,7 @@ final class HistoryUITests: XCTestCase {
         XCTAssertTrue(read.waitForExistence(timeout: 5))
         read.swipeLeft()
         app.buttons["Details"].tap()
-        XCTAssertTrue(app.staticTexts["Since 28 April 2026"].waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["Days logged"].exists)
+        XCTAssertTrue(app.staticTexts["Days logged"].waitForExistence(timeout: 3))
     }
 
     func testAPastDayIsLoggedFromTheDaySheetWithUndo() {
@@ -28,12 +27,12 @@ final class HistoryUITests: XCTestCase {
         let markDone = app.buttons["Mark done"]
         XCTAssertTrue(markDone.waitForExistence(timeout: 5))
         markDone.tap()
-        let line = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Logged '")).firstMatch
+        let line = app.staticTexts.matching(NSPredicate(format: "label CONTAINS ' logged, ' AND label CONTAINS 'November'")).firstMatch
         XCTAssertTrue(line.waitForExistence(timeout: 3))
         app.buttons["Undo"].tap()
         // Undo leaves no line behind: neither the old one, a new "Cleared" one, nor an Undo button.
         let gone = NSPredicate(format: "exists == false")
-        let cleared = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Cleared '")).firstMatch
+        let cleared = app.staticTexts.matching(NSPredicate(format: "label CONTAINS ' cleared, ' AND label CONTAINS 'November'")).firstMatch
         for element in [line, app.buttons["Undo"]] {
             XCTAssertEqual(XCTWaiter.wait(for: [expectation(for: gone, evaluatedWith: element)], timeout: 3), .completed)
         }

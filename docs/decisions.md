@@ -198,3 +198,9 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **The day sheet's buttons say what they make,** "Add, makes 9" and "Take away, makes 7", in place of a separate line. The habit's name is a heading that wraps, and the bar shows the date. Asked for by the senior designer and the typographer.
 
 **A unit is shown as typed.** Habit detail's total reads "Total 1,253 ml", so "ml" never becomes "Ml". Asked for by the typographer.
+
+**Habit detail shows no pair of counts that makes a pass rate unless the user opted in.** By default it shows Days logged and, for a counted habit, the total. Days done comes with Show runs, and the "Since" date with Show days not logged. "This week" counts days logged for a habit with a daily target, not a weekly sum. The neurodiversity and behavioural reviews both found that Days logged beside Days done, under a start date, read as days failed. This changes the owner's 14 November default, which showed Days done.
+
+**The run help line matches the run maths.** It now says a run counts the days in a row with any log, and days off don't break it. The old line said only scheduled days count, which could stop someone logging on a day off. Asked for by the behavioural scientist.
+
+**Counts have plural forms in a String Catalog,** and dates, week ranges and lists follow the locale. The past-day Undo line names the habit. The day sheet buttons read "Add 1, total 9". "Already here" became "Logs already here". "Details" stays as the row menu name. Asked for by the content designer.

@@ -50,12 +50,21 @@ struct DayWords {
         date(day).formatted(style().day().month(.wide).year())
     }
 
-    /// "9 to 15 November", or "30 November to 6 December" across a month end.
+    private func intervalStyle() -> Date.IntervalFormatStyle {
+        Date.IntervalFormatStyle(locale: locale, calendar: gregorian, timeZone: clock.calendar.timeZone)
+    }
+
+    /// "9–15 November" in en_GB, "November 9 – 15" in en_US. The locale orders and joins the dates.
     func week(_ days: [DayKey]) -> String {
         guard let first = days.first, let last = days.last else { return "" }
         if first == last { return dayMonth(first) }
-        let start = first.month == last.month ? date(first).formatted(style().day()) : dayMonth(first)
-        return String(localized: "\(start) to \(dayMonth(last))", comment: "A week, for example 9 to 15 November")
+        return (date(first)..<date(last)).formatted(intervalStyle().day().month(.wide))
+    }
+
+    /// "17 July – 13 November 2026", with the year.
+    func range(_ first: DayKey, _ last: DayKey) -> String {
+        if first == last { return full(first) }
+        return (date(first)..<date(last)).formatted(intervalStyle().day().month(.wide).year())
     }
 
     func title(_ kind: PeriodKind, anchor: DayKey) -> String {

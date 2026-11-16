@@ -139,12 +139,13 @@ struct DaySheet: View {
         }
         // Each button says what it makes, so a correction needs no sum.
         if let amount {
-            primaryButton("Add, makes\u{00A0}\(min(total + amount, CountText.maximumAmount).formatted())") { apply(.add(amount)) }
+            // The first number is the amount typed; the second is the day's new total.
+            primaryButton("Add \(amount.formatted()), total\u{00A0}\(min(total + amount, CountText.maximumAmount).formatted())") { apply(.add(amount)) }
         } else {
             primaryButton("Add") {}.disabled(true)
         }
         if let amount, total > 0 {
-            textButton("Take away, makes\u{00A0}\(max(total - amount, 0).formatted())") { apply(.takeAway(amount)) }
+            textButton("Take away \(amount.formatted()), total\u{00A0}\(max(total - amount, 0).formatted())") { apply(.takeAway(amount)) }
         } else {
             textButton("Take away") {}.disabled(true)
         }

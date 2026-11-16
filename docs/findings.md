@@ -34,9 +34,17 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 13 | "What the marks mean" in Habit detail sits below the stats, out of view, and is missing before the first log | First-day user, 15 Nov. `HabitDetailView.swift`, `detail-month-paper.jpg` |
 | 13 | Weekday labels in the Habit detail week shrink one by one, so a row can mix sizes, most in longer languages | Typographer, 15 Nov. `HabitDetailView.swift`, WeekGrid |
 | 13 | A file picker that fails to open a file shows nothing | UI and UX designer, 15 Nov. `ImportExport.swift`, `ImportPresenter` |
+| 3 | Bring back offers to pause the span the habit was archived, so a run is not broken by a deliberate break. Keeping archive spans would be a schema change for the owner | Behavioural scientist, 15 Nov. `AppModel.bringBack`, `Runs.swift` |
+| 3 | "Pause for dates" can be reached from Habit detail, where a returning user looks at a gap | Neurodiversity, 15 Nov |
 | 3 | Tests for travel across a pause edge | `docs/spec.md`, Milestone 3 screens |
 | 4 | Pencil dark version, Pencil marks board, hand-drawn dashes for days to come | `docs/spec.md`, Pencil |
 | After MVP | Habit detail in two columns on the Mac, and a popover for a past day | `docs/spec.md`, Mac window |
+
+## Open between lenses
+
+| Question | Lenses | Where |
+|---|---|---|
+| Should Longest run hide, or come second, while the current run is "Between runs"? The neurodiversity review says the pair invites "you used to be better". The behavioural review says the pairing was settled and would reopen it only on evidence | Neurodiversity, Behavioural scientist, Returning user | `detail-runs-paper.jpg`, `HabitDetailView.swift` StatsBlock |
 
 ## Not adopted
 
@@ -49,7 +57,6 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 
 | Item | Lens that should see it | Where |
 |---|---|---|
-| The row menu item that opens Habit detail is called "Details" | Content designer | `m3-menu.png` |
 | An archived habit shows in History under "Archived" only in a period where it has a log | Product owner, Returning user | `m2-hist-many.png` |
 | An imported habit that differs keeps this device's version | Senior software engineer, QA engineer | `docs/spec.md`, Export |
 | The export file keeps complete protection, though a share still running when the phone locks can then fail. The release engineer suggested complete-unless-open | Security and privacy | `App/Data/ImportExport.swift`, `writeTemporaryFile` |

@@ -109,7 +109,7 @@ One drawing has one meaning.
 
 **Today** is an outline in the text colour around the day's mark. On the Today screen every control has it, so the control is visible in every state, including paused. A today with nothing logged is the outline alone.
 
-**Days not logged. Owner.** By default a past day with no log draws nothing, and Habit detail shows Days done, Longest run and Extra credit. One switch in You, "Show days not logged", turns on the empty outline for those days and adds Current run to Habit detail. This replaces the brief's default of drawing a missed day as an empty outline.
+**Days not logged. Owner.** By default a past day with no log draws nothing, and Habit detail shows Days logged and, for a counted habit, its total. One switch in You, "Show days not logged", turns on the empty outline for those days and shows the "Since" date. "Show runs" adds Days done, Current run and Longest run (changed on 15 November 2026, see `docs/decisions.md`). This replaces the brief's default of drawing a missed day as an empty outline.
 
 **Year view. Owner.** Cells are too small to hatch. Each state is a small shape: a full square for done, a half square cut on the diagonal for part done, a short bar for paused, a diamond for extra credit, nothing otherwise. Today has an outline. In Watercolor the square is a disc and the half square is a half disc. This replaces the brief's four opacity steps, which carried state by intensity.
 
@@ -315,7 +315,7 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 
 **Day boundary.** Between midnight and the day-start hour, Today shows "Until 04:00" under the date. The day-start setting has the caption "Logs before this time count for the day before."
 
-**Stats.** Habit detail leads with Days done, with its start date, and for a counted habit a total in the user's unit. Longest run and Current run are behind one switch, "Show runs". "Show days not logged" is a separate switch. A run row is never hidden at zero.
+**Stats.** Habit detail leads with Days logged, and for a counted habit a total in the user's unit. Days done comes with Show runs and the start date with Show days not logged. Longest run and Current run are behind one switch, "Show runs". "Show days not logged" is a separate switch. A run row is never hidden at zero.
 
 **Pausing one habit.** Milestone 3 adds "Pause this habit" to the Edit form and the row menu, open-ended, with Resume in the same place. Gentle Mode is reachable from Today as well as from You. The Vacation form says the start can be in the past.
 

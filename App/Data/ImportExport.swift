@@ -143,14 +143,10 @@ struct ImportSheet: View {
         let ids = plan.newLogs.map(\.habit).filter { seen.insert($0).inserted }
         let shown = ids.prefix(3).compactMap { names[$0] }
         let more = ids.count - shown.count
-        let list = more > 0
-            ? String(localized: "\(shown.joined(separator: ", ")) and \(more) more")
-            : shown.formatted(.list(type: .and))
-        let words = DayWords(clock: settings.clock)
-        let from = words.full(DayKey(rawValue: first)), to = words.full(DayKey(rawValue: last))
-        return first == last
-            ? String(localized: "Logs for \(list), on \(from).")
-            : String(localized: "Logs for \(list), from \(from) to \(to).")
+        let items = more > 0 ? shown + [String(localized: "\(more) other habits", comment: "Plural variations in the String Catalog.")] : shown
+        let list = items.formatted(.list(type: .and))
+        let range = DayWords(clock: settings.clock).range(DayKey(rawValue: first), DayKey(rawValue: last))
+        return String(localized: "Logs for \(list), \(range).", comment: "The habits an import adds logs to, then the days, for example: Logs for Floss and Read, 17 July – 13 November 2026.")
     }
 
     @ToolbarContentBuilder
@@ -183,15 +179,13 @@ struct ImportSheet: View {
                 }
             }
             // Set apart, because these logs are not added.
-            StatRow(label: String(localized: "Already here"), value: plan.skippedLogs.formatted())
+            StatRow(label: String(localized: "Logs already here"), value: plan.skippedLogs.formatted())
                 .padding(.top, 8)
             if let which = receiving(plan) {
                 caption(which)
             }
             if plan.differing > 0 {
-                caption(plan.differing == 1
-                    ? String(localized: "1 habit has different details in this file. The version on this device is kept. Nothing here will be replaced.")
-                    : String(localized: "\(plan.differing) habits have different details in this file. The version on this device is kept. Nothing here will be replaced."))
+                caption(String(localized: "\(plan.differing) habits have different details in this file. The version on this device is kept. Nothing here will be replaced.", comment: "Plural variations in the String Catalog."))
             }
             Button("Import") {
                 guard !importing else { return }
@@ -211,7 +205,7 @@ struct ImportSheet: View {
                 if result.pausesAdded > 0 {
                     StatRow(label: String(localized: "Pauses added"), value: result.pausesAdded.formatted())
                 }
-                StatRow(label: String(localized: "Already here, skipped"), value: result.skipped.formatted())
+                StatRow(label: String(localized: "Logs already here"), value: result.skipped.formatted())
             }
             caption("Nothing was replaced. Importing the same file again adds nothing.")
         case .problem(let problem):
