@@ -8,7 +8,7 @@ the contrast of each mark as drawn against the worst pixel of its paper.
 import json, math, sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-from scipy.ndimage import gaussian_filter, distance_transform_edt
+from scipy.ndimage import gaussian_filter, maximum_filter, distance_transform_edt
 
 S = 10                       # pixels per point
 SIZE = 24                    # the mark, in points
@@ -189,8 +189,23 @@ def papers(style, ap):
     field = paper * (1 - g["maxAlpha"] * tex) + grain * g["maxAlpha"] * tex
     return field, worst, hexrgb(t["text"])
 
-def render(style, ap, state, accent, outline=False):
+def heavier(m):                                             # Increase Contrast: flat, and half a point heavier, a quarter point each side
+    return maximum_filter((np.asarray(m, float) > 0.5).astype(float), size=round(0.5 * S) + 1)
+
+def render(style, ap, state, accent, outline=False, ic=False):
+    global CUT
     field, worst, text = papers(style, ap); ink = ap == "ink"
+    if ic:                                                  # marks in the text colour, flat, heavier; the diamond's cut half a point wider as drawn; Watercolor loses wash and grain
+        if state == "today": state, outline = "done", True
+        fn = pencil if style == "pencil" else (lambda s: water(s, ink))
+        CUT = 1.25 + 0.5 + 0.5                              # drawn a point wider, because the heavier strokes take half a point back
+        try: a, _ = fn(state)
+        finally: CUT = 1.25
+        a = heavier(a)
+        if style == "watercolor": field = np.ones_like(field) * hexrgb(TOK["styles"][style][ap]["paper"])
+        img = field * (1 - a[..., None]) + text * a[..., None]
+        if outline: ring = heavier(pencil_today() if style == "pencil" else water_today()); img = img * (1 - ring[..., None]) + text * ring[..., None]
+        return img, ratio(float(lum(text[None])[0]), float(lum(worst[None])[0]))
     fn = pencil if style == "pencil" else (lambda s: water(s, ink))
     strength = TOK["markAlpha"][style] if not (style == "watercolor" and ink) else 1.0
     if state == "today": state, outline = "done", True
@@ -247,7 +262,7 @@ def measures():
             f = lambda v: (f"{v[0]:.2f} {v[1]}" if isinstance(v, tuple) else f"{v:.2f}")
             print(f"{style:11} {ap:6} {f(row[0]):>13} {f(row[1]):>12} {f(row[2]):>15} {f(row[3]):>9} {f(row[4]):>12}")
 
-def main(out):
+def main(out, ic=False):
     font = ImageFont.load_default(); accent = hexrgb(TOK["swatches"]["blue"])
     cell = N // 2; pad = 14; lab = 170
     rows = [(st, ap) for st in ("pencil", "watercolor") for ap in ("paper", "ink")]
@@ -257,12 +272,13 @@ def main(out):
     for ri, (style, ap) in enumerate(rows):
         y = 40 + ri * (cell + pad); d.text((10, y + cell // 2 - 6), f"{style}, {ap}", fill=(0, 0, 0), font=font); crs = []
         for ci, (st, _) in enumerate(STATES):
-            img, cr = render(style, ap, st, accent); crs.append(cr)
+            img, cr = render(style, ap, st, accent, ic=ic); crs.append(cr)
             sharp = Image.fromarray((np.clip(img, 0, 1) * 255).astype("uint8")).resize((cell, cell), Image.LANCZOS)
             bl = Image.fromarray((np.clip(gaussian_filter(img, sigma=(0.75 * S, 0.75 * S, 0)), 0, 1) * 255).astype("uint8")).resize((cell, cell), Image.LANCZOS)
             x = lab + ci * (2 * cell + pad); sheet.paste(sharp, (x, y)); sheet.paste(bl, (x + cell, y))
         print(f"{style:11} {ap:6} " + " ".join(f"{c:>11.2f}" for c in crs[:6]))
-    sheet.save(out); print(sheet.size); measures()
+    sheet.save(out); print(sheet.size)
+    if not ic: measures()
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else "m4-marks.png")
+    main(sys.argv[1] if len(sys.argv) > 1 else "m4-marks.png", ic="ic" in sys.argv[2:])
