@@ -9,7 +9,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | Milestone | Test | If it fails | Set by |
 |---|---|---|---|
 | 3 | The widget in clear and tinted modes, on the lightest wallpaper, keeps 3:1 for marks and 4.5:1 for text | Use the system's vibrant foreground. If it still fails, the widget ships without clear mode support | Low vision, 15 Nov. Seen in `m3-w-clear.png` |
-| 4 | History month strip at the largest text size, and under a blur test, in Pen and ink, Pencil and Watercolor | Month moves to milestone 13. History becomes Week only, with no control | Product owner and low vision, 15 Nov. Seen in `sheet-hist-month.png` |
+| 4 | History month strip and the Habit detail year grid at the largest text size, and under a blur test, in Pen and ink, Pencil and Watercolor. Includes "Not logged" against an empty today, with Show days not logged on (`notlogged-*.jpg`) | Month moves to milestone 13. History becomes Week only, with no control | Product owner and low vision, 15 Nov. Seen in `sheet-hist-month.png` |
 | 3 | On a device with VoiceOver, the rotor offers Audio Graph on the Habit detail year grid | Wrap the grid in `.accessibilityElement(children: .contain)` and test again. If it still fails, put the descriptor on one element that sums up the year | Accessibility, 15 Nov. `App/History/HabitDetailView.swift`, YearGrid |
 | 3 | One signed, sandboxed run of the Mac app with the owner's free account: export to a picked folder, import from it, and open the App Group store | Unsigned builds run without the sandbox, so no test has exercised it. If it fails, find the missing entitlement or profile and bring it to the owner | Release engineer, 15 Nov. `Config/Habit-macOS.entitlements` |
 | 13 | The system offers to save an export password that has no account or domain | The export screen does not mention saving | Security and privacy, 15 Nov |
@@ -32,6 +32,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 3 | History week rows expose each day as its own VoiceOver element instead of one row summary | `App/History/HistoryView.swift` |
 | 13 | Swipe to change period in Habit detail and History, beside the arrows. Needs a check that it does not fight the back swipe | Human factors, 15 Nov. `detail-month-paper.jpg` |
 | 13 | "What the marks mean" in Habit detail sits below the stats, out of view, and is missing before the first log | First-day user, 15 Nov. `HabitDetailView.swift`, `detail-month-paper.jpg` |
+| 13 | Weekday labels in the Habit detail week shrink one by one, so a row can mix sizes, most in longer languages | Typographer, 15 Nov. `HabitDetailView.swift`, WeekGrid |
 | 13 | A file picker that fails to open a file shows nothing | UI and UX designer, 15 Nov. `ImportExport.swift`, `ImportPresenter` |
 | 3 | Tests for travel across a pause edge | `docs/spec.md`, Milestone 3 screens |
 | 4 | Pencil dark version, Pencil marks board, hand-drawn dashes for days to come | `docs/spec.md`, Pencil |
@@ -51,5 +52,4 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | The row menu item that opens Habit detail is called "Details" | Content designer | `m3-menu.png` |
 | An archived habit shows in History under "Archived" only in a period where it has a log | Product owner, Returning user | `m2-hist-many.png` |
 | An imported habit that differs keeps this device's version | Senior software engineer, QA engineer | `docs/spec.md`, Export |
-| The key adds a "Today" entry. The accessibility review asked for it. The tired daily user found the key wraps to three lines on a phone | Senior designer | `history-month-paper.jpg` |
 | The export file keeps complete protection, though a share still running when the phone locks can then fail. The release engineer suggested complete-unless-open | Security and privacy | `App/Data/ImportExport.swift`, `writeTemporaryFile` |

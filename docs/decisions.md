@@ -188,3 +188,13 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **History's hint sits above the rows, and Week links to the marks board.** The hint was under the last row, behind the tab bar. Asked for by the first-day user.
 
 **A failed export says so.** A cancelled share leaves the export screen open, and a failed save on the Mac shows the existing message. Asked for by the UI and UX designer.
+
+**The key has no Today entry.** The senior designer decided the guess: the entry made the key three lines, and beside "Not logged" it was a second empty square. Today's outline is the last cell drawn in the current period.
+
+**A day before a habit began draws nothing.** The year view drew off-day dots in the weeks before the "Since" date. Asked for by the colour vision and low vision review.
+
+**Today's small outline sits inside its cell,** with the mark smaller within it, so it never joins the next day's mark. The year grid's cells grow with text size. Asked for by the colour vision and low vision review.
+
+**The day sheet's buttons say what they make,** "Add, makes 9" and "Take away, makes 7", in place of a separate line. The habit's name is a heading that wraps, and the bar shows the date. Asked for by the senior designer and the typographer.
+
+**A unit is shown as typed.** Habit detail's total reads "Total 1,253 ml", so "ml" never becomes "Ml". Asked for by the typographer.

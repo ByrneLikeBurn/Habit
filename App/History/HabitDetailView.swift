@@ -143,6 +143,8 @@ private struct HabitDetailPage: View {
 
                 if hasLogs {
                     StatsBlock(habit: habit, stats: stats, words: words, showRuns: settings.showRuns)
+                }
+                if hasLogs && kind != .year {
                     NavigationLink {
                         MarksBoardView()
                     } label: {
@@ -433,6 +435,8 @@ private struct YearGrid: View {
     @Environment(\.style) private var style
     @Environment(\.sharedPauses) private var sharedPauses
     @Environment(\.dynamicTypeSize) private var typeSize
+    /// 9 points at the default size, growing with text up to the width of the column.
+    @ScaledMetric(relativeTo: .caption2) private var cellLimit: CGFloat = 9
 
     var body: some View {
         let words = DayWords(clock: settings.clock)
@@ -471,7 +475,7 @@ private struct YearGrid: View {
                                 .font(style.label(.caption2))
                                 .foregroundStyle(style.secondary)
                             Canvas { context, size in
-                                let cell = min(size.width / 7, 9)
+                                let cell = min(size.width / 7, cellLimit)
                                 for (r, week) in weeks.enumerated() {
                                     for (c, day) in week.enumerated() {
                                         let rect = CGRect(x: CGFloat(c) * cell, y: CGFloat(r) * cell, width: cell, height: cell).insetBy(dx: 0.75, dy: 0.75)
@@ -479,7 +483,7 @@ private struct YearGrid: View {
                                     }
                                 }
                             }
-                            .frame(height: CGFloat(max(weeks.count, 4)) * 9)
+                            .frame(height: CGFloat(max(weeks.count, 4)) * cellLimit)
                         }
                         .frame(maxWidth: .infinity, minHeight: 44, alignment: .topLeading)
                         .contentShape(Rectangle())
@@ -536,7 +540,7 @@ private struct StatsBlock: View {
                 .padding(.bottom, 4)
             StatRow(label: String(localized: "Days logged"), value: stats.daysLogged.formatted())
             if habit.kind == .counted {
-                StatRow(label: unitLabel, value: stats.unitTotal.formatted())
+                StatRow(label: String(localized: "Total"), value: unitValue)
                 if habit.target != nil {
                     StatRow(label: String(localized: "Days done"), value: stats.daysDone.formatted())
                 }
@@ -554,11 +558,10 @@ private struct StatsBlock: View {
         n == 1 ? String(localized: "1 day") : String(localized: "\(n) days")
     }
 
-    /// The unit as typed, with a capital first letter, or "Total" with no unit.
-    private var unitLabel: String {
+    /// The total with the unit exactly as typed, so "ml" never becomes "Ml".
+    private var unitValue: String {
         let unit = habit.unit.trimmingCharacters(in: .whitespaces)
-        guard let first = unit.first else { return String(localized: "Total") }
-        return first.uppercased() + unit.dropFirst()
+        return unit.isEmpty ? stats.unitTotal.formatted() : "\(stats.unitTotal.formatted()) \(unit)"
     }
 
     private var runText: String {

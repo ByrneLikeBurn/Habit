@@ -21,6 +21,8 @@ struct LaunchOptions: Sendable {
     var appearance: AppearanceChoice?
     /// `-showRuns` turns Show runs on for screenshots.
     var showRuns = false
+    /// `-showDaysNotLogged` turns Show days not logged on for screenshots.
+    var showDaysNotLogged = false
 
     /// Saturday 14 November 2026, 09:41 in London.
     var clock: HabitClock? {
@@ -39,7 +41,8 @@ struct LaunchOptions: Sendable {
             fixture: value("-fixture").flatMap(Fixture.init(rawValue:)),
             screen: value("-screen").flatMap(Screen.init(rawValue:)),
             appearance: value("-appearance").flatMap(AppearanceChoice.init(rawValue:)),
-            showRuns: arguments.contains("-showRuns")
+            showRuns: arguments.contains("-showRuns"),
+            showDaysNotLogged: arguments.contains("-showDaysNotLogged")
         )
     }()
 }

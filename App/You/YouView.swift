@@ -55,9 +55,7 @@ struct YouView: View {
                 if !isMacSettings {
                     Section {
                         Button("Export a copy") { model.showExport = true }
-                            .frame(minHeight: 44)
                         Button("Import a copy") { model.choosingImportFile = true }
-                            .frame(minHeight: 44)
                     } header: {
                         Text("Your data")
                     } footer: {

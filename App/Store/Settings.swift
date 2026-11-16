@@ -36,7 +36,7 @@ final class Settings {
         accent = Swatch.resolve(defaults.string(forKey: SettingKey.accent))
         controlsLeading = defaults.bool(forKey: SettingKey.controlsLeading)
         showRuns = LaunchOptions.current.showRuns || defaults.bool(forKey: SettingKey.showRuns)
-        showDaysNotLogged = defaults.bool(forKey: SettingKey.showDaysNotLogged)
+        showDaysNotLogged = LaunchOptions.current.showDaysNotLogged || defaults.bool(forKey: SettingKey.showDaysNotLogged)
         let stored = defaults.object(forKey: SettingKey.dayStartHour) as? Int
         dayStartHour = stored.map { min(max($0, HabitClock.dayStartRange.lowerBound), HabitClock.dayStartRange.upperBound) }
             ?? HabitClock.defaultDayStartHour

@@ -10,8 +10,11 @@ public enum SmallMark {
 
     /// Draws one day into `rect`. `rect` is the cell; shapes sit inside it.
     public static func draw(_ state: DayState, isToday: Bool, in rect: CGRect, context: inout GraphicsContext, style: ResolvedStyle) {
-        let side = min(rect.width, rect.height)
-        let box = CGRect(x: rect.midX - side / 2, y: rect.midY - side / 2, width: side, height: side)
+        let cellSide = min(rect.width, rect.height)
+        let cell = CGRect(x: rect.midX - cellSide / 2, y: rect.midY - cellSide / 2, width: cellSide, height: cellSide)
+        // Today's outline is drawn inside the cell, so it never meets the next mark. The mark shrinks within it.
+        let box = isToday ? cell.insetBy(dx: cellSide * 0.2, dy: cellSide * 0.2) : cell
+        let side = box.width
         let inner = box.insetBy(dx: side * 0.12, dy: side * 0.12)
         let mark = GraphicsContext.Shading.color(style.mark)
         switch state {
@@ -41,13 +44,13 @@ public enum SmallMark {
             let d = dotSize(cell: side)
             context.fill(Path(ellipseIn: CGRect(x: box.midX - d / 2, y: box.midY - d / 2, width: d, height: d)), with: .color(style.tertiary))
         case .notLogged:
-            context.stroke(Path(inner.insetBy(dx: 0.5, dy: 0.5)), with: .color(style.secondary), lineWidth: 1)
+            context.stroke(Path(inner.insetBy(dx: 0.5, dy: 0.5)), with: .color(style.secondary), lineWidth: max(1, style.ruleWidth * 2))
         case .blank:
             break
         }
         if isToday {
-            let outline = box.insetBy(dx: -1.5, dy: -1.5)
-            context.stroke(Path(outline), with: .color(style.text), lineWidth: style.outlineWidth * 0.8)
+            let width = style.outlineWidth * 0.8
+            context.stroke(Path(cell.insetBy(dx: width / 2, dy: width / 2)), with: .color(style.text), lineWidth: width)
         }
     }
 }

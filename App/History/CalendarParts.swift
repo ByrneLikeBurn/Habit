@@ -134,7 +134,6 @@ struct SmallMarkKey: View {
             (.loggedWhilePaused, false, "Logged while paused or on a day off"), (.offSchedule, false, "Not scheduled"),
         ]
         if settings.showDaysNotLogged { list.append((.notLogged, false, "Not logged")) }
-        list.append((.blank, true, "Today"))
         return list
     }
 

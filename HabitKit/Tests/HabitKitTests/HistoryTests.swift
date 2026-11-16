@@ -370,6 +370,23 @@ struct ExportImportTests {
 @MainActor
 @Suite("Review fixes, milestone 2")
 struct HistoryReviewFixTests {
+    @Test func daysBeforeTheHabitBeganDrawNothing() throws {
+        let context = try makeContext()
+        // Every day except Thursday, from Tuesday 28 April 2026.
+        var schedule = Weekdays.all
+        schedule.remove(Weekdays(weekday: 5))
+        let h = addHabit("Water", schedule: schedule, firstDay: DayKey(rawValue: 20260428), in: context)
+        let thursdayBefore = DayKey(rawValue: 20260423)
+        #expect(!h.rule(on: thursdayBefore).schedule.contains(thursdayBefore))
+        #expect(h.state(on: thursdayBefore, today: today) == .blank)
+        #expect(h.state(on: DayKey(rawValue: 20260427), today: today, showDaysNotLogged: true) == .blank)
+        // From the first day, an off day has its dot.
+        #expect(h.state(on: DayKey(rawValue: 20260430), today: today) == .offSchedule)
+        // A log before the first day still draws.
+        try log(.markDone, h, day: thursdayBefore, context)
+        #expect(h.state(on: thursdayBefore, today: today) == .loggedOffSchedule)
+    }
+
     @Test func everythingLoggingCanWriteImportsAgain() throws {
         let context = try makeContext()
         let big = addHabit("Steps", .counted, target: nil, in: context)

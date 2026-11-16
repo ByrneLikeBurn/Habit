@@ -59,6 +59,8 @@ extension Habit {
 
     /// The state of one day when its total is already known, so the events are not scanned again.
     public func state(on day: DayKey, today: DayKey, total: Int, sharedPauses: [Pause] = [], showDaysNotLogged: Bool = false) -> DayState {
+        // Before the habit began, a day with no log draws nothing: no dot, dash or outline.
+        if total <= 0, let start = rules.first?.fromDay, day.rawValue < start { return .blank }
         let rule = rule(on: day)
         return DayState.resolve(DayInput(
             total: max(0, total),

@@ -40,6 +40,13 @@ struct DaySheet: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 12) {
+                    // The habit is the subject, so it is set as a heading that wraps, not in the bar.
+                    Text(habit.name)
+                        .font(style.display(.title3, weight: .semibold))
+                        .foregroundStyle(style.text)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
                     switch habit.kind {
                     case .binary: binary(total: total, state: state)
                     case .counted: counted(total: total, state: state)
@@ -54,12 +61,8 @@ struct DaySheet: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .principal) {
-                    VStack(spacing: 0) {
-                        Text(habit.name).font(style.label(.caption2)).foregroundStyle(style.secondary).lineLimit(1)
-                        Text(words.long(day)).font(style.label(.subheadline, weight: .semibold)).foregroundStyle(style.text)
-                    }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityAddTraits(.isHeader)
+                    Text(words.long(day)).font(style.label(.subheadline, weight: .semibold)).foregroundStyle(style.text)
+                        .accessibilityAddTraits(.isHeader)
                 }
             }
             #if os(iOS)
@@ -91,10 +94,11 @@ struct DaySheet: View {
         let target = habit.rule(on: day).target
         if total > 0 {
             Text(total.formatted())
-                .font(style.count(.largeTitle))
+                .font(style.count(.largeTitle, weight: .semibold))
                 .foregroundStyle(style.text)
             Text(CountText.sheetCaption(target: target, unit: habit.unit, dayName: String(localized: "that day")))
-                .font(style.label(.subheadline))
+                // A step down at accessibility sizes, so the count still leads.
+                .font(style.label(typeSize.isAccessibilitySize ? .footnote : .subheadline))
                 .foregroundStyle(style.secondary)
             if let words = stateWords(state), state == .loggedOffSchedule || state == .loggedWhilePaused {
                 note(LocalizedStringKey(words))
@@ -130,20 +134,20 @@ struct DaySheet: View {
                     selection = TextSelection(range: amountText.startIndex..<amountText.endIndex)
                 }
             }
-        if let amount {
-            // The result of each button, so a correction needs no sum.
-            let added = min(total + amount, CountText.maximumAmount)
-            note(total > 0
-                 ? "Add makes \(added.formatted()). Take away makes \(max(total - amount, 0).formatted())."
-                 : "Add makes \(added.formatted()).")
-        } else {
+        if amount == nil {
             note("Type a whole number above 0.")
         }
-        primaryButton("Add") { if let amount { apply(.add(amount)) } }
-            .disabled(amount == nil)
-
-        textButton("Take away") { if let amount { apply(.takeAway(amount)) } }
-            .disabled(amount == nil || total == 0)
+        // Each button says what it makes, so a correction needs no sum.
+        if let amount {
+            primaryButton("Add, makes \(min(total + amount, CountText.maximumAmount).formatted())") { apply(.add(amount)) }
+        } else {
+            primaryButton("Add") {}.disabled(true)
+        }
+        if let amount, total > 0 {
+            textButton("Take away, makes \(max(total - amount, 0).formatted())") { apply(.takeAway(amount)) }
+        } else {
+            textButton("Take away") {}.disabled(true)
+        }
         if total > 0 {
             // On its own row, apart from Take away, so a slip does not clear the day.
             clearButton.padding(.top, 16)

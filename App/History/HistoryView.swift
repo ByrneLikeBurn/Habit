@@ -46,10 +46,23 @@ struct HistoryView: View {
                 } else {
                     Section {
                         // How to use the rows, above them, so it is seen before the list runs under the tab bar.
-                        Text(kind == .week ? Verb.tapHabitOrDay + " " + String(localized: "A dot is a day the habit is not scheduled.") : Verb.tapHabitMonth)
+                        Text(kind == .week ? Verb.tapHabitOrDay : Verb.tapHabitMonth)
                             .font(style.label(.footnote))
                             .foregroundStyle(style.secondary)
-                            .padding(.vertical, 4)
+                            .padding(.top, 4)
+                        if kind == .week {
+                            NavigationLink {
+                                MarksBoardView()
+                            } label: {
+                                Text("What the marks mean")
+                                    .font(style.label(.footnote, weight: .semibold))
+                                    .underline()
+                                    .foregroundStyle(style.text)
+                                    .frame(minHeight: 44)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
                         if kind == .month && !typeSize.isAccessibilitySize {
                             SmallMarkKey().padding(.vertical, 6)
                         }
@@ -67,21 +80,7 @@ struct HistoryView: View {
                                 row(habit, days: days, today: today, archived: true)
                             }
                         }
-                        if kind == .week {
-                            NavigationLink {
-                                MarksBoardView()
-                            } label: {
-                                HStack {
-                                    Text("What the marks mean").font(style.label(.body)).foregroundStyle(style.text)
-                                    Spacer()
-                                    Image(systemName: "chevron.right").foregroundStyle(style.secondary).accessibilityHidden(true)
-                                }
-                                .frame(minHeight: 44)
-                                .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.top, 8)
-                        }
+
                     } header: {
                         header(days: days, anchor: anchor, today: today, words: words)
                     }
@@ -217,8 +216,8 @@ private struct HistoryWeekRow: View {
             Button {
                 model.openDetail(habit, kind: .week, anchor: days.last.map { min($0, today) } ?? today, from: .history)
             } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: habit.symbolName).font(style.label(.footnote)).accessibilityHidden(true)
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    HabitSymbol(name: habit.symbolName)
                     Text(habit.name).font(style.display(.body)).multilineTextAlignment(.leading)
                     Spacer(minLength: 0)
                 }
@@ -300,8 +299,8 @@ private struct HistoryMonthRow: View {
             model.openDetail(habit, kind: .month, anchor: min(days.last ?? today, today), from: .history)
         } label: {
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    Image(systemName: habit.symbolName).font(style.label(.footnote)).accessibilityHidden(true)
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    HabitSymbol(name: habit.symbolName)
                     Text(habit.name).font(style.display(.body)).multilineTextAlignment(.leading)
                 }
                 .foregroundStyle(style.text)
@@ -329,5 +328,19 @@ private struct HistoryMonthRow: View {
         .accessibilityLabel(Text("\(habit.name). \(words.month(days.first ?? today)). \(sentence)"))
         .accessibilityHint(Text("Opens the month"))
         .accessibilityAddTraits(.isButton)
+    }
+}
+
+/// A habit's symbol in a column of one width, so names share a left edge. It sits on the first line of a wrapped name.
+private struct HabitSymbol: View {
+    let name: String
+    @Environment(\.style) private var style
+    @ScaledMetric(relativeTo: .footnote) private var width: CGFloat = 18
+
+    var body: some View {
+        Image(systemName: name)
+            .font(style.label(.footnote))
+            .frame(width: width)
+            .accessibilityHidden(true)
     }
 }

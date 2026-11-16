@@ -62,6 +62,10 @@ done
 for screen in history historyMonth detailWeek detailMonth detailYear dayCount you; do
   shot "ax5-$screen-paper" light accessibility-extra-extra-extra-large disabled -fixture today -screen $screen
 done
+# Show days not logged on, in every view that draws the empty outline.
+for screen in history historyMonth detailWeek detailMonth detailYear; do
+  shot "notlogged-$screen-paper" light large disabled -fixture today -screen $screen -showDaysNotLogged
+done
 shot "contrast-history-paper" light large enabled -fixture today -screen history
 shot "contrast-detail-month-ink" dark large enabled -fixture today -screen detailMonth
 
