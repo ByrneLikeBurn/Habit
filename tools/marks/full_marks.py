@@ -47,7 +47,7 @@ SQUARE = [(-H, -H), (H, -H), (H, H), (-H, H)]
 LOWER = [(-H, -H), (-H, H), (H, H)]
 DIAMOND = [(0, -H), (H, 0), (0, H), (-H, 0)]
 CUT = 1.25
-GROW = 0.0                   # Increase Contrast: the today square is half a point larger and the ring 0.6, so the heavier strokes keep 3 points clear
+GROW = 0.0                   # Increase Contrast: the today square is half a point larger and the ring 0.9, so the heavier strokes keep 3 points clear
 GAPX = 0.0                   # Increase Contrast: extra space between the dashes of 'to come', so 2 points of paper remain after the strokes thicken
 AMP = 0.035                  # how uneven the Watercolor disc's edge is
 tooth = gaussian_filter(rng.random((N, N)), 1.2); tooth = (tooth - tooth.min()) / (tooth.max() - tooth.min())
@@ -177,7 +177,7 @@ def water(state, ink=False):
     return np.zeros((N, N)), np.zeros((N, N), bool)
 
 def water_today():                                          # one brushed ring: pooled where it starts, thin where it lifts, gap of 1 point at most
-    r = H + 5.4 + GROW * 1.2; n = 120; gap = 1.0 / r; start = -0.7
+    r = H + 5.4 + GROW * 1.8; n = 120; gap = 1.0 / r; start = -0.7
     def at(i): a = start + gap + (2 * math.pi - gap) * i / n; rr = r + 0.3 * math.sin(a * 2 + 0.6) - 0.9 * (i / n); return rr * math.cos(a), rr * math.sin(a)   # the end lands just inside the start
     def width(i): t = i / n; return max(1.5, 3.0 - 1.5 * t ** 0.7)       # 3 points where it pools at the start, thinning all the way round to 1.5 where it lifts
     return mask(lambda d: [stamp(d, [at(i), at(i + 0.5), at(i + 1)], (lambda t, w=width(i): w), 4) for i in range(n)])
@@ -201,7 +201,7 @@ def render(style, ap, state, accent, outline=False, ic=False):
     if ic:                                                  # marks in the text colour, flat, heavier; the diamond's cut half a point wider as drawn; Watercolor loses wash and grain
         if state == "today": state, outline = "done", True
         fn = pencil if style == "pencil" else (lambda s: water(s, ink))
-        GAPX, AMP = 1.5, 0.06; CUT = 1.25 + 0.5 + 0.5                              # drawn a point wider, because the heavier strokes take half a point back
+        GAPX, AMP = 1.9, 0.045; CUT = 1.25 + 0.5 + 0.5                              # drawn a point wider, because the heavier strokes take half a point back
         try: a, _ = fn(state)
         finally: CUT, GAPX, AMP = 1.25, 0.0, 0.035
         a = heavier(a)

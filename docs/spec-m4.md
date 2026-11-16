@@ -171,14 +171,14 @@ Gates before the milestone 4 build:
 - A three-line name and the largest text size are checked on the in-app screens. If rows stop separating in Watercolor, the row gap grows with the text size.
 - Whether Pen and ink drops the plus in a counted control: human factors and first-day user.
 
-## Step 4: Increase Contrast. Drawn, in review
+## Step 4: Increase Contrast. Passed, with three drawing fixes owed a measurement
 
 The rule, gathered from condition 7, step 3 and `CLAUDE.md`. Lines marked "new" go beyond those and move to `docs/decisions.md` when this file is merged.
 
 - Every mark is drawn in the text colour. The accent is not used. Measured 16.6:1 to 19.1:1.
 - Every stroke is half a point heavier. Marks are flat: no wash, no rim, no specks.
 - New: the diamond's cut is 1.75 points at 24 points, half a point wider than usual.
-- New: the today square is half a point larger and the ring 0.6 of a point larger, so the heavier strokes keep 3 points clear of the mark. Both stay inside 44 points.
+- New: the today square is half a point larger and the ring 0.9 of a point larger, so the heavier strokes keep 3 points clear of the mark. Both stay inside 44 points.
 - New: the dashes of "to come" sit further apart, so 2 points of bare paper remain between them after the strokes thicken.
 - New: the Watercolor disc keeps an uneven edge and the ring keeps its thick start and thin end, so the control does not read as a radio button.
 - Pencil keeps its paper grain. Watercolor loses its grain.
@@ -191,3 +191,12 @@ Drawings: `docs/mockups/png/m4-today-rows-ic.png` and `docs/mockups/png/m4-marks
 Closed: the step 3 clearance owed item. The lens measured 3.0 to 4.2 points without Increase Contrast.
 
 Added to the human factors gate before the build: in black, the Watercolor disc in a ring (radio button), the paused dab in a ring (delete button), and the diamond's two triangles in both styles (stepper arrows).
+
+Review, 16 November 2026, two rounds each. Senior designer and product owner passed all five of their findings. Accessibility and low vision passed the mark contrast, the cut, the control sizes, the states after the blur, the dashes of "to come" after the blur, and the Watercolor row line at 3.63:1 on Paper and 4.87:1 on Ink.
+
+Owed, round two spent. Each fix below is the lens's own and is applied. No lens has measured it since.
+- Bare paper between "to come" dashes measured 1.7 points against 2. Fix: 1.9 points of extra spacing.
+- Watercolor done on Paper measured 2.69 points clear of the ring against 3. Fix: a less uneven disc edge (0.045) and the ring 0.9 of a point larger.
+- The Pencil row line averaged 1.87:1 and 2.30:1 across its width against 3:1. Fix: drawn flat at half strength across the full point.
+
+These three, and the human factors gate above, are copied into `docs/findings.md` when this branch is merged. That file is being edited on `feat/history` now.

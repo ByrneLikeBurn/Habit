@@ -52,7 +52,7 @@ def panel(style, ap, ic=False):
                 t = (px / Q - x0) / (x1 - x0); cyp = (yy + bow * math.sin(math.pi * t)) * Q
                 press = 0.5 if ic else (0.62 + 0.2 * math.sin(t * 5 + ph[0]) + 0.12 * math.sin(t * 17 + ph[1])) * min(1, t / 0.03 + 0.4, (1 - t) / 0.03 + 0.4)
                 for py in range(int(cyp - Q), int(cyp + Q) + 1):
-                    a = max(0, 1 - abs(py - cyp) / (Q * 0.55)) * press * (1 if ic else (0.25 if big[py, px] > 0.6 else 1))
+                    a = (press if abs(py - cyp) <= Q / 2 else 0) if ic else max(0, 1 - abs(py - cyp) / (Q * 0.55)) * press * (1 if ic else (0.25 if big[py, px] > 0.6 else 1))
                     field[py, px] = field[py, px] * (1 - a) + text * a
     im = Image.fromarray((np.clip(field, 0, 1) * 255).astype("uint8")); d = ImageDraw.Draw(im)
     if ic and style == "watercolor":                                         # Increase Contrast: one straight line, 1 point, in the text colour
