@@ -112,7 +112,7 @@ def pencil(state):
         return m, m
     if state == "notlogged":
         q = H * 0.9; m = np.zeros((N, N))
-        for (ax, ay), (bx, by) in zip([(-q, -q), (q, -q), (q, q), (-q, q)], [(q, -q), (q, q), (-q, q), (-q, -q)]): m = np.maximum(m, mask(lambda d: stamp(d, bowed(ax - (bx - ax) * 0.04, ay - (by - ay) * 0.04 + (rng.random() - 0.5) * 0.6, bx + (bx - ax) * 0.04, by + (by - ay) * 0.04 + (rng.random() - 0.5) * 0.6, (rng.random() - 0.5) * 1.4), taper(1.9, 0.7, 0.07))))
+        for (ax, ay), (bx, by) in zip([(-q, -q), (q, -q), (q, q), (-q, q)], [(q, -q), (q, q), (-q, q), (-q, -q)]): m = np.maximum(m, mask(lambda d: stamp(d, bowed(ax - (bx - ax) * 0.04, ay - (by - ay) * 0.04 + (rng.random() - 0.5) * 0.6, bx + (bx - ax) * 0.04, by + (by - ay) * 0.04 + (rng.random() - 0.5) * 0.6, (1.1 + rng.random() * 0.7) * (1 if rng.random() < 0.5 else -1)), taper(1.9, 0.6, 0.1))))
         return m, m
     return np.zeros((N, N)), np.zeros((N, N))
 
@@ -197,7 +197,7 @@ def render(style, ap, state, accent):
     a = a * strength
     if style == "pencil" and ink:
         accent = accent + (1 - accent) * 0.22                                   # the same hue as a lighter pencil
-        a = a * np.where((speck < 0.42) & (np.asarray(core) < 0.5), 0.0, 1.0)   # charcoal specks at the edges and between strokes; the core stays solid
+        a = a * np.where((speck < 0.2) & (np.asarray(core) < 0.5), 0.0, 1.0)   # charcoal specks at the edges and between strokes; the core stays solid
     img = field * (1 - a[..., None]) + accent * a[..., None]
     if ring is not None: img = img * (1 - ring[..., None]) + text * ring[..., None]
     core = np.asarray(core) > 0.5

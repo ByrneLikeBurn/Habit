@@ -389,7 +389,7 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .dayc.on b{font-size:12px}
 .note.setlinks{display:flex;gap:26px;margin-top:6px;font-size:15px}
 .symrow2{display:flex;gap:0;margin:0 21px;flex-wrap:nowrap;justify-content:space-between}
-.lnk.dim{opacity:.4;text-decoration:none}
+.lnk.dim{color:var(--text3);font-weight:500;text-decoration:none}
 .mactitle{font:600 15px/1 var(--ui);margin:16px 21px 0}
 .macbtns{display:flex;justify-content:flex-end;gap:10px;margin:22px 21px 0}
 .symgrid .symb{width:44px;height:44px}
@@ -1186,7 +1186,7 @@ const repeats = (off)=>{ const n = off.length;
   <p class="note hint">${line}</p><p class="note setlinks"><span class="lnk ${n===0?"dim":""}" ${n===0?'aria-disabled="true"':""}>Set every day</span><span class="lnk">Set weekdays</span></p>`; };
 const symRow = (sel)=>`<div class="sec">Symbol</div><div class="symrow2"><span class="symb txt ${sel===-1?"on":""}">None</span>${["drop","book","moon","dice","walk"].map((k,i)=>`<span class="symb ${i===sel?"on":""}">${icon(k,26)}</span>`).join("")}<span class="symb txt more">More…</span></div>`;
 const logging = (count)=>`<div class="sec">Logging</div><div class="seg" style="margin-top:0"><span class="${count?"":"on"}">Mark done</span><span class="${count?"on":""}">Count</span></div>
-  <p class="note hint">${count?"Each log adds to the day's total.":"Log once and the day is done."}</p>`;
+  <p class="note hint">${count?"Each log adds to the day's total.":"Log once and it is done for the day."}</p>`;
 const nhTop = `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>New habit</b><span class="btn"><b>Add</b></span></div>`;
 function nhMark(style){
   return nhTop+`<div class="sec">Name</div><div class="field nm ph">For example, stretch after brushing teeth</div>${symRow(-1)}${logging(false)}${repeats([])}`;
@@ -1194,7 +1194,7 @@ function nhMark(style){
 function nhCount(style){
   return nhTop+`<div class="sec">Name</div><div class="field nm">Drink water</div>${symRow(0)}${logging(true)}
   <div class="frow"><span>Target each day</span><b class="num typed" role="textbox">8</b></div>
-  <div class="frow"><span>Unit and tap amount</span><span class="val">glasses, 1</span><span class="go" style="position:static;margin-left:8px;transform:scaleX(-1)">${chev}</span></div>${repeats([3])}`;
+  <div class="frow"><span>Unit and log amount</span><span class="val">glasses, 1</span><span class="go" style="position:static;margin-left:8px;transform:scaleX(-1)">${chev}</span></div>${repeats([3])}`;
 }
 function nhNoDays(style){
   return nhTop+`<div class="sec">Name</div><div class="field nm">Read</div>${symRow(1)}${logging(false)}${repeats([0,1,2,3,4,5,6])}`;
