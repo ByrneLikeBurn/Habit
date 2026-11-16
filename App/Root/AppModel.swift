@@ -103,7 +103,7 @@ final class AppModel {
                 }
             } else {
                 message = switch habit.kind {
-                case .binary: delta < 0 ? String(localized: "\(habit.name) cleared") : nil
+                case .binary: delta < 0 ? String(localized: "\(habit.name) cleared", comment: "Undo line, a status, not a command. The placeholder is the habit's name, for example: Read cleared.") : nil
                 case .counted: "\(habit.name): " + CountText.line(total: newTotal, target: habit.rule(on: logDay).target, unit: habit.unit)
                 }
             }
@@ -120,7 +120,7 @@ final class AppModel {
     func archive(_ habit: Habit, context: ModelContext, clock: HabitClock) {
         habit.archivedAt = clock.now()
         try? context.save()
-        show(UndoLine(message: String(localized: "\(habit.name) archived")) {
+        show(UndoLine(message: String(localized: "\(habit.name) archived", comment: "Undo line, a status, not a command. The placeholder is the habit's name, for example: Read archived.")) {
             habit.archivedAt = nil
             try? context.save()
         })

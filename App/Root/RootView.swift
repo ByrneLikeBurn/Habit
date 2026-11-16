@@ -91,6 +91,11 @@ struct RootView: View {
             if let habit = habits.first(where: { $0.kind == .binary && $0.total(on: clock.today) > 0 }) {
                 model.log(.tap, habit: habit, day: clock.today, context: context, clock: clock, undoManager: nil)
             }
+        case .undoLong:
+            // The longest fixture name, so the line is checked at its longest.
+            if let habit = habits.filter({ !$0.isArchived }).max(by: { $0.name.count < $1.name.count }) {
+                model.archive(habit, context: context, clock: clock)
+            }
         case .history, .historyMonth:
             break
         case .detailWeek, .detailMonth, .detailYear, .detailRuns:

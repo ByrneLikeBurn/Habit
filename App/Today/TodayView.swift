@@ -91,7 +91,8 @@ struct TodayView: View {
                     .font(style.label(.body))
                     .foregroundStyle(style.secondary)
                     .frame(minHeight: 44)
-                    .accessibilityElement(children: .combine)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text("Not scheduled today, \(split.notScheduled.count) habits", comment: "VoiceOver label for the group of habits not set for today. The number is how many."))
                 }
                 .listRowBackground(style.paper)
                 .listRowSeparatorTint(style.rule)
@@ -251,22 +252,32 @@ struct UndoLineView: View {
     let line: UndoLine
     @Environment(AppModel.self) private var model
     @Environment(\.style) private var style
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
-        HStack(spacing: 12) {
+        // At accessibility sizes Undo sits under the message, so a long name keeps rows in view.
+        let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 0)) : AnyLayout(HStackLayout(spacing: 12))
+        layout {
+            // Three lines at most. The middle is cut, so the name's start and the status word stay.
+            // VoiceOver reads the whole line.
             Text(line.message)
                 .font(style.label(.subheadline))
+                .lineLimit(3)
+                .truncationMode(.middle)
+                .padding(.top, typeSize.isAccessibilitySize ? 10 : 0)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if let undo = line.undo {
                 Button {
                     undo()
                     model.undoLine = nil
                 } label: {
+                    // The frame sits inside the label, so the whole 44-point square takes the tap.
                     Text("Undo").underline()
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .font(style.label(.subheadline, weight: .semibold))
-                .frame(minWidth: 44, minHeight: 44)
             }
         }
         // Reversed text and paper keep the fixed text contrast in both appearances.

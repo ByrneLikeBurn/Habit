@@ -26,7 +26,10 @@ final class TodayUITests: XCTestCase {
         let undo = app.buttons["Undo"]
         XCTAssertTrue(undo.waitForExistence(timeout: 2))
         XCTAssertTrue(app.staticTexts["Walk outside cleared"].exists)
-        undo.tap()
+        // The whole 44-point square takes the tap, not only the word: tap near its top edge.
+        XCTAssertGreaterThanOrEqual(undo.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(undo.frame.width, 44)
+        undo.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.06)).tap()
         XCTAssertEqual(walk.value as? String, "Done")
     }
 
@@ -96,7 +99,21 @@ final class TodayUITests: XCTestCase {
         read.swipeLeft()
         app.buttons["Archive"].tap()
         XCTAssertFalse(control("Read").waitForExistence(timeout: 1))
+        XCTAssertTrue(app.staticTexts["Read archived"].exists)
         app.buttons["Undo"].tap()
         XCTAssertTrue(control("Read").waitForExistence(timeout: 2))
+    }
+
+    /// The fixture's today is a Saturday, so the weekdays-only habit is not scheduled.
+    func testTheNotScheduledGroupReadsItsCountAndOpens() {
+        // A button holding the system disclosure triangle. XCUITest does not expose the open state,
+        // so collapsed and expanded are checked with VoiceOver, not here.
+        let group = app.buttons["Not scheduled today, 1 habit"]
+        XCTAssertTrue(group.waitForExistence(timeout: 5))
+        XCTAssertTrue(group.disclosureTriangles["Not scheduled today, 1 habit"].exists)
+        XCTAssertFalse(app.staticTexts["A log here still counts."].exists)
+        group.tap()
+        XCTAssertTrue(app.staticTexts["A log here still counts."].waitForExistence(timeout: 2))
+        XCTAssertTrue(control("Practise scales").exists)
     }
 }
