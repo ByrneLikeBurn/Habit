@@ -121,7 +121,10 @@ final class TodayUITests: XCTestCase {
                                "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
         app.launch()
         let undo = app.buttons["Undo"]
-        XCTAssertTrue(undo.waitForExistence(timeout: 5))
+        XCTAssertTrue(undo.waitForExistence(timeout: 5), "The fixture's long habit has no log in the last week to clear")
+        // The status is checked visibly by the screenshot ax5-undo-long-past-paper.jpg. Here its height
+        // shows it is drawn on more than one line, not cut to one.
+        XCTAssertGreaterThan(app.staticTexts["undo-status"].frame.height, undo.frame.height)
         let line = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@",
                                                         "Write three lines in the journal before the day gets going cleared, ", "November")).firstMatch
         XCTAssertTrue(line.exists, "VoiceOver should read the whole line")

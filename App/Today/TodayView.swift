@@ -256,37 +256,25 @@ struct UndoLineView: View {
     @Environment(\.style) private var style
     @Environment(\.dynamicTypeSize) private var typeSize
 
+    /// Three lines of the line's text at the current size. A sentence taller than this splits.
+    @ScaledMetric(relativeTo: .subheadline) private var threeLines: CGFloat = 62
+
     var body: some View {
         Group {
-            if typeSize.isAccessibilitySize, let name = line.name {
-                // The name takes one line and loses its end if it must. The status and Undo share
-                // the next line, so the capsule stays short and what happened always shows in full.
-                VStack(alignment: .leading, spacing: 0) {
-                    Text(name)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .padding(.top, 10)
-                        .accessibilityHidden(true)
-                    // Undo sits beside the status when both fit on one line, and under it when not,
-                    // so the status is never squeezed into a narrow column.
-                    ViewThatFits(in: .horizontal) {
-                        HStack(spacing: 12) {
-                            status.fixedSize(horizontal: true, vertical: false)
-                            Spacer(minLength: 0)
-                            undoButton
-                        }
-                        VStack(alignment: .leading, spacing: 0) {
-                            status.padding(.top, 4)
-                            undoButton
-                        }
+            if let name = line.name {
+                if typeSize.isAccessibilitySize {
+                    split(name)
+                } else {
+                    // The one sentence when it fits in three lines. A very long name splits instead,
+                    // so the capsule never fills the screen.
+                    ViewThatFits(in: .vertical) {
+                        sentence
+                        split(name)
                     }
+                    .frame(maxHeight: threeLines + 16)
                 }
             } else {
-                HStack(spacing: 12) {
-                    Text(line.message)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    undoButton
-                }
+                sentence
             }
         }
         .font(style.label(.subheadline))
@@ -301,17 +289,40 @@ struct UndoLineView: View {
         .frame(maxWidth: 393)
     }
 
-    private var status: some View {
-        Text(line.status)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .accessibilityLabel(Text(verbatim: line.message))
+    private var sentence: some View {
+        HStack(spacing: 12) {
+            Text(line.message)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            undoButton
+        }
+    }
+
+    /// The name, cut to two lines if it must, with Undo always at its trailing end.
+    /// The status has the full width below and is never cut. VoiceOver reads the whole line.
+    private func split(_ name: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text(name)
+                    .lineLimit(2)
+                    .truncationMode(.tail)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityHidden(true)
+                undoButton
+            }
+            Text(line.status)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 10)
+                .accessibilityLabel(Text(verbatim: line.message))
+                .accessibilityIdentifier("undo-status")
+        }
     }
 
     @ViewBuilder
     private var undoButton: some View {
         if let undo = line.undo {
             Button {
-                    undo()
+                undo()
                 model.undoLine = nil
             } label: {
                 // The frame sits inside the label, so the whole 44-point square takes the tap.

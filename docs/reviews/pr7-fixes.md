@@ -18,3 +18,20 @@ Nine lenses reviewed PR #7 and found six items on Today. The lines were the same
 | QA, Accessibility | 10 | The counted lines joined strings outside the catalog | Fixed. Both are localized formats with comments. The wording is unchanged |
 | QA | 11 | Only the "one" plural form was tested | Fixed. `theNotScheduledLabelHasBothPluralForms` reads the catalog |
 | QA | 12 | The working copy of the string catalog is an uncommitted Xcode rewrite with auto-generated comments | Not adopted. It is the owner's open Xcode session. Only the new plural entry was committed. Xcode takes the comments from the source when it extracts |
+
+## Round 2
+
+Accessibility passed all five of its round 1 findings. UI and UX passed four, and failed the capsule height for past-day and counted lines. QA passed four and one in part.
+
+The lenses disagreed on the name. UI and UX wanted one line and Undo moved off the status line. Accessibility and QA wanted two lines, so similar names can be told apart. The third option meets both. Undo sits at the trailing end of the name line, so it is always top right. The name has two lines, and the status has the full width below. At AX5 the archived and counted lines take three lines and a past-day clear four, against four and three before. The capsule no longer covers the counted mark. This was put together after both rounds and has not been back to the lenses.
+
+| Lens | Finding | Result |
+|---|---|---|
+| QA | The three-line cap at standard sizes was lost, so an imported 500-character name could fill the screen | Fixed. A sentence taller than three lines splits the same way. Checked once with a 300-character fixture name at the largest standard size: three lines. The fixture was restored |
+| QA | The AX5 test reads the full label, which does not change with what is drawn | Fixed in part. The status has an identifier, and the test checks it is taller than one line. The words themselves are checked by `ax5-undo-long-past-paper.jpg` |
+| QA | `undoLongPast` fell back to yesterday, where the tap logs | Fixed. With no log in the last week no line shows, and the test says the fixture is the cause |
+| UI and UX | Undo moved between screens at AX5 | Fixed by the third option |
+| UI and UX, QA, Accessibility | The `undo()` call was mis-indented | Fixed |
+| QA | At standard size the past-day counted line names no habit, "7 November: 4 of 8 glasses" | Owed to milestone 3. It is a wording change for the content lenses |
+| UI and UX | The past-day status could use a short month at accessibility sizes | Owed to milestone 3, with the item above |
+| Accessibility | After a log, scroll the row that was logged clear of the capsule | Owed to milestone 13 |

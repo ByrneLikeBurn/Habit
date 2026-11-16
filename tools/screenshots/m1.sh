@@ -58,6 +58,7 @@ done
 shot "ax5-undo-long-paper" light accessibility-extra-extra-extra-large disabled -fixture today -screen undoLong
 shot "ax5-undo-long-past-paper" light accessibility-extra-extra-extra-large disabled -fixture today -screen undoLongPast
 shot "ax5-undo-count-paper" light accessibility-extra-extra-extra-large disabled -fixture today -screen undoCount
+shot "xxxl-undo-long-past-paper" light extra-extra-extra-large disabled -fixture today -screen undoLongPast
 shot "ax5-contrast-today-ink" dark accessibility-extra-extra-extra-large enabled -fixture today
 
 xcrun simctl ui "$SIM" content_size large

@@ -99,8 +99,11 @@ struct RootView: View {
         case .undoLongPast:
             // The longest name, cleared on a past day: the line with the longest status.
             if let habit = habits.filter({ !$0.isArchived }).max(by: { $0.name.count < $1.name.count }) {
-                let day = (1...7).map { clock.today.adding(days: -$0) }.first { habit.total(on: $0) > 0 } ?? clock.today.adding(days: -1)
-                model.log(.tap, habit: habit, day: day, context: context, clock: clock, undoManager: nil)
+                // A day in the last week with a log, so the tap clears it. With none, no line shows,
+                // and the UI test that uses this screen fails on the fixture, not on the view.
+                if let day = (1...7).map({ clock.today.adding(days: -$0) }).first(where: { habit.total(on: $0) > 0 }) {
+                    model.log(.tap, habit: habit, day: day, context: context, clock: clock, undoManager: nil)
+                }
             }
         case .undoCount:
             if let habit = habits.first(where: { $0.kind == .counted && !$0.isArchived }) {
