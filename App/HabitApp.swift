@@ -12,6 +12,8 @@ struct HabitApp: App {
         // Screenshots run with animations off, system sheets included.
         if LaunchOptions.current.fixture != nil { UIView.setAnimationsEnabled(false) }
         #endif
+        // An export file left behind by a share that never finished.
+        DataTransfer.sweep()
     }
 
     var body: some Scene {
@@ -35,7 +37,35 @@ struct HabitApp: App {
             CommandGroup(replacing: .newItem) {
                 Button("New Habit") { model.showNewHabit = true }
                     .keyboardShortcut("n")
+                Divider()
+                Button("Export a Copy…") { model.showExport = true }
+                    .keyboardShortcut("e", modifiers: [.command, .shift])
+                Button("Import a Copy…") { model.choosingImportFile = true }
+                    .keyboardShortcut("i", modifiers: [.command, .shift])
             }
+            CommandGroup(before: .sidebar) {
+                Button("Today") { model.tab = .today }
+                    .keyboardShortcut("1")
+                Button("History") { model.tab = .history }
+                    .keyboardShortcut("2")
+                Divider()
+            }
+        }
+        #endif
+
+        #if os(macOS)
+        // On the Mac, settings live in a Settings window, opened with Command-comma.
+        SwiftUI.Settings {
+            Group {
+                if case .success(let container) = SharedStore.container {
+                    StyledScreen { YouView(isMacSettings: true) }
+                        .modelContainer(container)
+                }
+            }
+            .environment(settings)
+            .environment(model)
+            .preferredColorScheme(settings.preferredColorScheme)
+            .frame(minWidth: 460, minHeight: 520)
         }
         #endif
     }

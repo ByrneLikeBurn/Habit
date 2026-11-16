@@ -12,9 +12,11 @@ public enum DayState: String, Sendable, Equatable, CaseIterable {
     case loggedWhilePaused
     /// Diamond. The day is not scheduled and has a log.
     case loggedOffSchedule
-    /// Nothing. Off schedule, or no log.
+    /// A small dot. A past day or today that the habit is not scheduled for, with no log.
+    case offSchedule
+    /// Nothing. A scheduled day with no log, or a future day the habit is not set for.
     case blank
-    /// Faint dashed outline. A scheduled future day.
+    /// A scheduled future day. Calendars draw nothing for it: a future day shows its date alone.
     case toCome
     /// Empty outline. A past scheduled day with no log, only when Show days not logged is on.
     case notLogged
@@ -68,7 +70,7 @@ extension DayState {
             return input.targetMet ? .done : .partDone
         }
         if input.paused { return .paused }
-        guard input.scheduled else { return .blank }
+        guard input.scheduled else { return input.relation == .future ? .blank : .offSchedule }
         switch input.relation {
         case .future: return .toCome
         case .today: return .blank

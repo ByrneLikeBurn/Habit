@@ -45,9 +45,10 @@ public enum LogOutcome: Sendable, Equatable {
     }
 }
 
-/// Turns a log request into one `LogEvent`.
+/// Every `LogEvent` is created here.
 ///
-/// Invariant 5: only `LogHabitIntent` calls this in the app. A source check enforces it.
+/// Invariant 5: a user log reaches `log` only through `LogHabitIntent`. Import reaches
+/// `importEvents` only from the app's import file. A source check enforces both.
 public enum LogWriter {
     /// The delta an action would write, given the day's shown total. nil when nothing is written.
     public static func delta(for action: LogAction, kind: HabitKind, tapAmount: Int?, total: Int) -> Int? {
@@ -108,6 +109,78 @@ public enum LogWriter {
             throw error
         }
         return .wrote(delta: delta, newTotal: max(0, raw.addingSaturating(delta)))
+    }
+
+    /// The device value every imported log carries. The export file holds no device id.
+    public static let importedDeviceID = "imported"
+
+    public struct ImportResult: Sendable, Equatable {
+        public var habitsAdded: Int
+        public var logsAdded: Int
+        public var pausesAdded: Int
+        public var skipped: Int
+
+        public init(habitsAdded: Int, logsAdded: Int, pausesAdded: Int, skipped: Int) {
+            self.habitsAdded = habitsAdded
+            self.logsAdded = logsAdded
+            self.pausesAdded = pausesAdded
+            self.skipped = skipped
+        }
+    }
+
+    /// Writes a checked plan: all of it or none of it, with one save.
+    ///
+    /// A log keeps its id, day key, timestamp and source, and gets the device value "imported".
+    /// No value is altered: `ImportPlan.make` refuses a whole file for one bad record.
+    /// An existing habit keeps this device's details, archived state included.
+    @MainActor
+    @discardableResult
+    public static func importEvents(_ plan: ImportPlan, in context: ModelContext) throws -> ImportResult {
+        let existing = try context.fetch(FetchDescriptor<Habit>())
+        var habits = Dictionary(existing.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        // Into an empty store the file's order is kept as it is. Otherwise new habits follow the ones here.
+        let live = existing.filter { $0.deletedAt == nil }
+        let base = live.isEmpty ? nil : (live.map(\.sortIndex).max() ?? 0) + 1
+        for (rank, r) in plan.newHabits.sorted(by: { $0.sortIndex < $1.sortIndex }).enumerated() {
+            guard let kind = HabitKind(rawValue: r.kind), let first = r.rules.first else {
+                context.rollback()
+                throw ImportProblem.damaged
+            }
+            let habit = Habit(
+                name: r.name, symbolName: r.symbol, kind: kind, target: r.target, unit: r.unit,
+                schedule: Weekdays(rawValue: r.schedule), tapAmount: r.tapAmount,
+                sortIndex: base.map { $0 + rank } ?? r.sortIndex,
+                createdAt: r.created, firstDay: DayKey(rawValue: first.fromDay)
+            )
+            habit.id = r.id
+            habit.target = r.target
+            habit.tapAmount = r.tapAmount
+            habit.archivedAt = r.archived
+            habit.rules = r.rules.map { HabitRule(fromDay: DayKey(rawValue: $0.fromDay), target: $0.target, schedule: Weekdays(rawValue: $0.schedule)) }
+            context.insert(habit)
+            habits[r.id] = habit
+        }
+        for p in plan.newPauses {
+            let pause = Pause(habit: p.habit.flatMap { habits[$0] }, start: DayKey(rawValue: p.start), end: p.end.map(DayKey.init(rawValue:)), reason: PauseReason(rawValue: p.reason) ?? .manual)
+            pause.id = p.id
+            context.insert(pause)
+        }
+        for log in plan.newLogs {
+            guard let habit = habits[log.habit], let source = LogSource(rawValue: log.source) else {
+                context.rollback()
+                throw ImportProblem.damaged
+            }
+            let event = LogEvent(delta: log.delta, habit: habit, day: DayKey(rawValue: log.day), source: source, timestamp: log.time, deviceID: importedDeviceID)
+            event.id = log.id
+            context.insert(event)
+        }
+        do {
+            try context.save()
+        } catch {
+            context.rollback()
+            throw error
+        }
+        return ImportResult(habitsAdded: plan.newHabits.count, logsAdded: plan.newLogs.count, pausesAdded: plan.newPauses.count, skipped: plan.skippedLogs)
     }
 
     /// The raw total for one habit on one day, read with a day-filtered fetch.

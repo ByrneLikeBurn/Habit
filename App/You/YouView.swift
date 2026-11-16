@@ -3,7 +3,10 @@ import SwiftData
 import HabitKit
 
 struct YouView: View {
+    /// On the Mac this is the Settings window. Export and Import are in the File menu there.
+    var isMacSettings = false
     @Environment(Settings.self) private var settings
+    @Environment(AppModel.self) private var model
     @Environment(\.style) private var style
     @Query private var habits: [Habit]
     @State private var path: [Page] = LaunchOptions.current.screen.flatMap(Page.init(screen:)).map { [$0] } ?? []
@@ -27,16 +30,38 @@ struct YouView: View {
 
         NavigationStack(path: $path) {
             List {
-                Text("You")
-                    .font(style.display(.largeTitle, weight: .semibold))
-                    .foregroundStyle(style.text, style.secondary, style.tertiary)
-                    .accessibilityAddTraits(.isHeader)
-                    .listRowBackground(style.paper)
-                    .listRowSeparator(.hidden)
+                if !isMacSettings {
+                    Text("You")
+                        .font(style.display(.largeTitle, weight: .semibold))
+                        .foregroundStyle(style.text, style.secondary, style.tertiary)
+                        .accessibilityAddTraits(.isHeader)
+                        .listRowBackground(style.paper)
+                        .listRowSeparator(.hidden)
+                }
 
                 Section("Look") {
                     NavigationLink(value: Page.appearance) {
                         LabeledContent("Appearance", value: appearanceSummary)
+                    }
+                }
+                Section {
+                    SettingSwitch(title: "Show runs", isOn: $settings.showRuns)
+                    SettingSwitch(title: "Show days not logged", isOn: $settings.showDaysNotLogged)
+                } header: {
+                    Text("History")
+                } footer: {
+                    Text("A run counts the scheduled days in a row with any log, even a small one. Days not logged adds an empty outline to past days.")
+                }
+                if !isMacSettings {
+                    Section {
+                        Button("Export a copy") { model.showExport = true }
+                            .frame(minHeight: 44)
+                        Button("Import a copy") { model.choosingImportFile = true }
+                            .frame(minHeight: 44)
+                    } header: {
+                        Text("Your data")
+                    } footer: {
+                        Text("Your data lives on this device only. Export a copy now and then.")
                     }
                 }
                 Section {
@@ -68,6 +93,28 @@ struct YouView: View {
                 case .marks: MarksBoardView()
                 case .archived: ArchivedView()
                 }
+            }
+        }
+    }
+
+    /// The system switch. At accessibility sizes it sits on its own line with "On" or "Off" in words.
+    private struct SettingSwitch: View {
+        let title: LocalizedStringKey
+        @Binding var isOn: Bool
+        @Environment(\.dynamicTypeSize) private var typeSize
+
+        var body: some View {
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                    HStack {
+                        Toggle(title, isOn: $isOn).labelsHidden()
+                        Text(isOn ? "On" : "Off").accessibilityHidden(true)
+                    }
+                }
+                .accessibilityElement(children: .combine)
+            } else {
+                Toggle(title, isOn: $isOn)
             }
         }
     }
@@ -161,7 +208,7 @@ struct ArchivedView: View {
     }
 }
 
-/// The marks board. Only marks that milestone 1 can draw are listed.
+/// The marks board. Only marks the app can draw so far are listed. Pausing comes in milestone 3.
 struct MarksBoardView: View {
     @Environment(\.style) private var style
 
@@ -171,6 +218,7 @@ struct MarksBoardView: View {
             (.partDone, true, true, "Part done", "Some logged, under the target. It still counts."),
             (.blank, true, true, "Adds", "A plus means a tap adds to the count."),
             (.loggedOffSchedule, true, false, "Logged on a day off", "Logged on a day the habit is not set for. It still counts."),
+            (.offSchedule, false, false, "Not scheduled", "A dot is a day the habit is not set for."),
             (.blank, true, false, "Today", "The outline marks today. Empty means nothing logged yet."),
         ]
     }

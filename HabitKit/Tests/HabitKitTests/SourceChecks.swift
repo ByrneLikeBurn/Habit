@@ -79,6 +79,25 @@ struct SourceChecks {
         "HabitKit/Sources/HabitKit/Models/Schema.swift",
     ]
 
+    /// Invariant 5, second entry: only the app's import file calls `importEvents`.
+    static let importFile = "App/Data/ImportExport.swift"
+    static var importPattern: Regex<Substring> { try! Regex(#"importEvents\("#) }
+
+    @Test func onlyTheImportFileImports() throws {
+        let allowed: Set<String> = [Self.importFile, "HabitKit/Sources/HabitKit/Logic/LogWriter.swift"]
+        var offences: [String] = []
+        var found = false
+        for file in try swiftFiles() where !file.path.hasPrefix("HabitKit/Tests/") {
+            for (number, line) in file.text.split(separator: "\n", omittingEmptySubsequences: false).enumerated() where line.contains(Self.importPattern) {
+                if file.path == Self.importFile { found = true }
+                if !allowed.contains(file.path) { offences.append("\(file.path):\(number + 1)") }
+            }
+        }
+        #expect(found, "The import file does not call importEvents")
+        #expect(offences.isEmpty, "\(offences)")
+        #expect("try LogWriter.importEvents(plan, in: context)".contains(Self.importPattern))
+    }
+
     @Test func onlyTheIntentWritesLogs() throws {
         var offences: [String] = []
         for file in try swiftFiles() where !Self.writeAllowed.contains(file.path) && !file.path.hasPrefix("HabitKit/Tests/") {

@@ -6,6 +6,7 @@ struct HabitRow: View {
     struct Actions {
         var log: (LogAction) -> Void
         var openCount: () -> Void
+        var details: () -> Void
         var edit: () -> Void
         var archive: () -> Void
         var move: () -> Void
@@ -112,6 +113,7 @@ struct HabitRow: View {
 
     @ViewBuilder
     private var menu: some View {
+        Button("Details", systemImage: "calendar", action: actions.details)
         Button("Edit", systemImage: "pencil", action: actions.edit)
         Button("Move", systemImage: "arrow.up.arrow.down", action: actions.move)
         Button("Archive", systemImage: "archivebox", action: actions.archive)

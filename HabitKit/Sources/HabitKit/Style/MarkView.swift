@@ -65,9 +65,11 @@ public struct MarkView: View {
             Capsule().fill(style.mark).frame(width: inner * 0.7, height: style.markLineWidth * 2)
         case .notLogged:
             Rectangle().strokeBorder(style.secondary, lineWidth: style.markLineWidth)
-        case .toCome:
-            Rectangle().strokeBorder(style.tertiary, style: StrokeStyle(lineWidth: style.markLineWidth, dash: [3, 3]))
-        case .blank:
+        case .offSchedule:
+            // A small dot, so a day the habit is not set for never reads as a gap.
+            Circle().fill(style.tertiary).frame(width: SmallMark.dotSize(cell: size), height: SmallMark.dotSize(cell: size))
+        case .blank, .toCome:
+            // A future day shows its date alone.
             Color.clear
         }
     }

@@ -6,22 +6,35 @@ struct RootView: View {
     @Environment(Settings.self) private var settings
     @Environment(AppModel.self) private var model
     @Environment(\.modelContext) private var context
-    @State private var tab = LaunchOptions.current.screen?.opensYou == true ? Section.you : .today
-
-    enum Section: Hashable { case today, you }
+    @Query(filter: #Predicate<Pause> { $0.habit == nil }) private var sharedPauses: [Pause]
 
     var body: some View {
         @Bindable var model = model
         StyledScreen {
-            TabView(selection: $tab) {
-                Tab("Today", systemImage: "calendar", value: Section.today) {
-                    NavigationStack { TodayScreen() }
+            TabView(selection: $model.tab) {
+                Tab("Today", systemImage: "calendar", value: AppTab.today) {
+                    NavigationStack(path: $model.todayPath) {
+                        TodayScreen()
+                            .navigationDestination(for: DetailRoute.self) { HabitDetailView(route: $0, tab: .today) }
+                    }
+                    .undoLineInset()
                 }
-                Tab("You", systemImage: "person.crop.circle", value: Section.you) {
+                Tab("History", systemImage: "square.grid.2x2", value: AppTab.history) {
+                    NavigationStack(path: $model.historyPath) {
+                        HistoryView()
+                            .navigationDestination(for: DetailRoute.self) { HabitDetailView(route: $0, tab: .history) }
+                    }
+                    .undoLineInset()
+                }
+                #if !os(macOS)
+                Tab("You", systemImage: "person.crop.circle", value: AppTab.you) {
                     YouView()
                 }
+                #endif
             }
             .tabViewStyle(.sidebarAdaptable)
+            .environment(\.sharedPauses, sharedPauses)
+            .modifier(ImportPresenter())
             .sheet(isPresented: $model.showNewHabit) {
                 HabitFormView(habit: nil)
             }
@@ -31,8 +44,18 @@ struct RootView: View {
             .sheet(item: $model.counting) { request in
                 CountSheet(habit: request.habit, day: request.day)
             }
+            .sheet(item: $model.daySheet) { request in
+                DaySheet(habit: request.habit, day: request.day)
+            }
+            .sheet(item: $model.pickingPastDay) { habit in
+                PastDayPicker(habit: habit)
+            }
         }
-        .onAppear(perform: openLaunchScreen)
+        .onAppear {
+            if LaunchOptions.current.screen?.opensYou == true { model.tab = .you }
+            if LaunchOptions.current.screen?.opensHistory == true { model.tab = .history }
+            openLaunchScreen()
+        }
     }
 
     /// Opens the screen named by `-screen`, for screenshots.
@@ -54,6 +77,40 @@ struct RootView: View {
             if let habit = habits.first(where: { $0.kind == .binary && $0.total(on: clock.today) > 0 }) {
                 model.log(.tap, habit: habit, day: clock.today, context: context, clock: clock, undoManager: nil)
             }
+        case .history, .historyMonth:
+            break
+        case .detailWeek, .detailMonth, .detailYear, .detailRuns:
+            let kind: PeriodKind = screen == .detailWeek ? .week : (screen == .detailYear ? .year : .month)
+            if let habit = habits.first(where: { $0.kind == .counted }) {
+                model.openDetail(habit, kind: kind, anchor: clock.today, from: .today)
+            }
+        case .detailEmpty:
+            if let habit = habits.first(where: { !$0.hasLogs }) {
+                model.openDetail(habit, anchor: clock.today, from: .today)
+            }
+        case .day, .dayDone, .dayOff, .dayCount:
+            let past = (1...30).map { clock.today.adding(days: -$0) }
+            let pick: (Habit, DayKey)?
+            switch screen {
+            case .dayCount:
+                pick = habits.first { $0.kind == .counted }.flatMap { h in past.first { h.total(on: $0) > 0 }.map { (h, $0) } }
+            case .dayDone:
+                pick = habits.first { $0.kind == .binary && $0.schedule == .all }.flatMap { h in past.first { h.total(on: $0) > 0 }.map { (h, $0) } }
+            case .dayOff:
+                pick = habits.first { $0.schedule != .all }.flatMap { h in past.first { !h.isScheduled(on: $0) && h.total(on: $0) == 0 }.map { (h, $0) } }
+            default:
+                pick = habits.first { $0.kind == .binary && $0.schedule == .all }.flatMap { h in past.first { h.total(on: $0) == 0 }.map { (h, $0) } }
+            }
+            if let (habit, day) = pick {
+                model.openDetail(habit, anchor: clock.today, from: .today)
+                model.daySheet = DayRequest(habit: habit, day: day)
+            }
+        case .export:
+            model.showExport = true
+        case .importPreview, .importDone, .importNothing, .importNotHabit, .importNewer:
+            model.importStage = Fixtures.importStage(screen, context: context, clock: clock)
+        case .contrast:
+            break
         default:
             break
         }
@@ -63,7 +120,14 @@ struct RootView: View {
 extension LaunchOptions.Screen {
     var opensYou: Bool {
         switch self {
-        case .you, .appearance, .archived, .marks: true
+        case .you, .appearance, .archived, .marks, .export, .importPreview, .importDone, .importNothing, .importNotHabit, .importNewer: true
+        default: false
+        }
+    }
+
+    var opensHistory: Bool {
+        switch self {
+        case .history, .historyMonth: true
         default: false
         }
     }

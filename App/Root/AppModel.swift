@@ -22,6 +22,22 @@ struct CountRequest: Identifiable {
     var id: UUID { habit.id }
 }
 
+/// The day sheet's subject: one habit on one day, from Habit detail or History.
+struct DayRequest: Identifiable {
+    let habit: Habit
+    let day: DayKey
+    var id: String { "\(habit.id)-\(day)" }
+}
+
+/// Habit detail, opened on one period around one anchor day.
+struct DetailRoute: Hashable {
+    let habitID: UUID
+    var kind: PeriodKind
+    var anchor: DayKey
+}
+
+enum AppTab: Hashable { case today, history, you }
+
 /// Screen state shared by Today, the sheets and the menu commands.
 @MainActor
 @Observable
@@ -29,6 +45,15 @@ final class AppModel {
     var showNewHabit = false
     var editing: Habit?
     var counting: CountRequest?
+    var daySheet: DayRequest?
+    /// The past-day date picker in Habit detail, before the day sheet.
+    var pickingPastDay: Habit?
+    var tab: AppTab = .today
+    var todayPath: [DetailRoute] = []
+    var historyPath: [DetailRoute] = []
+    var showExport = false
+    var choosingImportFile = false
+    var importStage: ImportStage?
     var undoLine: UndoLine?
     var isReordering = false
     /// Changes on every log and take-back, for one haptic.
@@ -61,10 +86,20 @@ final class AppModel {
                 }
                 undoManager?.setActionName(String(localized: "Log"))
             }
-            // A take-back and every counted change show a line with Undo. A yes-or-no log shows its mark.
-            let message: String? = switch habit.kind {
-            case .binary: delta < 0 ? String(localized: "\(habit.name) cleared") : nil
-            case .counted: "\(habit.name): " + CountText.line(total: newTotal, target: habit.rule(on: logDay).target, unit: habit.unit)
+            // A take-back, every counted change and any change to a past day show a line with Undo.
+            // A yes-or-no log for today shows its mark.
+            let message: String?
+            if logDay != clock.today {
+                let date = clock.date(for: logDay).formatted(Date.FormatStyle(timeZone: clock.calendar.timeZone).day().month(.wide).locale(clock.calendar.locale ?? .autoupdatingCurrent))
+                message = switch habit.kind {
+                case .binary: delta < 0 ? String(localized: "Cleared \(date)") : String(localized: "Logged \(date)")
+                case .counted: "\(date): " + CountText.line(total: newTotal, target: habit.rule(on: logDay).target, unit: habit.unit)
+                }
+            } else {
+                message = switch habit.kind {
+                case .binary: delta < 0 ? String(localized: "\(habit.name) cleared") : nil
+                case .counted: "\(habit.name): " + CountText.line(total: newTotal, target: habit.rule(on: logDay).target, unit: habit.unit)
+                }
             }
             if let message, let inverse = outcome.inverse {
                 show(UndoLine(message: message) { [weak self] in
@@ -93,6 +128,16 @@ final class AppModel {
 
     func show(_ line: UndoLine) {
         undoLine = line
-        AccessibilityNotification.Announcement(line.message).post()
+        let spoken = line.undo == nil ? line.message : String(localized: "\(line.message). Undo available")
+        AccessibilityNotification.Announcement(spoken).post()
+    }
+
+    /// Opens Habit detail in the tab that asked for it.
+    func openDetail(_ habit: Habit, kind: PeriodKind = .month, anchor: DayKey, from tab: AppTab) {
+        let route = DetailRoute(habitID: habit.id, kind: kind, anchor: anchor)
+        switch tab {
+        case .history: historyPath.append(route)
+        default: todayPath.append(route)
+        }
     }
 }

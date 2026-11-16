@@ -12,11 +12,15 @@ struct LaunchOptions: Sendable {
 
     enum Screen: String, Sendable {
         case new, newCount, count, edit, you, appearance, archived, marks, notScheduled, undo
+        case history, historyMonth, detailWeek, detailMonth, detailYear, detailEmpty, detailRuns
+        case day, dayCount, dayOff, dayDone, export, importPreview, importDone, importNothing, importNotHabit, importNewer, contrast
     }
 
     var fixture: Fixture?
     var screen: Screen?
     var appearance: AppearanceChoice?
+    /// `-showRuns` turns Show runs on for screenshots.
+    var showRuns = false
 
     /// Saturday 14 November 2026, 09:41 in London.
     var clock: HabitClock? {
@@ -34,7 +38,8 @@ struct LaunchOptions: Sendable {
         return LaunchOptions(
             fixture: value("-fixture").flatMap(Fixture.init(rawValue:)),
             screen: value("-screen").flatMap(Screen.init(rawValue:)),
-            appearance: value("-appearance").flatMap(AppearanceChoice.init(rawValue:))
+            appearance: value("-appearance").flatMap(AppearanceChoice.init(rawValue:)),
+            showRuns: arguments.contains("-showRuns")
         )
     }()
 }

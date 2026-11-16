@@ -129,11 +129,6 @@ struct TodayView: View {
                 }
             }
         }
-        .safeAreaInset(edge: .bottom) {
-            if let line = model.undoLine {
-                UndoLineView(line: line)
-            }
-        }
         .sensoryFeedback(.impact(weight: .light), trigger: model.feedback)
         .task(id: scenePhase) {
             // Redraw when the day turns over or passes midnight. Nothing is drawn per frame.
@@ -155,6 +150,7 @@ struct TodayView: View {
                 model.log(action, habit: habit, day: day, context: context, clock: clock, undoManager: undoManager)
             },
             openCount: { model.counting = CountRequest(habit: habit, day: day) },
+            details: { model.openDetail(habit, kind: .month, anchor: day, from: .today) },
             edit: { model.editing = habit },
             archive: { model.archive(habit, context: context, clock: clock) },
             move: { model.isReordering = true },
@@ -232,6 +228,18 @@ struct FirstRunView: View {
                 .buttonBorderShape(.capsule)
                 .foregroundStyle(style.paper)
                 .controlSize(.large)
+            // A second, quiet way in for someone moving from another device.
+            Button {
+                model.choosingImportFile = true
+            } label: {
+                Text("Import a copy")
+                    .underline()
+                    .font(style.label(.subheadline))
+                    .foregroundStyle(style.text)
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
         }
         .padding(.bottom, 12)
     }
@@ -286,6 +294,7 @@ extension View {
         swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button("Archive", systemImage: "archivebox", action: actions.archive)
             Button("Edit", systemImage: "pencil", action: actions.edit)
+            Button("Details", systemImage: "calendar", action: actions.details)
         }
     }
 

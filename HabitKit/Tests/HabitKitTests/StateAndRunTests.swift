@@ -33,7 +33,8 @@ struct DayStateTests {
 
     @Test func aLogOnAnOffScheduleDayIsCredited() {
         #expect(DayState.resolve(day(1, scheduled: false)) == .loggedOffSchedule)
-        #expect(DayState.resolve(day(0, scheduled: false)) == .blank)
+        #expect(DayState.resolve(day(0, scheduled: false)) == .offSchedule)
+        #expect(DayState.resolve(day(0, scheduled: false, .future)) == .blank)
     }
 
     @Test func aPastDayWithNoLogDrawsNothingUnlessTheUserOptsIn() {
