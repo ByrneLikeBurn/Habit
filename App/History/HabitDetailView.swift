@@ -554,10 +554,10 @@ private struct StatsBlock: View {
                 if habit.kind == .counted && habit.target != nil {
                     StatRow(label: String(localized: "Days done"), value: stats.daysDone.formatted())
                 }
-                // The best-ever run comes last, and is quieter unless the current run is the longest, so it is
-                // never the headline after a gap. It is last in reading order too.
+                // The best-ever run comes last and is always quiet. Its style never depends on the current run,
+                // so a missed day changes nothing here. It is last in reading order too.
                 if stats.longestRun > 0 {
-                    StatRow(label: String(localized: "Longest run"), value: Self.days(stats.longestRun), quiet: !isOnLongestRun)
+                    StatRow(label: String(localized: "Longest run"), value: Self.days(stats.longestRun), quiet: true)
                 }
             }
         }
@@ -574,10 +574,6 @@ private struct StatsBlock: View {
         CountText.line(total: stats.unitTotal, target: nil, unit: habit.unit)
     }
 
-    /// Longest run is full weight only while the current run is the longest, so it is a reward and never a gap.
-    private var isOnLongestRun: Bool {
-        if case .days(let n) = stats.run { n >= stats.longestRun } else { false }
-    }
 
     private var runText: String {
         switch stats.run {

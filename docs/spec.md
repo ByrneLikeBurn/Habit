@@ -315,7 +315,7 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 
 **Day boundary.** Between midnight and the day-start hour, Today shows "Until 04:00" under the date. The day-start setting has the caption "Logs before this time count for the day before."
 
-**Stats.** Habit detail leads with Days logged, and for a counted habit a total in the user's unit. Days done comes with Show runs and the start date with Show days not logged. Longest run and Current run are behind one switch, "Show runs". "Show days not logged" is a separate switch. Current run is never hidden. Longest run shows once it is 1 day or more, and is quieter unless the current run is the longest.
+**Stats.** Habit detail leads with Days logged, and for a counted habit a total in the user's unit. Days done comes with Show runs and the start date with Show days not logged. Longest run and Current run are behind one switch, "Show runs". "Show days not logged" is a separate switch. Current run is never hidden. Longest run shows once it is 1 day or more. It is always quiet and comes last.
 
 **Pausing one habit.** Milestone 3 adds "Pause this habit" to the Edit form and the row menu, open-ended, with Resume in the same place. Gentle Mode is reachable from Today as well as from You. The Vacation form says the start can be in the past.
 
