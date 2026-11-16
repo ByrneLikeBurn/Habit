@@ -123,7 +123,7 @@ struct ImportSheet: View {
 
     @ToolbarContentBuilder
     private var toolbar: some ToolbarContent {
-        if case .preview = stage {
+        if case .preview(let plan) = stage, !plan.isEmpty {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") { dismiss() }
             }
@@ -149,7 +149,9 @@ struct ImportSheet: View {
                 StatRow(label: String(localized: "New logs"), value: plan.newLogs.count.formatted())
             }
             if plan.differing > 0 {
-                caption(String(localized: "\(plan.differing) habits have different details in this file. The version on this device is kept. Nothing here will be replaced."))
+                caption(plan.differing == 1
+                    ? String(localized: "1 habit has different details in this file. The version on this device is kept. Nothing here will be replaced.")
+                    : String(localized: "\(plan.differing) habits have different details in this file. The version on this device is kept. Nothing here will be replaced."))
             }
             Button("Import") {
                 model.importStage = DataTransfer.write(plan, context: context).map(ImportStage.done).fold

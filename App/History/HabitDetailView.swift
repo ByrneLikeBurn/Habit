@@ -302,7 +302,7 @@ private struct WeekTotalLine: View {
         if logged > 0 {
             let value = habit.kind == .counted
                 ? CountText.line(total: values.reduce(0, +), target: nil, unit: habit.unit)
-                : String(localized: "\(logged) days logged")
+                : (logged == 1 ? String(localized: "1 day logged") : String(localized: "\(logged) days logged"))
             StatRow(label: String(localized: "This week"), value: value)
         }
     }
@@ -411,7 +411,7 @@ enum MonthWords {
         let paused = states.filter { $0 == .paused }.count
         let credited = states.filter { $0 == .loggedWhilePaused || $0 == .loggedOffSchedule }.count
         var parts: [String] = []
-        if done > 0 { parts.append(String(localized: "\(done) days done")) }
+        if done > 0 { parts.append(done == 1 ? String(localized: "1 day done") : String(localized: "\(done) days done")) }
         if part > 0 { parts.append(String(localized: "\(part) part done")) }
         if credited > 0 { parts.append(String(localized: "\(credited) logged on a paused day or a day off")) }
         if paused > 0 { parts.append(String(localized: "\(paused) paused")) }
@@ -541,10 +541,14 @@ private struct StatsBlock: View {
             if showRuns {
                 StatRow(label: String(localized: "Current run"), value: runText)
                 if stats.longestRun > 0 {
-                    StatRow(label: String(localized: "Longest run"), value: String(localized: "\(stats.longestRun) days"))
+                    StatRow(label: String(localized: "Longest run"), value: Self.days(stats.longestRun))
                 }
             }
         }
+    }
+
+    static func days(_ n: Int) -> String {
+        n == 1 ? String(localized: "1 day") : String(localized: "\(n) days")
     }
 
     /// The unit as typed, with a capital first letter, or "Total" with no unit.
@@ -556,7 +560,7 @@ private struct StatsBlock: View {
 
     private var runText: String {
         switch stats.run {
-        case .days(let n): String(localized: "\(n) days")
+        case .days(let n): Self.days(n)
         case .betweenRuns: String(localized: "Between runs", comment: "State label. No run is active after a gap. Restructure freely. Must not name a missed day or a zero.")
         case .noRunYet: String(localized: "No run yet")
         }

@@ -136,6 +136,8 @@ private struct HistoryWeekHeader: View {
                     .font(style.label(.caption, weight: day == today ? .bold : .regular))
                     .underline(day == today)
                     .foregroundStyle(day > today ? style.tertiary : style.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                     .frame(width: 44)
             }
         }

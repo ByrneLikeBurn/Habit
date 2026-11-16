@@ -9,8 +9,16 @@ struct RootView: View {
     @Query(filter: #Predicate<Pause> { $0.habit == nil }) private var sharedPauses: [Pause]
 
     var body: some View {
+        if LaunchOptions.current.screen == .contrast {
+            StyledScreen { ContrastBoard() }
+        } else {
+            main
+        }
+    }
+
+    private var main: some View {
         @Bindable var model = model
-        StyledScreen {
+        return StyledScreen {
             TabView(selection: $model.tab) {
                 Tab("Today", systemImage: "calendar", value: AppTab.today) {
                     NavigationStack(path: $model.todayPath) {
@@ -80,7 +88,8 @@ struct RootView: View {
         case .history, .historyMonth:
             break
         case .detailWeek, .detailMonth, .detailYear, .detailRuns:
-            let kind: PeriodKind = screen == .detailWeek ? .week : (screen == .detailYear ? .year : .month)
+            // Runs are shown in the week view, where the stats fit on one screen.
+            let kind: PeriodKind = screen == .detailWeek || screen == .detailRuns ? .week : (screen == .detailYear ? .year : .month)
             if let habit = habits.first(where: { $0.kind == .counted }) {
                 model.openDetail(habit, kind: kind, anchor: clock.today, from: .today)
             }
@@ -97,7 +106,7 @@ struct RootView: View {
             case .dayDone:
                 pick = habits.first { $0.kind == .binary && $0.schedule == .all }.flatMap { h in past.first { h.total(on: $0) > 0 }.map { (h, $0) } }
             case .dayOff:
-                pick = habits.first { $0.schedule != .all }.flatMap { h in past.first { !h.isScheduled(on: $0) && h.total(on: $0) == 0 }.map { (h, $0) } }
+                pick = habits.first { $0.schedule != .all && $0.kind == .binary }.flatMap { h in past.first { !h.isScheduled(on: $0) && h.total(on: $0) == 0 }.map { (h, $0) } }
             default:
                 pick = habits.first { $0.kind == .binary && $0.schedule == .all }.flatMap { h in past.first { h.total(on: $0) == 0 }.map { (h, $0) } }
             }

@@ -53,6 +53,7 @@ struct DayWords {
     /// "9 to 15 November", or "30 November to 6 December" across a month end.
     func week(_ days: [DayKey]) -> String {
         guard let first = days.first, let last = days.last else { return "" }
+        if first == last { return dayMonth(first) }
         let start = first.month == last.month ? date(first).formatted(style().day()) : dayMonth(first)
         return String(localized: "\(start) to \(dayMonth(last))", comment: "A week, for example 9 to 15 November")
     }
