@@ -218,7 +218,7 @@ struct MarksBoardView: View {
             (.done, true, false, "Done", "The target was met, or a yes-or-no habit was logged."),
             (.partDone, true, true, "Part done", "Some logged, under the target. It still counts."),
             (.blank, true, true, "Adds", "A plus means a tap adds to the count."),
-            (.loggedOffSchedule, true, false, "Logged on a paused day or a\u{00A0}day\u{00A0}off", "A log on a day the habit was paused or not set for. It still counts."),
+            (.loggedOffSchedule, true, false, LocalizedStringResource("Logged on a paused day or a\u{00A0}day\u{00A0}off", comment: "Marks key title. The spaces in \"a day off\" do not break, so it stays on one line in English. Use ordinary spaces if your language needs them."), "A log on a day the habit was paused or not set for. It still counts."),
             (.offSchedule, false, false, "Not scheduled", "A dot is a day the habit is not set for."),
             (.blank, true, false, "Today", "The outline marks today. Empty means nothing logged yet."),
         ]

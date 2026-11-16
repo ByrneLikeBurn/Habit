@@ -31,18 +31,38 @@ struct SourceChecks {
 
     /// The diamond's cut jumps from the wide gap to the hairline at 12 points. Every full-size mark the app draws must sit
     /// clearly above it, so one screen never mixes the two drawings. MarkView's diamond is 68% of its size, so 18 is the floor.
+    /// Each `MarkView(state:` call is read to its closing bracket, across lines. A size the test cannot read as numbers fails.
     @Test func everyFullSizeMarkIsAboveTheCutThreshold() throws {
-        let call = try Regex(#"(?:^|[^A-Za-z])MarkView\(state:[^\n]*?size: ([0-9.]+)"#)
-        var sizes: [Double] = [28] // the default size
+        let start = try Regex(#"(?:^|[^A-Za-z])MarkView\(\s*state:"#)
+        let number = try Regex(#"[0-9]+(?:\.[0-9]+)?"#)
+        var checked = 0
         for file in try swiftFiles() {
-            for match in file.text.matches(of: call) {
-                if let value = match.output[1].substring.flatMap({ Double($0) }) { sizes.append(value) }
+            for match in file.text.matches(of: start) {
+                // From the opening bracket to the one that closes it.
+                let open = file.text[match.range].lastIndex(of: "(")!
+                var depth = 0, index = open, close = open
+                while index < file.text.endIndex {
+                    let c = file.text[index]
+                    if c == "(" { depth += 1 } else if c == ")" { depth -= 1; if depth == 0 { close = index; break } }
+                    index = file.text.index(after: index)
+                }
+                let arguments = file.text[file.text.index(after: open)..<close]
+                guard let sizeLabel = arguments.range(of: "size:") else {
+                    checked += 1 // the default, 28
+                    continue
+                }
+                // The size runs to the next argument or the end.
+                var expression = arguments[sizeLabel.upperBound...]
+                if let comma = expression.firstIndex(of: ",") { expression = expression[..<comma] }
+                let sizes = expression.matches(of: number).compactMap { Double(expression[$0.range]) }
+                #expect(!sizes.isEmpty, "\(file.path): a MarkView size the test cannot read: \(expression)")
+                for size in sizes {
+                    #expect(size * 0.68 > 12, "\(file.path): a MarkView of \(size) points draws its diamond under 12 points")
+                }
+                checked += 1
             }
         }
-        #expect(sizes.count > 1, "No MarkView sizes were found")
-        for size in sizes {
-            #expect(size * 0.68 > 12, "A MarkView of \(size) points draws its diamond under 12 points")
-        }
+        #expect(checked > 3, "Too few MarkView calls were found")
     }
 
     /// Tokens live in the style files only. A view that computes a colour or names a font is a bug.
