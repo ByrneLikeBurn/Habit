@@ -153,3 +153,20 @@ Both reviews failed the first draft on 16 November 2026 and passed the second wi
 **Plain text is not a setting.** The product owner would not add a flag. It becomes a gate in step 5: twelve habit names at 17 points are shown to the tired user and neurodiversity lenses. If the hand font fails, habit names use SF in that style, and only headings keep the display font.
 
 **To remove from `docs/spec.md` when this file merges.** The line that says Pencil uses a hand circle in calendars. A circle would match Watercolor's ring.
+
+### Step 3 drawing: reviewed, 16 November 2026
+
+`docs/mockups/png/m4-today-rows.png`, drawn by `tools/marks/today_rows.py`. Six Today rows in Pencil and Watercolor, on Paper and Ink. Senior designer and product owner, and accessibility and low vision, each took two rounds.
+
+Passed: each style can be told from one row. The Watercolor ring reads as one brush stroke, 1.61 to 3.12 points wide, closed, in the same place on every row. The control measures 40.2 points in Pencil and 36.5 in Watercolor, inside 44. Part done against done, and empty against paused, differ by shape. Secondary text is 7.5 on Paper and 8.4 on Ink or better. Pencil lines read as pencil. A name that wraps to two lines keeps 34 points between rows against 6 inside one.
+
+Changed after review: the Watercolor paused dab is shorter and tilted 12 degrees, because a centred straight dab in a circle read as the system's delete button.
+
+Owed, round two spent: mark clearance measured 2.5 to 2.97 points against 3. The lens's fix is applied (`q = H + 7`, `r = H + 5.4`). No lens has measured it since.
+
+Not adopted: "the diamond looks smaller than 24 points". It is 24 points tip to tip with a 1.25 point cut. A diamond covers half the area of a square that size.
+
+Gates before the milestone 4 build:
+- Human factors sees the Watercolor paused dab and the Watercolor diamond inside the ring. Test: shown one row for a glance, does either read as a delete button or as a stepper with two arrows. If it fails, the mark changes before it is built.
+- A three-line name and the largest text size are checked on the in-app screens. If rows stop separating in Watercolor, the row gap grows with the text size.
+- Whether Pen and ink drops the plus in a counted control: human factors and first-day user.

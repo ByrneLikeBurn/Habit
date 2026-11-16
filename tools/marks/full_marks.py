@@ -117,7 +117,7 @@ def pencil(state):
     return np.zeros((N, N)), np.zeros((N, N))
 
 def pencil_today():                                         # four strokes whose ends cross and overshoot each corner by 1 point
-    q = H + 6.5; m = np.zeros((N, N))      # 3 points clear of the mark, stroke ends and bow included
+    q = H + 7; m = np.zeros((N, N))      # 3 points clear of the mark, stroke ends and bow included
     for x0, y0, x1, y1 in [(-q - 1, -q, q + 1, -q + 0.5), (q, -q - 1, q - 0.4, q + 1), (q + 1, q, -q - 1, q - 0.5), (-q, q + 1, -q + 0.4, -q - 1)]:
         m = np.maximum(m, mask(lambda d: stamp(d, bowed(x0, y0, x1, y1, (rng.random() - 0.5) * 1.6), taper(1.5, 0.75, 0.06))))
     return m
@@ -174,7 +174,7 @@ def water(state, ink=False):
     return np.zeros((N, N)), np.zeros((N, N), bool)
 
 def water_today():                                          # one brushed ring: pooled where it starts, thin where it lifts, gap of 1 point at most
-    r = H + 5.2; n = 120; gap = 1.0 / r; start = -0.7
+    r = H + 5.4; n = 120; gap = 1.0 / r; start = -0.7
     def at(i): a = start + gap + (2 * math.pi - gap) * i / n; rr = r + 0.3 * math.sin(a * 2 + 0.6) - 0.9 * (i / n); return rr * math.cos(a), rr * math.sin(a)   # the end lands just inside the start
     def width(i): t = i / n; return max(1.5, 3.0 - 1.5 * t ** 0.7)       # 3 points where it pools at the start, thinning all the way round to 1.5 where it lifts
     return mask(lambda d: [stamp(d, [at(i), at(i + 0.5), at(i + 1)], (lambda t, w=width(i): w), 4) for i in range(n)])
