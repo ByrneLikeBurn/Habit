@@ -439,6 +439,24 @@ Drawn in `docs/mockups/png/sheet-m3.png`, in Pen and ink. Three reviews saw the 
 
 **Still owed.** The largest text size for the Today lines and the widget, clear mode, the Mac and Watch versions, and tests for travel across a pause edge.
 
+## History tab: month, no habits, many habits
+
+Drawn in `m2-hist-month.png`, `m2-hist-many.png` and `m2-hist-empty.png`. The product owner, senior designer, tired daily user and returning user settled this on 15 November 2026.
+
+**History has Week and Month. Year is cut from the History tab.** A year row would need one cell per week, which has to sum up seven days. That is a new mark and reads as a grade. Year stays in Habit detail. The product owner wanted Month cut too, and the returning user wanted both. They agreed on Month only, because it reuses the year view's small shapes and adds no screen. The product owner would still cut Month if the strip cannot be read in Pencil or Watercolor.
+
+**Month.** One row per habit: the name above one strip of the month's days. Each day is a small shape from the year view, with a little extra space before each Monday. A header shows the date above each Monday. A day with no log draws nothing. Today has the thin outline. The row is at least 56 points high and is one button. It opens Habit detail in Month, on the same month, and Back reads "History". Days are not targets in Month. VoiceOver reads one element per row: "Read. November 2026. 12 days done, 2 part done, 1 paused. Opens the month." It gives no count of days without a log. At accessibility sizes the strip becomes that sentence as text. History opens on Week, on the current week.
+
+**No habits.** "No habits yet", "Add a habit and its days will show here.", and an "Add a habit" button that opens the add sheet. The Week and Month control, the arrows and the header are hidden. A period with habits and no logs shows the rows and no message.
+
+**Many habits.** The list scrolls in Today's order. The control, the period title and the weekday or date header stay pinned. There is no totals row, no search and no filter. The hint sits once, after the last row. An archived habit is off the list. It appears under a plain "Archived" heading at the end only in a period where it has a log (**Guess**).
+
+**After the low-vision and tired-user check.** The month strip stays. Its dash is thicker and as wide as the cell, the diamond fills the cell, and the dot is 4 points. The same shapes are used in the year view. Month shows the year view's key under the hint, because part done is a triangle here and hatching in Week. Days to come draw nothing in Week and in Month. An archived row has no today outline, because it cannot be logged. Not drawn: Month with many rows.
+
+**The product owner's test, run on 15 November.** The product owner had said to cut Month if the strip cannot be read in Pencil or Watercolor. The strip was drawn in all three styles, light and dark, in `sheet-hist-month.png`, and measured. Marks are 4.1:1 to 4.4:1 and the dot is 4.9:1 to 5.4:1 in all six. Pen and ink and Pencil keep all five states apart. Watercolor was weakest: its part-done shape was a low half-round that sat beside the paused dash. It is now a half-disc split top to bottom, at full mark height, here and in the year view. Verdict: Month stays, because it is the only screen that shows every habit across a month. Conditions for milestone 4: check the strip at the largest text size and with a blur test in all three styles. If either fails, Month moves to milestone 13 and History becomes Week only, with no control. Measured again against the worst grain pixel in an empty band of each frame: marks are 3.96:1 or better and the dot is 4.85:1 or better in all six, against a floor of 3:1. These are drawings at twice size with 256 colours, so the build measures again on a simulator. The low-vision reviewer measured the new Watercolor part-done shape: 4.24:1 on paper and 4.37:1 on ink, and it stays apart from done and from the dash under a blur test. Its nearest neighbour under heavy blur is the 4 point dot, told apart mainly by blue against grey. The dash is now the width of the square, so a dash, a diamond and a dash in a row do not join.
+
+**Widget, clear mode.** Drawn in `m3-w-clear.png`. The drawing fails contrast on its wallpaper: text and marks measure between 1.8:1 and 2.9:1. In the build the system's vibrant foreground and glass backing draw the text and marks, and the widget is tested on the lightest wallpaper. No widget row draws the plus, in any mode, because it hid the part-done hatching and the whole row is the button.
+
 ## Largest text size, milestones 2 and 3
 
 Drawn in `docs/mockups/png/sheet-ax.png`. The accessibility and low-vision reviews saw the first draft on 15 November 2026. These are the rules after their findings.

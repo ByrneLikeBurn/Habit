@@ -116,6 +116,36 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 **Review lenses.** Each lens runs as a separate subagent that has not seen the working. It gets its brief, this file and the thing under review. It returns at most five findings, ranked, each with a file and line or a screen, and a concrete failure scenario. Valid findings are fixed. The rest are listed with the reason.
 
+**How much review a change gets.** The owner set this on 15 November 2026, after three reviewers tested it. It keeps reviews few and stops unchecked work from moving forward.
+
+1. Tag every change with the areas it touches. Only the lenses listed for those areas run. A change that touches two areas gets both sets.
+2. Easy to undo, such as a wording or drawing fix a lens asked for: that lens checks the fix, and nothing else runs.
+3. Later work builds on it, such as a written rule, a data rule, a mark's shape or how screens connect: every lens for that area passes it before the merge.
+4. Hard to undo, meaning the schema, anything that leaves the device, a dependency, cost or an invariant: those lenses, and then the owner.
+5. When the size is unclear, use the larger one. The size comes from what the change touches, not from how small it feels.
+6. Review the written rule first, then the drawing, then the build. Before anything is drawn, each lens says what it needs to see to pass.
+7. When a rule is written, compare it with what `main` already does. Compare again at the merge only if `main` has moved.
+8. A condition a lens sets is tested now, or it becomes a named gate in `docs/findings.md` for a later milestone, with the test and what happens if it fails. It is never left as a sentence in a report.
+9. Two rounds per lens per change. After that, an easy-to-undo item is recorded as owed. Anything larger stays unmerged, goes back to the lenses that disagree, and then to the owner.
+10. `docs/findings.md` is the one list of findings, each with a status: fixed, confirmed fixed, not adopted with the reason, or owed to a milestone. Every lens is given the list. Every finding names the frame, or the file and line, where it was seen, and the author looks there before acting on it.
+11. Read the gates and owed items at the start of each milestone.
+12. At each stop, record what the routed lenses missed and correct the table below.
+
+The PR body lists the areas touched, which lenses saw the final version, and what is still unchecked.
+
+| Area a change touches | Lenses that run |
+|---|---|
+| Wording and strings | Content designer, Neurodiversity expert, Tired daily user |
+| Layout, navigation and flows | UI and UX designer, Human factors, Accessibility expert, First-day user |
+| Marks, colour, contrast and type | Accessibility expert, Color vision and low vision, Typographer, Senior designer |
+| Behaviour: runs, pausing, nudges, targets | Behavioural scientist, Neurodiversity expert, Returning user |
+| Adding or cutting a screen or feature | Product owner, Senior designer |
+| Platform conventions: Mac, iPad, Watch, widgets | Apple industrial designer, Accessibility expert, Release engineer |
+| Data rules, schema and sync | Senior software engineer, QA engineer, then the owner for the schema |
+| Files, permissions, dependencies, anything leaving the device | Security and privacy expert, Release engineer, then the owner |
+| Code | Senior software engineer, QA engineer. Performance and app size when scrolling, launch or assets change |
+| Scenes | Illustrator, Color vision and low vision, Performance and app size, then the owner |
+
 After each milestone three lenses run: senior software engineer, QA engineer and tired daily user. Accessibility is added when the diff changes the UI. Security and privacy is added when the diff adds a permission, a file or a dependency. All twenty run at each stop: the end of phase 1, after milestone 3, and at the end. Run lenses two or three at a time, not all at once. The owner set this on 14 November 2026.
 
 | Lens | Team role | Brief |

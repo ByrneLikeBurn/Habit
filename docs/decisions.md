@@ -138,3 +138,9 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **On the Mac, settings live in a Settings window.** The brief put You in the sidebar on every platform. The Apple platform review found that a Mac user presses Command-comma and expects settings there. Pausing moves to the Habit menu and Today, and Export and Import move to the File menu.
 
 **Mac controls sit in the window toolbar and rows can be selected.** The first draft was the phone page centred in a window. The platform and accessibility reviews asked for toolbar buttons, a visible selection, arrow keys and a full set of menu commands, so every action works from the keyboard.
+
+## 15 November 2026, History tab
+
+**The History tab has Week and Month, and no Year.** The brief gave it all three. Four reviews found that a year row for every habit needs one cell per week, which sums up seven days and reads as a grade. Year stays in Habit detail, one tap away.
+
+**Reviews are sized by what a change touches and how hard it is to undo.** The owner asked for a logic with fewer reviews and no unchecked work moving forward. Twelve rules and a routing table are now in `CLAUDE.md`, tested by a tech lead, QA and product review. Open findings, gates and guesses live in one list, `docs/findings.md`.
