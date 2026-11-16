@@ -40,6 +40,18 @@ final class HistoryUITests: XCTestCase {
         XCTAssertFalse(cleared.exists)
     }
 
+    func testAddAPastDayOpensTheDaySheetFromTheBottomButton() {
+        let app = launch(["-screen", "detailMonth"])
+        let add = app.buttons["Add a past day"]
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        add.tap()
+        let open = app.buttons["Open this day"]
+        XCTAssertTrue(open.waitForExistence(timeout: 3))
+        open.tap()
+        // The picker defaults to yesterday, Friday 13 November. The day sheet follows with no timer.
+        XCTAssertTrue(app.staticTexts["Friday 13 November"].waitForExistence(timeout: 3))
+    }
+
     func testHistoryShowsEveryHabitAndArchivedOnlyWithALog() {
         let app = launch(["-screen", "history"])
         XCTAssertTrue(app.staticTexts["History"].waitForExistence(timeout: 5))

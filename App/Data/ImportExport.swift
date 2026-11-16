@@ -108,6 +108,8 @@ struct ImportSheet: View {
     @Environment(\.style) private var style
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    @Environment(Settings.self) private var settings
+    @Query private var habits: [Habit]
     /// Set on the first tap, so a double tap cannot write the file twice.
     @State private var importing = false
 
@@ -129,6 +131,26 @@ struct ImportSheet: View {
             .toolbar { toolbar }
         }
         .presentationDetents([.medium, .large])
+    }
+
+    /// Which habits get the new logs and over which days, so the user can tell it is the right file.
+    /// Import cannot be undone, so this is the check before it.
+    private func receiving(_ plan: ImportPlan) -> String? {
+        guard let first = plan.newLogs.map(\.day).min(), let last = plan.newLogs.map(\.day).max() else { return nil }
+        var names: [UUID: String] = Dictionary(habits.map { ($0.id, $0.name) }, uniquingKeysWith: { a, _ in a })
+        for r in plan.newHabits { names[r.id] = r.name }
+        var seen = Set<UUID>()
+        let ids = plan.newLogs.map(\.habit).filter { seen.insert($0).inserted }
+        let shown = ids.prefix(3).compactMap { names[$0] }
+        let more = ids.count - shown.count
+        let list = more > 0
+            ? String(localized: "\(shown.joined(separator: ", ")) and \(more) more")
+            : shown.formatted(.list(type: .and))
+        let words = DayWords(clock: settings.clock)
+        let from = words.full(DayKey(rawValue: first)), to = words.full(DayKey(rawValue: last))
+        return first == last
+            ? String(localized: "Logs for \(list), on \(from).")
+            : String(localized: "Logs for \(list), from \(from) to \(to).")
     }
 
     @ToolbarContentBuilder
@@ -163,6 +185,9 @@ struct ImportSheet: View {
             // Set apart, because these logs are not added.
             StatRow(label: String(localized: "Already here"), value: plan.skippedLogs.formatted())
                 .padding(.top, 8)
+            if let which = receiving(plan) {
+                caption(which)
+            }
             if plan.differing > 0 {
                 caption(plan.differing == 1
                     ? String(localized: "1 habit has different details in this file. The version on this device is kept. Nothing here will be replaced.")
@@ -312,13 +337,21 @@ struct ExportSheet: View {
         .presentationDetents([.medium, .large])
         #if os(iOS)
         .sheet(item: $shareURL, onDismiss: { written.map(DataTransfer.remove) }) { url in
-            ShareSheet(url: url) { dismiss() }
+            ShareSheet(url: url) { completed, error in
+                // A finished share closes the export screen. A cancel leaves it open to try again.
+                shareURL = nil
+                if error { failed = true } else if completed { dismiss() }
+            }
                 .presentationDetents([.medium, .large])
         }
         #else
         .fileExporter(isPresented: Binding(get: { exporting != nil }, set: { if !$0 { exporting = nil } }),
-                      document: exporting, contentType: .json, defaultFilename: DataTransfer.fileName(clock: settings.clock)) { _ in
-            dismiss()
+                      document: exporting, contentType: .json, defaultFilename: DataTransfer.fileName(clock: settings.clock)) { result in
+            // A failed save keeps the screen open with the message, so nobody believes they have a copy.
+            switch result {
+            case .success: dismiss()
+            case .failure: failed = true
+            }
         }
         #endif
     }
@@ -351,13 +384,14 @@ extension URL: @retroactive Identifiable {
 /// The system share sheet. The file is deleted when it closes.
 private struct ShareSheet: UIViewControllerRepresentable {
     let url: URL
-    var finished: () -> Void
+    /// Whether the share finished, and whether it failed.
+    var finished: (Bool, Bool) -> Void
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let controller = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-        controller.completionWithItemsHandler = { _, _, _, _ in
+        controller.completionWithItemsHandler = { _, completed, _, error in
             DataTransfer.remove(url)
-            finished()
+            finished(completed, error != nil)
         }
         return controller
     }

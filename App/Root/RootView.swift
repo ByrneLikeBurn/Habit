@@ -25,14 +25,14 @@ struct RootView: View {
                         TodayScreen()
                             .navigationDestination(for: DetailRoute.self) { HabitDetailView(route: $0, tab: .today) }
                     }
-                    .undoLineInset()
+                    .undoLineInset(.today)
                 }
                 Tab("History", systemImage: "square.grid.2x2", value: AppTab.history) {
                     NavigationStack(path: $model.historyPath) {
                         HistoryView()
                             .navigationDestination(for: DetailRoute.self) { HabitDetailView(route: $0, tab: .history) }
                     }
-                    .undoLineInset()
+                    .undoLineInset(.history)
                 }
                 #if !os(macOS)
                 Tab("You", systemImage: "person.crop.circle", value: AppTab.you) {
@@ -55,7 +55,13 @@ struct RootView: View {
             .sheet(item: $model.daySheet) { request in
                 DaySheet(habit: request.habit, day: request.day)
             }
-            .sheet(item: $model.pickingPastDay) { habit in
+            .sheet(item: $model.pickingPastDay, onDismiss: {
+                // The day sheet opens once the picker has gone, with no timer.
+                if let next = model.pastDayChosen {
+                    model.pastDayChosen = nil
+                    model.daySheet = next
+                }
+            }) { habit in
                 PastDayPicker(habit: habit)
             }
         }

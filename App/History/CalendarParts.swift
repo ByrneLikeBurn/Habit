@@ -224,18 +224,20 @@ enum Verb {
 }
 
 extension View {
-    /// The Undo line above the tab bar. It covers nothing and stays until the next action.
-    func undoLineInset() -> some View {
-        modifier(UndoLineInset())
+    /// The Undo line above the tab bar, in the tab where the action was made. It covers nothing and
+    /// stays until the next action.
+    func undoLineInset(_ tab: AppTab) -> some View {
+        modifier(UndoLineInset(tab: tab))
     }
 }
 
 private struct UndoLineInset: ViewModifier {
+    let tab: AppTab
     @Environment(AppModel.self) private var model
 
     func body(content: Content) -> some View {
         content.safeAreaInset(edge: .bottom) {
-            if let line = model.undoLine {
+            if let line = model.undoLine, line.tab == tab {
                 UndoLineView(line: line)
             }
         }

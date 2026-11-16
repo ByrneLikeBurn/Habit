@@ -16,9 +16,16 @@ struct DaySheet: View {
     @Environment(\.undoManager) private var undoManager
     @Environment(\.sharedPauses) private var sharedPauses
     @Environment(\.dynamicTypeSize) private var typeSize
-    @State private var amountText = "1"
+    /// Starts at the tap amount, like the count sheet on Today.
+    @State private var amountText: String
     @State private var selection: TextSelection?
     @FocusState private var amountFocused: Bool
+
+    init(habit: Habit, day: DayKey) {
+        self.habit = habit
+        self.day = day
+        _amountText = State(initialValue: (habit.tapAmount ?? 1).formatted())
+    }
 
     private var amount: Int? {
         CountText.parse(amountText).flatMap { $0 > 0 ? $0 : nil }
@@ -68,7 +75,7 @@ struct DaySheet: View {
     private func binary(total: Int, state: DayState) -> some View {
         if total > 0 {
             heading(stateWords(state) ?? String(localized: "Done"))
-            textButton("Clear this day") { apply(.clear) }
+            clearButton
         } else {
             heading(state == .offSchedule ? String(localized: "Not scheduled") : String(localized: "Nothing logged"))
             if state == .offSchedule { note("A log here still counts.") }
@@ -122,19 +129,23 @@ struct DaySheet: View {
                     selection = TextSelection(range: amountText.startIndex..<amountText.endIndex)
                 }
             }
-        if amount == nil {
+        if let amount {
+            // The result of each button, so a correction needs no sum.
+            let added = min(total + amount, CountText.maximumAmount)
+            note(total > 0
+                 ? "Add makes \(added.formatted()). Take away makes \(max(total - amount, 0).formatted())."
+                 : "Add makes \(added.formatted()).")
+        } else {
             note("Type a whole number above 0.")
         }
         primaryButton("Add") { if let amount { apply(.add(amount)) } }
             .disabled(amount == nil)
 
-        let stack = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 4)) : AnyLayout(HStackLayout(spacing: 20))
-        stack {
-            textButton("Take away") { if let amount { apply(.takeAway(amount)) } }
-                .disabled(amount == nil || total == 0)
-            if total > 0 {
-                textButton("Clear this day") { apply(.clear) }
-            }
+        textButton("Take away") { if let amount { apply(.takeAway(amount)) } }
+            .disabled(amount == nil || total == 0)
+        if total > 0 {
+            // On its own row, apart from Take away, so a slip does not clear the day.
+            clearButton.padding(.top, 16)
         }
     }
 
@@ -187,6 +198,18 @@ struct DaySheet: View {
         .buttonStyle(.plain)
     }
 
+    /// Clear differs from Take away by its symbol as well as its words.
+    private var clearButton: some View {
+        Button { apply(.clear) } label: {
+            Label("Clear this day", systemImage: "xmark")
+                .font(style.label(.subheadline))
+                .foregroundStyle(style.text)
+                .frame(minWidth: 44, maxWidth: typeSize.isAccessibilitySize ? .infinity : nil, minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
     private func apply(_ action: LogAction) {
         model.log(action, habit: habit, day: day, context: context, clock: settings.clock, undoManager: undoManager)
         dismiss()
@@ -213,6 +236,18 @@ struct PastDayPicker: View {
                     .environment(\.timeZone, clock.calendar.timeZone)
             }
             .scrollContentBackground(.hidden)
+            .safeAreaInset(edge: .bottom) {
+                // Within thumb reach, as well as Next in the bar.
+                Button(action: next) {
+                    Text("Open this day").frame(maxWidth: .infinity, minHeight: 32)
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+                .foregroundStyle(style.paper)
+                .controlSize(.large)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 8)
+            }
             .paperBackground(style)
             .navigationTitle("Add a past day")
             #if os(iOS)
@@ -223,21 +258,21 @@ struct PastDayPicker: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Next") {
-                        // The picker gives a calendar date, not an instant in a habit day, so read its fields directly.
-                        var gregorian = Calendar(identifier: .gregorian)
-                        gregorian.timeZone = clock.calendar.timeZone
-                        let c = gregorian.dateComponents([.year, .month, .day], from: date)
-                        let chosen = min(DayKey(year: c.year ?? 2000, month: c.month ?? 1, day: c.day ?? 1), clock.today)
-                        dismiss()
-                        Task {
-                            try? await Task.sleep(for: .milliseconds(400))
-                            model.daySheet = DayRequest(habit: habit, day: chosen)
-                        }
-                    }
+                    Button("Next", action: next)
                 }
             }
         }
         .onAppear { date = clock.date(for: clock.today.adding(days: -1)) }
+    }
+
+    private func next() {
+        let clock = settings.clock
+        // The picker gives a calendar date, not an instant in a habit day, so read its fields directly.
+        var gregorian = Calendar(identifier: .gregorian)
+        gregorian.timeZone = clock.calendar.timeZone
+        let c = gregorian.dateComponents([.year, .month, .day], from: date)
+        let chosen = min(DayKey(year: c.year ?? 2000, month: c.month ?? 1, day: c.day ?? 1), clock.today)
+        model.pastDayChosen = DayRequest(habit: habit, day: chosen)
+        dismiss()
     }
 }

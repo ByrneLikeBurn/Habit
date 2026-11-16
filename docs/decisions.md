@@ -172,3 +172,19 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **Each window has its own state.** One model was shared by every window, so an export or import opened in all of them, and the Mac File menu stayed live with no window open. Each window now has its own, and the Mac menus act on the focused window and are off when none is open. Asked for by the release engineer.
 
 **The import preview leads with what changes.** It showed the file's totals first, so the reader had to subtract. It now shows the habits, logs and pauses it adds and the logs already here, in the same rows as the result. Asked for by the tired daily user.
+
+**An archived habit takes no logs in Habit detail either.** History already drew an archived habit's days as plain marks, while detail let them be logged. Detail now matches: its days are not buttons, and "Add a past day" becomes "Bring back". Asked for by the UI and UX designer.
+
+**The Undo line shows only in the tab where the action was made.** A line made in History also showed on Today, where Undo would change a day out of sight. Asked for by the UI and UX designer.
+
+**The day sheet says what each button makes.** A count could only be corrected by working out the difference. A line under the amount now reads, for example, "Add makes 9. Take away makes 7." Clear this day is on its own row with a symbol, away from Take away. Asked for by human factors.
+
+**The past-day amount starts at the tap amount**, as the count sheet on Today does. Asked for by the first-day user and the UI and UX designer.
+
+**Add a past day has a button at the bottom, "Open this day",** as well as Next, and the day sheet follows the picker with no timer. Asked for by human factors.
+
+**The import preview names the habits that get logs and the days they cover,** because an import cannot be undone. Asked for by human factors.
+
+**History's hint sits above the rows, and Week links to the marks board.** The hint was under the last row, behind the tab bar. Asked for by the first-day user.
+
+**A failed export says so.** A cancelled share leaves the export screen open, and a failed save on the Mac shows the existing message. Asked for by the UI and UX designer.

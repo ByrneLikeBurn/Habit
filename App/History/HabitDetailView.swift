@@ -36,6 +36,7 @@ private struct HabitDetailPage: View {
     @Environment(\.style) private var style
     @Environment(\.sharedPauses) private var sharedPauses
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.modelContext) private var context
     @State private var kind: PeriodKind
     @State private var anchor: DayKey
 
@@ -113,10 +114,19 @@ private struct HabitDetailPage: View {
                     }
                 }
 
+                if habit.isArchived {
+                    Text("Archived. Bring it back to add a log.")
+                        .font(style.label(.subheadline))
+                        .foregroundStyle(style.secondary)
+                }
                 Button {
-                    model.pickingPastDay = habit
+                    if habit.isArchived {
+                        model.bringBack(habit, context: context, all: (try? context.fetch(FetchDescriptor<Habit>())) ?? [])
+                    } else {
+                        model.pickingPastDay = habit
+                    }
                 } label: {
-                    Text("Add a past day")
+                    Text(habit.isArchived ? "Bring back" : "Add a past day")
                         .font(style.label(.subheadline, weight: .semibold))
                         .foregroundStyle(hasLogs ? style.text : style.paper)
                         .padding(.horizontal, 14)
@@ -257,7 +267,8 @@ private struct WeekGrid: View {
     private func dayButton(_ day: DayKey, state: DayState, words: DayWords, @ViewBuilder label: () -> some View) -> some View {
         let spoken = [words.long(day), DayWords.state(state), countWords(day)].compactMap { $0 }.joined(separator: ". ")
         // A future day is not a button, unless it already holds a log (after travel or a new day-start hour).
-        if day > today && (totals[day.rawValue] ?? 0) <= 0 {
+        // An archived habit takes no logs, as in History. Detail offers to bring it back.
+        if (day > today && (totals[day.rawValue] ?? 0) <= 0) || habit.isArchived {
             label()
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text(spoken))

@@ -30,9 +30,19 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 2 | No screen was checked on a phone smaller than 393 by 852 points | `sheet-ax.png` |
 | 3 | The Mac Habit menu, row selection and arrow keys are not built. File and View menus are | `mac-menus.png` |
 | 3 | History week rows expose each day as its own VoiceOver element instead of one row summary | `App/History/HistoryView.swift` |
+| 13 | Swipe to change period in Habit detail and History, beside the arrows. Needs a check that it does not fight the back swipe | Human factors, 15 Nov. `detail-month-paper.jpg` |
+| 13 | "What the marks mean" in Habit detail sits below the stats, out of view, and is missing before the first log | First-day user, 15 Nov. `HabitDetailView.swift`, `detail-month-paper.jpg` |
+| 13 | A file picker that fails to open a file shows nothing | UI and UX designer, 15 Nov. `ImportExport.swift`, `ImportPresenter` |
 | 3 | Tests for travel across a pause edge | `docs/spec.md`, Milestone 3 screens |
 | 4 | Pencil dark version, Pencil marks board, hand-drawn dashes for days to come | `docs/spec.md`, Pencil |
 | After MVP | Habit detail in two columns on the Mac, and a popover for a past day | `docs/spec.md`, Mac window |
+
+## Not adopted
+
+| Finding | Reason |
+|---|---|
+| An empty Habit detail should show an empty week, to show the shape of the screen (first-day user) | The spec asks for one sentence and Add a past day. An empty grid on day one reads as days not logged |
+| A "Set to" control on the day sheet (human factors) | The "makes" line removes the sum with no new control |
 
 ## Guesses
 

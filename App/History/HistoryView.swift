@@ -45,6 +45,11 @@ struct HistoryView: View {
                     }
                 } else {
                     Section {
+                        // How to use the rows, above them, so it is seen before the list runs under the tab bar.
+                        Text(kind == .week ? Verb.tapHabitOrDay : Verb.tapHabitMonth)
+                            .font(style.label(.footnote))
+                            .foregroundStyle(style.secondary)
+                            .padding(.vertical, 4)
                         if kind == .month && !typeSize.isAccessibilitySize {
                             SmallMarkKey().padding(.vertical, 6)
                         }
@@ -62,15 +67,21 @@ struct HistoryView: View {
                                 row(habit, days: days, today: today, archived: true)
                             }
                         }
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(kind == .week ? Verb.tapHabitOrDay : Verb.tapHabitMonth)
-                            if kind == .week {
-                                Text("A dot is a day the habit is not scheduled.")
+                        if kind == .week {
+                            NavigationLink {
+                                MarksBoardView()
+                            } label: {
+                                HStack {
+                                    Text("What the marks mean").font(style.label(.body)).foregroundStyle(style.text)
+                                    Spacer()
+                                    Image(systemName: "chevron.right").foregroundStyle(style.secondary).accessibilityHidden(true)
+                                }
+                                .frame(minHeight: 44)
+                                .contentShape(Rectangle())
                             }
+                            .buttonStyle(.plain)
+                            .padding(.top, 8)
                         }
-                        .font(style.label(.footnote))
-                        .foregroundStyle(style.secondary)
-                        .padding(.top, 12)
                     } header: {
                         header(days: days, anchor: anchor, today: today, words: words)
                     }
@@ -82,6 +93,7 @@ struct HistoryView: View {
             .frame(maxWidth: .infinity)
         }
         .paperBackground(style)
+        .navigationTitle("History")
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
         #endif
@@ -201,7 +213,7 @@ private struct HistoryWeekRow: View {
         let states = habit.states(for: days, today: today, totals: totals, sharedPauses: sharedPauses, showDaysNotLogged: settings.showDaysNotLogged)
         let words = DayWords(clock: settings.clock)
 
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 6) {
             Button {
                 model.openDetail(habit, kind: .week, anchor: days.last.map { min($0, today) } ?? today, from: .history)
             } label: {

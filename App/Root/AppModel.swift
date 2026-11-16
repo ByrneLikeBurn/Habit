@@ -8,6 +8,8 @@ struct UndoLine: Identifiable {
     let message: String
     /// nil for a line that only informs, such as a failed save.
     let undo: (@MainActor () -> Void)?
+    /// The tab the action was made in. The line shows there only, so Undo never acts out of sight.
+    var tab: AppTab = .today
 
     init(message: String, undo: (@MainActor () -> Void)? = nil) {
         self.message = message
@@ -48,6 +50,8 @@ final class AppModel {
     var daySheet: DayRequest?
     /// The past-day date picker in Habit detail, before the day sheet.
     var pickingPastDay: Habit?
+    /// The day picked in "Add a past day", opened when the picker has closed.
+    var pastDayChosen: DayRequest?
     var tab: AppTab = .today
     var todayPath: [DetailRoute] = []
     var historyPath: [DetailRoute] = []
@@ -127,6 +131,8 @@ final class AppModel {
     }
 
     func show(_ line: UndoLine) {
+        var line = line
+        line.tab = tab
         undoLine = line
         let spoken = line.undo == nil ? line.message : String(localized: "\(line.message). Undo available")
         AccessibilityNotification.Announcement(spoken).post()
