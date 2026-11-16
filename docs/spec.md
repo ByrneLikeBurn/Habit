@@ -439,6 +439,20 @@ Drawn in `docs/mockups/png/sheet-m3.png`, in Pen and ink. Three reviews saw the 
 
 **Still owed.** The largest text size for the Today lines and the widget, clear mode, the Mac and Watch versions, and tests for travel across a pause edge.
 
+## History tab: month, no habits, many habits
+
+Drawn in `m2-hist-month.png`, `m2-hist-many.png` and `m2-hist-empty.png`. The product owner, senior designer, tired daily user and returning user settled this on 15 November 2026.
+
+**History has Week and Month. Year is cut from the History tab.** A year row would need one cell per week, which has to sum up seven days. That is a new mark and reads as a grade. Year stays in Habit detail. The product owner wanted Month cut too, and the returning user wanted both. They agreed on Month only, because it reuses the year view's small shapes and adds no screen. The product owner would still cut Month if the strip cannot be read in Pencil or Watercolor.
+
+**Month.** One row per habit: the name above one strip of the month's days. Each day is a small shape from the year view, with a little extra space before each Monday. A header shows the date above each Monday. A day with no log draws nothing. Today has the thin outline. The row is at least 56 points high and is one button. It opens Habit detail in Month, on the same month, and Back reads "History". Days are not targets in Month. VoiceOver reads one element per row: "Read. November 2026. 12 days done, 2 part done, 1 paused. Opens the month." It gives no count of days without a log. At accessibility sizes the strip becomes that sentence as text. History opens on Week, on the current week.
+
+**No habits.** "No habits yet", "Add a habit and its days will show here.", and an "Add a habit" button that opens the add sheet. The Week and Month control, the arrows and the header are hidden. A period with habits and no logs shows the rows and no message.
+
+**Many habits.** The list scrolls in Today's order. The control, the period title and the weekday or date header stay pinned. There is no totals row, no search and no filter. The hint sits once, after the last row. An archived habit is off the list. It appears under a plain "Archived" heading at the end only in a period where it has a log (**Guess**).
+
+**Widget, clear mode.** Drawn in `m3-w-clear.png`. Marks are full opacity and the rows have no rules.
+
 ## Largest text size, milestones 2 and 3
 
 Drawn in `docs/mockups/png/sheet-ax.png`. The accessibility and low-vision reviews saw the first draft on 15 November 2026. These are the rules after their findings.

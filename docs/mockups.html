@@ -368,6 +368,18 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .mmenu div{display:flex;justify-content:space-between;padding:6px 10px}
 .mmenu kbd{font:400 13px/1 var(--ui);color:var(--text2)}
 .mmenu hr{border:0;border-top:1px solid var(--rule);margin:4px 8px}
+.hstrip{display:flex;align-items:center;height:22px}
+.hs{width:11px;height:11px;flex:none;display:grid;place-items:center;position:relative}
+.hs.mon{margin-left:3px}
+.hs svg{width:9.5px;height:9.5px;display:block}
+.hs.yoff::after{left:4px;top:4px}
+.hh{height:16px}
+.hh b{font:500 10px/1 var(--ui);color:var(--text3);position:absolute;left:0;top:0;white-space:nowrap}
+.lr.hm{min-height:56px;padding:8px 0 4px}
+.pinned{position:sticky;top:0;background:var(--paper);padding-top:6px;border-bottom:1px solid var(--rule2)}
+.wclear{padding:22px;border-radius:26px;background:linear-gradient(135deg,#5b6f8a,#a9806f 55%,#d9b98a)}
+.widget.clear{background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);backdrop-filter:blur(8px)}
+.widget.clear .wr + .wr{border-top:0}
 .ymons{display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 21px 0}
 .ym{display:grid;gap:5px;min-height:44px;align-content:start}
 .ym span{font:500 11px/1 var(--ui);color:var(--text3)}
@@ -885,7 +897,7 @@ function m2Progress(style){
              ["moon","Stretch before bed",["blank","blank","solid","blank","solid","blank","blank"]]];
   const cell = (x,i)=> `<span class="lc ${i===5?"now":""} ${i>5?"later":""}">${x==="off" ? offDot(20) : mark(x,{style,size:20})}</span>`;
   return status()+`<div class="nav"><span></span><span></span></div>${head("History")}
-  <div class="seg"><span class="on">Week</span><span>Month</span><span>Year</span></div>
+  <div class="seg"><span class="on">Week</span><span>Month</span></div>
   <div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
   <div class="ledger"><div class="lh">${"MTWTFSS".split("").map((d,i)=>`<span class="${i===5?"now":""}">${d}</span>`).join("")}</div>
   ${P.map(([ic,n,st])=>`<div class="lr" role="button"><span class="ln">${icon(ic,22)}${n}</span><div class="lcs">${st.map(cell).join("")}</div></div>`).join("")}</div>
@@ -1070,7 +1082,7 @@ function macHistory(style){
              ["moon","Stretch before bed",["blank","blank","solid","blank","solid","blank","blank"]]];
   const cell = (x,i)=> `<span class="lc ${i===5?"now":""}">${x==="off" ? offDot(20) : mark(x,{style,size:20})}</span>`;
   return macWin("progress", `<span></span><span></span>`, `${head("History")}
-  <div class="seg"><span class="on">Week</span><span>Month</span><span>Year</span></div>
+  <div class="seg"><span class="on">Week</span><span>Month</span></div>
   <div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
   <div class="ledger wide"><div class="lr lhr"><span></span><div class="lh">${"MTWTFSS".split("").map((d,i)=>`<span class="${i===5?"now":""}">${d}</span>`).join("")}</div></div>
   ${P.map(([ic,n,st])=>`<div class="lr" role="button"><span class="ln">${icon(ic,22)}${n}</span><div class="lcs">${st.map(cell).join("")}</div></div>`).join("")}</div>
@@ -1088,6 +1100,43 @@ const macMenu = s=>`<div class="menubar"><b>Habit</b><span>File</span><span>Edit
   ${mm("Edit",[["Undo Log","⌘Z"],["Redo","⇧⌘Z"]],"c0 r3")}
   ${mm("Habit",[["Log","⌘↩"],["Add an Amount…","⌘L"],null,["Details","⌘I"],["Edit…","⌘E"],["Pause This Habit",""],["Archive","⌘⌫"],null,["Pause Everything","⇧⌘P"],["Pause for Dates…",""],null,["Add a Past Day…","⇧⌘D"]],"c1")}
   ${mm("View",[["Today","⌘1"],["History","⌘2"],null,["Week","⌥⌘1"],["Month","⌥⌘2"],["Year","⌥⌘3"],null,["Back","⌘["],["Previous Period","⌘←"],["Next Period","⌘→"],["Go to Today","⌘T"]],"c2")}`;
+
+/* ---------- History: month, no habits, many habits ---------- */
+const HP = [["drop","Drink water",3],["book","Read",-1],["leaf","Walk outside",1],["pill","Take vitamins",-1],["moon","Stretch before bed",-1]];
+function histStrip(style, hi, offDow){
+  // November 2026 starts on a Sunday. Days after the 14th are still to come and draw nothing.
+  let out = "";
+  for(let d=1; d<=30; d++){
+    const dow = (d+5)%7, k = (d*7 + hi*5) % 11;
+    let st = d>14 ? "none" : dow===offDow ? "off" : (hi===0 && d>=5 && d<=8 ? (d===7?"extra":"paused") : k<6?"solid":k<8?"hatched":"blank");
+    out += `<i class="hs ${dow===0?"mon":""} ${st==="off"?"yoff":""}">${st==="none"||st==="off"?"":ycell(st,style,d===14)}</i>`;
+  }
+  return out;
+}
+function m2HistMonth(style){
+  const hdr = Array.from({length:30},(_,i)=>{ const d=i+1, dow=(d+5)%7; return `<i class="hs ${dow===0?"mon":""}">${dow===0?`<b>${d}</b>`:""}</i>`; }).join("");
+  return status()+`<div class="nav"><span></span><span></span></div>${head("History")}
+  <div class="seg"><span>Week</span><span class="on">Month</span></div>
+  <div class="month"><b class="plink">November 2026</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="ledger"><div class="hstrip hh">${hdr}</div>
+  ${HP.map(([ic,n,off],i)=>`<div class="lr hm" role="button"><span class="ln">${icon(ic,22)}${n}</span><div class="hstrip">${histStrip(style,i,off)}</div></div>`).join("")}</div>
+  <p class="note hint">Tap a habit to open its month.</p>${tabbar("progress")}`;
+}
+function m2HistEmpty(style){
+  return status()+`<div class="nav"><span></span><span></span></div>${head("History")}
+  <div class="empty"><p class="big">No habits yet</p><p>Add a habit and its days will show here.</p>${sysbtn("Add a habit")}</div>${tabbar("progress")}`;
+}
+function m2HistMany(style){
+  const names = ["Stretch before bed","Floss","Call a friend","Tidy the desk","Practise guitar","Take a break outside","Plan tomorrow"];
+  const cell = (x,i)=> `<span class="lc ${i===5?"now":""}">${x==="off" ? offDot(20) : mark(x,{style,size:20})}</span>`;
+  const st = i=>[0,1,2,3,4,5,6].map(d=>d===6?"blank":((i*3+d*5)%7<4?"solid":(i+d)%5===0?"off":"blank"));
+  return status()+`<div class="pinned"><div class="seg"><span class="on">Week</span><span>Month</span></div>
+  <div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
+  <div class="ledger"><div class="lh">${"MTWTFSS".split("").map((d,i)=>`<span class="${i===5?"now":""}">${d}</span>`).join("")}</div></div></div>
+  <div class="ledger">${names.map((n,i)=>`<div class="lr" role="button"><span class="ln">${n}</span><div class="lcs">${st(i).map(cell).join("")}</div></div>`).join("")}
+  <div class="sec" style="margin:18px 0 0">Archived</div><div class="lr" role="button"><span class="ln">Morning pages</span><div class="lcs">${["solid","solid","blank","blank","blank","blank","blank"].map(cell).join("")}</div></div></div>
+  <p class="note hint">Tap a habit to open it. Tap a day to add or change a log. A dot is a day the habit is not scheduled.</p>${tabbar("progress")}`;
+}
 
 /* ---------- page ---------- */
 const SCREENS = {today:[today,"Today"], detail:[detail,"Habit detail"], gentle:[gentle,"Gentle Mode on Today"], appearance:[appearance,"Appearance"], marks:[marks,"Marks board"]};
@@ -1127,7 +1176,7 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
   const s = "penAndInk", v = css({...vars(s,"paper"), "--accent":TOKENS.swatches.blue});
   const G = [["month","phone",m2Month,"Habit detail, month"],["month-runs","phone",m2MonthRuns,"Month, with runs and days not logged turned on"],["runs-gap","phone",m2RunsGap,"The same, after a gap"],
              ["week","phone",m2Week,"Habit detail, week"],["year","phone",m2Year,"Habit detail, year"],["new","phone",m2New,"A habit with nothing logged"],["progress","phone",m2Progress,"History"],
-             ["you","phone",m2You,"You"],["empty","phone",m2Empty,"Today, first run, with Import"],["day","phone modal",m2Day,"A past day, yes or no"],["day-count","phone modal",m2DayCount,"A past day, count, at zero"],
+             ["hist-month","phone",m2HistMonth,"History, month"],["hist-many","phone",m2HistMany,"History, scrolled, 30 habits"],["hist-empty","phone",m2HistEmpty,"History, no habits"],["you","phone",m2You,"You"],["empty","phone",m2Empty,"Today, first run, with Import"],["day","phone modal",m2Day,"A past day, yes or no"],["day-count","phone modal",m2DayCount,"A past day, count, at zero"],
              ["day-logged","phone modal",m2DayLogged,"A past day with a log"],["day-done","phone modal",m2DayDone,"A past day, yes or no, done"],["day-off","phone modal",m2DayOff,"A past day that was not scheduled"],["day-undo","phone",m2DayUndo,"After a past day is cleared"],
              ["import-preview","phone modal",m2ImportPreview,"Import, before"],["import","phone modal",m2Import,"Import, done"],["import-nothing","phone modal",m2ImportNothing,"Import, nothing new"],
              ["import-fail","phone modal",m2ImportFail,"Import, not a Habit file"],["import-newer","phone modal",m2ImportNewer,"Import, newer version"]];
@@ -1148,6 +1197,7 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
   html += `<h2 class="group">Milestone 3 screens, Pen and ink</h2><div class="sheet">`;
   for(const [k,cls,fn,label] of G) html += `<figure><div class="${cls} ${s} paper" data-shot="m3-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
   html += `<figure><div class="widget ${s} ink" data-shot="m3-w-tinted" style='${vt}'>${m3WidgetSmall(s)}</div><figcaption>Widget, tinted mode. The system sets the colour</figcaption></figure>`;
+  html += `<figure><div class="wclear"><div class="widget ${s} ink clear" data-shot="m3-w-clear" style='${vt}'>${m3WidgetSmall(s)}</div></div><figcaption>Widget, clear mode, over a wallpaper</figcaption></figure>`;
   html += `</div>`; M1 = false;
 }
 { // Largest text size, milestones 2 and 3
