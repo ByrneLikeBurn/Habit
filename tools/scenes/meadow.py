@@ -87,22 +87,70 @@ def variant_b() -> np.ndarray:
     return p.finish()
 
 
+def seg_field(x0, y0, x1, y1, w0, w1):
+    """Signed field in pixels for one tapered stroke from (x0, y0) to (x1, y1), normalised ends, widths in pixels."""
+    ax, ay, bx, by = x0 * W, y0 * H, x1 * W, y1 * H
+    dx, dy = bx - ax, by - ay; L2 = dx * dx + dy * dy
+    t = np.clip(((XX - ax) * dx + (YP - ay) * dy) / L2, 0, 1)
+    d = np.hypot(XX - (ax + t * dx), YP - (ay + t * dy))
+    return (w0 + (w1 - w0) * t) - d
+
+
+def copse(p, cx, base, width, height, density, seed):
+    """One stand of trees as a single low mass of uneven domes, wider than tall, seated on the ground.
+
+    No trunks show. A rounded mass on legs reads as an animal, which invariant 7 rules out.
+    """
+    f = np.full((H, W), -99.0)
+    for dx, top, rx in [(-0.44, 0.50, 0.16), (-0.27, 0.78, 0.20), (-0.04, 1.00, 0.24), (0.20, 0.70, 0.19), (0.36, 0.86, 0.17), (0.50, 0.42, 0.13)]:
+        ex, ey = (cx + dx * width) * W, base * H
+        rxp, ryp = rx * width * W, top * height * H
+        f = np.maximum(f, (1.0 - np.sqrt(((XX - ex) / rxp) ** 2 + ((YP - ey) / ryp) ** 2)) * min(rxp, ryp))
+    m = p.ragged(f, edge=1.6, rough=3.0, fine=2.5, tooth=1.4, seed=seed) * (f > -6) * smoothstep(base + 0.004, base - 0.004, YN)
+    p.wash(m, density, rim=0.22, rim_w=3, gran=0.075, flow=0.2, seed=seed + 5)
+    p.wash(m * smoothstep(base - height * 0.45, base, YN), 0.30, rim=0, gran=0.06, flow=0.2, seed=seed + 6)   # darker toward the ground
+
+
+def swell(p, pts, density, seed, fade, soft):
+    """A swell of grass whose upper edge melts into the wash behind it. soft is the edge softness in pixels."""
+    prof = p.profile(pts, wobble=0.002, wobble_sigma=14, seed=seed)
+    m = p.ragged(p.below(prof), edge=soft, rough=1.6, fine=1.6, tooth=0.9, seed=seed + 1)
+    d = density - fade[0] * smoothstep(fade[1], fade[2], YN)
+    p.wash(m, d, rim=0.0, gran=0.085, flow=0.26, flow_sigma=30, flow_aspect=6.0, seed=seed + 2)
+    return prof
+
+
+def blades(p, prof, n, seed, density=0.78):
+    """Short tapered blades of grass along one crest, all leaning at 56 degrees, uneven in length and spacing."""
+    rng = np.random.default_rng(seed); ang = np.radians(56.0)
+    f = np.full((H, W), -99.0)
+    for i in range(n):
+        x = (i + rng.random()) / n
+        if rng.random() < 0.22: continue                                   # gaps, so the crest is not a comb
+        px = int(np.clip(x * W, 0, W - 1)); y = prof[px] / H + 0.006
+        ln = (0.030 + 0.045 * rng.random()) * H
+        x1, y1 = x + ln * np.cos(ang) / W, y - ln * np.sin(ang) / H
+        f = np.maximum(f, seg_field(x, y, x1, y1, 0.0024 * W * (0.7 + 0.6 * rng.random()), 0.3))
+    m = p.ragged(f, edge=0.9, rough=1.0, fine=1.0, seed=seed + 1) * (f > -3)
+    p.wash(m, density, rim=0.0, gran=0.06, flow=0.1, seed=seed + 2)
+
+
 def variant_c() -> np.ndarray:
-    """Tall grass. A high horizon. The viewer stands in the meadow: swells of grass fill the card, with a small copse far off."""
+    """Tall grass. A high horizon. The viewer stands in the meadow: long swells of grass cross each other, with one copse far off."""
     p = Painting(paper_seed=29)
     above = np.ones_like(YN)
     sky(p, above, top=0.24, reach=0.34, seed=811)
     ridge(p, [(-0.05, .36), (.2, .345), (.45, .37), (.7, .35), (1.05, .365)], 0.18, above, 821, edge=2.4, fade=(0.08, 0.34, 0.44))
     haze(p, 0.405, 0.015, 0.026, 0.5, 826)
-    grass(p, [(-0.05, .43), (.25, .42), (.5, .435), (.78, .425), (1.05, .43)], 0.28, 831, fade=(0.08, 0.43, 0.56))
-    for i, (x, h, s) in enumerate([(.185, .085, .030), (.235, .115, .040), (.290, .075, .026)]):
-        crown_tree(p, x, 0.432, h, s, 0.56, 840 + 9 * i)
-    grass(p, [(-0.05, .56), (.2, .54), (.42, .575), (.66, .60), (.86, .57), (1.05, .555)], 0.40, 851, fade=(0.10, 0.56, 0.70))
-    swathes(p, 0.47, 0.54, 1, 856, strength=0.22)
-    grass(p, [(-0.05, .70), (.2, .73), (.45, .705), (.7, .68), (1.05, .715)], 0.54, 861, fade=(0.12, 0.70, 0.84))
-    swathes(p, 0.62, 0.68, 1, 866, strength=0.22)
-    grass(p, [(-0.05, .87), (.24, .845), (.5, .88), (.76, .90), (1.05, .86)], 0.82, 871, tooth=3.0)
-    swathes(p, 0.775, 0.83, 1, 876, strength=0.22)
+    # long shallow S-curves that cross: each swell is thin where it runs out and deep where it comes near
+    copse(p, 0.700, 0.446, 0.200, 0.115, 0.50, 841)            # painted before the first swell, so the grass hides the trunks: a mass on legs reads as an animal
+    swell(p, [(-0.05, .455), (.22, .437), (.48, .428), (.74, .437), (1.05, .452)], 0.26, 831, (0.08, 0.44, 0.58), 5.0)
+    swell(p, [(-0.05, .50), (.20, .525), (.42, .565), (.64, .585), (.84, .565), (1.05, .525)], 0.36, 851, (0.10, 0.54, 0.72), 6.0)
+    swell(p, [(-0.05, .70), (.18, .665), (.40, .625), (.60, .63), (.80, .675), (1.05, .735)], 0.48, 861, (0.12, 0.66, 0.84), 6.0)
+    swathes(p, 0.585, 0.62, 1, 866, strength=0.16)
+    swell(p, [(-0.05, .775), (.22, .805), (.46, .845), (.68, .835), (.86, .79), (1.05, .745)], 0.62, 871, (0.10, 0.80, 0.95), 5.0)
+    near = swell(p, [(-0.05, .93), (.20, .905), (.44, .895), (.70, .925), (1.05, .965)], 0.84, 881, (0.0, 0.9, 1.0), 2.2)
+    blades(p, near, 64, 891)
     return p.finish()
 
 
