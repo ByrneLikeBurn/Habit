@@ -50,14 +50,14 @@ def panel(style, ap, ic=False):
             yy += h; x0, x1 = 21 + 2 + rng.random() * 2, W - 21 - 2 - rng.random() * 2; bow = (rng.random() - 0.5) * 2; ph = rng.random(2) * 6.28
             for px in range(int(x0 * Q), int(x1 * Q)):
                 t = (px / Q - x0) / (x1 - x0); cyp = (yy + bow * math.sin(math.pi * t)) * Q
-                press = 1.0 if ic else (0.62 + 0.2 * math.sin(t * 5 + ph[0]) + 0.12 * math.sin(t * 17 + ph[1])) * min(1, t / 0.03 + 0.4, (1 - t) / 0.03 + 0.4)
+                press = 0.5 if ic else (0.62 + 0.2 * math.sin(t * 5 + ph[0]) + 0.12 * math.sin(t * 17 + ph[1])) * min(1, t / 0.03 + 0.4, (1 - t) / 0.03 + 0.4)
                 for py in range(int(cyp - Q), int(cyp + Q) + 1):
                     a = max(0, 1 - abs(py - cyp) / (Q * 0.55)) * press * (1 if ic else (0.25 if big[py, px] > 0.6 else 1))
                     field[py, px] = field[py, px] * (1 - a) + text * a
     im = Image.fromarray((np.clip(field, 0, 1) * 255).astype("uint8")); d = ImageDraw.Draw(im)
     if ic and style == "watercolor":                                         # Increase Contrast: one straight line, 1 point, in the text colour
         yy = 96
-        for h in hs[:-1]: yy += h; d.line([(21 * Q, yy * Q), ((W - 21) * Q, yy * Q)], fill=mix(text, text, 0), width=Q)
+        for h in hs[:-1]: yy += h; d.line([(21 * Q, yy * Q), ((W - 21) * Q, yy * Q)], fill=mix(paper, text, 0.5), width=Q)
     tcol, sec = mix(text, text, 0), mix(paper, text, min(1, tok["secondaryAlpha"] + (0.15 if ic else 0)))
     d.text((21 * Q, 24 * Q), "Today", font=display(style, 34 * Q), fill=tcol)
     d.text((21 * Q, 68 * Q), "Saturday 14 November", font=label(15 * Q), fill=sec)

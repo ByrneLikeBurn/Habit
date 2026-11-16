@@ -170,3 +170,24 @@ Gates before the milestone 4 build:
 - Human factors sees the Watercolor paused dab and the Watercolor diamond inside the ring. Test: shown one row for a glance, does either read as a delete button or as a stepper with two arrows. If it fails, the mark changes before it is built.
 - A three-line name and the largest text size are checked on the in-app screens. If rows stop separating in Watercolor, the row gap grows with the text size.
 - Whether Pen and ink drops the plus in a counted control: human factors and first-day user.
+
+## Step 4: Increase Contrast. Drawn, in review
+
+The rule, gathered from condition 7, step 3 and `CLAUDE.md`. Lines marked "new" go beyond those and move to `docs/decisions.md` when this file is merged.
+
+- Every mark is drawn in the text colour. The accent is not used. Measured 16.6:1 to 19.1:1.
+- Every stroke is half a point heavier. Marks are flat: no wash, no rim, no specks.
+- New: the diamond's cut is 1.75 points at 24 points, half a point wider than usual.
+- New: the today square is half a point larger and the ring 0.6 of a point larger, so the heavier strokes keep 3 points clear of the mark. Both stay inside 44 points.
+- New: the dashes of "to come" sit further apart, so 2 points of bare paper remain between them after the strokes thicken.
+- New: the Watercolor disc keeps an uneven edge and the ring keeps its thick start and thin end, so the control does not read as a radio button.
+- Pencil keeps its paper grain. Watercolor loses its grain.
+- Lines between rows, both styles: 1 point, the text colour at half strength, unbroken. Watercolor has a line here only under Increase Contrast, as step 3 says.
+- New: secondary text is stronger by 0.15 of the text colour. Measured 12.1:1 to 13.7:1.
+- State is carried by shape. Nothing here uses colour.
+
+Drawings: `docs/mockups/png/m4-today-rows-ic.png` and `docs/mockups/png/m4-marks-ic.png`, from `today_rows.py` and `full_marks.py` with the `ic` argument.
+
+Closed: the step 3 clearance owed item. The lens measured 3.0 to 4.2 points without Increase Contrast.
+
+Added to the human factors gate before the build: in black, the Watercolor disc in a ring (radio button), the paused dab in a ring (delete button), and the diamond's two triangles in both styles (stepper arrows).

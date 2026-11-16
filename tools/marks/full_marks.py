@@ -47,6 +47,9 @@ SQUARE = [(-H, -H), (H, -H), (H, H), (-H, H)]
 LOWER = [(-H, -H), (-H, H), (H, H)]
 DIAMOND = [(0, -H), (H, 0), (0, H), (-H, 0)]
 CUT = 1.25
+GROW = 0.0                   # Increase Contrast: the today square is half a point larger and the ring 0.6, so the heavier strokes keep 3 points clear
+GAPX = 0.0                   # Increase Contrast: extra space between the dashes of 'to come', so 2 points of paper remain after the strokes thicken
+AMP = 0.035                  # how uneven the Watercolor disc's edge is
 tooth = gaussian_filter(rng.random((N, N)), 1.2); tooth = (tooth - tooth.min()) / (tooth.max() - tooth.min())
 speck = gaussian_filter(rng.random((N, N)), 2.6); speck = (speck - speck.min()) / (speck.max() - speck.min())   # charcoal specks, about half a point across
 dimple = gaussian_filter(rng.random((N, N)), 6); dimple = (dimple - dimple.min()) / (dimple.max() - dimple.min())
@@ -108,7 +111,7 @@ def pencil(state):
             t = 0.04
             while t < 0.9:
                 ln = (2.6 + rng.random() * 1.8) / (2 * q); t1 = min(t + ln, 0.98)
-                m = np.maximum(m, hand_line(ax + (bx - ax) * t, ay + (by - ay) * t, ax + (bx - ax) * t1, ay + (by - ay) * t1, 2.0)); t = t1 + (2.2 + rng.random() * 0.8) / (2 * q)
+                m = np.maximum(m, hand_line(ax + (bx - ax) * t, ay + (by - ay) * t, ax + (bx - ax) * t1, ay + (by - ay) * t1, 2.0)); t = t1 + (2.2 + rng.random() * 0.8 + GAPX) / (2 * q)
         return m, m
     if state == "notlogged":
         q = H * 0.9; m = np.zeros((N, N))
@@ -117,7 +120,7 @@ def pencil(state):
     return np.zeros((N, N)), np.zeros((N, N))
 
 def pencil_today():                                         # four strokes whose ends cross and overshoot each corner by 1 point
-    q = H + 7; m = np.zeros((N, N))      # 3 points clear of the mark, stroke ends and bow included
+    q = H + 7 + GROW; m = np.zeros((N, N))      # 3 points clear of the mark, stroke ends and bow included
     for x0, y0, x1, y1 in [(-q - 1, -q, q + 1, -q + 0.5), (q, -q - 1, q - 0.4, q + 1), (q + 1, q, -q - 1, q - 0.5), (-q, q + 1, -q + 0.4, -q - 1)]:
         m = np.maximum(m, mask(lambda d: stamp(d, bowed(x0, y0, x1, y1, (rng.random() - 0.5) * 1.6), taper(1.5, 0.75, 0.06))))
     return m
@@ -151,7 +154,7 @@ def wash(shape, ink):
 
 def water(state, ink=False):
     R = H
-    if state == "done": return wash(wobble_shape(lambda: disc_pts(R)), ink)
+    if state == "done": return wash(wobble_shape(lambda: disc_pts(R, AMP)), ink)
     if state == "diamond":
         sh = wobble_shape(diamond_pts) * (1 - mask(lambda d: poly(d, [(-H * 2, -CUT / 2), (H * 2, -CUT / 2), (H * 2, CUT / 2), (-H * 2, CUT / 2)])))
         return wash(sh, ink)
@@ -167,14 +170,14 @@ def water(state, ink=False):
         while a0 < 2 * math.pi - 0.3:
             a1 = a0 + (2.4 + rng.random() * 1.6) / r
             m = np.maximum(m, mask(lambda d: stamp(d, [(r * math.cos(a0), r * math.sin(a0)), (r * 1.01 * math.cos((a0 + a1) / 2), r * 1.01 * math.sin((a0 + a1) / 2)), (r * math.cos(a1), r * math.sin(a1))], brush(2.0), 20)))
-            a0 = a1 + (2.3 + rng.random() * 0.8) / r
+            a0 = a1 + (2.3 + rng.random() * 0.8 + GAPX) / r
         return m, m > 0.99
     if state == "notlogged":                                # one thin closed ring at the done mark's size
         o = wobble_shape(lambda: disc_pts(R * 0.98, 0.02)); i = wobble_shape(lambda: disc_pts(R * 0.98 - 1.7, 0.035)); m = np.clip(o - i, 0, 1); return m, m > 0.99
     return np.zeros((N, N)), np.zeros((N, N), bool)
 
 def water_today():                                          # one brushed ring: pooled where it starts, thin where it lifts, gap of 1 point at most
-    r = H + 5.4; n = 120; gap = 1.0 / r; start = -0.7
+    r = H + 5.4 + GROW * 1.2; n = 120; gap = 1.0 / r; start = -0.7
     def at(i): a = start + gap + (2 * math.pi - gap) * i / n; rr = r + 0.3 * math.sin(a * 2 + 0.6) - 0.9 * (i / n); return rr * math.cos(a), rr * math.sin(a)   # the end lands just inside the start
     def width(i): t = i / n; return max(1.5, 3.0 - 1.5 * t ** 0.7)       # 3 points where it pools at the start, thinning all the way round to 1.5 where it lifts
     return mask(lambda d: [stamp(d, [at(i), at(i + 0.5), at(i + 1)], (lambda t, w=width(i): w), 4) for i in range(n)])
@@ -193,18 +196,22 @@ def heavier(m):                                             # Increase Contrast:
     return maximum_filter((np.asarray(m, float) > 0.5).astype(float), size=round(0.5 * S) + 1)
 
 def render(style, ap, state, accent, outline=False, ic=False):
-    global CUT
+    global CUT, GROW, GAPX, AMP
     field, worst, text = papers(style, ap); ink = ap == "ink"
     if ic:                                                  # marks in the text colour, flat, heavier; the diamond's cut half a point wider as drawn; Watercolor loses wash and grain
         if state == "today": state, outline = "done", True
         fn = pencil if style == "pencil" else (lambda s: water(s, ink))
-        CUT = 1.25 + 0.5 + 0.5                              # drawn a point wider, because the heavier strokes take half a point back
+        GAPX, AMP = 1.5, 0.06; CUT = 1.25 + 0.5 + 0.5                              # drawn a point wider, because the heavier strokes take half a point back
         try: a, _ = fn(state)
-        finally: CUT = 1.25
+        finally: CUT, GAPX, AMP = 1.25, 0.0, 0.035
         a = heavier(a)
         if style == "watercolor": field = np.ones_like(field) * hexrgb(TOK["styles"][style][ap]["paper"])
         img = field * (1 - a[..., None]) + text * a[..., None]
-        if outline: ring = heavier(pencil_today() if style == "pencil" else water_today()); img = img * (1 - ring[..., None]) + text * ring[..., None]
+        if outline:
+            GROW = 0.5
+            try: ring = heavier(pencil_today() if style == "pencil" else water_today())
+            finally: GROW = 0.0
+            img = img * (1 - ring[..., None]) + text * ring[..., None]
         return img, ratio(float(lum(text[None])[0]), float(lum(worst[None])[0]))
     fn = pencil if style == "pencil" else (lambda s: water(s, ink))
     strength = TOK["markAlpha"][style] if not (style == "watercolor" and ink) else 1.0
