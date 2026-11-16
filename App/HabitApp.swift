@@ -42,7 +42,8 @@ struct HabitApp: App {
         SwiftUI.Settings {
             Group {
                 if case .success(let container) = SharedStore.container {
-                    StyledScreen { YouView(isMacSettings: true) }
+                    // Bring back in Archived shows its Undo line here.
+                    StyledScreen { YouView(isMacSettings: true).undoLineInset(.today) }
                         .modelContainer(container)
                 }
             }

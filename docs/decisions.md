@@ -149,7 +149,7 @@ One entry per decision that changed the brief. Each says what changed and why, i
 
 **The Mac app may read and write a file the user picks.** Export and import on the Mac use the system save and open panels, which the sandbox blocks without the user-selected files entitlement. The owner approved it. The app gets no other file access.
 
-**Days to come draw nothing.** The brief drew a scheduled future day as a faint dashed outline. Week and Month already drew nothing for those days after the low-vision review, so the state was removed. A future day that holds a log draws by its state.
+**Days to come draw nothing.** The brief drew a scheduled future day as a faint dashed outline. Week and Month already drew nothing for those days after the low-vision and tired-user check (`docs/spec.md`, History tab), so the state was removed. `CLAUDE.md` still lists the dashed outline under the design rules, and the owner is asked to remove it. A future day that holds a log draws by its state.
 
 **Weeks, months and years are Gregorian.** Day keys are Gregorian dates, so each period holds whole stored days. Weeks start on the user's first weekday, and names follow the user's locale.
 
@@ -206,3 +206,9 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **Counts have plural forms in a String Catalog,** and dates, week ranges and lists follow the locale. The past-day Undo line names the habit. The day sheet buttons read "Add 1, total 9". "Already here" became "Logs already here". "Details" stays as the row menu name. Asked for by the content designer.
 
 **While the current run is "Between runs", Longest run stays, second and quieter.** The neurodiversity review found the best-ever run under "Between runs" read as "you used to be better". The behavioural review wanted it kept, because a past best shows it can be done again. Both accepted it shown after Current run, smaller, in the secondary colour and with no rule. Days done moves after the runs.
+
+**History and Habit detail use about 720 points on iPad and Mac,** and a History week row puts the name and its seven days on one line there. Mac sheets have a width in place of detents, Return exports, and the Mac Settings window drops "Controls on the left". Asked for by the Apple industrial designer, under the Mac window rules.
+
+**Longest run is full weight only while the current run is the longest.** Otherwise it is quieter, so a restart reads "1 day" without a full-weight "14 days" beside it. VoiceOver reads it last. Asked for by the returning user, within the treatment the neurodiversity and behavioural reviews accepted.
+
+**The screenshot flags for Show runs and Show days not logged work only in debug builds.** Asked for by the product owner.

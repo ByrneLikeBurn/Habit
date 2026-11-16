@@ -109,7 +109,7 @@ One drawing has one meaning.
 
 **Today** is an outline in the text colour around the day's mark. On the Today screen every control has it, so the control is visible in every state, including paused. A today with nothing logged is the outline alone.
 
-**Days not logged. Owner.** By default a past day with no log draws nothing, and Habit detail shows Days logged and, for a counted habit, its total. One switch in You, "Show days not logged", turns on the empty outline for those days and shows the "Since" date. "Show runs" adds Days done, Current run and Longest run (changed on 15 November 2026, see `docs/decisions.md`). This replaces the brief's default of drawing a missed day as an empty outline.
+**Days not logged. Owner, changed by the reviews on 15 November 2026.** By default a past day with no log draws nothing, and Habit detail shows Days logged and, for a counted habit, its total. One switch in You, "Show days not logged", turns on the empty outline for those days and shows the "Since" date. "Show runs" adds Days done, Current run and Longest run (changed on 15 November 2026, see `docs/decisions.md`). This replaces the brief's default of drawing a missed day as an empty outline.
 
 **Year view. Owner.** Cells are too small to hatch. Each state is a small shape: a full square for done, a half square cut on the diagonal for part done, a short bar for paused, a diamond for extra credit, nothing otherwise. Today has an outline. In Watercolor the square is a disc and the half square is a half disc. This replaces the brief's four opacity steps, which carried state by intensity.
 
@@ -315,7 +315,7 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 
 **Day boundary.** Between midnight and the day-start hour, Today shows "Until 04:00" under the date. The day-start setting has the caption "Logs before this time count for the day before."
 
-**Stats.** Habit detail leads with Days logged, and for a counted habit a total in the user's unit. Days done comes with Show runs and the start date with Show days not logged. Longest run and Current run are behind one switch, "Show runs". "Show days not logged" is a separate switch. A run row is never hidden at zero.
+**Stats.** Habit detail leads with Days logged, and for a counted habit a total in the user's unit. Days done comes with Show runs and the start date with Show days not logged. Longest run and Current run are behind one switch, "Show runs". "Show days not logged" is a separate switch. Current run is never hidden. Longest run shows once it is 1 day or more, and is quieter unless the current run is the longest.
 
 **Pausing one habit.** Milestone 3 adds "Pause this habit" to the Edit form and the row menu, open-ended, with Resume in the same place. Gentle Mode is reachable from Today as well as from You. The Vacation form says the start can be in the past.
 
@@ -334,7 +334,7 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 
 ## Milestone 2 screens
 
-Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Redrawn on 15 November to the rules below. Still owed: History in month and year, History with no habits and with 30, the largest text size, and the Mac and Watch versions.
+Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Redrawn on 15 November to the rules below. Built in milestone 2 and captured in `docs/screenshots/m2/`. The Watch is milestone 7.
 
 - Habit detail in month, week and year views. A future day shows its date alone. The year starts in the month the habit was added and labels its months.
 - Stats: Days done, Days logged, and a total in the user's unit, with the start date. Current run and Longest run appear only when "Show runs" is on.
@@ -348,7 +348,7 @@ Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Redrawn on 15 November
 
 Accessibility, UI and UX, and a combined behavioural and returning-user review looked at `sheet-m2.png`. These are adopted. The drawings do not show them all yet.
 
-**Stats.** Order is Days logged, then the unit total, then Days done. A counted habit with no target shows the first two only. There is never a rate, a percentage or "of N days". The same stats mean the same thing in week, month and year: all time, under the label "Since 28 April 2026". The week view adds one line for the week's total, and only when the week has a log. A week with no log shows no zeros.
+**Stats.** Order is Days logged, then the unit total. With Show runs on, Current run, Longest run and Days done follow. The "Since" date shows only with Show days not logged on (changed by the neurodiversity and behavioural reviews, see `docs/decisions.md`). There is never a rate, a percentage or "of N days". The same stats mean the same thing in week, month and year: all time. The week view adds one line for the week's total, and only when the week has a log. A week with no log shows no zeros.
 
 **Place.** Habit detail keeps one anchor date per visit. Switching between week, month and year opens the period that holds it. The period title is a button that returns to the current period. Opened from History, detail shows the same range and period, and Back reads "History".
 
@@ -504,6 +504,7 @@ Each needs the owner. The recommendation is mine.
 | 3 | The usage data page | Build it in milestone 13 from the existing log fields | Milestone 13 |
 | 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
 | 5 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
+| 6 | Keep the span a habit was archived, so Bring back can treat it as a pause and not break a run. This needs a new optional field or model, so it is a schema change | Offer to pause the span on Bring back in milestone 3 first, with no schema change, and decide this only if that is not enough | Milestone 3 |
 
 Decided on 14 November 2026 and now written into this file and `CLAUDE.md`: whole-number deltas and typed numbers, the `.entitlements` file for the App Group, the milestone order, export in milestone 2, three review lenses per milestone, red allowed as a user's accent, and three more lenses (UI and UX, human factors, senior designer).
 

@@ -70,7 +70,11 @@ struct DaySheet: View {
             #endif
         }
         // A count has the amount, its result line and three buttons, which do not fit at medium height.
+        #if os(iOS)
         .presentationDetents(typeSize.isAccessibilitySize || habit.kind == .counted ? [.large] : [.medium, .large])
+        #else
+        .frame(minWidth: 440, idealWidth: 480, minHeight: 360)
+        #endif
     }
 
     // MARK: Yes or no
@@ -260,8 +264,9 @@ struct PastDayPicker: View {
                     .environment(\.timeZone, clock.calendar.timeZone)
             }
             .scrollContentBackground(.hidden)
+            #if os(iOS)
             .safeAreaInset(edge: .bottom) {
-                // Within thumb reach, as well as Next in the bar.
+                // Within thumb reach, as well as Next in the bar. The Mac has Next as the sheet's default button.
                 Button(action: next) {
                     Text("Open this day").frame(maxWidth: .infinity, minHeight: 32)
                 }
@@ -272,6 +277,7 @@ struct PastDayPicker: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 8)
             }
+            #endif
             .paperBackground(style)
             .navigationTitle("Add a past day")
             #if os(iOS)

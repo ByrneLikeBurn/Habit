@@ -50,7 +50,7 @@ struct YouView: View {
                 } header: {
                     Text("History")
                 } footer: {
-                    Text("Show runs adds runs and days done to each habit. A run counts the days in a row with any log, even a small one. Days off don't break it. Days not logged adds an empty outline to past days.")
+                    Text("Show runs adds runs and days done to each habit. A run counts the days in a row with any log, even a small one. Days off don't break it. Show days not logged adds an empty outline to past days and the date each habit began.")
                 }
                 if !isMacSettings {
                     Section {
@@ -63,7 +63,10 @@ struct YouView: View {
                     }
                 }
                 Section {
-                    Toggle("Controls on the left", isOn: $settings.controlsLeading)
+                    if !isMacSettings {
+                        // Thumb reach has no meaning on the Mac.
+                        Toggle("Controls on the left", isOn: $settings.controlsLeading)
+                    }
                     NavigationLink(value: Page.dayStart) {
                         LabeledContent("Day starts at", value: DayStartView.label(settings.dayStartHour, clock: settings.clock))
                     }

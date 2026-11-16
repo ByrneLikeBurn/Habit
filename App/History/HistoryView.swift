@@ -88,7 +88,7 @@ struct HistoryView: View {
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 24)
-            .frame(maxWidth: 393, alignment: .leading)
+            .frame(maxWidth: WideLayout.contentWidth, alignment: .leading)
             .frame(maxWidth: .infinity)
         }
         .paperBackground(style)
@@ -135,10 +135,17 @@ private struct HistoryWeekHeader: View {
     let today: DayKey
     @Environment(Settings.self) private var settings
     @Environment(\.style) private var style
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    private var isWide: Bool { sizeClass == .regular }
+    #else
+    private let isWide = true
+    #endif
 
     var body: some View {
         let labels = Dictionary(uniqueKeysWithValues: WeekdayText.labels(calendar: settings.clock.calendar).map { ($0.weekday, $0.short) })
         HStack(spacing: 0) {
+            if isWide { Spacer(minLength: 0) }
             ForEach(days, id: \.self) { day in
                 // Today is marked once in the header and by a thin outline in the cell.
                 Text(labels[day.weekday] ?? "")
@@ -206,13 +213,20 @@ private struct HistoryWeekRow: View {
     @Environment(AppModel.self) private var model
     @Environment(\.style) private var style
     @Environment(\.sharedPauses) private var sharedPauses
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    private var isWide: Bool { sizeClass == .regular }
+    #else
+    private let isWide = true
+    #endif
 
     var body: some View {
         let totals = habit.dayTotals()
         let states = habit.states(for: days, today: today, totals: totals, sharedPauses: sharedPauses, showDaysNotLogged: settings.showDaysNotLogged)
         let words = DayWords(clock: settings.clock)
 
-        VStack(alignment: .leading, spacing: 6) {
+        let layout = isWide ? AnyLayout(HStackLayout(alignment: .center, spacing: 12)) : AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
+        layout {
             Button {
                 model.openDetail(habit, kind: .week, anchor: days.last.map { min($0, today) } ?? today, from: .history)
             } label: {
@@ -343,4 +357,9 @@ private struct HabitSymbol: View {
             .frame(width: width)
             .accessibilityHidden(true)
     }
+}
+
+/// Content width for History and Habit detail: the phone column on a phone, about 720 points on iPad and Mac.
+enum WideLayout {
+    static let contentWidth: CGFloat = 720
 }

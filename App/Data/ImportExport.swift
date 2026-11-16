@@ -130,7 +130,11 @@ struct ImportSheet: View {
             #endif
             .toolbar { toolbar }
         }
+        #if os(iOS)
         .presentationDetents([.medium, .large])
+        #else
+        .frame(minWidth: 440, idealWidth: 480, minHeight: 360)
+        #endif
     }
 
     /// Which habits get the new logs and over which days, so the user can tell it is the right file.
@@ -311,6 +315,7 @@ struct ExportSheet: View {
                     .buttonBorderShape(.capsule)
                     .foregroundStyle(style.paper)
                     .controlSize(.large)
+                    .keyboardShortcut(.defaultAction)
                     .disabled(habits.allSatisfy { $0.deletedAt != nil })
                 }
                 .padding(20)
@@ -328,7 +333,11 @@ struct ExportSheet: View {
                 }
             }
         }
+        #if os(iOS)
         .presentationDetents([.medium, .large])
+        #else
+        .frame(minWidth: 440, idealWidth: 480, minHeight: 360)
+        #endif
         #if os(iOS)
         .sheet(item: $shareURL, onDismiss: { written.map(DataTransfer.remove) }) { url in
             ShareSheet(url: url) { completed, error in
@@ -336,7 +345,11 @@ struct ExportSheet: View {
                 shareURL = nil
                 if error { failed = true } else if completed { dismiss() }
             }
+                #if os(iOS)
                 .presentationDetents([.medium, .large])
+                #else
+                .frame(minWidth: 440, idealWidth: 480, minHeight: 360)
+                #endif
         }
         #else
         .fileExporter(isPresented: Binding(get: { exporting != nil }, set: { if !$0 { exporting = nil } }),
@@ -464,5 +477,6 @@ struct StatRow: View {
             if !quiet { Rectangle().fill(style.rule).frame(height: style.ruleWidth) }
         }
         .accessibilityElement(children: .combine)
+        .accessibilitySortPriority(quiet ? -1 : 0)
     }
 }

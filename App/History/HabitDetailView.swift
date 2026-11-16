@@ -161,7 +161,7 @@ private struct HabitDetailPage: View {
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 24)
-            .frame(maxWidth: 393, alignment: .leading)
+            .frame(maxWidth: WideLayout.contentWidth, alignment: .leading)
             .frame(maxWidth: .infinity)
         }
         .paperBackground(style)
@@ -552,7 +552,7 @@ private struct StatsBlock: View {
                 StatRow(label: String(localized: "Current run"), value: runText)
                 if stats.longestRun > 0 {
                     // After a gap the best-ever run stays, but quieter, so it is not the headline.
-                    StatRow(label: String(localized: "Longest run"), value: Self.days(stats.longestRun), quiet: isBetweenRuns)
+                    StatRow(label: String(localized: "Longest run"), value: Self.days(stats.longestRun), quiet: !isOnLongestRun)
                 }
                 // Days done beside Days logged reads as a pass rate. It is a result, so it comes with Show runs,
                 // after the runs.
@@ -572,8 +572,9 @@ private struct StatsBlock: View {
         CountText.line(total: stats.unitTotal, target: nil, unit: habit.unit)
     }
 
-    private var isBetweenRuns: Bool {
-        if case .betweenRuns = stats.run { true } else { false }
+    /// Longest run is full weight only while the current run is the longest, so it is a reward and never a gap.
+    private var isOnLongestRun: Bool {
+        if case .days(let n) = stats.run { n >= stats.longestRun } else { false }
     }
 
     private var runText: String {
