@@ -1,0 +1,122 @@
+"""Mountains scene. Three hand-placed compositions. Run: python3 mountains.py <out_dir> [a b c]
+
+Not approved by the owner. These are variants for the scene gate. Nothing here ships until one is approved.
+"""
+from __future__ import annotations
+
+import sys
+import numpy as np
+from paint import Painting, XN, YN, H, W, smoothstep, save_value, noise
+from lake import treeline, sky, water, ripples
+
+
+def ridge(p, pts, density, above, seed, edge=2.0, rim=0.28, gran=0.068, wobble=0.005, sigma=18, fade=None):
+    prof = p.profile(pts, wobble=wobble, wobble_sigma=sigma, seed=seed)
+    m = p.ragged(p.below(prof), edge=edge, rough=4, fine=2.5, seed=seed + 1) * above
+    d = density if fade is None else density - fade[0] * smoothstep(fade[1], fade[2], YN)
+    p.wash(m, d, rim=rim, rim_w=5, gran=gran, flow=0.18, seed=seed + 2)
+    return prof, m
+
+
+def snow(p, prof, m, depth, seed, lit=1.0):
+    """Bare paper kept on the upper slopes. The snow line runs down in uneven tongues, and the side away from the light keeps more pigment."""
+    from scipy import ndimage as ndi
+    rng = np.random.default_rng(seed)
+    t = ndi.gaussian_filter1d(rng.standard_normal(W), 9.0); t /= t.std()
+    g = ndi.gaussian_filter1d(rng.standard_normal(W), 40.0); g /= g.std()
+    reach = depth * np.clip(0.8 + 0.28 * t + 0.25 * g, 0.35, 1.5)             # how far down the snow reaches at each x
+    yy = np.arange(H)[:, None] * np.ones((1, W))
+    cap = smoothstep(5.0, -5.0, yy - (prof + reach * H)[None, :]) * m
+    cap = cap * smoothstep(2.0, 6.0, yy - prof[None, :])                        # the ridge keeps its pigment rim, so the peak holds its outline against the sky
+    slope = ndi.gaussian_filter1d(np.gradient(prof), 14.0)                      # smoothed, so the light changes by face and not by pixel
+    shade = 0.45 + 0.55 * smoothstep(-0.15, 0.15, -slope)[None, :]
+    p.lift(0.66 * cap * shade)
+
+
+def variant_a() -> np.ndarray:
+    """Massif. One broad snow peak right of centre, a lower shoulder to the left, mist in the valley, a dark wooded spur."""
+    p = Painting(paper_seed=17)
+    yh = 0.66
+    above = np.ones_like(YN)
+    sky(p, above, top=0.32, reach=0.50, seed=311)
+
+    prof, m = ridge(p, [(-0.05, .43), (.10, .40), (.22, .33), (.30, .355), (.40, .30), (.50, .21), (.585, .115),
+                        (.63, .135), (.70, .10), (.77, .19), (.86, .27), (.95, .25), (1.05, .30)],
+                    0.40, above, 321, wobble=0.007, sigma=12, fade=(0.26, 0.20, yh))
+    snow(p, prof, m, 0.085, 325)
+    p.mist(yh - 0.14, 0.07, 0.70, seed=326)
+
+    ridge(p, [(-0.05, .50), (.12, .47), (.26, .52), (.40, .56), (.55, .53), (.70, .49), (.84, .52), (1.05, .47)],
+          0.42, above, 331, fade=(0.20, 0.48, yh + 0.05))
+    p.mist(yh - 0.03, 0.04, 0.55, seed=336)
+
+    ridge(p, [(-0.05, .66), (.15, .64), (.34, .67), (.52, .71), (.70, .68), (.88, .63), (1.05, .60)],
+          0.52, above, 341, fade=(0.16, 0.64, 0.86))
+    near = p.profile([(-0.05, .60), (.06, .63), (.16, .69), (.26, .76), (.36, .84), (.46, .93), (.56, 1.02), (1.05, 1.2)],
+                     wobble=0.003, wobble_sigma=10, seed=351)
+    near = treeline(near, [(.020, .095, .0074), (.052, .055, .0052), (.078, .120, .0086), (.096, .070, .0060),
+                           (.142, .085, .0070), (.171, .050, .0048), (.214, .070, .0060), (.262, .045, .0045),
+                           (.318, .040, .0040)], canopy=0.014, seed=5)
+    m = p.ragged(p.below(near), edge=1.3, rough=3, fine=3, tooth=1.6, seed=352)
+    p.wash(m, 0.84, rim=0.25, rim_w=4, gran=0.080, flow=0.22, seed=353)
+    return p.finish()
+
+
+def variant_b() -> np.ndarray:
+    """Ranges. Five ridges, one behind the other, pale to dark, with mist lying between them. No snow."""
+    p = Painting(paper_seed=18)
+    above = np.ones_like(YN)
+    sky(p, above, top=0.26, reach=0.30, seed=411)
+    rows = [
+        ([(-0.05, .34), (.12, .30), (.24, .22), (.33, .26), (.46, .31), (.60, .24), (.70, .20), (.82, .27), (1.05, .33)], 0.24, .30),
+        ([(-0.05, .40), (.10, .43), (.25, .38), (.40, .33), (.52, .39), (.68, .43), (.84, .36), (1.05, .40)], 0.32, .42),
+        ([(-0.05, .56), (.14, .50), (.28, .46), (.42, .52), (.58, .57), (.74, .52), (.90, .47), (1.05, .50)], 0.42, .55),
+        ([(-0.05, .62), (.18, .66), (.36, .70), (.52, .66), (.66, .61), (.82, .65), (1.05, .72)], 0.56, .70),
+        ([(-0.05, .86), (.16, .80), (.32, .77), (.50, .82), (.70, .88), (.86, .84), (1.05, .80)], 0.80, .88),
+    ]
+    for i, (pts, d, base) in enumerate(rows):
+        ridge(p, pts, d, above, 421 + 20 * i, edge=2.4 - 0.25 * i, gran=0.060 + 0.005 * i, sigma=22 - 3 * i,
+              fade=(d * 0.55, base - 0.06, base + 0.10))
+        if i < 4: p.mist(base + 0.06, 0.035, 0.55 - 0.05 * i, seed=430 + 20 * i)
+    return p.finish()
+
+
+def variant_c() -> np.ndarray:
+    """Tarn. The fold: two steep snow peaks and a dark scree slope, mirrored in a small still water."""
+    p = Painting(paper_seed=19)
+    yw = 0.60
+    above = smoothstep(yw + 0.004, yw - 0.004, YN)
+    sky(p, above, top=0.30, reach=0.50, seed=511)
+    land0 = p.T.copy()
+
+    prof, m = ridge(p, [(-0.05, .40), (.08, .36), (.18, .25), (.25, .15), (.30, .19), (.38, .30), (.47, .36), (.56, .29),
+                        (.64, .17), (.69, .12), (.75, .20), (.84, .31), (.94, .37), (1.05, .40)],
+                    0.40, above, 521, wobble=0.008, sigma=10, fade=(0.22, 0.24, yw))
+    snow(p, prof, m, 0.075, 525)
+    p.mist(yw - 0.06, 0.05, 0.62, seed=526)
+
+    ridge(p, [(-0.05, .52), (.14, .50), (.30, .53), (.46, .56), (.62, .54), (.80, .55), (1.05, .51)],
+          0.44, above, 531, fade=(0.16, 0.50, yw))
+    scree = p.profile([(-0.05, yw + .30), (.52, yw + .10), (.60, yw + .01), (.68, .56), (.78, .50), (.88, .43),
+                       (.97, .385), (1.05, .36)], wobble=0.004, wobble_sigma=10, seed=541)
+    scree = treeline(scree, [(.705, .040, .0044), (.742, .070, .0062), (.760, .042, .0044), (.815, .085, .0072),
+                             (.838, .050, .0050), (.896, .075, .0066), (.948, .095, .0080), (.972, .055, .0052)],
+                     canopy=0.012, seed=6)
+    m = p.ragged(p.below(scree), edge=1.3, rough=3, fine=3, tooth=1.6, seed=542) * above
+    p.wash(m, 0.84, rim=0.25, rim_w=4, gran=0.080, flow=0.22, seed=543)
+
+    land = p.T / np.maximum(land0, 1e-6)
+    water(p, yw, land, near=0.24, far=0.04, seed=551, squash=0.84)
+    ripples(p,
+        lights=[(.24, .655, .10, .0050, .55), (.60, .650, .12, .0048, .55), (.40, .720, .12, .0066, .55),
+                (.78, .740, .09, .0070, .50), (.22, .810, .12, .0088, .50), (.58, .860, .15, .0100, .50)],
+        darks=[(.48, .780, .09, .0066, .22), (.80, .850, .10, .0085, .26), (.30, .920, .14, .0105, .28)])
+    return p.finish()
+
+
+VARIANTS = {"a": variant_a, "b": variant_b, "c": variant_c}
+
+if __name__ == "__main__":
+    out = sys.argv[1]
+    for k in sys.argv[2:] or list(VARIANTS):
+        save_value(VARIANTS[k](), f"{out}/mountains-{k}-value.png"); print("painted", k)
