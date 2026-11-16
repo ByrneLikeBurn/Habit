@@ -126,6 +126,8 @@ The paused bar is as wide as the done shape and at least 2 points thick. The acc
 
 **This reaches milestone 2.** Pen and ink's small diamond is in the year view and the History month strip, which are being built now. The product owner set it as a gate on the milestone 2 merge: the small diamond is drawn split before that PR merges.
 
+**Step 2, full-size marks: first drawing, 16 November.** Drawn by `tools/marks/full_marks.py` to the rules above, in `docs/mockups/png/m4-marks.png`: every state at 24 points, in Paper and Ink, sharp and blurred by 0.75 points. Contrast as drawn against the worst pixel of each paper: Pencil 3.97 on Paper and 4.26 on Ink, measured on the solid core of a stroke. Watercolor 3.74 on Paper, measured on the rim, and 4.30 on Ink, measured on the flat paint. Not yet reviewed. Not yet drawn: the marks in yellow and red, Increase Contrast, and the marks inside the app's screens.
+
 **Plain text is not a setting.** The product owner would not add a flag. It becomes a gate in step 5: twelve habit names at 17 points are shown to the tired user and neurodiversity lenses. If the hand font fails, habit names use SF in that style, and only headings keep the display font.
 
 **To remove from `docs/spec.md` when this file merges.** The line that says Pencil uses a hand circle in calendars. A circle would match Watercolor's ring.
