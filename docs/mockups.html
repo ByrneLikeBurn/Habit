@@ -535,7 +535,7 @@ function mark(state, o){
 function ycell(state, style, today){
   const A="var(--accent)", K="var(--text)", round = style==="watercolor"; let g="";
   if(state==="solid") g = round?`<circle cx="6" cy="6" r="5" fill="${A}"/>`:`<rect x="1" y="1" width="10" height="10" rx="1" fill="${A}"/>`;
-  if(state==="hatched") g = round?`<path d="M1 6A5 5 0 0 0 11 6Z" fill="${A}"/>`:`<path d="M1 1V11H11Z" fill="${A}"/>`;
+  if(state==="hatched") g = round?`<path d="M6 1A5 5 0 0 0 6 11Z" fill="${A}"/>`:`<path d="M1 1V11H11Z" fill="${A}"/>`;
   if(state==="paused") g = `<path d="M1.5 6H10.5" stroke="${A}" stroke-width="2.5" stroke-linecap="round"/>`;
   if(state==="extra") g = `<path d="M6 0 12 6 6 12 0 6Z" fill="${A}"/>`;
   const t = today?`<rect x="-.6" y="-.6" width="13.2" height="13.2" rx="${round?6.6:2}" fill="none" stroke="${K}" stroke-width="1.1"/>`:"";
@@ -1183,6 +1183,15 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
              ["import-fail","phone modal",m2ImportFail,"Import, not a Habit file"],["import-newer","phone modal",m2ImportNewer,"Import, newer version"]];
   html += `<h2 class="group">Milestone 2 screens, Pen and ink</h2><div class="sheet">`;
   for(const [k,cls,fn,label] of G) html += `<figure><div class="${cls} ${s} paper" data-shot="m2-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
+  html += `</div>`; M1 = false;
+}
+{ // History month in every style and appearance, to test whether the strip can be read
+  M1 = true;
+  html += `<h2 class="group">History month, every style</h2><div class="sheet">`;
+  for(const s of ["penAndInk","pencil","watercolor"]) for(const ap of ["paper","ink"]){
+    const v = css({...vars(s,ap), "--accent":TOKENS.swatches.blue});
+    html += `<figure><div class="phone ${s} ${ap}" data-shot="hm-${s}-${ap}" style='${v}'>${m2HistMonth(s)}</div><figcaption>${s}, ${ap}</figcaption></figure>`;
+  }
   html += `</div>`; M1 = false;
 }
 { // Milestone 3 screens
