@@ -117,6 +117,7 @@ def render() -> None:
     m1_sheet(png, [i for i in ids if i.startswith("ax-")], "sheet-ax.png", 8)
     m1_sheet(png, [i for i in ids if i.startswith("mac-")], "sheet-mac.png", 3)
     m1_sheet(png, [i for i in ids if i.startswith("hm-")], "sheet-hist-month.png", 6)
+    m1_sheet(png, [i for i in ids if i.startswith("nh-")], "sheet-new-habit.png", 6)
 
 
 def sheets(png: pathlib.Path, ids) -> None:

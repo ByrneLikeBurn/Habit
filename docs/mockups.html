@@ -380,6 +380,30 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .wclear{padding:22px;border-radius:26px;background:linear-gradient(135deg,#5b6f8a,#a9806f 55%,#d9b98a)}
 .widget.clear{background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);backdrop-filter:blur(8px)}
 .widget.clear .wr + .wr{border-top:0}
+.dayrow2{display:grid;grid-template-columns:repeat(7,44px);justify-content:space-between;margin:0 21px}
+.dayc{width:44px;height:44px;border-radius:50%;display:grid;justify-items:center;align-content:center;gap:2px;border:1px solid var(--text3);color:var(--text2);font:500 13px/1 var(--ui)}
+.dayc b{font-weight:500}
+.dayc.on{border:2.5px solid var(--text);color:var(--text)}
+.dayc.on b{font-weight:700}
+.dayc svg{display:block;width:10px;height:8px}
+.dayc.on b{font-size:12px}
+.note.setlinks{display:flex;gap:26px;margin-top:6px;font-size:15px}
+.symrow2{display:flex;gap:2px;margin:0 21px;flex-wrap:nowrap}
+.symb.txt{width:auto;padding:0 9px;font:500 14px/1 var(--ui)}
+.symb.txt.more{color:var(--text);text-decoration:underline;text-underline-offset:3px}
+.symb.ph{background:var(--fill);border-radius:10px;width:36px;height:36px;margin:4px}
+.field.ph{color:var(--text3)}
+.search{margin:10px 21px 0;height:38px;border-radius:10px;background:var(--fill);display:flex;align-items:center;padding:0 12px;font:400 16px/1 var(--ui);color:var(--text3)}
+.chips{display:flex;gap:8px;margin:12px 0 0 21px;overflow:hidden;white-space:nowrap}
+.macform .chips,.wrapchips{flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px;border-radius:17px;border:1px solid var(--text3);font:500 14px/1 var(--ui);color:var(--text2);flex:none}
+.chip.on{border:2.5px solid var(--text);color:var(--text);font-weight:700}
+.sec.gh{margin-top:20px}
+.symgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px 0;margin:0 17px;justify-items:center}
+.macsheet2{width:468px;background:var(--paper);color:var(--text);border-radius:12px;border:.5px solid var(--rule2);box-shadow:0 20px 60px rgba(0,0,0,.25);padding:6px 3px 26px;font-family:var(--ui)}
+.macsheet2 .grab{display:none}
+.macform{width:462px;margin:0 auto}
+.macform .sec{margin-top:20px}
 .ymons{display:flex;flex-wrap:wrap;gap:10px 14px;margin:6px 21px 0}
 .ym{display:grid;gap:5px;min-height:44px;align-content:start}
 .ym span{font:500 11px/1 var(--ui);color:var(--text3)}
@@ -550,6 +574,10 @@ const ICONS = {
   drop:'<path d="M24 8C17 18 13 24.500 13 30a11 11 0 0 0 22 0C35 24.500 31 18 24 8Z"/><path d="M19 31a5.500 5.500 0 0 0 4 5"/>',
   book:'<path d="M7 12h12a5 5 0 0 1 5 5v21a4 4 0 0 0-4-4H7Z"/><path d="M41 12H29a5 5 0 0 0-5 5v21a4 4 0 0 1 4-4h13Z"/>',
   leaf:'<path d="M11 37C11 21 21 11 38 10c0 17-10 27-27 27Z"/><path d="M11 37 27 21"/>',
+  dice:'<rect x="9" y="9" width="30" height="30" rx="6"/><circle cx="17.500" cy="17.500" r="1.200" fill="currentColor"/><circle cx="30.500" cy="30.500" r="1.200" fill="currentColor"/><circle cx="24" cy="24" r="1.200" fill="currentColor"/>',
+  walk:'<circle cx="26" cy="9" r="3.500"/><path d="M19 43l5-12-5-6 3-9 7 5 6 2M24 31l7 4 2 8M22 16l-7 4-1 7"/>',
+  people:'<circle cx="17" cy="16" r="5.500"/><circle cx="33" cy="18" r="4.500"/><path d="M6 39c0-7 5-11 11-11s11 4 11 11M30 28c6-1 12 3 12 10"/>',
+  tree:'<path d="M24 6 12 22h6l-8 11h28l-8-11h6Z"/><path d="M24 33v9"/>',
   pen:'<path d="m9 39 3.500-12L31 8.500l8.500 8.500L21 35.500Z"/><path d="m26.500 13 8.500 8.500"/>',
   pill:'<path d="M15.500 32.500a7.800 7.800 0 0 1 0-11l6-6a7.800 7.800 0 0 1 11 11l-6 6a7.800 7.800 0 0 1-11 0Z"/><path d="m18.500 18.500 11 11"/>',
   moon:'<path d="M36 29.500A14 14 0 1 1 18.500 12 11.500 11.500 0 0 0 36 29.500Z"/>',
@@ -1142,6 +1170,42 @@ function m2HistMany(style){
   <p class="note hint">Tap a habit to open it. Tap a day to add or change a log. A dot is a day the habit is not scheduled.</p>${tabbar("progress")}`;
 }
 
+/* ---------- New habit form, after the owner's first run on 16 November ---------- */
+const DAYS2 = ["Mo","Tu","We","Th","Fr","Sa","Su"];
+const tick = `<svg width="12" height="9" viewBox="0 0 12 9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.500 4.800 4.500 7.600 10.500 1.400"/></svg>`;
+const dayBtn = (d,on)=>`<span class="dayc ${on?"on":""}" role="switch" aria-checked="${on}">${on?tick:""}<b>${d}</b></span>`;
+const repeats = (off)=>{ const n = off.length;
+  const line = n===0 ? "Every day. Choose a day to leave it out." : n===7 ? "No days yet. Choose a day to add it." : "Every day except Thursday";
+  return `<div class="sec">Repeats on</div><div class="dayrow2">${DAYS2.map((d,i)=>dayBtn(d,!off.includes(i))).join("")}</div>
+  <p class="note hint">${line}</p><p class="note setlinks"><span class="lnk">Set every day</span><span class="lnk">Set weekdays</span></p>`; };
+const symRow = (sel)=>`<div class="sec">Symbol</div><div class="symrow2"><span class="symb txt ${sel===-1?"on":""}">None</span>${["drop","book","moon","dice","walk","people"].map((k,i)=>`<span class="symb ${i===sel?"on":""}">${icon(k,26)}</span>`).join("")}<span class="symb txt more">More…</span></div>`;
+const logging = (count)=>`<div class="sec">Logging</div><div class="seg" style="margin-top:0"><span class="${count?"":"on"}">Mark done</span><span class="${count?"on":""}">Count</span></div>
+  <p class="note hint">${count?"Each tap adds to the day's total.":"One tap marks the day done."}</p>`;
+const nhTop = `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>New habit</b><span class="btn"><b>Add</b></span></div>`;
+function nhMark(style){
+  return nhTop+`<div class="sec">Name</div><div class="field nm ph">Stretch after brushing teeth</div>${symRow(-1)}${logging(false)}${repeats([])}`;
+}
+function nhCount(style){
+  return nhTop+`<div class="sec">Name</div><div class="field nm">Drink water</div>${symRow(0)}${logging(true)}
+  <div class="frow"><span>Target each day</span><b class="num typed" role="textbox">8</b></div>
+  <div class="frow"><span>Unit and tap amount</span><span class="val">glasses, 1</span><span class="go" style="position:static;margin-left:8px;transform:scaleX(-1)">${chev}</span></div>${repeats([3])}`;
+}
+function nhNoDays(style){
+  return nhTop+`<div class="sec">Name</div><div class="field nm">Read</div>${symRow(1)}${logging(false)}${repeats([0,1,2,3,4,5,6])}`;
+}
+const GROUPS = ["Body","Food and drink","Home","Making","Mind","Movement","Outdoors","People","Play","Rest","Work and study"];
+const GLY = {Body:["pill","drop"],"Food and drink":["drop","leaf"],Home:["book"],Making:["pen"],Mind:["book","moon"],Movement:["walk"],Outdoors:["tree","leaf"],People:["people"],Play:["dice"],Rest:["moon"],"Work and study":["book","pen"]};
+const tile = (g,i)=>{ const k = GLY[g][i]; return `<span class="symb ${k?"":"ph"}">${k?icon(k,26):""}</span>`; };
+const chips = (sel, from=0)=>`<div class="chips">${["All",...GROUPS].slice(from).map(g=>`<span class="chip ${g===sel?"on":""}" role="button" aria-pressed="${g===sel}">${g===sel?tick:""}${g}</span>`).join("")}</div>`;
+const symTop = `<div class="grab"></div><div class="nav sheetnav"><span class="btn">Cancel</span><b>Symbol</b><span class="btn"><b>Done</b></span></div><div class="search">Search symbols</div>`;
+function nhSymbols(style){
+  return symTop+chips("All")+GROUPS.slice(0,4).map(g=>`<div class="sec gh">${g}</div><div class="symgrid">${Array.from({length:12},(_,i)=>tile(g,i)).join("")}</div>`).join("");
+}
+function nhSymbolsPlay(style){
+  return symTop+chips("Play",7)+`<div class="symgrid" style="margin-top:14px">${Array.from({length:12},(_,i)=>tile("Play",i)).join("")}</div><p class="note hint">12 symbols</p>`;
+}
+const nhMac = s=>`<div class="macform">${nhCount(s)}</div>`;
+
 /* ---------- page ---------- */
 const SCREENS = {today:[today,"Today"], detail:[detail,"Habit detail"], gentle:[gentle,"Gentle Mode on Today"], appearance:[appearance,"Appearance"], marks:[marks,"Marks board"]};
 const css = v=>Object.entries(v).map(([k,x])=>`${k}:${x}`).join(";");
@@ -1195,6 +1259,15 @@ for(const style of Object.keys(STYLE_NAMES)) for(const app of ["paper","ink"]){
     const v = css({...vars(s,ap), "--accent":TOKENS.swatches.blue});
     html += `<figure><div class="phone ${s} ${ap}" data-shot="hm-${s}-${ap}" style='${v}'>${m2HistMonth(s)}</div><figcaption>${s}, ${ap}</figcaption></figure>`;
   }
+  html += `</div>`; M1 = false;
+}
+{ // New habit form, after the owner's first run
+  M1 = true;
+  const s = "penAndInk", v = css({...vars(s,"paper"), "--accent":TOKENS.swatches.blue});
+  const G = [["mark","phone modal",nhMark,"New habit, Mark done, no symbol, every day"],["count","phone modal",nhCount,"New habit, Count, one day left out"],["nodays","phone modal",nhNoDays,"New habit, no days chosen"],
+             ["symbols","phone modal",nhSymbols,"Symbol picker, all groups. Grey tiles stand for symbols not drawn here"],["symbols-play","phone modal",nhSymbolsPlay,"Symbol picker, Play chosen"],["mac","macsheet2",nhMac,"The same form as a Mac sheet, one column 420 points wide"]];
+  html += `<h2 class="group">New habit form, after the first run</h2><div class="sheet">`;
+  for(const [k,cls,fn,label] of G) html += `<figure><div class="${cls} ${s} paper" data-shot="nh-${k}" style='${v}'>${fn(s)}</div><figcaption>${label}</figcaption></figure>`;
   html += `</div>`; M1 = false;
 }
 { // Milestone 3 screens
