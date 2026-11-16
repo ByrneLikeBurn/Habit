@@ -116,6 +116,8 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 **Review lenses.** Each lens runs as a separate subagent that has not seen the working. It gets its brief, this file and the thing under review. It returns at most five findings, ranked, each with a file and line or a screen, and a concrete failure scenario. Valid findings are fixed. The rest are listed with the reason.
 
+Before a PR is merged, every lens whose brief covers the change has seen the final version of it. A change made after a review goes back to the lens that asked for it before the merge. A lens with nothing in its brief that the change touches is not run. The PR body lists which lenses saw the final version and what is still unchecked. The owner set this on 15 November 2026, to keep the signal high and the noise low.
+
 After each milestone three lenses run: senior software engineer, QA engineer and tired daily user. Accessibility is added when the diff changes the UI. Security and privacy is added when the diff adds a permission, a file or a dependency. All twenty run at each stop: the end of phase 1, after milestone 3, and at the end. Run lenses two or three at a time, not all at once. The owner set this on 14 November 2026.
 
 | Lens | Team role | Brief |
