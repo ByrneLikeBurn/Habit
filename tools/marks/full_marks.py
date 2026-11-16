@@ -12,7 +12,7 @@ from scipy.ndimage import gaussian_filter, distance_transform_edt
 
 S = 10                       # pixels per point
 SIZE = 24                    # the mark, in points
-PAD = 7                      # room for the today square or ring
+PAD = 10                     # room for the today square or ring
 N = (SIZE + 2 * PAD) * S     # canvas edge in pixels
 C = N / 2
 TH = math.radians(56)
@@ -117,7 +117,7 @@ def pencil(state):
     return np.zeros((N, N)), np.zeros((N, N))
 
 def pencil_today():                                         # four strokes whose ends cross and overshoot each corner by 1 point
-    q = H + 5.5; m = np.zeros((N, N))      # 3 points clear of the mark, stroke ends included
+    q = H + 6.5; m = np.zeros((N, N))      # 3 points clear of the mark, stroke ends and bow included
     for x0, y0, x1, y1 in [(-q - 1, -q, q + 1, -q + 0.5), (q, -q - 1, q - 0.4, q + 1), (q + 1, q, -q - 1, q - 0.5), (-q, q + 1, -q + 0.4, -q - 1)]:
         m = np.maximum(m, mask(lambda d: stamp(d, bowed(x0, y0, x1, y1, (rng.random() - 0.5) * 1.6), taper(1.5, 0.75, 0.06))))
     return m
@@ -157,10 +157,11 @@ def water(state, ink=False):
         return wash(sh, ink)
     if state == "part":                                     # three brush strokes at full strength, each pooled at its start and lifted at its end
         dx, dy, nx, ny = math.cos(TH), -math.sin(TH), math.sin(TH), math.cos(TH); w = SIZE * 0.17
-        m = mask(lambda d: [stamp(d, bowed(nx * o - dx * L, ny * o - dy * L, nx * o + dx * L, ny * o + dy * L, b), brush(w)) for o, L, b in ((-SIZE * 0.3, SIZE * 0.27, 0.3), (0, SIZE * 0.43, -0.25), (SIZE * 0.3, SIZE * 0.27, 0.2))])
+        m = mask(lambda d: [stamp(d, bowed(nx * o - dx * L, ny * o - dy * L, nx * o + dx * L, ny * o + dy * L, b), brush(w)) for o, L, b in ((-SIZE * 0.3, SIZE * 0.27, 0.3), (0, SIZE * 0.42, -0.25), (SIZE * 0.3, SIZE * 0.27, 0.2))])
         return m, m > 0.99
     if state == "paused":
-        m = mask(lambda d: stamp(d, bowed(-SIZE * 0.27, 0.2, SIZE * 0.27, -0.2, 0.2), brush(SIZE * 0.17))); return m, m > 0.99
+        a = math.radians(-12); L = SIZE * 0.22      # a short tilted dab, so it does not read as the system's minus in a circle
+        m = mask(lambda d: stamp(d, bowed(-L * math.cos(a), -L * math.sin(a), L * math.cos(a), L * math.sin(a), 0.3), brush(SIZE * 0.17))); return m, m > 0.99
     if state == "tocome":                                   # a ring of short dabs of uneven length, 2 points, gaps of 2 points or more
         r = R * 0.9; m = np.zeros((N, N)); a0 = 0.1
         while a0 < 2 * math.pi - 0.3:
@@ -173,9 +174,9 @@ def water(state, ink=False):
     return np.zeros((N, N)), np.zeros((N, N), bool)
 
 def water_today():                                          # one brushed ring: pooled where it starts, thin where it lifts, gap of 1 point at most
-    r = H + 5; n = 120; gap = 1.0 / r; start = -0.7
+    r = H + 5.2; n = 120; gap = 1.0 / r; start = -0.7
     def at(i): a = start + gap + (2 * math.pi - gap) * i / n; rr = r + 0.3 * math.sin(a * 2 + 0.6) - 0.9 * (i / n); return rr * math.cos(a), rr * math.sin(a)   # the end lands just inside the start
-    def width(i): t = i / n; return 1.5 + 0.9 * max(0, 1 - t / 0.07) - 0.55 * max(0, (t - 0.8) / 0.2)       # pooled at the start, thin where it lifts
+    def width(i): t = i / n; return max(1.5, 3.0 - 1.5 * t ** 0.7)       # 3 points where it pools at the start, thinning all the way round to 1.5 where it lifts
     return mask(lambda d: [stamp(d, [at(i), at(i + 0.5), at(i + 1)], (lambda t, w=width(i): w), 4) for i in range(n)])
 
 # ---------- compose and measure ----------
