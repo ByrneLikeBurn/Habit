@@ -451,7 +451,9 @@ Drawn in `m2-hist-month.png`, `m2-hist-many.png` and `m2-hist-empty.png`. The pr
 
 **Many habits.** The list scrolls in Today's order. The control, the period title and the weekday or date header stay pinned. There is no totals row, no search and no filter. The hint sits once, after the last row. An archived habit is off the list. It appears under a plain "Archived" heading at the end only in a period where it has a log (**Guess**).
 
-**Widget, clear mode.** Drawn in `m3-w-clear.png`. Marks are full opacity and the rows have no rules.
+**After the low-vision and tired-user check.** The month strip stays. Its dash is thicker and as wide as the cell, the diamond fills the cell, and the dot is 4 points. The same shapes are used in the year view. Month shows the year view's key under the hint, because part done is a triangle here and hatching in Week. Days to come draw nothing in Week and in Month. An archived row has no today outline, because it cannot be logged. Not drawn: Month with many rows.
+
+**Widget, clear mode.** Drawn in `m3-w-clear.png`. The drawing fails contrast on its wallpaper: text and marks measure between 1.8:1 and 2.9:1. In the build the system's vibrant foreground and glass backing draw the text and marks, and the widget is tested on the lightest wallpaper. No widget row draws the plus, in any mode, because it hid the part-done hatching and the whole row is the button.
 
 ## Largest text size, milestones 2 and 3
 

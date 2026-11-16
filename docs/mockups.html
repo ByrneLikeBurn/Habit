@@ -256,7 +256,7 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .lc{width:44px;height:44px;display:grid;place-items:center;position:relative}
 .lc.now::after{content:"";position:absolute;inset:9px;border:1px solid var(--text);border-radius:3px}
 .yoff{position:relative}
-.yoff::after{content:"";position:absolute;left:4px;top:4px;width:3px;height:3px;border-radius:50%;background:var(--text3)}
+.yoff::after{content:"";position:absolute;left:3.5px;top:3.5px;width:4px;height:4px;border-radius:50%;background:var(--text3)}
 .ykey .yoff{width:11px;height:11px;display:block}
 .ym{min-width:44px}
 .grid .day span{color:var(--text2)}
@@ -372,7 +372,7 @@ figcaption{font:400 12px/1.4 var(--ui);color:#5a554d;margin-top:8px}
 .hs{width:11px;height:11px;flex:none;display:grid;place-items:center;position:relative}
 .hs.mon{margin-left:3px}
 .hs svg{width:9.5px;height:9.5px;display:block}
-.hs.yoff::after{left:4px;top:4px}
+.hs.yoff::after{left:3.5px;top:3.5px}
 .hh{height:16px}
 .hh b{font:500 10px/1 var(--ui);color:var(--text3);position:absolute;left:0;top:0;white-space:nowrap}
 .lr.hm{min-height:56px;padding:8px 0 4px}
@@ -536,8 +536,8 @@ function ycell(state, style, today){
   const A="var(--accent)", K="var(--text)", round = style==="watercolor"; let g="";
   if(state==="solid") g = round?`<circle cx="6" cy="6" r="5" fill="${A}"/>`:`<rect x="1" y="1" width="10" height="10" rx="1" fill="${A}"/>`;
   if(state==="hatched") g = round?`<path d="M1 6A5 5 0 0 0 11 6Z" fill="${A}"/>`:`<path d="M1 1V11H11Z" fill="${A}"/>`;
-  if(state==="paused") g = `<path d="M3 6H9" stroke="${A}" stroke-width="1.7" stroke-linecap="round"/>`;
-  if(state==="extra") g = `<path d="M6 1 11 6 6 11 1 6Z" fill="${A}"/>`;
+  if(state==="paused") g = `<path d="M1.5 6H10.5" stroke="${A}" stroke-width="2.5" stroke-linecap="round"/>`;
+  if(state==="extra") g = `<path d="M6 0 12 6 6 12 0 6Z" fill="${A}"/>`;
   const t = today?`<rect x="-.6" y="-.6" width="13.2" height="13.2" rx="${round?6.6:2}" fill="none" stroke="${K}" stroke-width="1.1"/>`:"";
   return `<svg viewBox="0 0 12 12" style="display:block;overflow:visible" aria-hidden="true">${g}${t}</svg>`;
 }
@@ -895,7 +895,7 @@ function m2Progress(style){
   const P = [["drop","Drink water",["solid","blank","solid","off","solid","hatched","blank"]],["book","Read",["solid","solid","solid","solid","solid","solid","blank"]],
              ["leaf","Walk outside",["solid","off","off","solid","solid","off","off"]],["pill","Take vitamins",["solid","solid","blank","solid","solid","solid","blank"]],
              ["moon","Stretch before bed",["blank","blank","solid","blank","solid","blank","blank"]]];
-  const cell = (x,i)=> `<span class="lc ${i===5?"now":""} ${i>5?"later":""}">${x==="off" ? offDot(20) : mark(x,{style,size:20})}</span>`;
+  const cell = (x,i)=> `<span class="lc ${i===5?"now":""} ${i>5?"later":""}">${i>5 ? "" : x==="off" ? offDot(20) : mark(x,{style,size:20})}</span>`;
   return status()+`<div class="nav"><span></span><span></span></div>${head("History")}
   <div class="seg"><span class="on">Week</span><span>Month</span></div>
   <div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
@@ -1010,7 +1010,7 @@ function m3EditPause(style, paused){
 }
 const m3EditPaused = s=>m3EditPause(s,true);
 // The widget. Rows keep Today's order. The whole row is the button and logs through LogHabitIntent.
-const wrow = (h,style,st)=>`<div class="wr" role="button"><span class="wn">${icon(h.icon,20)}<b>${h.name}</b></span>${mark(st||h.state,{style,size:24,today:true,ctl:true,plus:h.count&&(st||h.state)!=="solid"&&(st||h.state)!=="paused"})}</div>`;
+const wrow = (h,style,st)=>`<div class="wr" role="button"><span class="wn">${icon(h.icon,20)}<b>${h.name}</b></span>${mark(st||h.state,{style,size:24,today:true,ctl:true,plus:false})}</div>`;
 const WH = [HABITS[0],HABITS[1],HABITS[3],HABITS[2],HABITS[4]];
 function m3WidgetSmall(style){ return `<div class="wtitle">Today</div>${WH.slice(0,3).map(h=>wrow(h,style)).join("")}`; }
 function m3WidgetMed(style){ return `<div class="wtitle">Today<span>Saturday 14 November</span></div><div class="wcols">${WH.slice(0,4).map(h=>wrow(h,style)).join("")}</div>`; }
@@ -1120,7 +1120,8 @@ function m2HistMonth(style){
   <div class="month"><b class="plink">November 2026</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
   <div class="ledger"><div class="hstrip hh">${hdr}</div>
   ${HP.map(([ic,n,off],i)=>`<div class="lr hm" role="button"><span class="ln">${icon(ic,22)}${n}</span><div class="hstrip">${histStrip(style,i,off)}</div></div>`).join("")}</div>
-  <p class="note hint">Tap a habit to open its month.</p>${tabbar("progress")}`;
+  <p class="note hint">Tap a habit to open its month.</p>
+  <div class="ykey">${[["solid","Done"],["hatched","Part done"],["paused","Paused"],["extra","Logged while paused"]].map(([st,l])=>`<div><i>${ycell(st,style)}</i>${l}</div>`).join("")}<div><i class="yoff"></i>Not scheduled</div></div>${tabbar("progress")}`;
 }
 function m2HistEmpty(style){
   return status()+`<div class="nav"><span></span><span></span></div>${head("History")}
@@ -1134,7 +1135,7 @@ function m2HistMany(style){
   <div class="month"><b class="plink">9 to 15 November</b><span class="mnav"><i>${chev}</i><i class="off">${chev}</i></span></div>
   <div class="ledger"><div class="lh">${"MTWTFSS".split("").map((d,i)=>`<span class="${i===5?"now":""}">${d}</span>`).join("")}</div></div></div>
   <div class="ledger">${names.map((n,i)=>`<div class="lr" role="button"><span class="ln">${n}</span><div class="lcs">${st(i).map(cell).join("")}</div></div>`).join("")}
-  <div class="sec" style="margin:18px 0 0">Archived</div><div class="lr" role="button"><span class="ln">Morning pages</span><div class="lcs">${["solid","solid","blank","blank","blank","blank","blank"].map(cell).join("")}</div></div></div>
+  <div class="sec" style="margin:18px 0 0">Archived</div><div class="lr" role="button"><span class="ln">Morning pages</span><div class="lcs">${["solid","solid","blank","blank","blank","blank","blank"].map((x,i)=>`<span class="lc">${mark(x,{style,size:20})}</span>`).join("")}</div></div></div>
   <p class="note hint">Tap a habit to open it. Tap a day to add or change a log. A dot is a day the habit is not scheduled.</p>${tabbar("progress")}`;
 }
 
