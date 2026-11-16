@@ -29,6 +29,22 @@ struct SourceChecks {
         #expect(files.contains { $0.path == Self.intentFile }, "The app sources were not found")
     }
 
+    /// The diamond's cut jumps from the wide gap to the hairline at 12 points. Every full-size mark the app draws must sit
+    /// clearly above it, so one screen never mixes the two drawings. MarkView's diamond is 68% of its size, so 18 is the floor.
+    @Test func everyFullSizeMarkIsAboveTheCutThreshold() throws {
+        let call = try Regex(#"(?:^|[^A-Za-z])MarkView\(state:[^\n]*?size: ([0-9.]+)"#)
+        var sizes: [Double] = [28] // the default size
+        for file in try swiftFiles() {
+            for match in file.text.matches(of: call) {
+                if let value = match.output[1].substring.flatMap({ Double($0) }) { sizes.append(value) }
+            }
+        }
+        #expect(sizes.count > 1, "No MarkView sizes were found")
+        for size in sizes {
+            #expect(size * 0.68 > 12, "A MarkView of \(size) points draws its diamond under 12 points")
+        }
+    }
+
     /// Tokens live in the style files only. A view that computes a colour or names a font is a bug.
     @Test func coloursAndFontsAreNamedOnlyInTheStyleFiles() throws {
         // `Color(` as a call, not as the end of a name such as `swatchColor(`.
