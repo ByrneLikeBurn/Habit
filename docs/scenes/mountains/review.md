@@ -37,3 +37,13 @@ Other art in the same card:
 - Not to do: still lifes, sun or moon discs, stars, seasonal art, patterns that could read as a chart, anything that grows with use.
 
 None of this belongs before user testing of milestones 1 to 3. Scenes are milestone 5. A sixth scene needs a larger size budget, which is the owner's decision.
+
+## Illustrator, round two, on B
+
+Passed: the mist and the summit. Owed: the snow cap vanished at one-third size. It is now twice as wide. The illustrator has not seen that version.
+
+Rulings:
+- Horizon: not a breach of invariant 7. Sky meets land along one soft line, and the nearer ridges are land in front.
+- Fold: mist does not count as the fold. B needs a written exception in `docs/spec.md`: the fold applies where a scene has water, and other scenes use receding layers. Redwoods and Desert would build on that rule, so it is a rule later work builds on. It goes to the scene lenses, and then to the owner with the variant.
+
+B is ready for the owner, with the fold exception stated.

@@ -89,7 +89,7 @@ def variant_b() -> np.ndarray:
                         fade=(d * 0.55, base - 0.06, base + 0.10))
         if i == 0:                                             # one small cap of bare paper on the far summit, on the side toward the light
             yy = np.arange(H)[:, None] * np.ones((1, W))
-            cap = smoothstep(0.05 * H, 0.008 * H, yy - prof[None, :]) * m * np.exp(-((XN - 0.728) / 0.022) ** 2) * smoothstep(0.75, 0.73, XN)
+            cap = smoothstep(0.05 * H, 0.008 * H, yy - prof[None, :]) * m * np.exp(-((XN - 0.722) / 0.044) ** 2) * smoothstep(0.75, 0.73, XN)
             p.lift(0.92 * cap)
         if i < 4: haze(p, base + (0.05, 0.07, 0.045, 0.065)[i], (0.03, -0.04, 0.05, -0.025)[i], (0.034, 0.048, 0.032, 0.040)[i], 0.58 - 0.09 * i, 430 + 20 * i)
     return p.finish()
