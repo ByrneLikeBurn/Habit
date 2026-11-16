@@ -560,8 +560,7 @@ private struct StatsBlock: View {
 
     /// The total with the unit exactly as typed, so "ml" never becomes "Ml".
     private var unitValue: String {
-        let unit = habit.unit.trimmingCharacters(in: .whitespaces)
-        return unit.isEmpty ? stats.unitTotal.formatted() : "\(stats.unitTotal.formatted()) \(unit)"
+        CountText.line(total: stats.unitTotal, target: nil, unit: habit.unit)
     }
 
     private var runText: String {

@@ -193,7 +193,7 @@ One entry per decision that changed the brief. Each says what changed and why, i
 
 **A day before a habit began draws nothing.** The year view drew off-day dots in the weeks before the "Since" date. Asked for by the colour vision and low vision review.
 
-**Today's small outline sits inside its cell,** with the mark smaller within it, so it never joins the next day's mark. The year grid's cells grow with text size. Asked for by the colour vision and low vision review.
+**Today's small outline sits inside its cell,** heavier than the not-logged square, with the day's mark filling the space inside it, so it never joins the next day's mark. The year grid's cells grow with text size. Asked for by the colour vision and low vision review.
 
 **The day sheet's buttons say what they make,** "Add, makes 9" and "Take away, makes 7", in place of a separate line. The habit's name is a heading that wraps, and the bar shows the date. Asked for by the senior designer and the typographer.
 

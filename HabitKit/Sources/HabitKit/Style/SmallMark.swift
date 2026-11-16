@@ -12,10 +12,12 @@ public enum SmallMark {
     public static func draw(_ state: DayState, isToday: Bool, in rect: CGRect, context: inout GraphicsContext, style: ResolvedStyle) {
         let cellSide = min(rect.width, rect.height)
         let cell = CGRect(x: rect.midX - cellSide / 2, y: rect.midY - cellSide / 2, width: cellSide, height: cellSide)
-        // Today's outline is drawn inside the cell, so it never meets the next mark. The mark shrinks within it.
-        let box = isToday ? cell.insetBy(dx: cellSide * 0.2, dy: cellSide * 0.2) : cell
+        // Today's outline is drawn inside the cell, so it never meets the next mark. It is heavier than the
+        // not-logged square, and the mark fills the space just inside it, so the day's state stays readable.
+        let todayWidth = style.outlineWidth * 1.2
+        let box = isToday ? cell.insetBy(dx: todayWidth + 0.75, dy: todayWidth + 0.75) : cell
         let side = box.width
-        let inner = box.insetBy(dx: side * 0.12, dy: side * 0.12)
+        let inner = isToday ? box : box.insetBy(dx: side * 0.12, dy: side * 0.12)
         let mark = GraphicsContext.Shading.color(style.mark)
         switch state {
         case .done:
@@ -49,8 +51,7 @@ public enum SmallMark {
             break
         }
         if isToday {
-            let width = style.outlineWidth * 0.8
-            context.stroke(Path(cell.insetBy(dx: width / 2, dy: width / 2)), with: .color(style.text), lineWidth: width)
+            context.stroke(Path(cell.insetBy(dx: todayWidth / 2, dy: todayWidth / 2)), with: .color(style.text), lineWidth: todayWidth)
         }
     }
 }
