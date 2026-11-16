@@ -143,4 +143,4 @@ One entry per decision that changed the brief. Each says what changed and why, i
 
 **The History tab has Week and Month, and no Year.** The brief gave it all three. Four reviews found that a year row for every habit needs one cell per week, which sums up seven days and reads as a grade. Year stays in Habit detail, one tap away.
 
-**Every lens that a change touches sees its final version before the merge.** The owner set this on 15 November 2026. Until now a fix made after a review could be merged without going back to the lens that asked for it. The PR body now lists which lenses saw the final version.
+**Reviews are sized by what a change touches and how hard it is to undo.** The owner asked for a logic with fewer reviews and no unchecked work moving forward. Twelve rules and a routing table are now in `CLAUDE.md`, tested by a tech lead, QA and product review. Open findings, gates and guesses live in one list, `docs/findings.md`.
