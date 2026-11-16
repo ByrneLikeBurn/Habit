@@ -8,6 +8,27 @@ public enum SmallMark {
         max(4, (cell * 0.16).rounded())
     }
 
+    /// The gap across a small diamond, as a share of the cell: 2.5 units in a 12-unit cell.
+    /// Blurred, a whole diamond is too close to the done square (0.16). Split, it measures 0.38. See `docs/m4-blur-test.md`.
+    public static let diamondGap: CGFloat = 2.5 / 12
+
+    /// A diamond at the full cell with a flat gap across its middle: two triangles, point up and point down.
+    public static func splitDiamond(in box: CGRect) -> Path {
+        let gap = box.height * diamondGap
+        // The diamond's half-width at the gap's edge.
+        let halfWidth = box.width / 2 * (1 - gap / box.height)
+        var path = Path()
+        path.move(to: CGPoint(x: box.midX, y: box.minY))
+        path.addLine(to: CGPoint(x: box.midX + halfWidth, y: box.midY - gap / 2))
+        path.addLine(to: CGPoint(x: box.midX - halfWidth, y: box.midY - gap / 2))
+        path.closeSubpath()
+        path.move(to: CGPoint(x: box.midX - halfWidth, y: box.midY + gap / 2))
+        path.addLine(to: CGPoint(x: box.midX + halfWidth, y: box.midY + gap / 2))
+        path.addLine(to: CGPoint(x: box.midX, y: box.maxY))
+        path.closeSubpath()
+        return path
+    }
+
     /// Draws one day into `rect`. `rect` is the cell; shapes sit inside it.
     public static func draw(_ state: DayState, isToday: Bool, in rect: CGRect, context: inout GraphicsContext, style: ResolvedStyle) {
         let cellSide = min(rect.width, rect.height)
@@ -35,13 +56,7 @@ public enum SmallMark {
             let height = max(2, side * 0.2)
             context.fill(Path(CGRect(x: inner.minX, y: box.midY - height / 2, width: inner.width, height: height)), with: mark)
         case .loggedWhilePaused, .loggedOffSchedule:
-            var path = Path()
-            path.move(to: CGPoint(x: box.midX, y: box.minY))
-            path.addLine(to: CGPoint(x: box.maxX, y: box.midY))
-            path.addLine(to: CGPoint(x: box.midX, y: box.maxY))
-            path.addLine(to: CGPoint(x: box.minX, y: box.midY))
-            path.closeSubpath()
-            context.fill(path, with: mark)
+            context.fill(splitDiamond(in: box), with: mark)
         case .offSchedule:
             let d = dotSize(cell: side)
             context.fill(Path(ellipseIn: CGRect(x: box.midX - d / 2, y: box.midY - d / 2, width: d, height: d)), with: .color(style.tertiary))

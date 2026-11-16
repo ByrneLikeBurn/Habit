@@ -21,6 +21,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 |---|---|---|
 | 2 | Contrast of every mark and text token, measured on a simulator against the worst pixel of each paper | Passed. Paper text 17.73, secondary 6.88, tertiary 4.87. Ink text 16.29, secondary 8.34, tertiary 5.22. Marks 3.54 to 5.06. `AppUITests/ContrastUITests.swift` |
 | 2 | Import size and count limits are set, and a file over them is refused with nothing written | Passed. `ImportLimits`, tested by `HistoryTests.swift`, including a file at every limit that imports in full |
+| 2 | The small diamond (year grid, History month strip, small key) blurs apart from every other small state, with a pass mark of 0.25 | Passed after a change. A whole diamond measured 0.16 against done. It is now split by a flat gap of 2.5 units in a 12-unit cell and measures 0.38 in Pen and ink. The full-size diamond is unchanged. Measurements in `docs/m4-blur-test.md` on `docs/milestone-4-design`. `SmallMark.splitDiamond`, tested by `SmallDiamondTests`. Seen in `history-month-paper.jpg`, `detail-year-paper.jpg` |
 
 ## Owed
 
