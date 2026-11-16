@@ -218,7 +218,7 @@ struct MarksBoardView: View {
             (.done, true, false, "Done", "The target was met, or a yes-or-no habit was logged."),
             (.partDone, true, true, "Part done", "Some logged, under the target. It still counts."),
             (.blank, true, true, "Adds", "A plus means a tap adds to the count."),
-            (.loggedOffSchedule, true, false, "Logged on a day off", "Logged on a day the habit is not set for. It still counts."),
+            (.loggedOffSchedule, true, false, "Logged on a paused day or a day off", "A log on a day that was paused, or that the habit is not set for. It still counts."),
             (.offSchedule, false, false, "Not scheduled", "A dot is a day the habit is not set for."),
             (.blank, true, false, "Today", "The outline marks today. Empty means nothing logged yet."),
         ]

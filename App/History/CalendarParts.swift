@@ -137,10 +137,11 @@ struct SmallMarkKey: View {
     @Environment(Settings.self) private var settings
 
     /// The diamond is drawn for a log on a paused day and for a log on a day off, so its entry names both.
+    /// The cut is part of the diamond and does not mean paused.
     private var entries: [(DayState, Bool, LocalizedStringResource)] {
         var list: [(DayState, Bool, LocalizedStringResource)] = [
             (.done, false, "Done"), (.partDone, false, "Part done"), (.paused, false, "Paused"),
-            (.loggedWhilePaused, false, "Logged while paused or on a day off"), (.offSchedule, false, "Not scheduled"),
+            (.loggedWhilePaused, false, "Logged on a paused day or a day off"), (.offSchedule, false, "Not scheduled"),
         ]
         if settings.showDaysNotLogged { list.append((.notLogged, false, "Not logged")) }
         return list

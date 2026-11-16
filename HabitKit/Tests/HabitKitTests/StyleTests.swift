@@ -139,7 +139,7 @@ struct CountTextTests {
 @Suite struct SmallDiamondTests {
     @Test func theSmallDiamondHasAFlatGapOfTwoAndAHalfUnitsInTwelve() {
         let box = CGRect(x: 0, y: 0, width: 12, height: 12)
-        let path = SmallMark.splitDiamond(in: box)
+        let path = SmallMark.cutDiamond(in: box)
         // The gap runs from 4.75 to 7.25 across the middle and holds nothing.
         for x in stride(from: 0.5, through: 11.5, by: 0.5) {
             #expect(!path.contains(CGPoint(x: x, y: 6)))
@@ -155,5 +155,18 @@ struct CountTextTests {
         #expect(path.contains(CGPoint(x: 1.4, y: 4.7)))
         #expect(!path.contains(CGPoint(x: 1.0, y: 4.7)))
         #expect(path.boundingRect.minY == 0 && path.boundingRect.maxY == 12)
+    }
+
+    @Test func theCutIsAFifthOfTheMarkUpToTwelvePointsAndAHairlineAbove() {
+        #expect(SmallMark.diamondCut(width: 6) == 1.25)
+        #expect(SmallMark.diamondCut(width: 12) == 2.5)
+        #expect(SmallMark.diamondCut(width: 12.5) == 1.25)
+        #expect(SmallMark.diamondCut(width: 19) == 1.25)
+        // A full-size diamond, 19 points wide, is cut by a 1.25 point line and nothing wider.
+        let path = SmallMark.cutDiamond(in: CGRect(x: 0, y: 0, width: 19, height: 19))
+        #expect(!path.contains(CGPoint(x: 9.5, y: 9.5)))
+        #expect(!path.contains(CGPoint(x: 9.5, y: 8.95)))
+        #expect(path.contains(CGPoint(x: 9.5, y: 8.8)))
+        #expect(path.contains(CGPoint(x: 9.5, y: 10.2)))
     }
 }
