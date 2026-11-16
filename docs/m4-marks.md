@@ -1,6 +1,6 @@
 # Full-size marks, as measured
 
-Printed by `python3 tools/marks/full_marks.py docs/mockups/png/m4-marks.png` on 16 November 2026, second drawing. Blue swatch unless a column says otherwise. The first table is each mark as drawn against the worst pixel of its paper.
+Printed by `python3 tools/marks/full_marks.py docs/mockups/png/m4-marks.png` on 16 November 2026, third drawing. Blue swatch unless a column says otherwise. The first table is each mark as drawn against the worst pixel of its paper.
 
 ```
 style       paper         Done   Part done      Paused Logged on a     To come  Not logged
@@ -11,10 +11,10 @@ watercolor  ink           4.30        4.30        4.30        4.30        4.30  
 
 After a blur of 0.75 points, lowest contrast inside the mark, and the today outline as drawn:
 style       paper    done  diamond  to come  not logged  today outline
-pencil      paper    2.73     2.85     3.26        3.54          17.95
-pencil      ink      3.96     4.12     5.27        5.40          16.74
-watercolor  paper    2.16     2.70     2.96        3.18          18.14
-watercolor  ink      4.30     3.97     3.42        3.64          16.59
+pencil      paper    3.31     3.81     3.32        3.58          17.95
+pencil      ink      4.60     4.93     5.05        5.58          16.74
+watercolor  paper    2.16     2.70     2.97        2.94          18.14
+watercolor  ink      4.30     3.97     3.43        3.43          16.59
 
 Other colours as drawn, on the solid part of a mark. Custom hues are shaded until they hold 3:1:
 style       paper   ochre swatch  yellow, raw  yellow, shaded  red, raw  red, shaded

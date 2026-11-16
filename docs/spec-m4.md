@@ -126,7 +126,15 @@ The paused bar is as wide as the done shape and at least 2 points thick. The acc
 
 **This reaches milestone 2.** Pen and ink's small diamond is in the year view and the History month strip, which are being built now. The product owner set it as a gate on the milestone 2 merge: the small diamond is drawn split before that PR merges.
 
-**Step 2, full-size marks: first drawing, 16 November.** Drawn by `tools/marks/full_marks.py` to the rules above, in `docs/mockups/png/m4-marks.png`: every state at 24 points, in Paper and Ink, sharp and blurred by 0.75 points. Contrast as drawn against the worst pixel of each paper: Pencil 3.97 on Paper and 4.26 on Ink, measured on the solid core of a stroke. Watercolor 3.74 on Paper, measured on the rim, and 4.30 on Ink, measured on the flat paint. Not yet reviewed. Not yet drawn: the marks in yellow and red, Increase Contrast, and the marks inside the app's screens.
+**Step 2, full-size marks: reviewed, 16 November.** Drawn by `tools/marks/full_marks.py` in `docs/mockups/png/m4-marks.png`: every state at 24 points, in Paper and Ink, sharp and blurred by 0.75 points. The numbers are in `docs/m4-marks.md`.
+
+- Accessibility, colour vision and low vision: passed in the second round. As drawn, Pencil is 3.97 on Paper and 6.21 on Ink, and Watercolor is 3.74 on Paper and 4.30 on Ink.
+- Senior designer: three of five findings fixed in the second round. Four drawing fixes were made after it and have not been seen again: the Pencil "not logged" square is now four bowed strokes, the Watercolor today ring is thinner with a pooled start and a lifted end, the Watercolor "not logged" ring is thinner, and Pencil strokes overlap so no stray gap runs through a done mark. The designer sees them with step 3.
+- Not adopted: "the cut in the Pencil diamond on Ink is drawn as a light line". The pixels in the cut are bare paper. It was a misreading of the frame.
+- What the reviews changed from the first drawing: Pencil strokes touch, so a done mark blurs to a solid and the cut is the only line in the diamond. Pencil on Ink is a lighter pencil of the same hue with charcoal specks outside the solid core. The Watercolor rim is 1.5 to 2.6 points wide, wider where colour pools, and grades into the wash over 3 points. To come is drawn at 2 points.
+- Yellow, raw, is about 1.5:1 on the light papers. It is shaded to a dark ochre at 3.0. Thin marks in shaded yellow are measured in the colour ring PR.
+
+Not yet drawn: Increase Contrast, and the marks inside the app's screens.
 
 **Plain text is not a setting.** The product owner would not add a flag. It becomes a gate in step 5: twelve habit names at 17 points are shown to the tired user and neurodiversity lenses. If the hand font fails, habit names use SF in that style, and only headings keep the display font.
 

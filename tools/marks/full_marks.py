@@ -74,10 +74,10 @@ def pencil_strokes(shapes, n=11, cut=False):
     Returns (alpha, core). The core is the solid middle of every stroke, at least 1.5 points wide.
     """
     dx, dy, nx, ny = math.cos(TH), -math.sin(TH), math.sin(TH), math.cos(TH)
-    pitch = SIZE * 1.04 / n; w = pitch; core_w = max(1.5, w * 0.8)              # strokes touch, so done blurs to a solid; the eroded edges still show each stroke
+    pitch = SIZE * 1.04 / n; w = pitch + 0.25; core_w = max(1.5, w * 0.8)       # strokes overlap a little, so no gap opens between two of them, so done blurs to a solid; the eroded edges still show each stroke
     segs = []
     for k in range(n):
-        o = (k - (n - 1) / 2) * pitch + (rng.random() - 0.5) * 0.3; px, py = nx * o, ny * o
+        o = (k - (n - 1) / 2) * pitch + (rng.random() - 0.5) * 0.12; px, py = nx * o, ny * o
         for pts in shapes:
             r = clip_line(px, py, dx, dy, pts)
             if not r: continue
@@ -112,7 +112,7 @@ def pencil(state):
         return m, m
     if state == "notlogged":
         q = H * 0.9; m = np.zeros((N, N))
-        for (ax, ay), (bx, by) in zip([(-q, -q), (q, -q), (q, q), (-q, q)], [(q, -q), (q, q), (-q, q), (-q, -q)]): m = np.maximum(m, hand_line(ax - (bx - ax) * 0.03, ay - (by - ay) * 0.03, bx + (bx - ax) * 0.03, by + (by - ay) * 0.03, 2.0))
+        for (ax, ay), (bx, by) in zip([(-q, -q), (q, -q), (q, q), (-q, q)], [(q, -q), (q, q), (-q, q), (-q, -q)]): m = np.maximum(m, mask(lambda d: stamp(d, bowed(ax - (bx - ax) * 0.04, ay - (by - ay) * 0.04 + (rng.random() - 0.5) * 0.6, bx + (bx - ax) * 0.04, by + (by - ay) * 0.04 + (rng.random() - 0.5) * 0.6, (rng.random() - 0.5) * 1.4), taper(1.9, 0.7, 0.07))))
         return m, m
     return np.zeros((N, N)), np.zeros((N, N))
 
@@ -169,13 +169,13 @@ def water(state, ink=False):
             a0 = a1 + (2.3 + rng.random() * 0.8) / r
         return m, m > 0.99
     if state == "notlogged":                                # one thin closed ring at the done mark's size
-        o = wobble_shape(lambda: disc_pts(R * 0.98, 0.02)); i = wobble_shape(lambda: disc_pts(R * 0.98 - 2.0, 0.03)); m = np.clip(o - i, 0, 1); return m, m > 0.99
+        o = wobble_shape(lambda: disc_pts(R * 0.98, 0.02)); i = wobble_shape(lambda: disc_pts(R * 0.98 - 1.7, 0.035)); m = np.clip(o - i, 0, 1); return m, m > 0.99
     return np.zeros((N, N)), np.zeros((N, N), bool)
 
 def water_today():                                          # one brushed ring: pooled where it starts, thin where it lifts, gap of 1 point at most
-    r = H + 5; n = 120; gap = 0.9 / r; start = -1.15
-    def at(i): a = start + gap + (2 * math.pi - gap) * i / n; rr = r + 0.35 * math.sin(a * 2 + 0.6); return rr * math.cos(a), rr * math.sin(a)
-    def width(i): t = i / n; return 1.5 + 0.4 * max(0, 1 - t / 0.1) + 0.15 * math.sin(t * math.pi) - 0.3 * max(0, (t - 0.88) / 0.12)
+    r = H + 5; n = 120; gap = 1.0 / r; start = -0.7
+    def at(i): a = start + gap + (2 * math.pi - gap) * i / n; rr = r + 0.3 * math.sin(a * 2 + 0.6) - 0.9 * (i / n); return rr * math.cos(a), rr * math.sin(a)   # the end lands just inside the start
+    def width(i): t = i / n; return 1.5 + 0.9 * max(0, 1 - t / 0.07) - 0.55 * max(0, (t - 0.8) / 0.2)       # pooled at the start, thin where it lifts
     return mask(lambda d: [stamp(d, [at(i), at(i + 0.5), at(i + 1)], (lambda t, w=width(i): w), 4) for i in range(n)])
 
 # ---------- compose and measure ----------
