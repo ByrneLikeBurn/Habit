@@ -168,3 +168,7 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **The off-schedule dot is in the tertiary text colour.** It measures 4.87:1 on Paper and 5.22:1 on Ink, so it meets 3:1 without drawing attention.
 
 **Habit detail opens from "Details".** It is in the row menu and the swipe actions on Today, and a tap on a row in History. The name is still a guess for the content designer.
+
+**Each window has its own state.** One model was shared by every window, so an export or import opened in all of them, and the Mac File menu stayed live with no window open. Each window now has its own, and the Mac menus act on the focused window and are off when none is open. Asked for by the release engineer.
+
+**The import preview leads with what changes.** It showed the file's totals first, so the reader had to subtract. It now shows the habits, logs and pauses it adds and the logs already here, in the same rows as the result. Asked for by the tired daily user.

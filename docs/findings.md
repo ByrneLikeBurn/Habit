@@ -10,6 +10,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 |---|---|---|---|
 | 3 | The widget in clear and tinted modes, on the lightest wallpaper, keeps 3:1 for marks and 4.5:1 for text | Use the system's vibrant foreground. If it still fails, the widget ships without clear mode support | Low vision, 15 Nov. Seen in `m3-w-clear.png` |
 | 4 | History month strip at the largest text size, and under a blur test, in Pen and ink, Pencil and Watercolor | Month moves to milestone 13. History becomes Week only, with no control | Product owner and low vision, 15 Nov. Seen in `sheet-hist-month.png` |
+| 3 | One signed, sandboxed run of the Mac app with the owner's free account: export to a picked folder, import from it, and open the App Group store | Unsigned builds run without the sandbox, so no test has exercised it. If it fails, find the missing entitlement or profile and bring it to the owner | Release engineer, 15 Nov. `Config/Habit-macOS.entitlements` |
 | 13 | The system offers to save an export password that has no account or domain | The export screen does not mention saving | Security and privacy, 15 Nov |
 
 ## Gates passed
@@ -39,3 +40,4 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | The row menu item that opens Habit detail is called "Details" | Content designer | `m3-menu.png` |
 | An archived habit shows in History under "Archived" only in a period where it has a log | Product owner, Returning user | `m2-hist-many.png` |
 | An imported habit that differs keeps this device's version | Senior software engineer, QA engineer | `docs/spec.md`, Export |
+| The export file keeps complete protection, though a share still running when the phone locks can then fail. The release engineer suggested complete-unless-open | Security and privacy | `App/Data/ImportExport.swift`, `writeTemporaryFile` |

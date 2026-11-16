@@ -109,10 +109,9 @@ enum Fixtures {
         switch screen {
         case .importNotHabit: return .problem(.notAHabitExport)
         case .importNewer: return .problem(.newerVersion)
-        case .importDone: return .done(LogWriter.ImportResult(habitsAdded: 2, logsAdded: 212, pausesAdded: 0, skipped: 1_480))
-        case .importNothing, .importPreview:
+        case .importNothing, .importPreview, .importDone:
             guard var file = try? ExportFile.make(from: context, appBuild: "1", now: clock.now()) else { return nil }
-            if screen == .importPreview, let template = file.habits.first {
+            if screen != .importNothing, let template = file.habits.first {
                 for (i, name) in ["Floss", "Call a friend"].enumerated() {
                     var habit = template
                     habit.id = UUID()
@@ -129,7 +128,12 @@ enum Fixtures {
                 file.habits[0].name = "Water"
             }
             guard let data = try? file.encoded() else { return nil }
-            return DataTransfer.plan(data: data, context: context).map(ImportStage.preview).fold
+            let plan = DataTransfer.plan(data: data, context: context)
+            if screen == .importDone, case .success(let plan) = plan {
+                return .done(LogWriter.ImportResult(habitsAdded: plan.newHabits.count, logsAdded: plan.newLogs.count,
+                                                    pausesAdded: plan.newPauses.count, skipped: plan.skippedLogs))
+            }
+            return plan.map(ImportStage.preview).fold
         default:
             return nil
         }

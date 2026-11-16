@@ -161,24 +161,8 @@ private struct HabitDetailPage: View {
         }
     }
 
-    @ViewBuilder
     private var periodPicker: some View {
-        if typeSize.isAccessibilitySize {
-            // A segmented control keeps small text, so at these sizes it is one row that opens a list.
-            Picker(selection: $kind) {
-                ForEach(PeriodKind.allCases, id: \.self) { Text($0.name).tag($0) }
-            } label: {
-                Text("View")
-            }
-            .pickerStyle(.menu)
-            .frame(minHeight: 44)
-        } else {
-            Picker("View", selection: $kind) {
-                ForEach(PeriodKind.allCases, id: \.self) { Text($0.name).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-        }
+        PeriodPicker(kind: $kind, kinds: PeriodKind.allCases)
     }
 
     /// "8 glasses a day. Every day except Thursday."
@@ -447,7 +431,7 @@ private struct YearGrid: View {
         } else if typeSize.isAccessibilitySize {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(months, id: \.self) { month in
-                    let states = Periods.yearWeeks(of: month).flatMap { $0 }.map(state)
+                    let states = Periods.monthDays(of: month).map(state)
                     Button { openMonth(month) } label: {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(words.month(month)).foregroundStyle(style.text)
@@ -488,7 +472,8 @@ private struct YearGrid: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(Text("\(words.month(month)). \(MonthWords.summary(states.flatMap { $0 }))"))
+                    // Spoken for the calendar month, so it matches the month view it opens.
+                    .accessibilityLabel(Text("\(words.month(month)). \(MonthWords.summary(Periods.monthDays(of: month).map(state)))"))
                     .accessibilityHint(Text("Opens the month"))
                     .accessibilityAddTraits(.isButton)
                 }
@@ -507,8 +492,8 @@ private struct YearChart: AXChartDescriptorRepresentable {
 
     func makeChartDescriptor() -> AXChartDescriptor {
         let names = months.map(words.monthShort)
-        // The same days as each drawn month block: the weeks whose Monday falls in that month.
-        let values = months.map { month in Periods.yearWeeks(of: month).flatMap { $0 }.map(state).filter(\.isLogged).count }
+        // The calendar month, as spoken and as the month view counts it.
+        let values = months.map { month in Periods.monthDays(of: month).map(state).filter(\.isLogged).count }
         let points = zip(names, values).map { AXDataPoint(x: $0, y: Double($1)) }
         return AXChartDescriptor(
             title: habit.name,

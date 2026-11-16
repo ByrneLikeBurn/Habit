@@ -11,6 +11,7 @@ struct HistoryView: View {
     @Query private var habits: [Habit]
     @State private var kind: PeriodKind = LaunchOptions.current.screen == .historyMonth ? .month : .week
     @State private var anchor: DayKey?
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         let clock = settings.clock
@@ -44,6 +45,9 @@ struct HistoryView: View {
                     }
                 } else {
                     Section {
+                        if kind == .month && !typeSize.isAccessibilitySize {
+                            SmallMarkKey().padding(.vertical, 6)
+                        }
                         ForEach(active) { habit in
                             row(habit, days: days, today: today, archived: false)
                         }
@@ -62,8 +66,6 @@ struct HistoryView: View {
                             Text(kind == .week ? Verb.tapHabitOrDay : Verb.tapHabitMonth)
                             if kind == .week {
                                 Text("A dot is a day the habit is not scheduled.")
-                            } else {
-                                SmallMarkKey()
                             }
                         }
                         .font(style.label(.footnote))
@@ -88,12 +90,7 @@ struct HistoryView: View {
     private func header(days: [DayKey], anchor: DayKey, today: DayKey, words: DayWords) -> some View {
         let clock = settings.clock
         return VStack(alignment: .leading, spacing: 6) {
-            Picker("View", selection: $kind) {
-                Text("Week").tag(PeriodKind.week)
-                Text("Month").tag(PeriodKind.month)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
+            PeriodPicker(kind: $kind, kinds: [.week, .month])
             PeriodHeader(
                 title: words.title(kind, anchor: anchor),
                 isCurrent: Periods.same(anchor, today, kind: kind, firstWeekday: clock.calendar.firstWeekday),
@@ -103,7 +100,8 @@ struct HistoryView: View {
             )
             if kind == .week {
                 HistoryWeekHeader(days: days, today: today)
-            } else {
+            } else if !typeSize.isAccessibilitySize {
+                // At accessibility sizes the rows are sentences, so there is no strip to date.
                 HistoryMonthHeader(days: days, words: words)
             }
         }
@@ -141,6 +139,7 @@ private struct HistoryWeekHeader: View {
                     .frame(width: 44)
             }
         }
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .accessibilityHidden(true)
     }
 }
@@ -212,7 +211,7 @@ private struct HistoryWeekRow: View {
                     Spacer(minLength: 0)
                 }
                 .foregroundStyle(style.text)
-                .frame(minHeight: 32)
+                .frame(minHeight: 44)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)

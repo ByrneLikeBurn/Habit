@@ -61,7 +61,7 @@ struct YouView: View {
                     } header: {
                         Text("Your data")
                     } footer: {
-                        Text("Your data lives on this device only. Export a copy now and then.")
+                        Text("Your data lives on this device only.")
                     }
                 }
                 Section {

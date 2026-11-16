@@ -15,9 +15,17 @@ enum DataTransfer {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "0"
     }
 
-    /// Removes any export file left behind, for example after the app was closed mid-share.
+    /// Removes every export file left behind, for example after the app was closed mid-share. Launch only,
+    /// so a share running in another window keeps its file.
     static func sweep() {
         try? FileManager.default.removeItem(at: exportFolder)
+    }
+
+    /// Removes one export's folder when its sheet closes.
+    static func remove(_ file: URL) {
+        let folder = file.deletingLastPathComponent()
+        guard folder.deletingLastPathComponent().standardizedFileURL == exportFolder.standardizedFileURL else { return }
+        try? FileManager.default.removeItem(at: folder)
     }
 
     static func exportData(context: ModelContext, clock: HabitClock) throws -> Data {
@@ -28,12 +36,12 @@ enum DataTransfer {
         ExportFile.fileName(for: clock.now(), calendar: clock.calendar)
     }
 
-    /// Writes the export to the temporary folder with complete file protection.
+    /// Writes the export to its own temporary folder with complete file protection.
     static func writeTemporaryFile(context: ModelContext, clock: HabitClock) throws -> URL {
         let data = try exportData(context: context, clock: clock)
-        sweep()
-        try FileManager.default.createDirectory(at: exportFolder, withIntermediateDirectories: true)
-        let url = exportFolder.appending(path: fileName(clock: clock))
+        let folder = exportFolder.appending(path: UUID().uuidString, directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let url = folder.appending(path: fileName(clock: clock))
         #if os(iOS)
         try data.write(to: url, options: [.atomic, .completeFileProtection])
         #else
@@ -143,15 +151,15 @@ struct ImportSheet: View {
             heading("Nothing new in this file")
             caption("Everything in it is already here. Nothing was changed.")
         case .preview(let plan):
-            heading("This file holds")
+            // What will change comes first, in the same rows the result shows, so the numbers match.
+            heading("Importing adds")
             VStack(spacing: 0) {
-                StatRow(label: String(localized: "Habits"), value: plan.fileHabits.formatted())
-                StatRow(label: String(localized: "Logs"), value: plan.fileLogs.formatted())
-                StatRow(label: String(localized: "New habits"), value: plan.newHabits.count.formatted())
-                StatRow(label: String(localized: "New logs"), value: plan.newLogs.count.formatted())
+                StatRow(label: String(localized: "Habits"), value: plan.newHabits.count.formatted())
+                StatRow(label: String(localized: "Logs"), value: plan.newLogs.count.formatted())
                 if !plan.newPauses.isEmpty {
-                    StatRow(label: String(localized: "New pauses"), value: plan.newPauses.count.formatted())
+                    StatRow(label: String(localized: "Pauses"), value: plan.newPauses.count.formatted())
                 }
+                StatRow(label: String(localized: "Already here, skipped"), value: plan.skippedLogs.formatted())
             }
             if plan.differing > 0 {
                 caption(plan.differing == 1
@@ -253,6 +261,8 @@ struct ExportSheet: View {
     @Environment(\.modelContext) private var context
     @Query private var habits: [Habit]
     @State private var shareURL: URL?
+    /// This sheet's own file, removed when the share closes.
+    @State private var written: URL?
     @State private var failed = false
     #if os(macOS)
     @State private var exporting: ExportDocument?
@@ -299,7 +309,7 @@ struct ExportSheet: View {
         }
         .presentationDetents([.medium, .large])
         #if os(iOS)
-        .sheet(item: $shareURL, onDismiss: DataTransfer.sweep) { url in
+        .sheet(item: $shareURL, onDismiss: { written.map(DataTransfer.remove) }) { url in
             ShareSheet(url: url) { dismiss() }
                 .presentationDetents([.medium, .large])
         }
@@ -315,7 +325,9 @@ struct ExportSheet: View {
         failed = false
         #if os(iOS)
         do {
-            shareURL = try DataTransfer.writeTemporaryFile(context: context, clock: settings.clock)
+            let url = try DataTransfer.writeTemporaryFile(context: context, clock: settings.clock)
+            written = url
+            shareURL = url
         } catch {
             failed = true
         }
@@ -342,7 +354,7 @@ private struct ShareSheet: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let controller = UIActivityViewController(activityItems: [url], applicationActivities: nil)
         controller.completionWithItemsHandler = { _, _, _, _ in
-            DataTransfer.sweep()
+            DataTransfer.remove(url)
             finished()
         }
         return controller

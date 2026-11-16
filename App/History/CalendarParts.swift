@@ -125,18 +125,26 @@ struct PeriodHeader: View {
 /// The key under the year view and the History month: the small shapes and what each means.
 struct SmallMarkKey: View {
     @Environment(\.style) private var style
+    @Environment(Settings.self) private var settings
 
-    private let entries: [(DayState, LocalizedStringResource)] = [
-        (.done, "Done"), (.partDone, "Part done"), (.paused, "Paused"),
-        (.loggedWhilePaused, "Logged while paused"), (.offSchedule, "Not scheduled"),
-    ]
+    /// The diamond is drawn for a log on a paused day and for a log on a day off, so its entry names both.
+    private var entries: [(DayState, Bool, LocalizedStringResource)] {
+        var list: [(DayState, Bool, LocalizedStringResource)] = [
+            (.done, false, "Done"), (.partDone, false, "Part done"), (.paused, false, "Paused"),
+            (.loggedWhilePaused, false, "Logged while paused or on a day off"), (.offSchedule, false, "Not scheduled"),
+        ]
+        if settings.showDaysNotLogged { list.append((.notLogged, false, "Not logged")) }
+        list.append((.blank, true, "Today"))
+        return list
+    }
 
     var body: some View {
+        let entries = entries
         FlowLayout(spacing: 12, lineSpacing: 4) {
             ForEach(entries.indices, id: \.self) { i in
                 HStack(spacing: 4) {
-                    SmallMarkView(state: entries[i].0, size: 10)
-                    Text(entries[i].1)
+                    SmallMarkView(state: entries[i].0, isToday: entries[i].1, size: 10)
+                    Text(entries[i].2)
                 }
             }
         }
@@ -243,5 +251,31 @@ extension EnvironmentValues {
     var sharedPauses: [Pause] {
         get { self[SharedPausesKey.self] }
         set { self[SharedPausesKey.self] = newValue }
+    }
+}
+
+/// Week, Month and Year as a segmented control, or one row that opens a list at accessibility sizes,
+/// where a segmented control keeps small text.
+struct PeriodPicker: View {
+    @Binding var kind: PeriodKind
+    let kinds: [PeriodKind]
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    var body: some View {
+        if typeSize.isAccessibilitySize {
+            Picker(selection: $kind) {
+                ForEach(kinds, id: \.self) { Text($0.name).tag($0) }
+            } label: {
+                Text("View")
+            }
+            .pickerStyle(.menu)
+            .frame(minHeight: 44)
+        } else {
+            Picker("View", selection: $kind) {
+                ForEach(kinds, id: \.self) { Text($0.name).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+        }
     }
 }
