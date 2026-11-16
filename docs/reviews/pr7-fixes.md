@@ -35,3 +35,13 @@ The lenses disagreed on the name. UI and UX wanted one line and Undo moved off t
 | QA | At standard size the past-day counted line names no habit, "7 November: 4 of 8 glasses" | Owed to milestone 3. It is a wording change for the content lenses |
 | UI and UX | The past-day status could use a short month at accessibility sizes | Owed to milestone 3, with the item above |
 | Accessibility | After a log, scroll the row that was logged clear of the capsule | Owed to milestone 13 |
+
+## The third option, checked by the two lenses that disagreed
+
+Both failed 7c62347. Beside Undo, the second name line showed no more of the name, and a tail cut always removes the part that tells similar names apart. UI and UX also found Undo sat under the + control, so a low tap on + could undo the log.
+
+The layout now takes the accessibility lens's proposal and the UI and UX lens's middle cut. The name spans the full width, two lines at most, cut in the middle so its start and end show. The status is in full below. Undo has its own row at the leading edge, always in the same place and away from the column of controls. At AX5 the counted line is three rows, the archived line four and a past-day clear five.
+
+Accessibility also found that the fixed three-line cap could push a long translated status out of the capsule, and that the cap did not follow the style's font. The cap is gone. The sentence and three lines are measured in the style's own font at the sentence's width, and a taller sentence splits.
+
+Shots from a temporary fixture, since restored: `pr7/undo-ax5-night.jpg` and `pr7/undo-ax5-morning.jpg` show "lines in…at night" and "lines in…orning". `pr7/undo-long-xxxl.jpg` shows a 300-character name at the largest standard size, split into four rows.

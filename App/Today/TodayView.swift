@@ -256,27 +256,21 @@ struct UndoLineView: View {
     @Environment(\.style) private var style
     @Environment(\.dynamicTypeSize) private var typeSize
 
-    /// Three lines of the line's text at the current size. A sentence taller than this splits.
-    @ScaledMetric(relativeTo: .subheadline) private var threeLines: CGFloat = 62
+    /// The sentence's height and three lines' height, measured in the style's own font at the width
+    /// the sentence gets. A sentence taller than three lines splits.
+    @State private var sentenceHeight: CGFloat = 0
+    @State private var threeLines: CGFloat = .infinity
 
     var body: some View {
         Group {
-            if let name = line.name {
-                if typeSize.isAccessibilitySize {
-                    split(name)
-                } else {
-                    // The one sentence when it fits in three lines. A very long name splits instead,
-                    // so the capsule never fills the screen.
-                    ViewThatFits(in: .vertical) {
-                        sentence
-                        split(name)
-                    }
-                    .frame(maxHeight: threeLines + 16)
-                }
+            if let name = line.name, typeSize.isAccessibilitySize || sentenceHeight > threeLines + 1 {
+                split(name)
             } else {
                 sentence
             }
         }
+        // A new line is measured afresh.
+        .onChange(of: line.id) { sentenceHeight = 0 }
         .font(style.label(.subheadline))
         // Reversed text and paper keep the fixed text contrast in both appearances.
         .foregroundStyle(style.paper)
@@ -293,28 +287,38 @@ struct UndoLineView: View {
         HStack(spacing: 12) {
             Text(line.message)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .background {
+                    // Not drawn. Measures the whole sentence and three lines at this width.
+                    ZStack {
+                        Text(line.message).fixedSize(horizontal: false, vertical: true)
+                            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { sentenceHeight = $0 }
+                        Text(verbatim: "A\nA\nA").fixedSize(horizontal: false, vertical: true)
+                            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { threeLines = $0 }
+                    }
+                    .hidden()
+                    .accessibilityHidden(true)
+                }
             undoButton
         }
     }
 
-    /// The name, cut to two lines if it must, with Undo always at its trailing end.
-    /// The status has the full width below and is never cut. VoiceOver reads the whole line.
+    /// The name across the full width, two lines at most, cut in the middle so its start and end
+    /// both show. The status below is never cut. Undo has its own row at the leading edge, always
+    /// in the same place and away from the column of controls. VoiceOver reads the whole line.
     private func split(_ name: String) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Text(name)
-                    .lineLimit(2)
-                    .truncationMode(.tail)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .accessibilityHidden(true)
-                undoButton
-            }
+            Text(name)
+                .lineLimit(2)
+                .truncationMode(.middle)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 10)
+                .accessibilityHidden(true)
             Text(line.status)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, 10)
                 .accessibilityLabel(Text(verbatim: line.message))
                 .accessibilityIdentifier("undo-status")
+            undoButton
         }
     }
 

@@ -38,7 +38,6 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 3 | The marks board has no Paused or "Logged while paused" row, while the small keys name both. When pausing is built, the board gains the Paused row. The diamond row reads "Logged on a paused day or a day off" since 16 Nov | Senior designer, 16 Nov. `YouView.swift`, MarksBoardView. Seen in `marks-paper.jpg` |
 | 3 | On the Mac, History shows its title twice, in the toolbar and as the heading | Owner, signed Mac run, 16 Nov. `HistoryView.swift` |
 | 3 | The Undo line for a counted habit on a past day names no habit at standard sizes ("7 November: 4 of 8 glasses"). At accessibility sizes its date could be short, to save a line | QA and UI and UX, 16 Nov. `AppModel.swift`, `ax5-undo-long-past-paper.jpg` |
-| 3 | The Undo layout from the third option (Undo top right, two name lines) goes back to the accessibility and UI and UX lenses | `docs/reviews/pr7-fixes.md`, round 2 |
 | 3 | The Mac View menu lacks Week, Month, Year, Back, Previous and Next Period, and Go to Today | Apple industrial designer, 15 Nov. `App/HabitApp.swift` |
 | 3 | On the Mac, Export a Copy opens a sheet and then the save panel. The Mac way is the save panel at once, with the warning in it | Apple industrial designer, 15 Nov. `ImportExport.swift`, ExportSheet |
 | 3 | Today and You still use the 393 point column on iPad and Mac | Apple industrial designer, 15 Nov. `TodayView.swift`, `YouView.swift` |
