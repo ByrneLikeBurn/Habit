@@ -69,7 +69,8 @@ struct SourceChecks {
 
     /// Invariant 5: every LogEvent is written by LogHabitIntent, in any target.
     static var writePatterns: [Regex<Substring>] { [
-        try! Regex(#"LogWriter\.log\("#),
+        // The name, not the call, so a space or a stored reference is caught too.
+        try! Regex(#"(?:^|[^A-Za-z0-9_])LogWriter\s*\.\s*log(?![A-Za-z0-9_])"#),
         try! Regex(#"(?:^|[^A-Za-z_.])LogEvent\("#),
         try! Regex(#"\.delta\s*[-+]?=[^=]"#),
     ] }
@@ -81,7 +82,7 @@ struct SourceChecks {
 
     /// Invariant 5, second entry: only the app's import file calls `importEvents`.
     static let importFile = "App/Data/ImportExport.swift"
-    static var importPattern: Regex<Substring> { try! Regex(#"importEvents\("#) }
+    static var importPattern: Regex<Substring> { try! Regex(#"(?:^|[^A-Za-z0-9_])importEvents(?![A-Za-z0-9_])"#) }
 
     @Test func onlyTheImportFileImports() throws {
         let allowed: Set<String> = [Self.importFile, "HabitKit/Sources/HabitKit/Logic/LogWriter.swift"]
@@ -96,6 +97,8 @@ struct SourceChecks {
         #expect(found, "The import file does not call importEvents")
         #expect(offences.isEmpty, "\(offences)")
         #expect("try LogWriter.importEvents(plan, in: context)".contains(Self.importPattern))
+        #expect("let w = LogWriter.importEvents; try w(plan, ctx)".contains(Self.importPattern))
+        #expect("LogWriter.importEvents (plan, in: ctx)".contains(Self.importPattern))
     }
 
     @Test func onlyTheIntentWritesLogs() throws {
@@ -111,7 +114,7 @@ struct SourceChecks {
     }
 
     @Test func theWriteCheckCanFail() {
-        let samples = ["try LogWriter.log(.tap, habit: h)", "context.insert(LogEvent(delta: 1))", "event.delta = 4", "event.delta += 1"]
+        let samples = ["try LogWriter.log(.tap, habit: h)", "try LogWriter.log (.tap, habit: h)", "let write = LogWriter.log", "context.insert(LogEvent(delta: 1))", "event.delta = 4", "event.delta += 1"]
         for sample in samples {
             #expect(Self.writePatterns.contains { sample.contains($0) }, "\(sample)")
         }
@@ -135,7 +138,7 @@ struct SourceChecks {
 
     /// No network calls, analytics or logging of user actions.
     @Test func noNetworkOrLogging() throws {
-        let banned = ["URLSession", "URLRequest", "NWConnection", "os_log(", "Logger(", "print("]
+        let banned = ["URLSession", "URLRequest", "NWConnection", "os_log(", "Logger(", "print(", "NSLog(", "debugPrint(", "dump("]
         var offences: [String] = []
         for file in try swiftFiles() {
             for token in banned where file.text.contains(token) {

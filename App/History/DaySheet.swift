@@ -207,7 +207,7 @@ struct PastDayPicker: View {
         let clock = settings.clock
         NavigationStack {
             Form {
-                DatePicker("Day", selection: $date, in: ...clock.date(for: clock.today), displayedComponents: .date)
+                DatePicker("Day", selection: $date, in: clock.date(for: Periods.earliest)...clock.date(for: clock.today), displayedComponents: .date)
                     .datePickerStyle(.graphical)
                     .environment(\.calendar, clock.calendar)
                     .environment(\.timeZone, clock.calendar.timeZone)

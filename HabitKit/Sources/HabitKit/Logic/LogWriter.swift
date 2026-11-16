@@ -51,29 +51,44 @@ public enum LogOutcome: Sendable, Equatable {
 /// `importEvents` only from the app's import file. A source check enforces both.
 public enum LogWriter {
     /// The delta an action would write, given the day's shown total. nil when nothing is written.
+    ///
+    /// A day's total stops at the typed-number cap, so every delta written here is within the cap,
+    /// and an export of anything written here passes the import checks.
     public static func delta(for action: LogAction, kind: HabitKind, tapAmount: Int?, total: Int) -> Int? {
         let total = max(0, total)
         let cap = CountText.maximumAmount
+        let room = max(0, cap - total)
+        func adding(_ amount: Int) -> Int? {
+            let clamped = min(amount, room)
+            return clamped > 0 ? clamped : nil
+        }
         switch action {
         case .tap:
             switch kind {
             case .binary:
                 // Taking a log back writes minus the current total.
-                return total >= 1 ? -total : 1
+                return total >= 1 ? -min(total, cap) : 1
             case .counted:
                 guard let amount = tapAmount, amount > 0 else { return nil }
-                return min(amount, cap)
+                return adding(amount)
             }
         case .add(let amount):
-            return amount > 0 ? min(amount, cap) : nil
+            return amount > 0 ? adding(amount) : nil
         case .takeAway(let amount):
             let clamped = min(amount, total, cap)
             return clamped > 0 ? -clamped : nil
         case .markDone:
             return total >= 1 ? nil : 1
         case .clear:
-            return total > 0 ? -total : nil
+            // A total above the cap can only come from two devices. One clear takes the cap away.
+            return total > 0 ? -min(total, cap) : nil
         }
+    }
+
+    /// Why a log was not written.
+    public enum Problem: Error, Sendable {
+        /// The day is outside 2000 to 2199, the range import accepts.
+        case dayOutOfRange
     }
 
     @discardableResult
@@ -86,6 +101,8 @@ public enum LogWriter {
         now: Date,
         in context: ModelContext
     ) throws -> LogOutcome {
+        // The same day-key check as import, so nothing written here is refused there.
+        guard Periods.isValid(day.rawValue) else { throw Problem.dayOutOfRange }
         // Only this day's events are read, so a tap costs the same on day 1 and day 1,000.
         let raw = try rawTotal(of: habit, on: day, in: context)
         let shown = max(0, raw)
@@ -98,7 +115,7 @@ public enum LogWriter {
         // Two devices taking back the same log offline can leave a raw total below 0, shown as 0.
         // A yes-or-no log then lifts the day to exactly 1, so the tap is never swallowed.
         // A typed amount is always written as typed.
-        if raw < 0, delta > 0, habit.kind == .binary { delta -= raw }
+        if raw < 0, delta > 0, habit.kind == .binary { delta = min(delta - raw, CountText.maximumAmount) }
         let event = LogEvent(delta: delta, habit: habit, day: day, source: source, timestamp: now, deviceID: deviceID)
         context.insert(event)
         do {
@@ -138,10 +155,16 @@ public enum LogWriter {
     public static func importEvents(_ plan: ImportPlan, in context: ModelContext) throws -> ImportResult {
         let existing = try context.fetch(FetchDescriptor<Habit>())
         var habits = Dictionary(existing.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        // The plan was made when the file was picked. Check ids again, so writing one plan twice adds nothing.
+        let logIDs = Set(try context.fetch(FetchDescriptor<LogEvent>()).map(\.id))
+        let pauseIDs = Set(try context.fetch(FetchDescriptor<Pause>()).map(\.id))
+        let newHabits = plan.newHabits.filter { habits[$0.id] == nil }
+        let newPauses = plan.newPauses.filter { !pauseIDs.contains($0.id) }
+        let newLogs = plan.newLogs.filter { !logIDs.contains($0.id) }
         // Into an empty store the file's order is kept as it is. Otherwise new habits follow the ones here.
         let live = existing.filter { $0.deletedAt == nil }
         let base = live.isEmpty ? nil : (live.map(\.sortIndex).max() ?? 0) + 1
-        for (rank, r) in plan.newHabits.sorted(by: { $0.sortIndex < $1.sortIndex }).enumerated() {
+        for (rank, r) in newHabits.sorted(by: { $0.sortIndex < $1.sortIndex }).enumerated() {
             guard let kind = HabitKind(rawValue: r.kind), let first = r.rules.first else {
                 context.rollback()
                 throw ImportProblem.damaged
@@ -160,19 +183,27 @@ public enum LogWriter {
             context.insert(habit)
             habits[r.id] = habit
         }
-        for p in plan.newPauses {
+        for p in newPauses {
             let pause = Pause(habit: p.habit.flatMap { habits[$0] }, start: DayKey(rawValue: p.start), end: p.end.map(DayKey.init(rawValue:)), reason: PauseReason(rawValue: p.reason) ?? .manual)
             pause.id = p.id
             context.insert(pause)
         }
-        for log in plan.newLogs {
-            guard let habit = habits[log.habit], let source = LogSource(rawValue: log.source) else {
+        // Setting each event's habit one at a time grows the habit's event list one at a time, which is
+        // quadratic. Events are made without a habit and each habit's list is assigned once.
+        var batches: [UUID: [LogEvent]] = [:]
+        for log in newLogs {
+            guard habits[log.habit] != nil, let source = LogSource(rawValue: log.source) else {
                 context.rollback()
                 throw ImportProblem.damaged
             }
-            let event = LogEvent(delta: log.delta, habit: habit, day: DayKey(rawValue: log.day), source: source, timestamp: log.time, deviceID: importedDeviceID)
+            let event = LogEvent(delta: log.delta, habit: nil, day: DayKey(rawValue: log.day), source: source, timestamp: log.time, deviceID: importedDeviceID)
             event.id = log.id
             context.insert(event)
+            batches[log.habit, default: []].append(event)
+        }
+        for (id, events) in batches {
+            guard let habit = habits[id] else { continue }
+            habit.events = (habit.events ?? []) + events
         }
         do {
             try context.save()
@@ -180,7 +211,8 @@ public enum LogWriter {
             context.rollback()
             throw error
         }
-        return ImportResult(habitsAdded: plan.newHabits.count, logsAdded: plan.newLogs.count, pausesAdded: plan.newPauses.count, skipped: plan.skippedLogs)
+        return ImportResult(habitsAdded: newHabits.count, logsAdded: newLogs.count, pausesAdded: newPauses.count,
+                            skipped: plan.skippedLogs + plan.newLogs.count - newLogs.count)
     }
 
     /// The raw total for one habit on one day, read with a day-filtered fetch.

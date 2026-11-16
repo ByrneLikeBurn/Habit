@@ -120,7 +120,8 @@ extension HabitSchemaV1 {
         public var timestamp: Date = Date.now
         public var deviceID: String = ""
 
-        public init(delta: Int, habit: Habit, day: DayKey, source: LogSource, timestamp: Date, deviceID: String) {
+        /// Import passes nil and attaches a habit's events in one assignment, which keeps a large import linear.
+        public init(delta: Int, habit: Habit?, day: DayKey, source: LogSource, timestamp: Date, deviceID: String) {
             self.delta = delta
             self.habit = habit
             self.dayKey = day.rawValue

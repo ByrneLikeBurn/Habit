@@ -69,9 +69,11 @@ public struct ImportPlan: Sendable {
 
         var differing = 0
         var newHabits: [ExportFile.HabitRecord] = []
+        // A habit deleted on this device stays deleted. Its logs in the file are skipped, not hidden under it.
+        let deletedHere = Set(existing.filter { $0.deletedAt != nil }.map(\.id))
         for record in file.habits {
             if let habit = here[record.id] {
-                if !habit.matches(record) { differing += 1 }
+                if habit.deletedAt == nil, !habit.matches(record) { differing += 1 }
             } else {
                 newHabits.append(record)
             }
@@ -82,9 +84,9 @@ public struct ImportPlan: Sendable {
         var skipped = 0
         for log in file.logs {
             guard seen.insert(log.id).inserted else { throw .damaged }
-            if logIDs.contains(log.id) { skipped += 1 } else { newLogs.append(log) }
+            if logIDs.contains(log.id) || deletedHere.contains(log.habit) { skipped += 1 } else { newLogs.append(log) }
         }
-        let newPauses = file.pauses.filter { !pauseIDs.contains($0.id) }
+        let newPauses = file.pauses.filter { !pauseIDs.contains($0.id) && !($0.habit.map(deletedHere.contains) ?? false) }
         return ImportPlan(
             fileHabits: file.habits.count, fileLogs: file.logs.count,
             newHabits: newHabits, differing: differing,

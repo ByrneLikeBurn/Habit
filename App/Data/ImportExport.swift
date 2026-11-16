@@ -100,6 +100,8 @@ struct ImportSheet: View {
     @Environment(\.style) private var style
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    /// Set on the first tap, so a double tap cannot write the file twice.
+    @State private var importing = false
 
     var body: some View {
         NavigationStack {
@@ -147,6 +149,9 @@ struct ImportSheet: View {
                 StatRow(label: String(localized: "Logs"), value: plan.fileLogs.formatted())
                 StatRow(label: String(localized: "New habits"), value: plan.newHabits.count.formatted())
                 StatRow(label: String(localized: "New logs"), value: plan.newLogs.count.formatted())
+                if !plan.newPauses.isEmpty {
+                    StatRow(label: String(localized: "New pauses"), value: plan.newPauses.count.formatted())
+                }
             }
             if plan.differing > 0 {
                 caption(plan.differing == 1
@@ -154,17 +159,23 @@ struct ImportSheet: View {
                     : String(localized: "\(plan.differing) habits have different details in this file. The version on this device is kept. Nothing here will be replaced."))
             }
             Button("Import") {
+                guard !importing else { return }
+                importing = true
                 model.importStage = DataTransfer.write(plan, context: context).map(ImportStage.done).fold
             }
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.capsule)
             .foregroundStyle(style.paper)
             .controlSize(.large)
+            .disabled(importing)
         case .done(let result):
             heading("Imported")
             VStack(spacing: 0) {
                 StatRow(label: String(localized: "Habits added"), value: result.habitsAdded.formatted())
                 StatRow(label: String(localized: "Logs added"), value: result.logsAdded.formatted())
+                if result.pausesAdded > 0 {
+                    StatRow(label: String(localized: "Pauses added"), value: result.pausesAdded.formatted())
+                }
                 StatRow(label: String(localized: "Already here, skipped"), value: result.skipped.formatted())
             }
             caption("Nothing was replaced. Importing the same file again adds nothing.")

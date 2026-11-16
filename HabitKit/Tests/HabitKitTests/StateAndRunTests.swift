@@ -41,7 +41,8 @@ struct DayStateTests {
         #expect(DayState.resolve(day(0, .past)) == .blank)
         #expect(DayState.resolve(day(0, .past), showDaysNotLogged: true) == .notLogged)
         #expect(DayState.resolve(day(0, .today), showDaysNotLogged: true) == .blank)
-        #expect(DayState.resolve(day(0, .future)) == .toCome)
+        // A day to come draws nothing.
+        #expect(DayState.resolve(day(0, .future)) == .blank)
     }
 }
 

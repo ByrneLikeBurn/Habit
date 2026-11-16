@@ -42,7 +42,7 @@ public enum SmallMark {
             context.fill(Path(ellipseIn: CGRect(x: box.midX - d / 2, y: box.midY - d / 2, width: d, height: d)), with: .color(style.tertiary))
         case .notLogged:
             context.stroke(Path(inner.insetBy(dx: 0.5, dy: 0.5)), with: .color(style.secondary), lineWidth: 1)
-        case .blank, .toCome:
+        case .blank:
             break
         }
         if isToday {

@@ -72,7 +72,9 @@ private struct HabitDetailPage: View {
                     PeriodHeader(
                         title: words.title(kind, anchor: anchor),
                         isCurrent: Periods.same(anchor, today, kind: kind, firstWeekday: clock.calendar.firstWeekday),
-                        canGoBack: kind != .year || anchor.year > stats.since.year,
+                        canGoBack: kind == .year
+                            ? anchor.year > Periods.yearViewStart(since: stats.since).year
+                            : Periods.move(anchor, by: -1, kind: kind) >= Periods.earliest || anchor > Periods.earliest.adding(days: 6),
                         canGoForward: !Periods.same(anchor, today, kind: kind, firstWeekday: clock.calendar.firstWeekday) && anchor < today,
                         move: { anchor = Periods.move(anchor, by: $0, kind: kind) },
                         goToCurrent: { anchor = today }
@@ -270,7 +272,8 @@ private struct WeekGrid: View {
     @ViewBuilder
     private func dayButton(_ day: DayKey, state: DayState, words: DayWords, @ViewBuilder label: () -> some View) -> some View {
         let spoken = [words.long(day), DayWords.state(state), countWords(day)].compactMap { $0 }.joined(separator: ". ")
-        if day > today {
+        // A future day is not a button, unless it already holds a log (after travel or a new day-start hour).
+        if day > today && (totals[day.rawValue] ?? 0) <= 0 {
             label()
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text(spoken))
@@ -377,7 +380,7 @@ private struct MonthGrid: View {
     @ViewBuilder
     private func cell(_ day: DayKey, state: DayState, words: DayWords) -> some View {
         let content = VStack(spacing: 3) {
-            MarkView(state: day > today ? .blank : state, isToday: day == today, size: 24)
+            MarkView(state: state, isToday: day == today, size: 24)
             Text(day.day.formatted())
                 .font(style.label(.caption2).monospacedDigit())
                 .foregroundStyle(day > today ? style.tertiary : style.secondary)
@@ -386,7 +389,7 @@ private struct MonthGrid: View {
         .frame(maxWidth: .infinity, minHeight: 52)
         .contentShape(Rectangle())
         let spoken = [words.long(day), DayWords.state(state)].compactMap { $0 }.joined(separator: ". ")
-        if day > today {
+        if day > today && (totals[day.rawValue] ?? 0) <= 0 {
             content.accessibilityElement(children: .ignore).accessibilityLabel(Text(spoken))
         } else {
             Button { model.daySheet = DayRequest(habit: habit, day: day) } label: { content }
@@ -437,14 +440,14 @@ private struct YearGrid: View {
         let words = DayWords(clock: settings.clock)
         let months = Periods.yearMonths(year: year, since: since, today: today)
         let state: (DayKey) -> DayState = { day in
-            day > today ? .blank : habit.state(on: day, today: today, total: totals[day.rawValue] ?? 0, sharedPauses: sharedPauses, showDaysNotLogged: settings.showDaysNotLogged)
+            habit.state(on: day, today: today, total: totals[day.rawValue] ?? 0, sharedPauses: sharedPauses, showDaysNotLogged: settings.showDaysNotLogged)
         }
         if months.isEmpty {
             Text("Nothing logged this year").font(style.label(.subheadline)).foregroundStyle(style.secondary)
         } else if typeSize.isAccessibilitySize {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(months, id: \.self) { month in
-                    let states = Periods.monthDays(of: month).map(state)
+                    let states = Periods.yearWeeks(of: month).flatMap { $0 }.map(state)
                     Button { openMonth(month) } label: {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(words.month(month)).foregroundStyle(style.text)
@@ -504,7 +507,8 @@ private struct YearChart: AXChartDescriptorRepresentable {
 
     func makeChartDescriptor() -> AXChartDescriptor {
         let names = months.map(words.monthShort)
-        let values = months.map { month in Periods.monthDays(of: month).map(state).filter(\.isLogged).count }
+        // The same days as each drawn month block: the weeks whose Monday falls in that month.
+        let values = months.map { month in Periods.yearWeeks(of: month).flatMap { $0 }.map(state).filter(\.isLogged).count }
         let points = zip(names, values).map { AXDataPoint(x: $0, y: Double($1)) }
         return AXChartDescriptor(
             title: habit.name,

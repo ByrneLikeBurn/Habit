@@ -100,6 +100,10 @@ struct HabitFormView: View {
                         .font(style.display(.body))
                         .focused($nameFocused)
                         .submitLabel(.done)
+                        // The same length import accepts, so a habit made here always exports and imports.
+                        .onChange(of: name) { _, value in
+                            if value.count > ImportLimits.maxTextLength { name = String(value.prefix(ImportLimits.maxTextLength)) }
+                        }
                 } header: {
                     Text("Name")
                 } footer: {
@@ -222,6 +226,9 @@ struct HabitFormView: View {
     private var moreFields: some View {
         LabeledContent {
             TextField("Unit", text: $unit, prompt: Text("None"))
+                .onChange(of: unit) { _, value in
+                    if value.count > ImportLimits.maxTextLength { unit = String(value.prefix(ImportLimits.maxTextLength)) }
+                }
                 .multilineTextAlignment(.trailing)
         } label: {
             Text("Unit")

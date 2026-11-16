@@ -54,7 +54,7 @@ struct PeriodTests {
         #expect(Periods.move(today, by: -1, kind: .week) == DayKey(rawValue: 20261107))
     }
 
-    @Test func everyDayOfAYearIsInExactlyOneYearWeek() {
+    @Test func noDayOfAYearIsInTwoYearWeeks() {
         let months = (1...12).map { DayKey(year: 2026, month: $0, day: 1) }
         let days = months.flatMap { Periods.yearWeeks(of: $0).flatMap { $0 } }
         #expect(Set(days).count == days.count)
@@ -91,7 +91,7 @@ struct StatsTests {
         let h = addHabit("Pack lunch", schedule: weekdays, in: context)
         #expect(h.state(on: today, today: today) == .offSchedule)
         #expect(h.state(on: today.adding(days: 1), today: today) == .blank)
-        #expect(h.state(on: today.adding(days: 2), today: today) == .toCome)
+        #expect(h.state(on: today.adding(days: 2), today: today) == .blank)
     }
 
     @Test func statsForACountedHabit() throws {
@@ -347,11 +347,107 @@ struct ExportImportTests {
         let target = try makeContext()
         let plan = try ImportPlan.make(from: data, in: target)
         #expect(plan.newLogs.count == ImportLimits.maxLogs)
+        // Before events were attached per habit in one assignment, this took hours.
+        let started = Date()
+        let result = try LogWriter.importEvents(plan, in: target)
+        #expect(result.logsAdded == ImportLimits.maxLogs)
+        #expect(Date().timeIntervalSince(started) < 120)
+        // Each event points at its habit, and the habit holds every event.
+        let orphans = try target.fetchCount(FetchDescriptor<LogEvent>(predicate: #Predicate { $0.habit == nil }))
+        #expect(orphans == 0)
+        let habit = try #require(try target.fetch(FetchDescriptor<Habit>()).first { $0.id == template.habit })
+        // Every log in this file belongs to the template's habit.
+        #expect(habit.events?.count == ImportLimits.maxLogs)
     }
 
     @Test func exportFileNameHoldsNoName() {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Europe/London")!
         #expect(ExportFile.fileName(for: now, calendar: calendar) == "Habit export 2026-11-14.json")
+    }
+}
+
+@MainActor
+@Suite("Review fixes, milestone 2")
+struct HistoryReviewFixTests {
+    @Test func everythingLoggingCanWriteImportsAgain() throws {
+        let context = try makeContext()
+        let big = addHabit("Steps", .counted, target: nil, in: context)
+        let read = addHabit("Read", in: context)
+        // At the cap: adds stop there, so Clear stays within it.
+        try log(.add(CountText.maximumAmount), big, day: today, context)
+        try log(.add(CountText.maximumAmount), big, day: today, context)
+        #expect(big.total(on: today) == CountText.maximumAmount)
+        try log(.clear, big, day: today, context)
+        #expect(big.total(on: today) == 0)
+        try log(.markDone, read, day: Periods.earliest, context)
+        // A day before 2000 is refused at the write, the same check import makes.
+        #expect(throws: LogWriter.Problem.self) { try log(.markDone, read, day: DayKey(rawValue: 19991231), context) }
+        read.name = String(repeating: "a", count: ImportLimits.maxTextLength)
+        try context.save()
+
+        let data = try ExportFile.make(from: context, appBuild: "1", now: now).encoded()
+        let target = try makeContext()
+        let plan = try ImportPlan.make(from: data, in: target)
+        // The second add at the cap writes nothing: one add, one Clear, one mark done.
+        #expect(plan.newLogs.count == 3)
+    }
+
+    @Test func writingOnePlanTwiceAddsNothingTheSecondTime() throws {
+        let source = try makeContext()
+        let h = addHabit("Read", in: source)
+        for offset in 1...5 { try log(.markDone, h, day: today.adding(days: -offset), source) }
+        let data = try ExportFile.make(from: source, appBuild: "1", now: now).encoded()
+        let target = try makeContext()
+        let plan = try ImportPlan.make(from: data, in: target)
+        let first = try LogWriter.importEvents(plan, in: target)
+        let second = try LogWriter.importEvents(plan, in: target)
+        #expect(first.logsAdded == 5)
+        #expect(second.logsAdded == 0 && second.habitsAdded == 0)
+        #expect(try target.fetchCount(FetchDescriptor<LogEvent>()) == 5)
+        #expect(try target.fetchCount(FetchDescriptor<Habit>()) == 1)
+    }
+
+    @Test func logsForAHabitDeletedHereAreSkipped() throws {
+        let source = try makeContext()
+        let h = addHabit("Read", in: source)
+        try log(.markDone, h, day: today.adding(days: -1), source)
+        let data = try ExportFile.make(from: source, appBuild: "1", now: now).encoded()
+        let target = try makeContext()
+        _ = try LogWriter.importEvents(try ImportPlan.make(from: data, in: target), in: target)
+        let here = try #require(try target.fetch(FetchDescriptor<Habit>()).first)
+        here.deletedAt = now
+        try target.save()
+        try log(.markDone, h, day: today.adding(days: -2), source)
+        let plan = try ImportPlan.make(from: try ExportFile.make(from: source, appBuild: "1", now: now).encoded(), in: target)
+        #expect(plan.newLogs.isEmpty)
+        #expect(plan.differing == 0)
+    }
+
+    @Test func aLoggedDayAfterTodayIsDrawnByItsState() throws {
+        let context = try makeContext()
+        let h = addHabit("Read", in: context)
+        try log(.markDone, h, day: today.adding(days: 1), context)
+        #expect(h.state(on: today.adding(days: 1), today: today) == .done)
+        #expect(h.state(on: today.adding(days: 2), today: today) == .blank)
+    }
+
+    @Test func theYearViewDrawsEveryDayFromSinceToToday() {
+        for since in [DayKey(rawValue: 20260101), DayKey(rawValue: 20261101), DayKey(rawValue: 20260201), DayKey(rawValue: 20250615)] {
+            let start = Periods.yearViewStart(since: since)
+            var drawn = Set<DayKey>()
+            for year in start.year...today.year {
+                for month in Periods.yearMonths(year: year, since: since, today: today) {
+                    for day in Periods.yearWeeks(of: month).flatMap({ $0 }) {
+                        #expect(drawn.insert(day).inserted, "\(day) drawn twice")
+                    }
+                }
+            }
+            var day = since
+            while day <= today {
+                #expect(drawn.contains(day), "\(day) not drawn for since \(since)")
+                day = day.adding(days: 1)
+            }
+        }
     }
 }

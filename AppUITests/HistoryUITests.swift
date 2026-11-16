@@ -31,7 +31,13 @@ final class HistoryUITests: XCTestCase {
         let line = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Logged '")).firstMatch
         XCTAssertTrue(line.waitForExistence(timeout: 3))
         app.buttons["Undo"].tap()
-        XCTAssertFalse(line.waitForExistence(timeout: 1))
+        // Undo leaves no line behind: neither the old one, a new "Cleared" one, nor an Undo button.
+        let gone = NSPredicate(format: "exists == false")
+        let cleared = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Cleared '")).firstMatch
+        for element in [line, app.buttons["Undo"]] {
+            XCTAssertEqual(XCTWaiter.wait(for: [expectation(for: gone, evaluatedWith: element)], timeout: 3), .completed)
+        }
+        XCTAssertFalse(cleared.exists)
     }
 
     func testHistoryShowsEveryHabitAndArchivedOnlyWithALog() {

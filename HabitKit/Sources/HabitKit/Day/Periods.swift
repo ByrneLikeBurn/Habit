@@ -71,14 +71,26 @@ public enum Periods {
         }
     }
 
-    /// The months of the year view: from the month of `since` when it falls in `year`, else January,
-    /// through December or the month of `today`, whichever is first.
+    /// The first day the year view must draw for `since`: the Monday of its week, because a week
+    /// belongs to the month that holds its Monday. It may fall in the month or year before.
+    public static func yearViewStart(since: DayKey) -> DayKey {
+        weekStart(of: since, firstWeekday: 2)
+    }
+
+    /// The months of the year view: from the month holding the Monday of the `since` week when that
+    /// falls in `year`, else January, through December or the month holding the Monday of the week
+    /// of `today`, whichever is first. Every day from `since` to `today` is drawn once.
     public static func yearMonths(year: Int, since: DayKey, today: DayKey) -> [DayKey] {
-        let first = since.year == year ? since.month : 1
-        let last = today.year == year ? today.month : 12
-        guard since.year <= year, year <= today.year, first <= last else { return [] }
+        let start = yearViewStart(since: since)
+        let end = max(weekStart(of: today, firstWeekday: 2), start)
+        let first = start.year == year ? start.month : 1
+        let last = end.year == year ? end.month : 12
+        guard start.year <= year, year <= end.year, first <= last else { return [] }
         return (first...last).map { DayKey(year: year, month: $0, day: 1) }
     }
+
+    /// The earliest day that can be logged or shown, as import accepts.
+    public static let earliest = DayKey(year: 2000, month: 1, day: 1)
 
     /// The weeks drawn for one month in the year view. A week belongs to the month that holds its Monday,
     /// so every day is drawn once in the year.

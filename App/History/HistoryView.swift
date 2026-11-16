@@ -219,7 +219,7 @@ private struct HistoryWeekRow: View {
             HStack(spacing: 0) {
                 ForEach(days.indices, id: \.self) { i in
                     let day = days[i]
-                    let mark = MarkView(state: day > today ? .blank : states[i], size: 22)
+                    let mark = MarkView(state: states[i], size: 22)
                         .overlay {
                             if day == today && !archived {
                                 Rectangle().strokeBorder(style.text, lineWidth: style.ruleWidth * 2).frame(width: 28, height: 28)
@@ -227,7 +227,8 @@ private struct HistoryWeekRow: View {
                         }
                         .frame(width: 44, height: 44)
                         .contentShape(Rectangle())
-                    if day > today || archived {
+                    // A future day is not a target, unless it already holds a log.
+                    if (day > today && (totals[day.rawValue] ?? 0) <= 0) || archived {
                         mark
                     } else {
                         Button { model.daySheet = DayRequest(habit: habit, day: day) } label: { mark }
@@ -248,7 +249,7 @@ private struct HistoryWeekRow: View {
         }
         .accessibilityActions {
             if !archived {
-                ForEach(days.filter { $0 <= today }, id: \.self) { day in
+                ForEach(days.filter { $0 <= today || (totals[$0.rawValue] ?? 0) > 0 }, id: \.self) { day in
                     Button(String(localized: "Open \(words.long(day))")) {
                         model.daySheet = DayRequest(habit: habit, day: day)
                     }
@@ -280,7 +281,7 @@ private struct HistoryMonthRow: View {
 
     var body: some View {
         let totals = habit.dayTotals()
-        let states = days.map { $0 > today ? DayState.blank : habit.state(on: $0, today: today, total: totals[$0.rawValue] ?? 0, sharedPauses: sharedPauses, showDaysNotLogged: settings.showDaysNotLogged) }
+        let states = days.map { habit.state(on: $0, today: today, total: totals[$0.rawValue] ?? 0, sharedPauses: sharedPauses, showDaysNotLogged: settings.showDaysNotLogged) }
         let words = DayWords(clock: settings.clock)
         let sentence = MonthWords.summary(states)
 
