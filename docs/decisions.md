@@ -132,3 +132,9 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **"Pause everything" is one tap from Today.** The first draft had it only in You, which is three steps on a bad day. It needs no confirmation because a pause does no harm and can be undone.
 
 **A paused counted row shows no target.** "0 of 8 glasses" on a rest day reads as a demand. It now shows "0 glasses".
+
+## 15 November 2026, Mac design
+
+**On the Mac, settings live in a Settings window.** The brief put You in the sidebar on every platform. The Apple platform review found that a Mac user presses Command-comma and expects settings there. Pausing moves to the Habit menu and Today, and Export and Import move to the File menu.
+
+**Mac controls sit in the window toolbar and rows can be selected.** The first draft was the phone page centred in a window. The platform and accessibility reviews asked for toolbar buttons, a visible selection, arrow keys and a full set of menu commands, so every action works from the keyboard.
