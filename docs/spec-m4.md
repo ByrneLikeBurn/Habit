@@ -136,6 +136,18 @@ The paused bar is as wide as the done shape and at least 2 points thick. The acc
 
 Not yet drawn: Increase Contrast, and the marks inside the app's screens.
 
+## Step 3: the Today control and the lines between rows. Draft, for the reviews
+
+Nothing is drawn yet for this step.
+
+**Pencil.** The control on a Today row is the today square: four pencil strokes whose ends cross and overshoot each corner by 1 point, in the text colour, 1.5 points wide. It is 34 points across inside a 44 point target. An empty control is the square alone. A logged control holds the mark inside the square, at 24 points. A counted control that has not met its target shows a plus drawn as two short pencil strokes, in the text colour, over the part-done strokes, until the target is met. The line between rows is one pencil stroke in the text colour at the style's rule strength, 1 point wide, a little bowed. It starts and ends 2 to 4 points short of the margins, differently on each row, so no two lines match. The line carries no information.
+
+**Watercolor.** The control is the today ring: one brushed ring, pooled where it starts and thin where it lifts, with a gap of 1 point at most, in the text colour, 36 points across inside a 44 point target. An empty control is the ring alone. A logged control holds the mark inside the ring, at 24 points. A counted control that has not met its target shows a plus as two short brush strokes, in the text colour. There are no lines between rows. Rows are set apart by 14 points of space more than in Pen and ink.
+
+**Both.** The control keeps its place on the side the user chose. The square or ring never changes shape with the state, so the eye finds the control in the same place on every row. In Ink the square is a white pencil and the ring is opaque light paint. At the largest text sizes the control stays 44 points and the mark inside stays 24 points, as in Pen and ink.
+
+**For the reviews.** Does a plus in the text colour over part-done strokes hide the part-done state, as it did on the widget? Is space alone enough to set Watercolor rows apart when a habit name wraps to three lines?
+
 **Plain text is not a setting.** The product owner would not add a flag. It becomes a gate in step 5: twelve habit names at 17 points are shown to the tired user and neurodiversity lenses. If the hand font fails, habit names use SF in that style, and only headings keep the display font.
 
 **To remove from `docs/spec.md` when this file merges.** The line that says Pencil uses a hand circle in calendars. A circle would match Watercolor's ring.
