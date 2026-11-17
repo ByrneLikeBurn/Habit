@@ -258,7 +258,7 @@ The owner saw the picker, was on board, and asked for the open items to be fixed
 - **Largest text size.** `docs/mockups/png/m4-style-picker-ax5.png`. Accessibility passed it: nothing cut, tiles 250 points or taller, reading order sound. The designer asked for the sample line to go at these sizes and for the name to keep clear of the checkmark. Both are done.
 - **Wide window.** `docs/mockups/png/m4-style-picker-mac.png`, 700 points wide, the column capped at 360. The designer passed it. Whether the empty half is right on the Mac is for the Apple industrial designer at the stop.
 
-## Step 7: the colour ring. Rule in words, round two
+## Step 7: the colour ring. Words passed, not yet drawn
 
 The last and separate PR of milestone 4. Areas: adding a screen, layout, marks and colour. Review the words first, then the drawing, then the build.
 
@@ -267,9 +267,9 @@ The last and separate PR of milestone 4. Areas: adding a screen, layout, marks a
 - **The ring.** A ring of hues with one handle. The band is at least 44 points wide. A tap anywhere on the ring moves the handle there, so dragging is never the only way. The handle is at least 44 points across and has an outline in two tones, light inside dark, so it holds 3:1 anywhere on the ring. The ring is painted in the corrected colours, never the raw ones. Yellow on Paper shows as dark ochre. Dark blue on Ink shows as light periwinkle.
 - **Opening.** The handle opens at the hue of the current mark colour, so opening the screen changes nothing.
 - **The name and the number.** Under the ring, the hue's name and a field labelled "Hue" that shows the angle as "60°". The field can be typed, from 0 to 359. Arrows are never the only way to reach a number. The name comes from twelve sectors centred on multiples of 30, so Red runs from 345 to 14: Red, Orange, Yellow, Lime, Green, Mint, Teal, Sky, Blue, Violet, Purple, Pink. Red is offered by name. A softer word would mislead.
-- **The preview.** All seven mark states in the chosen colour, on the current style's paper in the current appearance. It redraws as the handle moves. The other appearance is seen by changing "Light or dark". At large text the preview wraps. VoiceOver reads it as one label: "Marks in Yellow".
+- **The preview.** All seven mark states in the chosen colour, on the current style's paper in the current appearance. It redraws as the handle moves. The other appearance is seen by changing "Light or dark". At large text the preview wraps. VoiceOver reads it as one label: "Marks in Yellow". One line sits under the preview: "The shade adjusts for light and dark."
 - **VoiceOver and keys.** The ring is one adjustable control. Its label is "Hue" and its value is "Yellow, 60 degrees". A swipe up adds 10 and a swipe down subtracts 10. On a keyboard the Right and Up arrows add 1, Left and Down subtract 1, and Shift makes it 10. 359 wraps to 0. The angle field is a separate element labelled "Hue angle".
-- **Saving.** The colour applies as the handle moves. "Done" keeps it. "Cancel" restores the colour that was chosen on entry. Choosing a swatch afterwards replaces it. The last custom hue is kept, so coming back does not lose it.
+- **Saving.** The colour applies as the handle moves. "Done" keeps it. "Cancel" restores the colour that was chosen on entry. Both sit in the system navigation bar. Choosing a swatch afterwards replaces it. The last custom hue is kept, so coming back does not lose it.
 - **What the colour never touches.** Text, rules and borders. Marks only. A custom hue never changes what a mark means, and no state depends on it.
 - **The test that must exist before the build merges.** A sweep of 360 hues, two appearances and three styles, measuring each of the seven marks as drawn. The lowest result is 3.0 or more. Thin marks in shaded yellow are measured by name.
 - **Not in this rule.** No saturation or brightness slider, no hex field, no eyedropper, no palettes of saved colours.
@@ -280,3 +280,6 @@ One disagreement, with a third option put back to both groups. Accessibility's e
 
 The drawing must show, to pass: the handle on yellow, red and dark blue in both appearances with its outline measured; the ring against the page; a focus state; the largest text size on one screen without a shrunken ring; the Marks list with Custom colour chosen; the system navigation bar untouched.
 
+Round two, 16 November 2026: both groups passed the words. Seven marks on the current appearance settled the disagreement. Accessibility added the line under the preview, because the colour shifts between Paper and Ink and nothing else says so. The designer asked that the drawing show "Cancel" and "Done" in the system navigation bar.
+
+Next: the drawing, then the 360-hue sweep.
