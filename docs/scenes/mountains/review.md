@@ -47,3 +47,15 @@ Rulings:
 - Fold: mist does not count as the fold. B needs a written exception in `docs/spec.md`: the fold applies where a scene has water, and other scenes use receding layers. Redwoods and Desert would build on that rule, so it is a rule later work builds on. It goes to the scene lenses, and then to the owner with the variant.
 
 B is ready for the owner, with the fold exception stated.
+
+## Owner, 16 November 2026
+
+The owner likes A, Massif, and C, Tarn, finds them distinct enough to keep both, and ranks B, Ranges, lowest. This overrules the reviews on C. Scene approval is the owner's. B is parked.
+
+Repainted after that, to the illustrator's round one notes on A and C:
+- Snow is bare paper on the face of each summit toward the light, broken by rock ribs at uneven spacing. The outline and the scalloped lower edge are gone.
+- The wood is one mass with an uneven top and a few low tips. A thin tall tip had read as a spire, which is a building.
+
+Blind naming test on the repainted cards: A "Mountain range, misty foothills", sure 5, told by the snow-lit ridge. C "Mountain lake", sure 5, told by the mirrored peaks. The reader called them two different kinds of place. Nothing was read as an object, a building or an animal. The reader called A's valley mist "weather of a kind". The Lake has the same mist and is approved, so this is recorded and not changed.
+
+Not yet done: the illustrator has not seen the repainted A and C. `mountains-massif-tarn.jpg` shows both in all five palettes.

@@ -19,18 +19,20 @@ def ridge(p, pts, density, above, seed, edge=2.0, rim=0.28, gran=0.068, wobble=0
 
 
 def snow(p, prof, m, depth, seed, lit=1.0):
-    """Bare paper kept on the upper slopes. The snow line runs down in uneven tongues, and the side away from the light keeps more pigment."""
+    """Bare paper kept on the side of each summit that faces the light, broken by rock ribs at uneven spacing. No outline."""
     from scipy import ndimage as ndi
     rng = np.random.default_rng(seed)
-    t = ndi.gaussian_filter1d(rng.standard_normal(W), 9.0); t /= t.std()
-    g = ndi.gaussian_filter1d(rng.standard_normal(W), 40.0); g /= g.std()
-    reach = depth * np.clip(0.8 + 0.28 * t + 0.25 * g, 0.35, 1.5)             # how far down the snow reaches at each x
+    t = ndi.gaussian_filter1d(rng.standard_normal(W), 26.0); t /= t.std()
+    reach = depth * np.clip(0.9 + 0.35 * t, 0.45, 1.5)                          # the snow line wanders slowly: no scallops
     yy = np.arange(H)[:, None] * np.ones((1, W))
-    cap = smoothstep(5.0, -5.0, yy - (prof + reach * H)[None, :]) * m
-    cap = cap * smoothstep(2.0, 6.0, yy - prof[None, :])                        # the ridge keeps its pigment rim, so the peak holds its outline against the sky
-    slope = ndi.gaussian_filter1d(np.gradient(prof), 14.0)                      # smoothed, so the light changes by face and not by pixel
-    shade = 0.45 + 0.55 * smoothstep(-0.15, 0.15, -slope)[None, :]
-    p.lift(0.66 * cap * shade)
+    below = yy - prof[None, :]                                                 # pixels under the ridge
+    cap = smoothstep(7.0, -7.0, below - (reach * H)[None, :]) * m
+    slope = ndi.gaussian_filter1d(np.gradient(prof), 16.0)
+    face = smoothstep(0.03, -0.12, slope)[None, :]                             # 1 where the ridge climbs to the right: the face toward the light
+    u = np.arange(W)[None, :] + 0.9 * below                                    # ribs run down and to the left, along the fall of the slope
+    n = ndi.gaussian_filter1d(rng.standard_normal(3 * W), 7.0); n /= n.std()
+    ribs = smoothstep(0.55, 1.05, n[np.clip(u.astype(int) + W, 0, 3 * W - 1)])
+    p.lift(0.86 * cap * face * (1.0 - 0.9 * ribs))
 
 
 def haze(p, y0, tilt, height, strength, seed):
@@ -64,9 +66,8 @@ def variant_a() -> np.ndarray:
           0.52, above, 341, fade=(0.16, 0.64, 0.86))
     near = p.profile([(-0.05, .60), (.06, .63), (.16, .69), (.26, .76), (.36, .84), (.46, .93), (.56, 1.02), (1.05, 1.2)],
                      wobble=0.003, wobble_sigma=10, seed=351)
-    near = treeline(near, [(.020, .095, .0074), (.052, .055, .0052), (.078, .120, .0086), (.096, .070, .0060),
-                           (.142, .085, .0070), (.171, .050, .0048), (.214, .070, .0060), (.262, .045, .0045),
-                           (.318, .040, .0040)], canopy=0.014, seed=5)
+    near = treeline(near, [(.030, .040, .0120), (.105, .046, .0140), (.185, .034, .0120)],
+                    canopy=0.024, seed=5)                    # one wood with an uneven top and a few low tips: tall thin tips read as towers
     m = p.ragged(p.below(near), edge=1.3, rough=3, fine=3, tooth=1.6, seed=352)
     p.wash(m, 0.84, rim=0.25, rim_w=4, gran=0.080, flow=0.22, seed=353)
     return p.finish()
@@ -113,9 +114,8 @@ def variant_c() -> np.ndarray:
           0.44, above, 531, fade=(0.16, 0.50, yw))
     scree = p.profile([(-0.05, yw + .30), (.52, yw + .10), (.60, yw + .01), (.68, .56), (.78, .50), (.88, .43),
                        (.97, .385), (1.05, .36)], wobble=0.004, wobble_sigma=10, seed=541)
-    scree = treeline(scree, [(.705, .040, .0044), (.742, .070, .0062), (.760, .042, .0044), (.815, .085, .0072),
-                             (.838, .050, .0050), (.896, .075, .0066), (.948, .095, .0080), (.972, .055, .0052)],
-                     canopy=0.012, seed=6)
+    scree = treeline(scree, [(.750, .040, .0080), (.822, .052, .0095), (.900, .040, .0085), (.962, .056, .0100)],
+                     canopy=0.022, seed=6)
     m = p.ragged(p.below(scree), edge=1.3, rough=3, fine=3, tooth=1.6, seed=542) * above
     p.wash(m, 0.84, rim=0.25, rim_w=4, gran=0.080, flow=0.22, seed=543)
 
