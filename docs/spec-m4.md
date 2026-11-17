@@ -257,3 +257,20 @@ The owner saw the picker, was on board, and asked for the open items to be fixed
 - **Pencil part done.** It is now six strokes with paper between them, in the lower triangle. It was eleven overlapping strokes, which read as a solid wedge. Measured at 24 points: strokes 1.8 to 1.9 points wide with 2.2 to 2.7 points of paper between; 3.97:1 on Paper and 6.21:1 on Ink as drawn; 3.01:1 or more on Paper after the 0.75 point blur, with the gaps still showing. Done covers 526 square points after the blur and part done 48. Both groups passed it. The margin on Paper is thin, so the strokes must not get narrower. The small shapes at 12 points and under are unchanged.
 - **Largest text size.** `docs/mockups/png/m4-style-picker-ax5.png`. Accessibility passed it: nothing cut, tiles 250 points or taller, reading order sound. The designer asked for the sample line to go at these sizes and for the name to keep clear of the checkmark. Both are done.
 - **Wide window.** `docs/mockups/png/m4-style-picker-mac.png`, 700 points wide, the column capped at 360. The designer passed it. Whether the empty half is right on the Mac is for the Apple industrial designer at the stop.
+
+## Step 7: the colour ring. Rule in words, not yet drawn or reviewed
+
+The last and separate PR of milestone 4. Areas: adding a screen, layout, marks and colour. It gathers the pass conditions above into one rule. Review the words first, then the drawing, then the build.
+
+- **Where.** "Custom colour" is the last row of the Marks list, under "Follow the scene" and the eight swatches. It opens one screen. It is the only route to red, which the owner asked for.
+- **One choice.** The person picks a hue and nothing else. The app sets how light or dark the colour is, for each style and for Paper and Ink, so every mark holds 3:1 as drawn.
+- **The ring.** A ring of hues with one handle. The handle is at least 44 points across and has an outline in two tones, light inside dark, so it holds 3:1 anywhere on the ring. The ring is painted in the corrected colours, never the raw ones. Yellow on Paper shows as dark ochre. Dark blue on Ink shows as light periwinkle.
+- **The name and the number.** Under the ring, the hue's name in words and its angle: "Yellow, 60 degrees". The name comes from twelve equal sectors: Red, Orange, Yellow, Lime, Green, Mint, Teal, Cyan, Blue, Indigo, Purple, Pink. The angle is a field that can be typed, from 0 to 359. Arrows are never the only way to reach a number.
+- **The preview.** All seven mark states in the chosen colour, on the current style's paper, shown on Paper and on Ink side by side. It redraws as the handle moves.
+- **Keys and VoiceOver.** The ring is one adjustable control. VoiceOver reads the name and the angle. A swipe up or down moves 10 degrees. On a keyboard the arrow keys move 1 degree and Shift with an arrow moves 10.
+- **Saving.** The colour applies as the handle moves. "Done" closes the screen. Choosing a swatch afterwards replaces it. The last custom hue is kept, so coming back does not lose it.
+- **What the colour never touches.** Text, rules and borders. Marks only. A custom hue never changes what a mark means, and no state depends on it.
+- **The test that must exist before the build merges.** A sweep of 360 hues, two appearances and three styles, measuring each mark as drawn. The lowest result is 3.0 or more. Thin marks in shaded yellow are measured by name, because a wash and broken strokes are where 3:1 is hardest.
+- **Not in this rule.** No saturation or brightness slider, no hex field, no eyedropper, no palettes of saved colours.
+
+Open for the lenses: whether twelve names are too coarse near the edges of a sector, and whether "Red" should be offered by name at all given that the app's own tokens never use red. The owner decided on 14 November 2026 that the user may pick red.
