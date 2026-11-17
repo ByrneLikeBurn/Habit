@@ -31,9 +31,10 @@ PAPER = PAPER / PAPER.std()
 class Sheet:
     def __init__(self): self.T = np.ones((H, W))                   # 1 is bare paper
 
-    def wash(self, field, density, wet=0.0, edge=0.55, edge_w=7.0, pool=0.25, vary=0.30, gran=0.10, seed=1):
+    def wash(self, field, density, wet=0.0, edge=0.55, edge_w=7.0, pool=0.25, vary=0.30, gran=0.10, seed=1, wander=None):
         """field: signed distance in pixels, positive inside. wet: 0 dry paper, 1 very wet paper."""
-        f = field + wet * 26.0 * fbm(seed, 34.0, octaves=3) + (1 - wet) * 2.2 * noise(seed + 1, 7.0)   # 1 and 8: the edge wanders
+        w = wet * 26.0 if wander is None else wander                                 # how far the edge strays. Small for a trunk, which must stay straight
+        f = field + w * fbm(seed, 34.0, octaves=3) + (1 - wet) * min(2.2, w + 0.6) * noise(seed + 1, 7.0)   # 1 and 8: the edge wanders
         soft = 1.5 + 46.0 * wet ** 1.5
         m = smoothstep(-soft, soft * 0.35, f)                                          # 1: feathered when wet
         d = density * (1.0 + vary * fbm(seed + 2, 90.0, octaves=2, sigma_x=60.0))      # 3: pigment drifts inside the wash
@@ -135,8 +136,60 @@ def conifers() -> np.ndarray:
     return s.finish()
 
 
+def straight(x, d, girth=1.0, lean=0.0):
+    """A trunk on the ground plane of redwoods.py: straight, slightly tapered, flared at the foot. Returns field, base, half, density."""
+    from redwoods import tree
+    base, half, dens = tree(d, girth)
+    t = np.clip((base - YN) / (base + 0.3), 0, 1.5)
+    hw = half * W * (1.0 - 0.10 * t) * (1.0 + (0.35 + 0.35 * d) * np.exp(-np.clip(base - YN, 0, 1) / (0.03 + 0.05 * d)))
+    cx = (x + lean * t) * W
+    return np.minimum(hw - np.abs(XX - cx), (base - YN) * H + 3), base, half, dens
+
+
+def redwoods_painted() -> np.ndarray:
+    """The second Redwoods drawing (straight trunks, one ground plane, ferns) painted with the marks of watercolour.
+
+    Form comes from the drawing. Paint behaviour comes from how wet the paper was: far is wet, near is dry.
+    Trunks do not wander and there are no backrun lines.
+    """
+    import redwoods as rw
+    s = Sheet()
+    s.wash(np.full((H, W), 60.0), 0.05 + 0.26 * smoothstep(0.5, 0.0, YN) * (0.5 + 1.0 * np.abs(XN - 0.52)), edge=0, pool=0, vary=0.5, seed=21)
+    for i, (x, y, rx, ry, d) in enumerate([(.24, .00, .08, .15, .26), (.38, .05, .07, .12, .20), (.52, .00, .08, .13, .22), (.66, .05, .07, .14, .20), (.79, .00, .08, .15, .26)]):
+        s.wash(dab(x, y, rx, ry, i), d, wet=0.8, edge=0, pool=0, seed=41 + 3 * i)          # foliage dropped into the wet top of the paper
+    s.wash((YN - 0.61) * H, 0.14 + 0.36 * smoothstep(0.61, 1.0, YN) ** 1.3, wet=0.3, edge=0, pool=0, vary=0.35, seed=72, wander=5.0)
+    trees = sorted([(.300, .08, 1.0, 0), (.372, .14, 1.2, 0), (.455, .06, .9, 0), (.535, .16, 1.1, 0), (.628, .10, 1.0, 0), (.700, .20, 1.2, 0), (.770, .07, .9, 0),
+                    (.238, .42, 1.0, .004), (.418, .52, 1.15, -.003), (.585, .36, .9, .003), (.672, .60, 1.0, -.004), (.805, .46, 1.1, .002),
+                    (.085, 1.0, 1.15, .010), (.930, .86, 1.0, -.008)], key=lambda t: t[1])
+    for i, (x, d, girth, lean) in enumerate(trees):
+        f, base, half, dens = straight(x, d, girth, lean)
+        wet = 0.5 * (1 - d) ** 1.5                                                    # far trunks went in while the paper was wet
+        m = smoothstep(-1.5, 1.0, f) if wet < 0.1 else smoothstep(-(1.5 + 46 * wet ** 1.5), (1.5 + 46 * wet ** 1.5) * 0.35, f)
+        s.T = s.T + (1 - s.T) * m * (0.9 if d > 0.3 else 0.5)                          # a nearer trunk covers what is behind it
+        s.wash(f, dens, wet=wet, edge=0.7 * d, edge_w=4 + 5 * d, pool=0.18 * d, vary=0.2 + 0.15 * d, seed=200 + 7 * i, wander=1.2)
+        if d > 0.3:                                                                   # bark: a second glaze of long straight strokes that follow the flare
+            n = 3 + int(5 * d)
+            for j in range(n):
+                off = (j + 0.5 + 0.3 * (rng.random() - 0.5)) / n * 2 - 1
+                g, *_ = straight(x + off * half * 0.82, d, girth * (0.05 + 0.05 * rng.random()), lean)
+                s.wash(np.minimum(g, f - 2), 0.22 + 0.12 * d, wet=0.04, edge=0.4, edge_w=2.5, pool=0.1, vary=0.5, seed=300 + 11 * i + j, wander=0.8)
+        if d > 0.8: s.dry(np.minimum(straight(x - half * 0.5, d, girth * 0.2, lean)[0], f - 2), 0.4, 400 + i)
+    # ferns: the fronds of the drawing, painted crisp on dry paper, with a wet shadow under each clump
+    for k, (clumps, dens, lw) in enumerate([([(x, .70 + .012 * (i % 3), .07, 6) for i, x in enumerate(np.linspace(.22, .82, 9))], 0.10, 0.9),
+                                            ([(.20, .83, .13, 7), (.32, .79, .11, 6), (.50, .86, .14, 7), (.62, .80, .11, 6), (.76, .84, .13, 7)], 0.20, 1.2),
+                                            ([(.19, .965, .22, 8), (.34, .975, .19, 7), (.49, .955, .23, 8), (.63, .975, .20, 7), (.77, .96, .22, 8), (.99, .96, .19, 7)], 0.30, 1.5)]):
+        r2 = np.random.default_rng(500 + k); f = np.full((H, W), -99.0)
+        for x, y, size, nf in clumps:
+            for j in range(nf):
+                a = np.radians(-68 + 136 * (j + 0.5 + 0.5 * (r2.random() - 0.5)) / nf)
+                rw.frond(f, x * W, y * H, a, size * H * (0.75 + 0.4 * r2.random()) * (1.0 - 0.25 * abs(np.sin(a))), r2, lw)
+        m = np.clip(f + 0.6, 0, 1); s.T = s.T + (1 - s.T) * m * 0.92                      # lit fronds: paper kept, then a light wash
+        s.wash(f, dens, wet=0.0, edge=0.3, edge_w=1.5, pool=0.0, vary=0.3, gran=0.05, seed=540 + k, wander=0.3)
+    return s.finish()
+
+
 if __name__ == "__main__":
-    v = conifers()
+    v = redwoods_painted() if "redwoods" in sys.argv[2:] else conifers()
     Image.fromarray((v * 255 + 0.5).astype(np.uint8), mode="L").save("/tmp/wc-value.png")
     cells = [to_image(tint(v, p)) for p in ("midday", "sunset", "night")]
     pad = 14; w, h = cells[0].size

@@ -41,3 +41,17 @@ The two-pigment idea is dropped. The second layer and the second ramp are not ne
 What the earlier scenes did that reads as drawing: every shape had the same crisp, toothed edge; every wash was filled evenly; an even fine stipple covered everything; shapes were built from many small exact strokes.
 
 Known faults in this study: the fringe of each backrun is a thin even line and reads as drawn; the trunks wobble too much; the ferns read as agave. It has not had a blind test or a review.
+
+## Owner on the study, 16 November 2026
+
+"Way further off. Now they look like weird squiggles. The intent is somewhat there. But they no longer look like redwoods."
+
+Cause: the study let every edge wander and drew a line round each backrun. A trunk has to stay straight to be a trunk.
+
+## Third experiment: the drawing's form, the paint's behaviour
+
+`redwoods_painted()` in `tools/scenes/wc.py`, picture `docs/scenes/redwoods/redwoods-painted.jpg`. The second Redwoods drawing supplies the form: straight tapered trunks on one ground plane, flared feet, ferns. The paint supplies only what depends on how wet the paper was: far trunks are soft, near trunks have a hard dried edge, washes pool and granulate, bark is a second glaze of long straight strokes. No trunk wanders and no backrun has a line.
+
+Known faults: two dark blots among the ferns, and the ferns are faint at card size. Not blind tested or reviewed.
+
+Stop rule agreed with myself and put to the owner: if this does not read as both redwoods and paint to the owner, computed scenes are parked until after user testing of milestones 1 to 3.
