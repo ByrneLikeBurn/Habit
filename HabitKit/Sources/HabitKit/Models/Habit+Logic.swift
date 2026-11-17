@@ -48,6 +48,12 @@ extension Habit {
         rule(on: day).schedule.contains(day)
     }
 
+    /// No set days on `day`: the rule for that day has no weekday on. Read from the rule, not the
+    /// current mask, so a change dated later does not move today's row early.
+    public func hasNoSetDays(on day: DayKey) -> Bool {
+        rule(on: day).schedule.isEmpty
+    }
+
     public func isPaused(on day: DayKey, sharedPauses: [Pause] = []) -> Bool {
         ((pauses ?? []) + sharedPauses).contains { $0.covers(day) }
     }

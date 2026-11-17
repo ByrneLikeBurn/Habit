@@ -1,4 +1,7 @@
 import Foundation
+#if os(macOS)
+import AppKit
+#endif
 import SwiftData
 import Testing
 @testable import HabitKit
@@ -546,5 +549,81 @@ struct NoSetDaysTests {
             #expect(try target.fetchCount(FetchDescriptor<Habit>()) == 0)
             #expect(try target.fetchCount(FetchDescriptor<LogEvent>()) == 0)
         }
+    }
+}
+
+@Suite("No set days on Today")
+@MainActor
+struct NoSetDaysOrderingTests {
+    /// Daily, no days, weekdays only (not Saturday), daily, in that order.
+    private func seed(_ context: ModelContext) -> [Habit] {
+        let names: [(String, Weekdays)] = [("Water", .all), ("Read", []), ("Scales", Weekdays(rawValue: 0b0111110)), ("Walk", .all)]
+        return names.enumerated().map { index, item in
+            let habit = addHabit(item.0, schedule: item.1, in: context)
+            habit.sortIndex = index
+            return habit
+        }
+    }
+
+    @Test func aNoDaysHabitIsInTodaysListInItsOwnOrderOnEveryWeekday() throws {
+        let context = try makeContext()
+        let habits = seed(context)
+        for offset in 0..<7 {
+            let split = Ordering.today(habits, day: today.adding(days: offset))
+            #expect(split.scheduled.map(\.name).contains("Read"))
+        }
+        let saturday = Ordering.today(habits, day: today)
+        #expect(saturday.scheduled.map(\.name) == ["Water", "Read", "Walk"])
+        #expect(saturday.notScheduled.map(\.name) == ["Scales"])
+    }
+
+    @Test func moveUpAndDownPastDailyRowsKeepsAHiddenHabitInPlace() throws {
+        let context = try makeContext()
+        let habits = seed(context)
+        var visible = Ordering.today(habits, day: today).scheduled
+        // Move Read up past Water.
+        Ordering.move(visible, from: IndexSet(integer: 1), to: 0, all: habits)
+        #expect(Ordering.sorted(habits).map(\.name) == ["Read", "Water", "Scales", "Walk"])
+        // Move Read down past Water and Walk.
+        visible = Ordering.today(habits, day: today).scheduled
+        Ordering.move(visible, from: IndexSet(integer: 0), to: 3, all: habits)
+        #expect(Ordering.today(habits, day: today).scheduled.map(\.name) == ["Water", "Walk", "Read"])
+        // Scales, hidden on Saturday, keeps its slot, third, and the visible rows fill the others.
+        #expect(Ordering.sorted(habits).map(\.name) == ["Water", "Walk", "Scales", "Read"])
+    }
+
+    @Test func noDaysIsReadFromTodaysRuleNotTheCurrentMask() throws {
+        let context = try makeContext()
+        let habit = addHabit("Read", schedule: .all, firstDay: today.adding(days: -10), in: context)
+        habit.setRule(target: 1, schedule: [], from: today.adding(days: 2))
+        #expect(habit.scheduleMask == 0)
+        #expect(!habit.hasNoSetDays(on: today))
+        #expect(habit.hasNoSetDays(on: today.adding(days: 2)))
+    }
+}
+
+@Suite("Symbols")
+struct SymbolCatalogTests {
+    @Test func elevenGroupsOfTwelveWithNoRepeats() {
+        let groups = SymbolCatalog.groups
+        #expect(groups.count == 11)
+        #expect(groups.allSatisfy { $0.symbols.count == 12 })
+        let names = SymbolCatalog.symbols.map(\.name)
+        #expect(Set(names).count == 132)
+        #expect(SymbolCatalog.firstRow.allSatisfy { names.contains($0) })
+        #expect(groups.map(\.title) == groups.map(\.title).sorted { $0.localizedStandardCompare($1) == .orderedAscending })
+    }
+
+    #if os(macOS)
+    @Test func everySymbolExistsOnThisSystem() {
+        let missing = SymbolCatalog.symbols.map(\.name).filter { NSImage(systemSymbolName: $0, accessibilityDescription: nil) == nil }
+        #expect(missing.isEmpty, "\(missing)")
+    }
+    #endif
+
+    @Test func searchMatchesLabelsAndGroups() {
+        #expect(SymbolCatalog.search("dice").map(\.name) == ["dice"])
+        #expect(SymbolCatalog.search("Play").count == 12)
+        #expect(SymbolCatalog.search("").count == 132)
     }
 }
