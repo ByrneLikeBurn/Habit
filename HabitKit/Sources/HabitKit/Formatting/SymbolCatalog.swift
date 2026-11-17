@@ -68,7 +68,7 @@ public enum SymbolCatalog {
         g("body", "Body", [
             s("pills", "Pills", "medication, medicine, meds, tablets, vitamins"), s("inhaler", "Inhaler", "asthma, medication, medicine"), s("cross.case", "First aid"), s("stethoscope", "Stethoscope"),
             s("bandage", "Bandage"), s("syringe", "Injection", "medication, medicine, insulin, jab"), s("lungs", "Lungs"), s("heart", "Heart"),
-            s("hands.and.sparkles", "Washing hands", "hygiene, teeth, brushing, skincare, wash"), s("shower", "Shower", "hygiene, wash, bath"), s("calendar.badge.clock", "Appointment", "doctor, therapy, dentist"), s("bubble.left", "Talking", "therapy, journal, speak"),
+            s("hands.and.sparkles", "Washing hands", "hygiene, teeth, brushing, skincare, wash"), s("shower", "Shower", "hygiene, wash, bath"), s("calendar.badge.clock", "Appointment", "doctor, therapy, dentist"),
         ]),
         g("food", "Food and drink", [
             s("drop", "Water", "drink, hydrate"), s("waterbottle", "Water bottle"), s("cup.and.saucer", "Cup"), s("mug", "Mug"),
@@ -111,12 +111,12 @@ public enum SymbolCatalog {
             s("figure.socialdance", "Dancing"), s("headphones", "Headphones"), s("ticket", "Ticket"), s("tent", "Tent"),
         ]),
         g("rest", "Rest", [
-            s("moon", "Moon"), s("moon.stars", "Night"), s("bed.double", "Bed", "sleep, bedtime"), s("zzz", "Sleep"),
+            s("moon", "Moon"), s("bed.double", "Bed", "sleep, bedtime"), s("zzz", "Sleep"),
             s("powersleep", "Nap"), s("alarm", "Alarm"), s("hourglass", "Hourglass"), s("beach.umbrella", "Beach"),
             s("bathtub", "Bath"), s("iphone.slash", "Phone away", "screen time, social media, offline"),
         ]),
         g("work", "Work and study", [
-            s("book", "Book", "read, reading"), s("books.vertical", "Books"), s("graduationcap", "Study"), s("character.book.closed", "Language", "learn, vocabulary"),
+            s("book", "Book", "read, reading"), s("graduationcap", "Study"), s("character.book.closed", "Language", "learn, vocabulary"),
             s("laptopcomputer", "Laptop"), s("keyboard", "Keyboard"), s("briefcase", "Work"), s("doc.text", "Document"),
             s("folder", "Folder"), s("checklist", "Checklist"), s("calendar", "Calendar"), s("chart.bar", "Chart"),
         ]),
