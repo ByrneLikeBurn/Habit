@@ -63,3 +63,11 @@ Stop rule agreed with myself and put to the owner: if this does not read as both
 Tried and reverted the same evening: ferns as low mounds of a few broad arching fronds, and one even step of value from far trunks to near. The mounds read as mushroom caps or helmets, and the near trunks lost their dark. The change was a test and it failed, so the code and the picture are back to the third experiment.
 
 Open: what "the densities are off" refers to. Asked of the owner. Idea not yet tried for the ferns: no fronds at all, only loose soft masses of undergrowth along the floor, as in the owner's first reference painting.
+
+## Parked, 16 November 2026
+
+The owner: "It does seem like we're putting in a lot of work for incremental gains. Let's go back to other design decisions."
+
+Scene painting stops here. Approved and kept: Lake A, Mountains A (Massif) and C (Tarn), in the current drawn method. Not accepted: Meadow, Coast, Redwoods. The owner's finding that every scene reads as a drawing and not a watercolour stands and is not solved.
+
+To pick this up again: ask in user testing of milestones 1 to 3 whether a picture at the top of Today adds anything. If scenes go ahead, decide first between the drawn method as it is, a real simulation of water and pigment, and paintings made by hand and scanned. Hand-made paintings bring cost and a licence, which are the owner's.
