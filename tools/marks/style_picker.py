@@ -44,7 +44,7 @@ def tile(style, name, ap, chosen, tw=None, scale=1.0, accent_hex="blue"):
     name_pt, samp_pt, mark_pt = 26 * scale, 17 * scale, 44 * (1.45 if big else 1.0)
     f, feats = display(style, int(name_pt * Q)); kw = {"features": feats} if feats else {}
     probe = ImageDraw.Draw(Image.new("RGB", (8, 8)))
-    while probe.textlength(name, font=f, **kw) > (tw - 32 - (40 if big else 0)) * Q:           # the name is never cut: it steps down until it fits the tile
+    while probe.textlength(name, font=f, **kw) > (tw - 32 - (58 if big else 0)) * Q:           # the name is never cut, and it keeps clear of the checkmark: it steps down until it fits the tile
         name_pt *= 0.96; f, feats = display(style, int(name_pt * Q))
     f2, _ = display(style, int(samp_pt * Q))
     words, lines, cur = "Walk 10 miles".split(), [], ""
@@ -52,8 +52,9 @@ def tile(style, name, ap, chosen, tw=None, scale=1.0, accent_hex="blue"):
         if cur and probe.textlength(cur + " " + w_, font=f2, **kw) > (tw - 32 - (0 if big else 160)) * Q: lines.append(cur); cur = w_
         else: cur = (cur + " " + w_).strip()
     lines.append(cur)
+    if big: lines = []                                                                           # at accessibility sizes the name alone is the sample
     k = 1.15 if style == "watercolor" else 1.0
-    y_name = 14; y_samp = y_name + name_pt * k * 1.28; y_marks = y_samp + len(lines) * samp_pt * k * 1.3 + 6
+    y_name = 14; y_samp = y_name + name_pt * k * 1.28; y_marks = y_samp + len(lines) * samp_pt * k * 1.3 + (6 if lines else 0)
     th = int(y_marks + mark_pt + 10) if big else 96
     field = np.ones((th * Q, tw * Q, 3)) * paper
     g = tok.get("grain")

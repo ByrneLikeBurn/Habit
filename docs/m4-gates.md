@@ -8,12 +8,13 @@
 |---|---|---|---|
 | Watercolor control in black | Human factors | One row shown for a glance under Increase Contrast. Does the disc in a ring read as a radio button, the paused dab as a delete button, the diamond as stepper arrows | The mark changes before it is built. The owner's view, recorded in `docs/spec-m4.md`: the ring's varied line weight keeps it from reading as a radio button |
 | Watercolor paused dab and diamond in colour | Human factors | The same glance test without Increase Contrast | The mark changes before it is built |
-| Pencil part done at 24 points | Accessibility, senior designer | On a device, can part done be told from done in Pencil at a glance | The strokes open up |
 | Plus in the Pen and ink counted control | Human factors, first-day user | Whether Pen and ink drops its plus, as Pencil and Watercolor have none | Pen and ink keeps its plus |
 | Names at the largest text size | Accessibility | A three-line name and a 58-character name in each style at the largest size, with Bold Text | The row gap grows with the text size in Watercolor |
 | Slashed zero at the largest size | Neurodiversity | Pencil's zero at the largest text size | The `zero` feature is turned off above a set size |
-| Style picker at the largest text size | Accessibility | A frame or device check: text scales, marks drop to their own line, tile grows | The layout is redrawn before the merge |
-| Style picker on Mac and iPad | Senior designer | Tiles capped at 360 points in a wide window | The cap is redrawn |
+
+| Appearance page on the Mac | Apple industrial designer | A 700 point window leaves the right half empty with the column capped at 360 | The column is centred or the tiles sit in a row |
+
+Closed on 16 November 2026 by a drawing and a measurement: Pencil part done at 24 points, the style picker at the largest text size, the 360 point cap.
 
 ## Owed: a fix is applied and no lens has measured it since
 

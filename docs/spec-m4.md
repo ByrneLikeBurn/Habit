@@ -233,7 +233,7 @@ The rule, as revised after round one:
 - One line under the tiles: "Changes the look of the whole app."
 - A tap chooses the style at once. Nothing is confirmed, because choosing again undoes it.
 - Each tile is one button of at least 76 points in height. VoiceOver reads the style's name with the selected trait. The sample line and the marks are hidden from VoiceOver. "Style" is a heading.
-- At the largest text sizes the text scales, the marks drop to their own line under it, and the tile grows.
+- At accessibility text sizes the name scales and steps down only if it would not fit beside the checkmark. The sample line is dropped, because the name is the sample. The marks sit on their own line under the name, and the tile grows. "Light or dark" and "Marks" put the value under the label.
 - Under Increase Contrast the marks on the tiles are drawn as step 4 says.
 - The "Light or dark" and "Marks" rows open lists and carry a disclosure chevron.
 - No tile shows a scene. Scenes are parked.
@@ -249,3 +249,11 @@ Drawing: `docs/mockups/png/m4-style-picker.png`, from `tools/marks/style_picker.
 Round two, 16 November 2026: both groups passed. Unchosen borders measure 3.27:1 and 3.32:1 on Paper, 4.61:1 and 4.73:1 on Ink. Tiles are 94 points high.
 
 Unchecked in a drawing: the 360 point cap on the Mac and iPad, and the layout at the largest text size.
+
+## After the owner's go-ahead, 16 November 2026: the open items
+
+The owner saw the picker, was on board, and asked for the open items to be fixed.
+
+- **Pencil part done.** It is now six strokes with paper between them, in the lower triangle. It was eleven overlapping strokes, which read as a solid wedge. Measured at 24 points: strokes 1.8 to 1.9 points wide with 2.2 to 2.7 points of paper between; 3.97:1 on Paper and 6.21:1 on Ink as drawn; 3.01:1 or more on Paper after the 0.75 point blur, with the gaps still showing. Done covers 526 square points after the blur and part done 48. Both groups passed it. The margin on Paper is thin, so the strokes must not get narrower. The small shapes at 12 points and under are unchanged.
+- **Largest text size.** `docs/mockups/png/m4-style-picker-ax5.png`. Accessibility passed it: nothing cut, tiles 250 points or taller, reading order sound. The designer asked for the sample line to go at these sizes and for the name to keep clear of the checkmark. Both are done.
+- **Wide window.** `docs/mockups/png/m4-style-picker-mac.png`, 700 points wide, the column capped at 360. The designer passed it. Whether the empty half is right on the Mac is for the Apple industrial designer at the stop.
