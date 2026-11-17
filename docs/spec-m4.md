@@ -220,7 +220,7 @@ Owner feedback, 16 November 2026, on the Pencil rows under Increase Contrast: th
 
 Owner, 16 November 2026: the smoothed Pencil marks read better and more like pencil. On Watercolor under Increase Contrast, the varied line weight of the ring keeps the control from reading as a radio button. The ring's thick start and thin end is therefore kept as a rule, not a detail. The human factors gate still runs before the build, with this view recorded beside it.
 
-## Step 6: the style picker. Round two
+## Step 6: the style picker. Passed
 
 Areas: adding a screen, layout, marks and type. It lives on the Appearance page that `docs/spec.md` already describes, in the "Style" row's place. Milestones 1 to 3 have one style, so nothing on `main` conflicts.
 
@@ -245,3 +245,7 @@ Not adopted: "Pen and ink marks measure 19 points, not 24". That is how `docs/mo
 Gate for the in-app screens: the Pencil part-done mark read as a solid wedge to both groups at this size. Test: at 24 points on a device, can part done be told from done in Pencil at a glance. If it fails, the strokes open up.
 
 Drawing: `docs/mockups/png/m4-style-picker.png`, from `tools/marks/style_picker.py`. New York is not on this machine, so the Pen and ink sample is set in a stand-in serif.
+
+Round two, 16 November 2026: both groups passed. Unchosen borders measure 3.27:1 and 3.32:1 on Paper, 4.61:1 and 4.73:1 on Ink. Tiles are 94 points high.
+
+Unchecked in a drawing: the 360 point cap on the Mac and iPad, and the layout at the largest text size.
