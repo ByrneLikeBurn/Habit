@@ -35,18 +35,20 @@ struct HabitFormView: View {
         var schedule: Weekdays
     }
 
-    init(habit: Habit?) {
+    init(habit: Habit?, today: DayKey) {
         self.habit = habit
+        // The form starts from the rule Today shows, not the latest stored values, which may begin later.
+        let rule = habit?.rule(on: today)
         let startCounted = habit == nil && LaunchOptions.current.screen == .newCount
         let snapshot = Snapshot(
             name: habit?.name ?? (startCounted ? "Drink water" : ""),
             // No symbol until one is chosen. Every input is optional.
             symbol: habit?.symbolName ?? (startCounted ? "drop" : ""),
-            targetText: habit.flatMap { $0.kind == .counted ? $0.target?.formatted() : nil } ?? (startCounted ? "8" : ""),
+            targetText: habit.flatMap { $0.kind == .counted ? rule?.target?.formatted() : nil } ?? (startCounted ? "8" : ""),
             unit: habit?.unit ?? (startCounted ? "glasses" : ""),
             tapText: habit.map { $0.tapAmount?.formatted() ?? "" } ?? "1",
             kind: habit?.kind ?? (startCounted ? .counted : .binary),
-            schedule: habit?.schedule ?? .all
+            schedule: rule?.schedule ?? .all
         )
         original = snapshot
         _name = State(initialValue: snapshot.name)
@@ -422,6 +424,6 @@ struct KindChooser: View {
 }
 
 #Preview("New habit") {
-    Color.clear.sheet(isPresented: .constant(true)) { HabitFormView(habit: nil) }
+    Color.clear.sheet(isPresented: .constant(true)) { HabitFormView(habit: nil, today: Fixtures.previewClock.today) }
         .previewEnvironment()
 }

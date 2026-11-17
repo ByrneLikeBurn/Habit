@@ -81,7 +81,8 @@ struct DayButtons: View {
     }
 
     private var circles: some View {
-        HStack(spacing: 4) {
+        // No spacing: on a 375-point phone seven buttons get 46 points each, so each keeps its 44-point target.
+        HStack(spacing: 0) {
             ForEach(WeekdayText.labels(calendar: calendar)) { label in
                 let on = selection.contains(weekday: label.weekday)
                 Button {
@@ -101,7 +102,7 @@ struct DayButtons: View {
                     .frame(maxWidth: 44, minHeight: 44)
                     .aspectRatio(1, contentMode: .fit)
                     .background {
-                        Circle().strokeBorder(on ? style.text : style.secondary, lineWidth: on ? style.outlineWidth * 1.6 : style.ruleWidth * 2)
+                        Circle().strokeBorder(on ? style.text : style.secondary, lineWidth: on ? style.chosenOutlineWidth : style.openOutlineWidth)
                     }
                     .frame(maxWidth: .infinity, minHeight: 44)
                     .contentShape(Rectangle())
@@ -175,7 +176,6 @@ struct SymbolRow: View {
     @Binding var selection: String
     /// Called before the picker opens, so the form can put its keyboard away.
     var willChoose: () -> Void = {}
-    @Environment(\.dynamicTypeSize) private var typeSize
     // The symbols screenshot opens the picker at once.
     @State private var choosing = LaunchOptions.current.screen == .symbols
     @Environment(\.style) private var style
@@ -187,13 +187,10 @@ struct SymbolRow: View {
     }
 
     var body: some View {
-        Group {
-            // At accessibility sizes the row wraps, so nothing runs off the screen.
-            if typeSize.isAccessibilitySize {
-                FlowLayout(spacing: 12, lineSpacing: 8) { cells }
-            } else {
-                HStack(spacing: 0) { cells }
-            }
+        // The row wraps whenever it does not fit: on a small phone, at large text, and at accessibility sizes.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 0) { cells }
+            FlowLayout(spacing: 12, lineSpacing: 8) { cells }
         }
         .sheet(isPresented: $choosing) {
             SymbolPickerSheet(selection: $selection)
@@ -238,7 +235,7 @@ struct SymbolRow: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .frame(maxWidth: typeSize.isAccessibilitySize ? nil : .infinity)
+        .frame(maxWidth: .infinity)
         .accessibilityLabel(label)
         .accessibilityAddTraits(on ? .isSelected : [])
     }
@@ -261,6 +258,10 @@ struct SymbolPickerSheet: View {
     }
 
     private var groups: [SymbolCatalog.Group] { SymbolCatalog.groups }
+
+    private func announceCount() {
+        AccessibilityNotification.Announcement(String(localized: "\(shownCount) symbols shown", comment: "VoiceOver, after a search or a group chip changes the symbols in view")).post()
+    }
 
     private var shownCount: Int {
         if !query.trimmingCharacters(in: .whitespaces).isEmpty { return SymbolCatalog.search(query).count }
@@ -299,8 +300,12 @@ struct SymbolPickerSheet: View {
             .onChange(of: query) { _, text in
                 if !text.isEmpty { group = nil }
             }
-            .onChange(of: shownCount) { _, count in
-                AccessibilityNotification.Announcement(String(localized: "\(count) symbols shown", comment: "VoiceOver, after a search or a group chip changes the symbols in view")).post()
+            // Announced when a chip changes the view, or once typing has paused, never over each keystroke.
+            .onChange(of: group) { announceCount() }
+            .task(id: query) {
+                guard !query.isEmpty else { return }
+                try? await Task.sleep(for: .milliseconds(600))
+                if !Task.isCancelled { announceCount() }
             }
             .foregroundStyle(style.text, style.secondary, style.tertiary)
             .paperBackground(style)

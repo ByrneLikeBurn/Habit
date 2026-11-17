@@ -1,5 +1,7 @@
 import Foundation
-#if os(macOS)
+#if canImport(UIKit)
+import UIKit
+#elseif os(macOS)
 import AppKit
 #endif
 import SwiftData
@@ -599,12 +601,16 @@ struct SymbolCatalogTests {
         #expect(groups.map(\.title) == groups.map(\.title).sorted { $0.localizedStandardCompare($1) == .orderedAscending })
     }
 
-    #if os(macOS)
+    /// A missing symbol draws as a blank space with no error, so every name is checked on the platform
+    /// the tests run on. `swift test` covers macOS; run the package on the pinned simulator for iOS.
     @Test func everySymbolExistsOnThisSystem() {
+        #if canImport(UIKit)
+        let missing = SymbolCatalog.symbols.map(\.name).filter { UIImage(systemName: $0) == nil }
+        #else
         let missing = SymbolCatalog.symbols.map(\.name).filter { NSImage(systemSymbolName: $0, accessibilityDescription: nil) == nil }
+        #endif
         #expect(missing.isEmpty, "\(missing)")
     }
-    #endif
 
     @Test func searchMatchesLabelsAndGroups() {
         #expect(SymbolCatalog.search("dice").map(\.name) == ["dice"])
@@ -641,6 +647,49 @@ struct NoSetDaysMarksAndRunsTests {
         #expect(water.state(on: today, today: today) == .partDone)
         try log(.add(5), water, day: today, context)
         #expect(water.state(on: today, today: today) == .done)
+    }
+
+    @Test func aCountedNoSetDaysHabitOverTargetAfterUndoAndAfterATargetChange() throws {
+        let context = try makeContext()
+        let water = addHabit("Water", .counted, target: 8, unit: "glasses", schedule: [], firstDay: today.adding(days: -5), in: context)
+        try log(.add(3), water, day: today, context)
+        try log(.add(5), water, day: today, context)
+        try log(.add(4), water, day: today, context)
+        #expect(water.state(on: today, today: today) == .done)
+        try log(.takeAway(12), water, day: today, context)
+        #expect(water.state(on: today, today: today) == .noSetDays)
+
+        try log(.add(8), water, day: today.adding(days: -1), context)
+        try log(.add(8), water, day: today, context)
+        water.setRule(target: 20, schedule: [], from: today)
+        #expect(water.state(on: today, today: today) == .partDone)
+        #expect(water.state(on: today.adding(days: -1), today: today) == .done)
+    }
+
+    /// Recorded behaviour, put to the behavioural scientist: under no set days, two paused logs twenty
+    /// days apart count as a run of 2, because a paused log extends a run (invariant 3) and no day between
+    /// them can break it.
+    @Test func pausedLogsApartUnderNoSetDaysChain() throws {
+        let context = try makeContext()
+        let habit = addHabit("Read", schedule: [], firstDay: today.adding(days: -60), in: context)
+        for offset in [-40, -20] {
+            context.insert(Pause(habit: habit, start: today.adding(days: offset), end: today.adding(days: offset), reason: .manual))
+            try log(.markDone, habit, day: today.adding(days: offset), context)
+        }
+        #expect(habit.runSummary(today: today).longest == 2)
+    }
+
+    /// Recorded behaviour, put to the behavioural scientist: choosing no set days today, after logging
+    /// today, makes today's log neutral, so Longest run falls by one until days are set again.
+    @Test func choosingNoSetDaysAfterLoggingTodayLowersLongestRunByOne() throws {
+        let context = try makeContext()
+        let habit = addHabit("Walk", schedule: .all, firstDay: today.adding(days: -20), in: context)
+        for offset in -9 ... 0 { try log(.markDone, habit, day: today.adding(days: offset), context) }
+        #expect(habit.runSummary(today: today).longest == 10)
+        habit.setRule(target: 1, schedule: [], from: today)
+        #expect(habit.runSummary(today: today).longest == 9)
+        habit.setRule(target: 1, schedule: .all, from: today)
+        #expect(habit.runSummary(today: today).longest == 10)
     }
 
     @Test func aRuleChangeMidWeekKeepsEachSideItsOwnMark() throws {

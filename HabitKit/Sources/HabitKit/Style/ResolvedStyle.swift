@@ -38,6 +38,10 @@ public struct ResolvedStyle: Sendable, Equatable {
     public var markLineWidth: CGFloat { increaseContrast ? 2 : 1.5 }
     public var outlineWidth: CGFloat { increaseContrast ? 1.75 : 1.25 }
     public var ruleWidth: CGFloat { increaseContrast ? 1 : 0.5 }
+    /// A chosen option drawn as an outline, such as a day in the form. Heavier than a today outline.
+    public var chosenOutlineWidth: CGFloat { outlineWidth * 1.6 }
+    /// An option that is not chosen, drawn as an outline.
+    public var openOutlineWidth: CGFloat { ruleWidth * 2 }
 
     // MARK: Type
 

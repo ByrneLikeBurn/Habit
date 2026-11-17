@@ -161,17 +161,22 @@ final class TodayUITests: XCTestCase {
         XCTAssertEqual(floss.value as? String, "Done")
     }
 
-    /// Editing a logged habit down to no days keeps its row and leaves its earlier marks as they were.
+    /// Editing down to no days keeps the row, reads "No set days", and leaves earlier days as they were.
+    /// Show days not logged is on, so a missed past day reads "Not logged" and a rewritten past would show.
     func testEditingDownToNoDaysKeepsTheRowAndHistory() {
+        app.terminate()
+        app.launchArguments = ["-fixture", "today", "-showDaysNotLogged"]
+        app.launch()
         let walk = control("Walk outside")
         XCTAssertTrue(walk.waitForExistence(timeout: 5))
-        walk.tap()
-        XCTAssertEqual(walk.value as? String, "Done")
+        XCTAssertEqual(walk.value as? String ?? "", "")
 
         app.buttons["History"].tap()
         let row = app.buttons["Walk outside"].firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 3))
-        let before = String(describing: row.value) + row.label
+        let before = row.value as? String ?? ""
+        let notLogged = before.components(separatedBy: "Not logged").count - 1
+        XCTAssertGreaterThan(notLogged, 0, before)
         app.buttons["Today"].tap()
 
         walk.swipeLeft()
@@ -179,15 +184,16 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Save"].waitForExistence(timeout: 2))
         app.swipeUp()
         chooseNoDays()
-        XCTAssertFalse(app.staticTexts["Choose at least one day."].exists)
+        XCTAssertTrue(app.staticTexts["No set days. Log it on any day."].exists)
         app.buttons["Save"].tap()
 
         XCTAssertTrue(walk.waitForExistence(timeout: 3))
         XCTAssertTrue(walk.isHittable)
-        XCTAssertEqual(walk.value as? String, "Done")
+        XCTAssertEqual(walk.value as? String, "No set days")
         app.buttons["History"].tap()
         XCTAssertTrue(row.waitForExistence(timeout: 3))
-        XCTAssertEqual(String(describing: row.value) + row.label, before)
+        let after = row.value as? String ?? ""
+        XCTAssertEqual(after.components(separatedBy: "Not logged").count - 1, notLogged, after)
     }
 
     /// A habit already at no set days, as import can make one, can be renamed and saved.
@@ -209,7 +215,10 @@ final class TodayUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["No set days. Log it on any day."].exists)
         XCTAssertTrue(save.isEnabled)
         save.tap()
-        XCTAssertTrue(control("Practise guitar daily").waitForExistence(timeout: 3))
+        let renamed = control("Practise guitar daily")
+        XCTAssertTrue(renamed.waitForExistence(timeout: 3))
+        // Save kept no set days: a counted habit at 0 reads its count and then "No set days".
+        XCTAssertTrue((renamed.value as? String ?? "").hasSuffix("No set days"), renamed.value as? String ?? "")
     }
 
     /// The fixture's today is a Saturday, so the weekdays-only habit is not scheduled.

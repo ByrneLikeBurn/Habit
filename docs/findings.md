@@ -61,6 +61,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 
 | Finding | Reason |
 |---|---|
+| Remove "Choose at least one day." and "No days chosen" from the string catalogs (senior software engineer, 16 Nov) | Neither is in a committed catalog. Both are in Xcode's uncommitted rewrite of the working copy, which marks them stale itself |
 | An empty Habit detail should show an empty week, to show the shape of the screen (first-day user) | The spec asks for one sentence and Add a past day. An empty grid on day one reads as days not logged |
 | A "Set to" control on the day sheet (human factors) | The "makes" line removes the sum with no new control |
 

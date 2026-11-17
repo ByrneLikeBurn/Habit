@@ -44,10 +44,10 @@ struct RootView: View {
             .environment(\.sharedPauses, sharedPauses)
             .modifier(ImportPresenter())
             .sheet(isPresented: $model.showNewHabit) {
-                HabitFormView(habit: nil)
+                HabitFormView(habit: nil, today: settings.clock.today)
             }
             .sheet(item: $model.editing) { habit in
-                HabitFormView(habit: habit)
+                HabitFormView(habit: habit, today: settings.clock.today)
             }
             .sheet(item: $model.counting) { request in
                 CountSheet(habit: request.habit, day: request.day)

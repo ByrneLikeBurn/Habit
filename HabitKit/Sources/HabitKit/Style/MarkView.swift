@@ -21,6 +21,13 @@ public struct MarkView: View {
 
     private var inset: CGFloat { size * 0.16 }
     private var inner: CGFloat { size - inset * 2 }
+    /// The dot's centre below the plus: half the plus, its round cap, a 1.5-point gap, then half the dot.
+    /// Capped so the dot stays inside the mark.
+    private var dotOffsetUnderPlus: CGFloat {
+        let dot = SmallMark.dotSize(cell: size)
+        let wanted = size * 0.14 + style.markLineWidth / 2 + 1.5 + dot / 2
+        return min(wanted, inner / 2 - dot / 2)
+    }
 
     public var body: some View {
         ZStack {
@@ -69,7 +76,7 @@ public struct MarkView: View {
             // A small dot, so a day the habit is not set for never reads as a gap.
             // Under a plus it sits low, so the plus never covers it.
             Circle().fill(style.tertiary).frame(width: SmallMark.dotSize(cell: size), height: SmallMark.dotSize(cell: size))
-                .offset(y: showsPlus ? inner * 0.34 : 0)
+                .offset(y: showsPlus ? dotOffsetUnderPlus : 0)
         case .blank:
             // A future day shows its date alone.
             Color.clear
