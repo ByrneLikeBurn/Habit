@@ -28,7 +28,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 1. **No guilt mechanics.** No streak-loss alarms, no red chosen by the app, no "you're falling behind", no mention of a missed day unless the user opted in. Missing a day produces silence. The user may pick red as their own accent. The owner decided this on 14 November 2026.
 2. **Colour carries no meaning.** Heat-map intensity is hatching density, never hue. The user's accent tints marks only, never text, never rules. Text contrast is a fixed constant the user cannot break.
-3. **Pausing only ever helps.** A paused day with no log never breaks a run and never extends it. A paused day with a log extends it. The app calls such a day "Logged while paused". The streak function has unit tests that assert exactly this.
+3. **Pausing only ever helps.** A paused day with no log never breaks a run and never extends it. A paused set day with a log extends it. Under no set days a pause changes nothing. The app calls a paused day with a log "Logged while paused". The owner reworded this on 16 November 2026. The streak function has unit tests that assert exactly this.
 4. **Every input is optional.** NFC, widgets and the Watch are shortcuts, not dependencies. Losing a tag breaks nothing.
 5. **One write path.** Every `LogEvent` is created in `LogWriter`. A user log reaches it only through `LogHabitIntent`: widget button, Shortcuts and NFC, Control Centre, Action button, Siri and in-app taps all route through it. Import reaches it only through `LogWriter.importEvents`, which writes all of a file or none. The owner approved this wording on 15 November 2026.
 6. **Time of day carries no habit meaning.** Palettes follow the clock. They never react to streaks, misses, pauses, counts or completion.
@@ -98,7 +98,7 @@ These outrank every other instruction. Violating one is a bug, however good the 
 
 - Builds for macOS, `generic/platform=iOS Simulator` and watchOS with no errors and no new warnings
 - `swift test` in `HabitKit` and the app tests pass, including tests added
-- Streak tests assert invariant 3 directly: paused with no log neither breaks nor extends; paused with a log extends
+- Streak tests assert invariant 3 directly: paused with no log neither breaks nor extends; a paused set day with a log extends; under no set days a pause changes nothing
 - A test asserts no style token, swatch or palette colour is red
 - Contrast test: every text token on the worst pixel of each style's paper, both appearances, meets the floor
 - Palette selection by clock is tested at every boundary, with the day-start hour at 0 and at 6

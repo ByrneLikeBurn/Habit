@@ -698,17 +698,24 @@ struct NoSetDaysMarksAndRunsTests {
         #expect(water.state(on: today.adding(days: -1), today: today) == .done)
     }
 
-    /// Recorded behaviour, put to the behavioural scientist: under no set days, two paused logs twenty
-    /// days apart count as a run of 2, because a paused log extends a run (invariant 3) and no day between
-    /// them can break it.
-    @Test func pausedLogsApartUnderNoSetDaysChain() throws {
+    /// Invariant 3, as the owner reworded it on 16 November 2026: under no set days a pause changes
+    /// nothing, so a paused log neither extends nor breaks a run. Two paused logs twenty days apart are
+    /// not a run. They still count as logged and done, and the day still reads Logged while paused.
+    @Test func pausedLogUnderNoSetDaysLeavesTheRunUnchanged() throws {
         let context = try makeContext()
         let habit = addHabit("Read", schedule: [], firstDay: today.adding(days: -60), in: context)
         for offset in [-40, -20] {
             context.insert(Pause(habit: habit, start: today.adding(days: offset), end: today.adding(days: offset), reason: .manual))
             try log(.markDone, habit, day: today.adding(days: offset), context)
         }
-        #expect(habit.runSummary(today: today).longest == 2)
+        let summary = habit.runSummary(today: today)
+        #expect(summary.longest == 0)
+        #expect(summary.current == 0)
+        #expect(habit.state(on: today.adding(days: -20), today: today) == .loggedWhilePaused)
+        let paused = DayInput(total: 1, kind: .binary, target: nil, scheduled: false, paused: true, relation: .past, noSetDays: true)
+        #expect(Runs.effect(of: paused) == .neutral)
+        let unpaused = DayInput(total: 1, kind: .binary, target: nil, scheduled: false, paused: false, relation: .past, noSetDays: true)
+        #expect(Runs.effect(of: paused) == Runs.effect(of: unpaused))
     }
 
     /// Settled by the behavioural scientist and the returning user: choosing no set days on a day already
@@ -812,16 +819,19 @@ struct NoSetDaysMarksAndRunsTests {
         #expect(water.runSummary(today: today) == RunSummary(current: 0, longest: 0, daysDone: 0, daysLogged: 3))
     }
 
-    /// Invariant 3 holds under no set days: a paused day with a log extends a run.
-    @Test func aPausedDayWithALogExtendsARunUnderNoSetDays() throws {
+    /// Invariant 3 under no set days: a pause changes nothing. Paused logs give the same runs as
+    /// the same logs unpaused, and still count as logged and done.
+    @Test func aPausedDayWithALogChangesNothingUnderNoSetDays() throws {
         let context = try makeContext()
-        let habit = addHabit("Read", schedule: [], firstDay: today.adding(days: -60), in: context)
-        context.insert(Pause(habit: habit, start: today.adding(days: -1), end: today, reason: .manual))
-        try log(.markDone, habit, day: today.adding(days: -1), context)
-        try log(.markDone, habit, day: today, context)
-        let runs = habit.runSummary(today: today)
-        #expect(runs.current == 2)
-        #expect(runs.longest == 2)
+        let paused = addHabit("Read", schedule: [], firstDay: today.adding(days: -60), in: context)
+        context.insert(Pause(habit: paused, start: today.adding(days: -1), end: today, reason: .manual))
+        try log(.markDone, paused, day: today.adding(days: -1), context)
+        try log(.markDone, paused, day: today, context)
+        let plain = addHabit("Walk", schedule: [], firstDay: today.adding(days: -60), in: context)
+        try log(.markDone, plain, day: today.adding(days: -1), context)
+        try log(.markDone, plain, day: today, context)
+        #expect(paused.runSummary(today: today) == RunSummary(current: 0, longest: 0, daysDone: 2, daysLogged: 2))
+        #expect(paused.runSummary(today: today) == plain.runSummary(today: today))
     }
 
     @Test func aRunFromSetDaysIsKeptThroughNoSetDays() throws {

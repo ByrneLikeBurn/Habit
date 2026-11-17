@@ -29,7 +29,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 
 | Question | Lenses | Recorded by |
 |---|---|---|
-| Under no set days, a paused day with a log extends a run (invariant 3), while a plain log is neutral. Two paused logs twenty days apart read as Longest run 2. The behavioural scientist and the neurodiversity expert recommend that a paused log under no set days be neutral, as an unpaused one is. Pausing would still never give less than not pausing. Invariant 3 would read: "A paused set day with a log extends it. Under no set days a pause changes nothing." The returning user accepts either, if a pause never lowers a run | Behavioural scientist, neurodiversity, returning user, 16 Nov | `pausedLogsApartUnderNoSetDaysChain`, `pausedLogUnderNoSetDaysNeverLowersLongest` |
+| None open. The paused-log question was decided by the owner on 16 Nov: under no set days a pause changes nothing. See `docs/decisions.md` | | |
 
 ## Gates passed
 
