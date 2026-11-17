@@ -120,17 +120,18 @@ def swell(p, pts, density, seed, fade, soft):
     return prof
 
 
-def blades(p, prof, n, seed, density=0.78):
+def blades(p, prof, n, seed, density=0.78, width=0.0024, length=(0.030, 0.045), clump=0.0):
     """Short tapered blades of grass along one crest, all leaning at 56 degrees, uneven in length and spacing."""
     rng = np.random.default_rng(seed); ang = np.radians(56.0)
     f = np.full((H, W), -99.0)
     for i in range(n):
         x = (i + rng.random()) / n
         if rng.random() < 0.22: continue                                   # gaps, so the crest is not a comb
+        if clump and np.sin(x * 40.0 + 3.0 * np.sin(x * 9.0)) < clump: continue    # blades stand in tufts with bare sand between
         px = int(np.clip(x * W, 0, W - 1)); y = prof[px] / H + 0.006
-        ln = (0.030 + 0.045 * rng.random()) * H
+        ln = (length[0] + length[1] * rng.random()) * H
         x1, y1 = x + ln * np.cos(ang) / W, y - ln * np.sin(ang) / H
-        f = np.maximum(f, seg_field(x, y, x1, y1, 0.0024 * W * (0.7 + 0.6 * rng.random()), 0.3))
+        f = np.maximum(f, seg_field(x, y, x1, y1, width * W * (0.7 + 0.6 * rng.random()), 0.3))
     m = p.ragged(f, edge=0.9, rough=1.0, fine=1.0, seed=seed + 1) * (f > -3)
     p.wash(m, density, rim=0.0, gran=0.06, flow=0.1, seed=seed + 2)
 
