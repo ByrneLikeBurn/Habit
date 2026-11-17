@@ -62,7 +62,7 @@ public enum SmallMark {
             context.fill(Path(CGRect(x: inner.minX, y: box.midY - height / 2, width: inner.width, height: height)), with: mark)
         case .loggedWhilePaused, .loggedOffSchedule:
             context.fill(cutDiamond(in: box), with: mark)
-        case .offSchedule:
+        case .offSchedule, .noSetDays:
             let d = dotSize(cell: side)
             context.fill(Path(ellipseIn: CGRect(x: box.midX - d / 2, y: box.midY - d / 2, width: d, height: d)), with: .color(style.tertiary))
         case .notLogged:

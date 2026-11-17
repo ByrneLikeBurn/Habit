@@ -484,21 +484,6 @@ struct NoSetDaysTests {
         #expect(HabitForm.problems(HabitDraft(name: "Water", kind: .counted, targetText: "", tapText: "")).isEmpty)
     }
 
-    @Test func statesForAHabitWithNoDays() throws {
-        let context = try makeContext()
-        let habit = addHabit("Read", schedule: [], firstDay: today.adding(days: -10), in: context)
-        #expect(habit.state(on: today.adding(days: -2), today: today) == .offSchedule)
-        #expect(habit.state(on: today, today: today) == .offSchedule)
-        #expect(habit.state(on: today.adding(days: 1), today: today) == .blank)
-        #expect(habit.state(on: today.adding(days: -11), today: today) == .blank)
-        try log(.markDone, habit, day: today.adding(days: -3), context)
-        #expect(habit.state(on: today.adding(days: -3), today: today) == .loggedOffSchedule)
-        let pause = Pause(habit: habit, start: today.adding(days: -5), end: today.adding(days: -4), reason: .manual)
-        context.insert(pause)
-        try log(.markDone, habit, day: today.adding(days: -4), context)
-        #expect(habit.state(on: today.adding(days: -4), today: today) == .loggedWhilePaused)
-    }
-
     @Test func noDaysIsStoredAsZeroAndEditsApplyFromToday() throws {
         let context = try makeContext()
         let empty = addHabit("Read", schedule: [], in: context)
@@ -625,5 +610,96 @@ struct SymbolCatalogTests {
         #expect(SymbolCatalog.search("dice").map(\.name) == ["dice"])
         #expect(SymbolCatalog.search("Play").count == 12)
         #expect(SymbolCatalog.search("").count == 132)
+    }
+}
+
+/// The agreed rule for a habit with no set days, from the behaviour, wording and accessibility lenses.
+@Suite("No set days: marks and runs")
+@MainActor
+struct NoSetDaysMarksAndRunsTests {
+    @Test func marksForNoSetDays() throws {
+        let context = try makeContext()
+        let habit = addHabit("Read", schedule: [], firstDay: today.adding(days: -10), in: context)
+        #expect(habit.state(on: today, today: today) == .noSetDays)
+        #expect(habit.state(on: today.adding(days: -2), today: today) == .blank)
+        #expect(habit.state(on: today.adding(days: -2), today: today, showDaysNotLogged: true) == .blank)
+        #expect(habit.state(on: today.adding(days: 1), today: today) == .blank)
+        #expect(habit.state(on: today.adding(days: -11), today: today) == .blank)
+        try log(.markDone, habit, day: today.adding(days: -3), context)
+        #expect(habit.state(on: today.adding(days: -3), today: today) == .done)
+        let pause = Pause(habit: habit, start: today.adding(days: -5), end: today.adding(days: -4), reason: .manual)
+        context.insert(pause)
+        try log(.markDone, habit, day: today.adding(days: -4), context)
+        #expect(habit.state(on: today.adding(days: -4), today: today) == .loggedWhilePaused)
+        #expect(habit.state(on: today.adding(days: -5), today: today) == .paused)
+    }
+
+    @Test func aCountedLogIsPartDoneOrDoneByTheTarget() throws {
+        let context = try makeContext()
+        let water = addHabit("Water", .counted, target: 8, unit: "glasses", schedule: [], in: context)
+        try log(.add(3), water, day: today, context)
+        #expect(water.state(on: today, today: today) == .partDone)
+        try log(.add(5), water, day: today, context)
+        #expect(water.state(on: today, today: today) == .done)
+    }
+
+    @Test func aRuleChangeMidWeekKeepsEachSideItsOwnMark() throws {
+        let context = try makeContext()
+        let habit = addHabit("Walk", schedule: .all, firstDay: today.adding(days: -20), in: context)
+        habit.setRule(target: 1, schedule: [], from: today.adding(days: -3))
+        #expect(habit.state(on: today.adding(days: -4), today: today, showDaysNotLogged: true) == .notLogged)
+        #expect(habit.state(on: today.adding(days: -3), today: today, showDaysNotLogged: true) == .blank)
+        #expect(habit.state(on: today, today: today) == .noSetDays)
+    }
+
+    @Test func logsMonthsApartAreNotARun() throws {
+        let context = try makeContext()
+        let habit = addHabit("Read", schedule: [], firstDay: today.adding(days: -60), in: context)
+        for offset in [-40, -20, 0] { try log(.markDone, habit, day: today.adding(days: offset), context) }
+        let runs = habit.runSummary(today: today)
+        #expect(runs == RunSummary(current: 0, longest: 0, daysDone: 3, daysLogged: 3))
+
+        let water = addHabit("Water", .counted, target: 8, schedule: [], firstDay: today.adding(days: -60), in: context)
+        for offset in [-40, -20, 0] { try log(.add(1), water, day: today.adding(days: offset), context) }
+        #expect(water.runSummary(today: today) == RunSummary(current: 0, longest: 0, daysDone: 0, daysLogged: 3))
+    }
+
+    /// Invariant 3 holds under no set days: a paused day with a log extends a run.
+    @Test func aPausedDayWithALogExtendsARunUnderNoSetDays() throws {
+        let context = try makeContext()
+        let habit = addHabit("Read", schedule: [], firstDay: today.adding(days: -60), in: context)
+        context.insert(Pause(habit: habit, start: today.adding(days: -1), end: today, reason: .manual))
+        try log(.markDone, habit, day: today.adding(days: -1), context)
+        try log(.markDone, habit, day: today, context)
+        let runs = habit.runSummary(today: today)
+        #expect(runs.current == 2)
+        #expect(runs.longest == 2)
+    }
+
+    @Test func aRunFromSetDaysIsKeptThroughNoSetDays() throws {
+        let context = try makeContext()
+        let habit = addHabit("Walk", schedule: .all, firstDay: today.adding(days: -30), in: context)
+        for offset in -30 ... -20 { try log(.markDone, habit, day: today.adding(days: offset), context) }
+        habit.setRule(target: 1, schedule: [], from: today.adding(days: -19))
+        for offset in -19 ... 0 { try log(.markDone, habit, day: today.adding(days: offset), context) }
+        let runs = habit.runSummary(today: today)
+        #expect(runs.current == 11)
+        #expect(runs.longest == 11)
+        #expect(runs.daysLogged == 31)
+    }
+
+    @Test func setDaysToNoneAndBackKeepsTheRun() throws {
+        let context = try makeContext()
+        let weekdays = Weekdays(rawValue: 0b0111110)
+        // Today is a Saturday. Monday to Friday until day -19, then no days, then Monday to Friday from day -1.
+        let habit = addHabit("Walk", schedule: weekdays, firstDay: today.adding(days: -30), in: context)
+        for offset in -30 ... -20 where weekdays.contains(today.adding(days: offset)) {
+            try log(.markDone, habit, day: today.adding(days: offset), context)
+        }
+        let before = habit.runSummary(today: today.adding(days: -20)).current
+        habit.setRule(target: 1, schedule: [], from: today.adding(days: -19))
+        habit.setRule(target: 1, schedule: weekdays, from: today.adding(days: -1))
+        try log(.markDone, habit, day: today.adding(days: -1), context)
+        #expect(habit.runSummary(today: today).current == before + 1)
     }
 }

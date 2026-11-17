@@ -185,6 +185,54 @@
         }
       }
     },
+    "%lld symbols": {
+      "comment": "Under the symbol grid: how many symbols are shown",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld symbol"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld symbols"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld symbols shown": {
+      "comment": "VoiceOver, after a search or a group chip changes the symbols in view",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld symbol shown"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld symbols shown"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Not scheduled today, %lld habits": {
       "comment": "VoiceOver label for the group of habits not set for today. The number is how many.",
       "extractionState": "manual",

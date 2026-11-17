@@ -189,6 +189,7 @@ struct HabitRow: View {
         case .partDone: parts.append(String(localized: "Part done"))
         case .loggedOffSchedule: parts.append(String(localized: "Logged on a day off"))
         case .loggedWhilePaused: parts.append(String(localized: "Logged while paused"))
+        case .noSetDays: parts.append(String(localized: "No set days"))
         default: break
         }
         return parts.joined(separator: ", ")

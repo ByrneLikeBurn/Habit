@@ -169,6 +169,7 @@ struct HabitFormView: View {
                 if value.count > ImportLimits.maxTextLength { name = String(value.prefix(ImportLimits.maxTextLength)) }
             }
             .frame(minHeight: 44)
+            .accessibilityIdentifier("habit-name")
             FieldRule()
             if let nameProblem, !isEdit || hasChanges { hint(nameProblem) }
         }

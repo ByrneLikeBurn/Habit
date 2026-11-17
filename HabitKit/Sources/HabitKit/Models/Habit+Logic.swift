@@ -74,7 +74,8 @@ extension Habit {
             target: rule.target,
             scheduled: rule.schedule.contains(day),
             paused: isPaused(on: day, sharedPauses: sharedPauses),
-            relation: day < today ? .past : (day == today ? .today : .future)
+            relation: day < today ? .past : (day == today ? .today : .future),
+            noSetDays: rule.schedule.isEmpty
         ), showDaysNotLogged: showDaysNotLogged)
     }
 }

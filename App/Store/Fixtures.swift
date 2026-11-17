@@ -51,6 +51,16 @@ enum Fixtures {
                 Spec(name: "Take vitamins", symbol: "pills", logged: 1),
                 Spec(name: "Stretch before bed", symbol: "moon", logged: 1),
             ]
+        case .noDays:
+            // A habit with no set days, second in the list, beside daily habits and one set for weekdays.
+            // It is the only counted habit, so Habit detail opens on it.
+            return [
+                Spec(name: "Read", symbol: "book", logged: 1, history: 120, pattern: { $0 % 4 == 3 ? 0 : 1 }),
+                Spec(name: "Practise guitar", symbol: "guitars", kind: .counted, target: 20, unit: "minutes", tap: 10, schedule: [],
+                     history: 200, pattern: { [0, 0, 20, 0, 0, 0, 10, 0, 0, 30, 0, 0, 0][$0 % 13] }),
+                Spec(name: "Walk outside", symbol: "", history: 120, pattern: { $0 % 3 == 0 ? 1 : 0 }),
+                Spec(name: "Practise scales", symbol: "music.note", schedule: weekdaysOnly),
+            ]
         case .noneToday:
             return [
                 Spec(name: "Practise scales", symbol: "music.note", schedule: weekdaysOnly),

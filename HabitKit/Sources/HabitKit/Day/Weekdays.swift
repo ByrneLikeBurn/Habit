@@ -66,7 +66,7 @@ public enum WeekdayText {
         case 7:
             return String(localized: "Every day", bundle: .module)
         case 0:
-            return String(localized: "No days chosen", bundle: .module)
+            return String(localized: "No set days", bundle: .module, comment: "Habit detail. The habit has no set days and can be logged on any day.")
         case 4...6:
             let list = missing.formatted(.list(type: .and).locale(locale))
             return String(localized: "Every day except \(list)", bundle: .module, comment: "The list names the days the habit is not set for")

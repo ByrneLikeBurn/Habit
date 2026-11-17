@@ -142,7 +142,7 @@ private struct HabitDetailPage: View {
                 .buttonStyle(.plain)
 
                 if hasLogs {
-                    StatsBlock(habit: habit, stats: stats, words: words, showRuns: settings.showRuns, showDaysNotLogged: settings.showDaysNotLogged)
+                    StatsBlock(habit: habit, stats: stats, words: words, showRuns: settings.showRuns, showDaysNotLogged: settings.showDaysNotLogged, noSetDaysToday: habit.hasNoSetDays(on: today))
                 }
                 if hasLogs && kind != .year {
                     NavigationLink {
@@ -532,6 +532,8 @@ private struct StatsBlock: View {
     let words: DayWords
     let showRuns: Bool
     let showDaysNotLogged: Bool
+    /// Runs count set days. While today's rule has none, the current run cannot move, so it is not shown.
+    let noSetDaysToday: Bool
     @Environment(\.style) private var style
 
     var body: some View {
@@ -549,7 +551,9 @@ private struct StatsBlock: View {
                 StatRow(label: String(localized: "Total"), value: unitValue)
             }
             if showRuns {
-                StatRow(label: String(localized: "Current run"), value: runText)
+                if !noSetDaysToday {
+                    StatRow(label: String(localized: "Current run"), value: runText)
+                }
                 // Days done beside Days logged reads as a pass rate. It is a result, so it comes with Show runs.
                 if habit.kind == .counted && habit.target != nil {
                     StatRow(label: String(localized: "Days done"), value: stats.daysDone.formatted())

@@ -7,7 +7,7 @@ import HabitKit
 /// `-appearance paper|ink`
 struct LaunchOptions: Sendable {
     enum Fixture: String, Sendable {
-        case today, empty, noneToday = "none-today", allDone = "all-done", long
+        case today, empty, noneToday = "none-today", allDone = "all-done", long, noDays = "no-days"
     }
 
     enum Screen: String, Sendable {

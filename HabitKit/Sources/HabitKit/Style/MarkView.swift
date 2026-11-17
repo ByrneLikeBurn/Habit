@@ -65,9 +65,11 @@ public struct MarkView: View {
             Capsule().fill(style.mark).frame(width: inner * 0.7, height: style.markLineWidth * 2)
         case .notLogged:
             Rectangle().strokeBorder(style.secondary, lineWidth: style.markLineWidth)
-        case .offSchedule:
+        case .offSchedule, .noSetDays:
             // A small dot, so a day the habit is not set for never reads as a gap.
+            // Under a plus it sits low, so the plus never covers it.
             Circle().fill(style.tertiary).frame(width: SmallMark.dotSize(cell: size), height: SmallMark.dotSize(cell: size))
+                .offset(y: showsPlus ? inner * 0.34 : 0)
         case .blank:
             // A future day shows its date alone.
             Color.clear

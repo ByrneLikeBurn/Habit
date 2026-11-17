@@ -84,6 +84,7 @@ struct DayWords {
         case .loggedWhilePaused: String(localized: "Logged while paused")
         case .loggedOffSchedule: String(localized: "Logged on a day off")
         case .offSchedule: String(localized: "Not scheduled")
+        case .noSetDays: String(localized: "No set days")
         case .notLogged: String(localized: "Not logged")
         case .blank: nil
         }

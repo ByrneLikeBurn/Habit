@@ -111,7 +111,7 @@ struct WeekdayTests {
         #expect(WeekdayText.sentence(for: noThursday, calendar: britain) == "Every day except Thursday")
         let mwf = Weekdays([Weekdays(weekday: 2), Weekdays(weekday: 4), Weekdays(weekday: 6)])
         #expect(WeekdayText.sentence(for: mwf, calendar: britain) == "Monday, Wednesday and Friday")
-        #expect(WeekdayText.sentence(for: [], calendar: britain) == "No days chosen")
+        #expect(WeekdayText.sentence(for: [], calendar: britain) == "No set days")
     }
 
     @Test func maskBits() {

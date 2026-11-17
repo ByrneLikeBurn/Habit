@@ -134,6 +134,84 @@ final class TodayUITests: XCTestCase {
         XCTAssertFalse(undo.waitForExistence(timeout: 1))
     }
 
+    private func chooseNoDays() {
+        for weekday in 1...7 {
+            let day = app.buttons["day-\(weekday)"]
+            if (day.value as? String) == "Selected" { day.tap() }
+        }
+    }
+
+    /// No set days is a valid habit: Add stays on, and the habit is on Today's list with its own words.
+    func testANewHabitWithNoDaysIsAddedAndCanBeLogged() {
+        app.buttons["New habit"].tap()
+        XCTAssertTrue(app.buttons["Add"].waitForExistence(timeout: 2))
+        sleep(1)
+        app.typeText("Floss")
+        app.swipeUp()
+        chooseNoDays()
+        XCTAssertTrue(app.staticTexts["No set days. Log it on any day."].exists)
+        XCTAssertTrue(app.buttons["Add"].isEnabled)
+        app.buttons["Add"].tap()
+        let floss = control("Floss")
+        XCTAssertTrue(floss.waitForExistence(timeout: 3))
+        XCTAssertTrue(floss.isHittable)
+        XCTAssertEqual(floss.value as? String, "No set days")
+        XCTAssertFalse(app.staticTexts["Nothing set for today"].exists)
+        floss.tap()
+        XCTAssertEqual(floss.value as? String, "Done")
+    }
+
+    /// Editing a logged habit down to no days keeps its row and leaves its earlier marks as they were.
+    func testEditingDownToNoDaysKeepsTheRowAndHistory() {
+        let walk = control("Walk outside")
+        XCTAssertTrue(walk.waitForExistence(timeout: 5))
+        walk.tap()
+        XCTAssertEqual(walk.value as? String, "Done")
+
+        app.buttons["History"].tap()
+        let row = app.buttons["Walk outside"].firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 3))
+        let before = String(describing: row.value) + row.label
+        app.buttons["Today"].tap()
+
+        walk.swipeLeft()
+        app.buttons["Edit"].tap()
+        XCTAssertTrue(app.buttons["Save"].waitForExistence(timeout: 2))
+        app.swipeUp()
+        chooseNoDays()
+        XCTAssertFalse(app.staticTexts["Choose at least one day."].exists)
+        app.buttons["Save"].tap()
+
+        XCTAssertTrue(walk.waitForExistence(timeout: 3))
+        XCTAssertTrue(walk.isHittable)
+        XCTAssertEqual(walk.value as? String, "Done")
+        app.buttons["History"].tap()
+        XCTAssertTrue(row.waitForExistence(timeout: 3))
+        XCTAssertEqual(String(describing: row.value) + row.label, before)
+    }
+
+    /// A habit already at no set days, as import can make one, can be renamed and saved.
+    func testEditIsNeverTrappedByNoSetDays() {
+        app.terminate()
+        app.launchArguments = ["-fixture", "no-days"]
+        app.launch()
+        let guitar = control("Practise guitar")
+        XCTAssertTrue(guitar.waitForExistence(timeout: 5))
+        guitar.swipeLeft()
+        app.buttons["Edit"].tap()
+        let save = app.buttons["Save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 2))
+        let name = app.descendants(matching: .any)["habit-name"].firstMatch
+        // The field spans the width, so a tap at its far end puts the cursor after the name.
+        name.coordinate(withNormalizedOffset: CGVector(dx: 0.98, dy: 0.5)).tap()
+        name.typeText(" daily")
+        app.swipeUp()
+        XCTAssertTrue(app.staticTexts["No set days. Log it on any day."].exists)
+        XCTAssertTrue(save.isEnabled)
+        save.tap()
+        XCTAssertTrue(control("Practise guitar daily").waitForExistence(timeout: 3))
+    }
+
     /// The fixture's today is a Saturday, so the weekdays-only habit is not scheduled.
     func testTheNotScheduledGroupReadsItsCountAndOpens() {
         // A button holding the system disclosure triangle. XCUITest does not expose the open state,
