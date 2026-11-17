@@ -29,3 +29,16 @@ Closed on 16 November 2026 by a drawing and a measurement: Pencil part done at 2
 
 - Step 5: the Bold Text weight pair for each style, upstream file hashes for `docs/asset-licenses.md`, ExtraBold for Alegreya Sans.
 - Step 7: the colour ring, as the last and separate PR.
+
+## From Claude Code's branch, read on 16 November 2026 at `6623c48`
+
+`feat/history` now defines a habit with no set days (`DayState.noSetDays`): the small dot on today until logged, read as "No set days". These touch milestone 4 design and are not drawn yet.
+
+| Item | Source | What the design branch owes |
+|---|---|---|
+| The no-set-days dot inside the Today control | `docs/decisions.md` on `feat/history`, "Its marks" | Draw it in the Pencil square and the Watercolor ring, with the 3 point clearance, and under Increase Contrast |
+| Plus alone against plus with dot | Gate for milestone 4 in `docs/findings.md` on `feat/history` | Pencil and Watercolor have no plus, so the gate applies to Pen and ink only. It bears on the open question of whether Pen and ink drops its plus |
+| Two split diamonds side by side read as an up-down chevron | Gate for milestone 4 | Check the Pencil tilted gap and the Watercolor curved diamond in a History month row |
+| History month strip and Habit detail year grid at the largest text size, in all three styles | Gate for milestone 4 | Draw both in Pencil and Watercolor |
+
+Invariant 3 in `CLAUDE.md` was reworded on `feat/history`: "Under no set days a pause changes nothing." The design branch still has the older wording. It comes in when `main` is merged after PR #12.
