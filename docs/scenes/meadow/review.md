@@ -16,3 +16,9 @@ To paint next in C:
 ## Size and delivery
 
 Six scenes at about 250 KB each is 1.5 MB, the whole budget, before any further scene. Downloading scenes on demand would need Apple-hosted asset packs. That is a network call and needs the paid Developer Program, so it is the owner's decision under "anything leaving the device" and "cost". Bundled scenes do not slow launch: only the chosen scene is decoded.
+
+## Illustrator, round two, on C
+
+All five notes passed. The copse has no trunks and sits on the ground, because a rounded mass on short trunks read as an animal. The illustrator agreed.
+
+Owed: the copse's base was a ruled line and read as an island on water in the evening palettes. The base now melts into the grass. The illustrator has not seen that version. C is ready for the owner.

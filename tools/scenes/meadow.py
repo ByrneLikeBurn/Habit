@@ -106,7 +106,7 @@ def copse(p, cx, base, width, height, density, seed):
         ex, ey = (cx + dx * width) * W, base * H
         rxp, ryp = rx * width * W, top * height * H
         f = np.maximum(f, (1.0 - np.sqrt(((XX - ex) / rxp) ** 2 + ((YP - ey) / ryp) ** 2)) * min(rxp, ryp))
-    m = p.ragged(f, edge=1.6, rough=3.0, fine=2.5, tooth=1.4, seed=seed) * (f > -6) * smoothstep(base + 0.004, base - 0.004, YN)
+    m = p.ragged(f, edge=1.6, rough=3.0, fine=2.5, tooth=1.4, seed=seed) * (f > -6) * smoothstep(base + 0.010, base - 0.012, YN + 0.010 * noise(seed + 9, 3.0, sigma_x=14.0))   # the base melts into the grass: a ruled base reads as an island on water
     p.wash(m, density, rim=0.22, rim_w=3, gran=0.075, flow=0.2, seed=seed + 5)
     p.wash(m * smoothstep(base - height * 0.45, base, YN), 0.30, rim=0, gran=0.06, flow=0.2, seed=seed + 6)   # darker toward the ground
 
