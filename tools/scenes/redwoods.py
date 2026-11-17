@@ -34,10 +34,20 @@ def stamp(f, x0, y0, x1, y1, w0, w1):
     f[ya:yb, xa:xb] = np.maximum(f[ya:yb, xa:xb], (w0 + (w1 - w0) * t) - d)
 
 
-def cover(p, m, density, seed, **kw):
+MIX = np.zeros((H, W))      # experiment: which of two pigments each area takes. 0 is the leaf pigment, 1 is the earth pigment
+SOFT = np.zeros((H, W))     # experiment: how wet the paper was. 1 is far and soft, 0 is near and crisp
+
+
+def mark(m, mix, soft):
+    MIX[:] = MIX * (1 - m) + mix * m
+    SOFT[:] = SOFT * (1 - m) + soft * m
+
+
+def cover(p, m, density, seed, mix=0.0, soft=0.0, **kw):
     """Paint a shape so that it hides what is behind it: lift its area back to paper, then lay its wash."""
     p.lift(m)
     p.wash(m, density, seed=seed, **kw)
+    mark(m, mix, soft)
 
 
 def tree(d, girth=1.0):
@@ -54,7 +64,7 @@ def trunk(p, x, d, seed, girth=1.0, lean=0.0):
     m = p.ragged(f, edge=1.2 + 0.6 * d, rough=0.5 + 0.7 * d, fine=1.0, tooth=0.4 + 0.5 * d, seed=seed) * (f > -5)
     u = (XX - cx) / np.maximum(hw, 1.0)                                       # -1 at the left edge, 1 at the right
     side = 0.80 + 0.20 * smoothstep(-0.9, 0.9, u)                             # the side away from the light is deeper
-    cover(p, m, dens * side, seed + 1, rim=0.18, rim_w=3 + 2 * d, gran=0.07, flow=0.08)
+    cover(p, m, dens * side, seed + 1, mix=1.0, soft=1.0 - d, rim=0.18, rim_w=3 + 2 * d, gran=0.07, flow=0.08)
     # bark: long fibrous furrows that follow the flare, dark and light, broken along their length
     rng = np.random.default_rng(seed + 2)
     k = 26 + 40 * girth * d
@@ -84,7 +94,7 @@ def frond(f, bx, by, ang, L, rng, lw):
         px, py = x, y
 
 
-def ferns(p, clumps, density, seed, light=0.0):
+def ferns(p, clumps, density, seed, light=0.0, soft=0.0):
     """Clumps of sword fern. clumps: (x, y, size, fronds), normalised, size as a share of the card's height."""
     rng = np.random.default_rng(seed)
     f = np.full((H, W), -99.0)
@@ -93,7 +103,7 @@ def ferns(p, clumps, density, seed, light=0.0):
             a = np.radians(-72 + 144 * (j + 0.5 + 0.5 * (rng.random() - 0.5)) / nf)
             frond(f, x * W, y * H, a, size * H * (0.75 + 0.4 * rng.random()) * (1.0 - 0.25 * abs(np.sin(a))), rng, max(size * H * 0.011, 1.0))
     m = np.clip(f + 0.6, 0.0, 1.0)
-    cover(p, m, density, seed + 1, rim=0.0, gran=0.06, flow=0.12)
+    cover(p, m, density, seed + 1, mix=0.0, soft=soft, rim=0.0, gran=0.06, flow=0.12)
     if light: p.lift(light * m * smoothstep(-0.2, 0.8, noise(seed + 2, 12.0)))
 
 
@@ -127,10 +137,12 @@ def ground(p, y0, seed):
     edge = p.profile([(-0.05, y0), (.25, y0 - .012), (.5, y0 + .008), (.75, y0 - .01), (1.05, y0)], wobble=0.003, wobble_sigma=14, seed=seed)
     m = p.ragged(p.below(edge), edge=4.0, rough=2.0, fine=2.0, tooth=0.8, seed=seed + 1)
     p.wash(m, 0.16 + 0.42 * smoothstep(y0, 1.0, YN) ** 1.3, rim=0, gran=0.085, flow=0.22, flow_sigma=30, flow_aspect=5.0, seed=seed + 2)
+    mark(m, 0.7, 0.7)
 
 
 def grove(seed, trees, far_ferns, mid_ferns, near_ferns, hang, cross, top=0.10):
     p = Painting(paper_seed=seed)
+    MIX[:] = 0.1; SOFT[:] = 1.0
     # light at the back of the grove: pale at the centre, a little deeper toward the top and the sides
     p.wash(np.ones_like(YN), 0.05 + 0.13 * smoothstep(0.45, 0.0, YN) + 0.05 * np.abs(XN - 0.5) * 2, rim=0, gran=0.05, flow=0.2, seed=seed + 1)
     ground(p, 0.60, seed + 2)
@@ -139,10 +151,10 @@ def grove(seed, trees, far_ferns, mid_ferns, near_ferns, hang, cross, top=0.10):
     for i, (x, d, girth, lean) in enumerate(order):
         if stage == 0 and d > 0.30:
             p.lift(0.22 * np.exp(-((YN - 0.63) / 0.07) ** 2))                  # thin mist at the feet of the far trees. They stay solid.
-            ferns(p, far_ferns, 0.12, seed + 40); stage = 1
+            ferns(p, far_ferns, 0.12, seed + 40, soft=0.9); stage = 1
         if stage == 1 and d > 0.70:
             sprays(p, hang, 0.36, seed + 50, needle=0.034)
-            ferns(p, mid_ferns, 0.24, seed + 60, light=0.2); stage = 2
+            ferns(p, mid_ferns, 0.24, seed + 60, light=0.2, soft=0.45); stage = 2
         trunk(p, x, d, seed + 100 + 11 * i, girth, lean)
     sprays(p, cross, 0.44, seed + 70, needle=0.040)
     ferns(p, near_ferns, 0.36, seed + 80, light=0.2)       # lit fronds over the dark floor
