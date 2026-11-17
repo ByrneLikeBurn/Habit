@@ -15,15 +15,18 @@ struct HabitSymbolImage: View {
 }
 
 /// A section label above its field, as drawn in `sheet-new-habit.png`.
+/// The one uppercase label, also used for the symbol picker's group headings.
 struct FieldLabel: View {
-    let title: LocalizedStringKey
+    let text: Text
     @Environment(\.style) private var style
 
-    init(_ title: LocalizedStringKey) { self.title = title }
+    init(_ title: LocalizedStringKey) { text = Text(title) }
+    init(verbatim title: String) { text = Text(verbatim: title) }
 
     var body: some View {
-        Text(title)
+        text
             .textCase(.uppercase)
+            .tracking(style.capsTracking)
             .font(style.label(.caption, weight: .medium))
             .foregroundStyle(style.secondary)
             .accessibilityAddTraits(.isHeader)
@@ -52,9 +55,9 @@ struct DayButtons: View {
     @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
-        // Two letters do not fit a 44-point circle at accessibility sizes, so the days become a list of
-        // full names, each with a checkmark when chosen, as Logging does.
-        if typeSize.isAccessibilitySize { list } else { circles }
+        // Two letters and a checkmark fill a 44-point circle at the default size. From xxLarge the days
+        // become a list of full names, each with a checkmark when chosen, as Logging does.
+        if typeSize >= .xxLarge { list } else { circles }
     }
 
     private var list: some View {
@@ -65,7 +68,8 @@ struct DayButtons: View {
                     selection.formSymmetricDifference(Weekdays(weekday: label.weekday))
                 } label: {
                     HStack {
-                        Text(label.full).font(style.label(.body, weight: on ? .semibold : .regular))
+                        // One weight either way, so ticking a day never rewraps its name. The checkmark carries the state.
+                        Text(label.full).font(style.label(.body))
                         Spacer(minLength: 8)
                         Image(systemName: "checkmark").opacity(on ? 1 : 0).accessibilityHidden(true)
                     }
@@ -95,10 +99,11 @@ struct DayButtons: View {
                             .opacity(on ? 1 : 0)
                         Text(Self.twoLetters(label, calendar: calendar))
                             .font(style.label(.footnote, weight: on ? .semibold : .regular))
-                            .minimumScaleFactor(0.6)
                             .lineLimit(1)
                     }
                     .foregroundStyle(on ? style.text : style.secondary)
+                    // Every circle at one size, which fits; larger text gets the list.
+                    .dynamicTypeSize(...DynamicTypeSize.large)
                     .frame(maxWidth: 44, minHeight: 44)
                     .aspectRatio(1, contentMode: .fit)
                     .background {
@@ -153,6 +158,7 @@ struct DayShortcuts: View {
     private func buttons(_ weekdays: Weekdays) -> some View {
         shortcut("Set every day", matches: selection == .all) { selection = .all }
         shortcut("Set weekdays", matches: selection == weekdays) { selection = weekdays }
+        shortcut("Set no days", matches: selection.isEmpty) { selection = [] }
     }
 
     private func shortcut(_ title: LocalizedStringKey, matches: Bool, action: @escaping () -> Void) -> some View {
@@ -177,7 +183,7 @@ struct SymbolRow: View {
     /// Called before the picker opens, so the form can put its keyboard away.
     var willChoose: () -> Void = {}
     // The symbols screenshot opens the picker at once.
-    @State private var choosing = LaunchOptions.current.screen == .symbols
+    @State private var choosing = [.symbols, .symbolsNew].contains(LaunchOptions.current.screen)
     @Environment(\.style) private var style
 
     private var shown: [String] {
@@ -288,11 +294,7 @@ struct SymbolPickerSheet: View {
                     } else {
                         ForEach(groups) { group in
                             VStack(alignment: .leading, spacing: 6) {
-                                Text(verbatim: group.title)
-                                    .textCase(.uppercase)
-                                    .font(style.label(.caption, weight: .medium))
-                                    .foregroundStyle(style.secondary)
-                                    .accessibilityAddTraits(.isHeader)
+                                FieldLabel(verbatim: group.title)
                                 grid(group.symbols)
                             }
                         }

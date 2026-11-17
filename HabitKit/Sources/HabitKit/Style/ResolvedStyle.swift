@@ -43,6 +43,9 @@ public struct ResolvedStyle: Sendable, Equatable {
     /// An option that is not chosen, drawn as an outline.
     public var openOutlineWidth: CGFloat { ruleWidth * 2 }
 
+    /// Letter spacing for small uppercase labels, so caps at caption size do not crowd.
+    public var capsTracking: CGFloat { 0.4 }
+
     // MARK: Type
 
     /// The style's display face, scaled with the text style.

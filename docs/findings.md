@@ -63,6 +63,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 13 | The marks board and the small keys have no "No set days" entry. The dot's entry reads "Not scheduled" | Accessibility, 16 Nov. `YouView.swift`, `CalendarParts.swift` |
 | 13 | No UI run covers the form opened after travel or a day-start change, where today's rule differs from the latest one. The kit covers `ruleForEditing` and `rule(on:)` | QA, 16 Nov. `HabitFormView.swift` init |
 | 13 | Package tests run on iOS only when run on the simulator (`xcodebuild test -scheme HabitKit`). Add that run to the definition-of-done walk | Senior software engineer, 16 Nov |
+| 13 | At accessibility sizes a Today row's control sits on its own line below the name and count, where it can read as part of the next row. This came before the form work | First-day user, 16 Nov. `ax5-nodays-today-paper.jpg` |
 | 4 | Pencil dark version and Pencil marks board | `docs/spec.md`, Pencil |
 | After MVP | Habit detail in two columns on the Mac, and a popover for a past day | `docs/spec.md`, Mac window |
 

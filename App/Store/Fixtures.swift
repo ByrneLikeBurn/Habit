@@ -57,6 +57,7 @@ enum Fixtures {
             return [
                 Spec(name: "Practise guitar", symbol: "guitars", kind: .counted, target: 20, unit: "minutes", tap: 10, schedule: [],
                      history: 200, pattern: { [0, 0, 20, 0, 0, 0, 10, 0, 0, 30, 0, 0, 0][$0 % 13] }),
+                Spec(name: "Call a friend", symbol: "phone", schedule: [], history: 90, pattern: { $0 % 9 == 4 ? 1 : 0 }),
                 Spec(name: "Read", symbol: "book", logged: 1, history: 120, pattern: { $0 % 4 == 3 ? 0 : 1 }),
                 Spec(name: "Walk outside", symbol: "", history: 120, pattern: { $0 % 3 == 0 ? 1 : 0 }),
                 Spec(name: "Practise scales", symbol: "music.note", schedule: weekdaysOnly),

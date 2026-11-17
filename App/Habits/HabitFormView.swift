@@ -26,6 +26,9 @@ struct HabitFormView: View {
     @State private var showUnitPage = false
     @State private var confirmDiscard = false
     @FocusState private var nameFocused: Bool
+    @FocusState private var targetFocused: Bool
+    @FocusState private var tapFocused: Bool
+    @State private var confirmArchive = false
 
     private let original: Snapshot
 
@@ -139,12 +142,25 @@ struct HabitFormView: View {
                 }
             }
             .interactiveDismissDisabled(hasChanges)
+            #if os(iOS)
+            // The number pad has no return key, so Done above the keyboard puts it away.
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        nameFocused = false
+                        targetFocused = false
+                        tapFocused = false
+                    }
+                }
+            }
+            #endif
             .onChange(of: targetText) {
                 // The default log amount follows the target until the user types one.
                 if !tapEdited { tapText = CountText.defaultTapAmount(forTarget: target)?.formatted() ?? "" }
             }
             .task {
-                guard !isEdit, LaunchOptions.current.screen != .symbols else { return }
+                guard !isEdit, LaunchOptions.current.screen != .symbolsNew else { return }
                 // Focus after the sheet has settled; earlier focus is dropped.
                 try? await Task.sleep(for: .milliseconds(350))
                 nameFocused = true
@@ -174,7 +190,8 @@ struct HabitFormView: View {
                         .accessibilityHidden(true)
                 }
                 TextField(String(localized: "Name"), text: $name, prompt: Text(verbatim: ""), axis: .vertical)
-                    .lineLimit(1...4)
+                    // At accessibility sizes four lines hold three words, so a long name gets room to show.
+                    .lineLimit(typeSize.isAccessibilitySize ? 1...12 : 1...4)
                     .textFieldStyle(.plain)
                     .font(style.display(.body))
                     .focused($nameFocused)
@@ -228,16 +245,20 @@ struct HabitFormView: View {
                 if !typeSize.isAccessibilitySize { Spacer(minLength: 12) }
                 TextField(String(localized: "Target"), text: $targetText, prompt: Text("None").foregroundStyle(style.tertiary))
                     .textFieldStyle(.plain)
-                    .font(style.count(.body))
+                    .font(style.label(.body).monospacedDigit())
                     .multilineTextAlignment(typeSize.isAccessibilitySize ? .leading : .trailing)
                     .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : 90)
                     #if os(iOS)
                     .keyboardType(.numberPad)
                     #endif
+                    .focused($targetFocused)
                     .padding(.bottom, 4)
                     .overlay(alignment: .bottom) { FieldRule() }
             }
             .frame(minHeight: 48)
+            // The whole row focuses the field, the word "Target" included.
+            .contentShape(Rectangle())
+            .onTapGesture { targetFocused = true }
             hint(targetProblem ?? (targetText.trimmingCharacters(in: .whitespaces).isEmpty
                 ? String(localized: "With no target, any amount counts as done.")
                 : String(localized: "A day is done when its total reaches the target.", comment: "New and Edit habit, under a typed target")))
@@ -282,10 +303,8 @@ struct HabitFormView: View {
         VStack(alignment: .leading, spacing: 4) {
             FieldRule()
             Button {
-                // Edits made before Archive are kept, so Undo brings back the habit as the user left it.
-                if hasChanges, canSave { applyChanges() }
-                dismiss()
-                model.archive(habit, context: context, clock: settings.clock)
+                // With unsaved changes, Archive asks what to do with them, as Cancel does.
+                if hasChanges { confirmArchive = true } else { archive(habit) }
             } label: {
                 Text("Archive habit")
                     .underline()
@@ -295,8 +314,22 @@ struct HabitFormView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .confirmationDialog("Archive with your changes?", isPresented: $confirmArchive, titleVisibility: .visible) {
+                if canSave {
+                    Button("Save changes and archive") { applyChanges(); archive(habit) }
+                }
+                Button("Archive without changes") { archive(habit) }
+                Button("Keep editing", role: .cancel) {}
+            }
             hint(String(localized: "You can bring it back at any time. Its history is kept."))
         }
+        // Set apart from the day shortcuts above, which look alike, so a slip does not reach it.
+        .padding(.top, 16)
+    }
+
+    private func archive(_ habit: Habit) {
+        dismiss()
+        model.archive(habit, context: context, clock: settings.clock)
     }
 
     /// Unit and log amount, one step in from the form on iPhone and iPad.
@@ -333,11 +366,12 @@ struct HabitFormView: View {
                         prompt: Text("Type each time").foregroundStyle(style.tertiary)
                     )
                     .textFieldStyle(.plain)
-                    .font(style.count(.body))
+                    .font(style.label(.body).monospacedDigit())
                     .frame(minHeight: 44)
                     #if os(iOS)
                     .keyboardType(.numberPad)
                     #endif
+                    .focused($tapFocused)
                     FieldRule()
                     hint(tapProblem ?? (tapText.isEmpty
                         ? String(localized: "Leave it empty to type an amount each time.")
