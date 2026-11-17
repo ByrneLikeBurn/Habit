@@ -297,11 +297,12 @@ struct SymbolPickerSheet: View {
                 .padding(.vertical, 12)
             }
             .searchable(text: $query, prompt: Text("Search symbols"))
-            .onChange(of: query) { _, text in
+            .onChange(of: query) { old, text in
                 if !text.isEmpty { group = nil }
+                // Clearing a search returns the grid: say so. A chip that clears it says so once, here.
+                if text.isEmpty, !old.isEmpty { announceCount() }
             }
             // Announced when a chip changes the view, or once typing has paused, never over each keystroke.
-            .onChange(of: group) { announceCount() }
             .task(id: query) {
                 guard !query.isEmpty else { return }
                 try? await Task.sleep(for: .milliseconds(600))
@@ -336,8 +337,12 @@ struct SymbolPickerSheet: View {
         let items: [(key: String?, title: String)] = [(nil, String(localized: "All"))] + groups.map { ($0.key, $0.title) }
         let row = ForEach(Array(items.enumerated()), id: \.offset) { index, item in
             chip(item.title, on: group == item.key, position: index + 1, of: items.count) {
+                let searching = !query.isEmpty
                 group = item.key
                 query = ""
+                // The count is said once: by the query handler when a search was cleared, otherwise here.
+                // Typing that turns a chip off says nothing until it pauses.
+                if !searching { announceCount() }
             }
         }
         #if os(macOS)
@@ -363,7 +368,7 @@ struct SymbolPickerSheet: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
             .background {
-                Capsule().strokeBorder(on ? style.text : style.secondary, lineWidth: on ? style.outlineWidth * 1.6 : style.ruleWidth * 2)
+                Capsule().strokeBorder(on ? style.text : style.secondary, lineWidth: on ? style.chosenOutlineWidth : style.openOutlineWidth)
             }
             .frame(minHeight: 44)
             .contentShape(Rectangle())
