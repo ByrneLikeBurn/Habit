@@ -220,18 +220,28 @@ Owner feedback, 16 November 2026, on the Pencil rows under Increase Contrast: th
 
 Owner, 16 November 2026: the smoothed Pencil marks read better and more like pencil. On Watercolor under Increase Contrast, the varied line weight of the ring keeps the control from reading as a radio button. The ring's thick start and thin end is therefore kept as a rule, not a detail. The human factors gate still runs before the build, with this view recorded beside it.
 
-## Step 6: the style picker. Rule written, drawn, in review
+## Step 6: the style picker. Round two
 
 Areas: adding a screen, layout, marks and type. It lives on the Appearance page that `docs/spec.md` already describes, in the "Style" row's place. Milestones 1 to 3 have one style, so nothing on `main` conflicts.
 
-The rule:
-- Three tiles, one per style, in the order Pen and ink, Pencil, Watercolor. Each tile is the full width of the page and they sit one under another at every text size. One layout serves the phone, the Mac and the largest text.
-- A tile is that style's own paper in the current appearance, with its grain. On it, from the left: the style's display font showing "Aa 0O 1l" at 28 points or more, then the done, part-done and paused marks at 24 points in the user's mark colour. The style's name sits under the sample in the system font.
-- Watercolor's sample is drawn at 1.15 times the size, as its habit names are.
-- The chosen tile has a 2 point border in the text colour and a checkmark at its top right. The others have a 1 point border in the rule colour. Selection is never shown by colour alone.
-- A tap chooses the style at once. Nothing is confirmed, because choosing again undoes it. The preview row at the top of the page redraws in the new style.
-- Each tile is one button of at least 76 points in height. VoiceOver says the name, then "style", then "selected" for the chosen one.
+The rule, as revised after round one:
+- The page opens with a preview: one Today row in the chosen style, with no scene. It redraws when the style changes.
+- Three tiles, one per style, in the order Pen and ink, Pencil, Watercolor. They sit one under another at every text size. A tile is the full width of the page, up to 360 points on the Mac and iPad.
+- A tile is that style's own paper in the current appearance, with its grain. On it: the style's name set in its own display font at 26 points, and under it "Walk 10 miles" in the same font at the size of a habit name. To the right, the done, part-done and paused marks at 24 points in the user's mark colour. The name is the sample. "Walk 10 miles" shows 1, l, i and 0 in words a person reads.
+- Watercolor's text is drawn at 1.15 times the size, as its habit names are.
+- The chosen tile has a 2 point border in the text colour and a checkmark in a filled disc at its top right. The others have a 1 point border that holds 3:1 against the page. Selection is never shown by colour alone.
+- One line under the tiles: "Changes the look of the whole app."
+- A tap chooses the style at once. Nothing is confirmed, because choosing again undoes it.
+- Each tile is one button of at least 76 points in height. VoiceOver reads the style's name with the selected trait. The sample line and the marks are hidden from VoiceOver. "Style" is a heading.
+- At the largest text sizes the text scales, the marks drop to their own line under it, and the tile grows.
 - Under Increase Contrast the marks on the tiles are drawn as step 4 says.
+- The "Light or dark" and "Marks" rows open lists and carry a disclosure chevron.
 - No tile shows a scene. Scenes are parked.
+
+Round one, 16 November 2026. Senior designer and product owner, and accessibility and first-day user, both failed the first drawing. They disagreed on the sample "Aa 0O 1l": the designer wanted it replaced by the style's name in its own font and the label removed; accessibility and the first-day user wanted the name first and the sample second. The option above meets both: the name is the first line and is itself the sample, and the second line is a readable habit name that still shows the glyphs a typographer checks.
+
+Not adopted: "Pen and ink marks measure 19 points, not 24". That is how `docs/mockups.html` and `main` draw them: the mark fills 0.78 of its nominal size.
+
+Gate for the in-app screens: the Pencil part-done mark read as a solid wedge to both groups at this size. Test: at 24 points on a device, can part done be told from done in Pencil at a glance. If it fails, the strokes open up.
 
 Drawing: `docs/mockups/png/m4-style-picker.png`, from `tools/marks/style_picker.py`. New York is not on this machine, so the Pen and ink sample is set in a stand-in serif.
