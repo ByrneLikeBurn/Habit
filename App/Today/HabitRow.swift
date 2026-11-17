@@ -74,7 +74,7 @@ struct HabitRow: View {
         Button { actions.log(.tap) } label: {
             if typeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 8) {
-                    symbol
+                    if !habit.symbolName.isEmpty { symbol }
                     name
                 }
             } else {
@@ -95,7 +95,7 @@ struct HabitRow: View {
     }
 
     private var symbol: some View {
-        Image(systemName: habit.symbolName)
+        HabitSymbolImage(name: habit.symbolName)
             .font(style.label(.body))
             .foregroundStyle(style.text)
             .accessibilityHidden(true)

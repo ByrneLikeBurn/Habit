@@ -189,7 +189,7 @@ struct ArchivedView: View {
             }
             ForEach(archived) { habit in
                 HStack(spacing: 12) {
-                    Image(systemName: habit.symbolName).accessibilityHidden(true)
+                    HabitSymbolImage(name: habit.symbolName)
                     Text(habit.name).font(style.display(.body))
                     Spacer()
                     Button("Bring back") {

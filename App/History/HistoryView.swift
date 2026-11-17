@@ -352,7 +352,7 @@ private struct HabitSymbol: View {
     @ScaledMetric(relativeTo: .footnote) private var width: CGFloat = 18
 
     var body: some View {
-        Image(systemName: name)
+        HabitSymbolImage(name: name)
             .font(style.label(.footnote))
             .frame(width: width)
             .accessibilityHidden(true)
