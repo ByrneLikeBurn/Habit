@@ -115,9 +115,9 @@ struct DayButtons: View {
         }
     }
 
-    /// Two letters at equal width, for example "Mo" and "Tu".
+    /// Two letters at equal width, for example "Mo" and "Tu", unless they repeat in this locale.
     static func twoLetters(_ label: WeekdayLabel, calendar: Calendar) -> String {
-        String(calendar.shortStandaloneWeekdaySymbols[label.weekday - 1].prefix(2))
+        WeekdayText.buttonTexts(calendar: calendar)[label.weekday - 1]
     }
 
     /// The locale's working days: every weekday that is not its weekend.
@@ -271,9 +271,9 @@ struct SymbolPickerSheet: View {
 
     var body: some View {
         NavigationStack {
+          ScrollViewReader { reader in
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    chips
                     if !query.trimmingCharacters(in: .whitespaces).isEmpty {
                         let found = SymbolCatalog.search(query)
                         if found.isEmpty {
@@ -301,6 +301,21 @@ struct SymbolPickerSheet: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
             }
+            // The chips stay in place while the grid scrolls under them.
+            .safeAreaInset(edge: .top, spacing: 0) {
+                chips
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(style.paper)
+            }
+            // Edit opens on the habit's symbol, wherever it sits in the list.
+            .task {
+                // After the sheet settles, so the lazy grid has laid out.
+                guard !draft.isEmpty else { return }
+                try? await Task.sleep(for: .milliseconds(300))
+                reader.scrollTo(draft, anchor: .center)
+            }
             .searchable(text: $query, prompt: Text("Search symbols"))
             .onChange(of: query) { old, text in
                 if !text.isEmpty { group = nil }
@@ -325,6 +340,9 @@ struct SymbolPickerSheet: View {
                     Button("Done") { selection = draft; dismiss() }
                 }
             }
+            // A swipe never drops a symbol the user picked: Cancel or Done says which.
+            .interactiveDismissDisabled(draft != selection)
+          }
         }
         #if os(macOS)
         .frame(minWidth: 460, idealWidth: 520, minHeight: 480, idealHeight: 600)
@@ -387,7 +405,7 @@ struct SymbolPickerSheet: View {
     /// A search with no match is not a dead end: None is offered beside the line.
     private var noMatch: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("No symbols match. A habit works without one.")
+            Text("No symbols match. A habit works without one.", comment: "Symbol search with no result. \"One\" is a symbol. A None button follows")
                 .font(style.label(.subheadline))
                 .foregroundStyle(style.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -423,6 +441,7 @@ struct SymbolPickerSheet: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .id(symbol.name)
                 .accessibilityLabel(Text(verbatim: symbol.label))
                 .accessibilityAddTraits(on ? .isSelected : [])
             }

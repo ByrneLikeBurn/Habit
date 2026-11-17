@@ -748,12 +748,23 @@ struct NoSetDaysMarksAndRunsTests {
         #expect(habit.runSummary(today: today).longest >= 10)
     }
 
+    /// Seven different labels in the day buttons, in every locale, right-to-left and CJK included.
+    @Test(arguments: ["en_GB", "en_US", "fr_FR", "de_DE", "ar", "ar_SA", "he_IL", "fa_IR", "zh_Hans", "ja_JP", "ko_KR", "ru_RU", "hi_IN", "th_TH"])
+    func dayButtonTextsDifferInEveryLocale(identifier: String) {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = Locale(identifier: identifier)
+        let texts = WeekdayText.buttonTexts(calendar: calendar)
+        #expect(texts.count == 7)
+        #expect(Set(texts).count == 7, "\(identifier): \(texts)")
+    }
+
     /// A no-set-days habit is never owed, so before a log its row shows the target alone.
     @Test func noSetDaysRowShowsTheTargetAloneBeforeALog() {
         let en = Locale(identifier: "en_GB")
-        #expect(CountText.todayLine(total: 0, target: 20, unit: "minutes", noSetDays: true, locale: en) == "20 minutes")
+        #expect(CountText.todayLine(total: 0, target: 20, unit: "minutes", noSetDays: true, locale: en) == "Target 20 minutes")
         #expect(CountText.todayLine(total: 10, target: 20, unit: "minutes", noSetDays: true, locale: en) == "10 of 20 minutes")
         #expect(CountText.todayLine(total: 0, target: 20, unit: "minutes", noSetDays: false, locale: en) == "0 of 20 minutes")
+        #expect(CountText.todayLine(total: 0, target: 20, unit: "", noSetDays: true, locale: en) == "Target 20")
     }
 
     @Test func aRuleChangeMidWeekKeepsEachSideItsOwnMark() throws {

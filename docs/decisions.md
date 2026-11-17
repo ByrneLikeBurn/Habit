@@ -240,3 +240,11 @@ One entry per decision that changed the brief. Each says what changed and why, i
 **The locked Logging line names the way out:** "This is fixed once a habit has logs. To count instead, add a new habit." Asked for by the neurodiversity expert.
 
 **Symbol search matches what a habit is for,** such as "teeth", "meds", "therapy" and "chores", through search words on each symbol. A search with no match says "No symbols match. A habit works without one." and offers None. Asked for by the neurodiversity expert.
+
+**Wording and flows round, 16 November 2026.**
+- A no-set-days row with nothing logged today reads "Target 20 minutes". The target alone read as 20 minutes logged. Asked for by the content designer.
+- The form's field is "Target", and the line under it follows the field: "With no target, any amount counts as done." while empty, and "A day is done when its total reaches the target." once typed. "Target each day" brought back a daily quota for a habit with no set days, and the no-target line stayed under a typed target. Asked for by the tired daily user.
+- Day buttons use two letters of the short name where all seven differ, and the locale's very short names, or the short names in full, where they repeat, as in Arabic and Hebrew. Tested over fourteen locales. Asked for by the content designer.
+- "This stays as it is once a habit has logs." replaces "fixed", which can translate as "repaired". The unit summary is one string per case, such as "glasses, adds 1". Search words split on any comma. Asked for by the content designer.
+- Habit detail reads today's rule, and adds "From tomorrow: No set days." while a change waits. Archive keeps valid edits made before it. The symbol picker's chips stay in place, it opens on the chosen symbol, and a swipe cannot close it while a new symbol is picked but not confirmed. On the Mac, Unit and the log amount sit in the form, because a Mac sheet has no back button. Asked for by the UI and UX designer and the tired daily user.
+- "Add a name to continue." stays on a blank New habit form. The UI and UX designer asked for it to wait for a first attempt. `docs/spec.md` says "If Add is disabled, a line says why", and the tired daily user and the neurodiversity expert passed it.

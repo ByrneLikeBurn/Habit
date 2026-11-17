@@ -48,7 +48,7 @@ struct HabitFormView: View {
             unit: habit?.unit ?? (startCounted ? "glasses" : ""),
             tapText: habit.map { $0.tapAmount?.formatted() ?? "" } ?? "1",
             kind: habit?.kind ?? (startCounted ? .counted : .binary),
-            schedule: rule?.schedule ?? .all
+            schedule: LaunchOptions.current.screen == .editWaits ? [] : (rule?.schedule ?? .all)
         )
         original = snapshot
         _name = State(initialValue: snapshot.name)
@@ -113,7 +113,7 @@ struct HabitFormView: View {
             .scrollDismissesKeyboard(.interactively)
             .onAppear {
                 // The editDays screenshot opens the form at Repeats on.
-                if LaunchOptions.current.screen == .editDays { reader.scrollTo("days", anchor: .top) }
+                if [.editDays, .editWaits].contains(LaunchOptions.current.screen) { reader.scrollTo("days", anchor: .top) }
             }
           }
             .foregroundStyle(style.text, style.secondary, style.tertiary)
@@ -205,8 +205,8 @@ struct HabitFormView: View {
             if kindLocked {
                 Text(kind == .counted ? "Count" : "Mark done").font(style.label(.body))
                 hint(kind == .counted
-                     ? String(localized: "This is fixed once a habit has logs. To mark it done instead, add a new habit.")
-                     : String(localized: "This is fixed once a habit has logs. To count instead, add a new habit."))
+                     ? String(localized: "This stays as it is once a habit has logs. To mark it done instead, add a new habit.", comment: "Edit habit, under Logging. \"This\" is how the habit logs: counted. It cannot change once there are logs")
+                     : String(localized: "This stays as it is once a habit has logs. To count instead, add a new habit.", comment: "Edit habit, under Logging. \"This\" is how the habit logs: marked done. It cannot change once there are logs"))
             } else {
                 KindChooser(kind: $kind)
                 hint(kind == .counted
@@ -224,9 +224,9 @@ struct HabitFormView: View {
                 ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
                 : AnyLayout(HStackLayout())
             targetLayout {
-                Text("Target each day").font(style.label(.body))
+                Text("Target").font(style.label(.body))
                 if !typeSize.isAccessibilitySize { Spacer(minLength: 12) }
-                TextField(String(localized: "Target each day"), text: $targetText, prompt: Text("None").foregroundStyle(style.tertiary))
+                TextField(String(localized: "Target"), text: $targetText, prompt: Text("None").foregroundStyle(style.tertiary))
                     .textFieldStyle(.plain)
                     .font(style.count(.body))
                     .multilineTextAlignment(typeSize.isAccessibilitySize ? .leading : .trailing)
@@ -238,8 +238,14 @@ struct HabitFormView: View {
                     .overlay(alignment: .bottom) { FieldRule() }
             }
             .frame(minHeight: 48)
-            hint(targetProblem ?? String(localized: "With no target, any amount counts as done."))
+            hint(targetProblem ?? (targetText.trimmingCharacters(in: .whitespaces).isEmpty
+                ? String(localized: "With no target, any amount counts as done.")
+                : String(localized: "A day is done when its total reaches the target.", comment: "New and Edit habit, under a typed target")))
             FieldRule().padding(.top, 8)
+            #if os(macOS)
+            // A Mac sheet has no back button, so Unit and the log amount sit in the form itself.
+            unitFields.padding(.top, 12)
+            #else
             Button { showUnitPage = true } label: {
                 HStack {
                     Text("Unit and log amount").font(style.label(.body)).foregroundStyle(style.text)
@@ -251,6 +257,7 @@ struct HabitFormView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            #endif
             if let tapProblem { hint(tapProblem) }
             FieldRule()
         }
@@ -275,6 +282,8 @@ struct HabitFormView: View {
         VStack(alignment: .leading, spacing: 4) {
             FieldRule()
             Button {
+                // Edits made before Archive are kept, so Undo brings back the habit as the user left it.
+                if hasChanges, canSave { applyChanges() }
                 dismiss()
                 model.archive(habit, context: context, clock: settings.clock)
             } label: {
@@ -290,10 +299,21 @@ struct HabitFormView: View {
         }
     }
 
-    /// Unit and log amount, one step in from the form.
+    /// Unit and log amount, one step in from the form on iPhone and iPad.
     private var unitPage: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            unitFields
+                .padding(24)
+                .frame(maxWidth: 560, alignment: .leading)
+                .frame(maxWidth: .infinity)
+        }
+        .foregroundStyle(style.text, style.secondary, style.tertiary)
+        .paperBackground(style)
+        .navigationTitle("Unit and log amount")
+    }
+
+    private var unitFields: some View {
+        VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 8) {
                     FieldLabel("Unit")
                     TextField(String(localized: "Unit"), text: $unit, prompt: Text("None").foregroundStyle(style.tertiary))
@@ -323,20 +343,22 @@ struct HabitFormView: View {
                         ? String(localized: "Leave it empty to type an amount each time.")
                         : String(localized: "Each log on Today adds this much.")))
                 }
-            }
-            .padding(24)
-            .frame(maxWidth: 560, alignment: .leading)
-            .frame(maxWidth: .infinity)
         }
-        .foregroundStyle(style.text, style.secondary, style.tertiary)
-        .paperBackground(style)
-        .navigationTitle("Unit and log amount")
     }
 
+    /// One string per case, so translators see the whole phrase.
     private var unitSummary: String {
-        let unitPart = unit.trimmingCharacters(in: .whitespaces).isEmpty ? String(localized: "No unit") : unit
-        let amountPart = tapText.isEmpty ? String(localized: "Type each time") : tapText
-        return [unitPart, amountPart].formatted(.list(type: .and, width: .narrow))
+        let unitText = unit.trimmingCharacters(in: .whitespaces)
+        switch (unitText.isEmpty, tapAmount) {
+        case (false, let n?):
+            return String(localized: "\(unitText), adds \(n)", comment: "Unit and log amount row: the unit as typed, and how much one log adds")
+        case (false, nil):
+            return String(localized: "\(unitText), typed each time", comment: "Unit and log amount row: the unit as typed; the amount is typed at each log")
+        case (true, let n?):
+            return String(localized: "No unit, adds \(n)", comment: "Unit and log amount row: no unit, and how much one log adds")
+        case (true, nil):
+            return String(localized: "No unit, typed each time", comment: "Unit and log amount row: no unit; the amount is typed at each log")
+        }
     }
 
     private func hint(_ text: String) -> some View {
@@ -359,6 +381,11 @@ struct HabitFormView: View {
 
     private func save() {
         guard canSave else { return }
+        applyChanges()
+        dismiss()
+    }
+
+    private func applyChanges() {
         let clock = settings.clock
         let resolvedTap: Int? = kind == .binary ? 1 : tapAmount
         let resolvedTarget: Int? = kind == .binary ? 1 : target
@@ -385,7 +412,6 @@ struct HabitFormView: View {
             context.insert(new)
         }
         try? context.save()
-        dismiss()
     }
 }
 

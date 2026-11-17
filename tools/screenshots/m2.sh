@@ -81,7 +81,9 @@ for appearance in light dark; do
   shot "form-new-$tag"       $appearance large disabled -fixture today -screen new
   shot "form-new-count-$tag" $appearance large disabled -fixture today -screen newCount
   shot "form-edit-$tag"      $appearance large disabled -fixture today -screen edit
-  shot "form-symbols-$tag"   $appearance large disabled -fixture today -screen symbols
+  shot "form-symbols-$tag"   $appearance large disabled -fixture no-days -screen symbols
+  shot "form-edit-nodays-$tag" $appearance large disabled -fixture no-days -screen edit
+  shot "form-edit-waits-$tag"  $appearance large disabled -fixture today -screen editWaits
   shot "ax5-form-new-$tag"   $appearance accessibility-extra-extra-extra-large disabled -fixture today -screen new
   shot "ax5-form-edit-$tag"  $appearance accessibility-extra-extra-extra-large disabled -fixture today -screen edit
   shot "ax5-form-days-$tag"  $appearance accessibility-extra-extra-extra-large disabled -fixture today -screen editDays

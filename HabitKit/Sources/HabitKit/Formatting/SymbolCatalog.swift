@@ -53,8 +53,8 @@ public enum SymbolCatalog {
             name: name,
             label: String(localized: label, bundle: .module, comment: "A symbol's name, read by VoiceOver and matched by search"),
             keywords: keywords.map {
-                String(localized: $0, bundle: .module, comment: "Search words for a symbol, separated by commas. Not shown. Use words people search for in your language")
-                    .split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+                String(localized: $0, bundle: .module, comment: "Search words for a symbol, separated by commas. Not shown. Use words people search for in your language. Any comma works: , or ، or ，")
+                    .split(whereSeparator: { ",،，".contains($0) }).map { $0.trimmingCharacters(in: .whitespaces) }
             } ?? []
         )
     }

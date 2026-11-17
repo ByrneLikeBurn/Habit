@@ -180,11 +180,23 @@ private struct HabitDetailPage: View {
     }
 
     /// "8 glasses a day. Every day except Thursday."
+    /// Today's rule, which may differ from the latest stored values when a change waits for tomorrow.
     private func ruleSentence(clock: HabitClock) -> String {
-        let schedule = WeekdayText.sentence(for: habit.schedule, calendar: clock.calendar)
-        guard habit.kind == .counted, let target = habit.target else { return schedule + "." }
-        let amount = CountText.line(total: target, target: nil, unit: habit.unit)
-        return String(localized: "\(amount) a day. \(schedule).", comment: "Habit detail subtitle. The daily target with its unit, then the schedule, for example: 8 glasses a day. Every day except Thursday.")
+        let today = habit.rule(on: clock.today)
+        let schedule = WeekdayText.sentence(for: today.schedule, calendar: clock.calendar)
+        var sentence: String
+        if habit.kind == .counted, let target = today.target {
+            let amount = CountText.line(total: target, target: nil, unit: habit.unit)
+            sentence = String(localized: "\(amount) a day. \(schedule).", comment: "Habit detail subtitle. The daily target with its unit, then the schedule, for example: 8 glasses a day. Every day except Thursday.")
+        } else {
+            sentence = schedule + "."
+        }
+        let waiting = habit.ruleForEditing(today: clock.today)
+        if waiting.fromDay != today.fromDay, waiting.scheduleMask != today.scheduleMask {
+            let next = WeekdayText.sentence(for: waiting.schedule, calendar: clock.calendar)
+            sentence += " " + String(localized: "From tomorrow: \(next).", comment: "Habit detail subtitle, after the schedule, when an edit starts tomorrow. For example: From tomorrow: No set days.")
+        }
+        return sentence
     }
 }
 

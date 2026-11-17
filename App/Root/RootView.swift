@@ -78,9 +78,9 @@ struct RootView: View {
         let habits = Ordering.sorted((try? context.fetch(FetchDescriptor<Habit>())) ?? [])
         let clock = settings.clock
         switch screen {
-        case .new, .newCount, .symbols:
+        case .new, .newCount:
             model.showNewHabit = true
-        case .edit, .editDays:
+        case .edit, .editDays, .editWaits, .symbols:
             model.editing = habits.first
         case .count:
             if let habit = habits.first(where: { $0.kind == .counted }) {
