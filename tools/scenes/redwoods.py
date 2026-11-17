@@ -84,6 +84,34 @@ def bough(p, x0, y0, x1, y1, n, seed, density=0.6, needle=0.030, width=0.0012):
     p.wash(m, density, rim=0.0, gran=0.06, flow=0.1, seed=seed + 2)
 
 
+def spray(f, x0, y0, x1, y1, n, needle, width, rng):
+    """One twig with needles in two ranks, as a redwood carries them. Adds to the field f and returns it."""
+    f = np.maximum(f, seg_field(x0, y0, x1, y1, 0.0020 * W, 0.0007 * W))
+    dx, dy = (x1 - x0) * W, (y1 - y0) * H; L = np.hypot(dx, dy); ux, uy = dx / L, dy / L
+    for i in range(n):
+        t = (i + 0.5) / n
+        bx, by = x0 * W + dx * t, y0 * H + dy * t
+        ln = needle * H * (0.55 + 0.6 * np.sin(np.pi * t)) * (0.85 + 0.3 * rng.random())
+        for sgn in (1.0, -1.0):                                   # needles lean toward the tip of the twig
+            ex, ey = bx + ln * (0.55 * ux - sgn * 0.83 * uy), by + ln * (0.55 * uy + sgn * 0.83 * ux)
+            f = np.maximum(f, seg_field(bx / W, by / H, ex / W, ey / H, width * W, 0.3))
+    return f
+
+
+def framing_branch(p, pts, twigs, seed, density=0.86, needle=0.050, width=0.0016):
+    """A branch close to the viewer that enters from the edge of the card. pts: the main stem. twigs: (t along stem, dx, dy, n)."""
+    rng = np.random.default_rng(seed)
+    f = np.full((H, W), -99.0)
+    for (xa, ya), (xb, yb) in zip(pts[:-1], pts[1:]):
+        f = np.maximum(f, seg_field(xa, ya, xb, yb, 0.0034 * W, 0.0022 * W))
+    xs, ys = np.array([q[0] for q in pts]), np.array([q[1] for q in pts]); tt = np.linspace(0, 1, len(pts))
+    for t, dx, dy, n in twigs:
+        x0, y0 = np.interp(t, tt, xs), np.interp(t, tt, ys)
+        f = spray(f, x0, y0, x0 + dx, y0 + dy, n, needle, width, rng)
+    m = p.ragged(f, edge=0.9, rough=1.0, fine=1.0, seed=seed + 1) * (f > -3)
+    p.wash(m, density, rim=0.0, gran=0.06, flow=0.1, seed=seed + 2)
+
+
 def wall(p, base, tips, density, seed, cut):
     """A far wall of forest: one mass with an uneven top and narrow tips, as the Lake's wood is painted."""
     from lake import treeline
@@ -103,12 +131,9 @@ def variant_a() -> np.ndarray:
     haze(p, 0.64, 0.01, 0.08, 0.6, 1256)
     floor(p, [(-0.05, .75), (.3, .735), (.6, .755), (1.05, .74)], 0.28, 1261, (0.08, 0.75, 0.9))
     trunk(p, .575, 0.80, -0.2, .030, 0.44, 1271, lean=-0.005)
-    bough(p, .600, .20, .700, .15, 32, 1275, density=0.42, needle=0.034)
     floor(p, [(-0.05, .86), (.25, .845), (.5, .865), (.8, .85), (1.05, .865)], 0.44, 1281, (0.08, 0.86, 0.98))
     trunk(p, .925, 0.92, -0.2, .060, 0.74, 1291, lean=-0.008, flare=0.65, bark=0.24)
     trunk(p, .115, 0.94, -0.2, .092, 0.86, 1301, lean=0.010, flare=0.7, bark=0.26)
-    bough(p, .200, .26, .345, .19, 44, 1305, density=0.8, needle=0.046, width=0.0015)
-    bough(p, .868, .34, .770, .29, 32, 1309, density=0.7, needle=0.040, width=0.0014)
     g2 = floor(p, [(-0.05, .955), (.3, .94), (.62, .925), (.85, .945), (1.05, .93)], 0.70, 1311)
     blades(p, g2, 150, 1316, density=0.6, width=0.0015, length=(0.03, 0.04), clump=-0.2)
     return p.finish()
@@ -125,11 +150,10 @@ def variant_b() -> np.ndarray:
     floor(p, [(-0.05, .76), (.3, .745), (.6, .77), (1.05, .75)], 0.30, 1361, (0.08, 0.76, 0.9))
     trunk(p, .480, 0.80, -0.2, .030, 0.46, 1371, lean=0.006)
     trunk(p, .775, 0.83, -0.2, .048, 0.58, 1381, lean=-0.008)
-    bough(p, .745, .30, .640, .245, 36, 1385, density=0.55, needle=0.040, width=0.0014)
     floor(p, [(-0.05, .86), (.25, .84), (.5, .865), (.8, .85), (1.05, .87)], 0.46, 1391, (0.08, 0.86, 0.98))
     trunk(p, .165, 0.93, -0.2, .088, 0.84, 1401, lean=0.010, flare=0.7, bark=0.26)
-    bough(p, .250, .22, .400, .15, 48, 1405, density=0.8, needle=0.048, width=0.0015)
-    bough(p, .248, .46, .345, .43, 28, 1408, density=0.76, needle=0.036, width=0.0014)
+    framing_branch(p, [(1.03, .04), (.93, .10), (.84, .19), (.77, .31)],
+                   [(.18, -.085, .010, 13), (.36, -.020, .115, 12), (.55, -.100, .030, 14), (.74, -.010, .120, 11), (1.0, -.060, .085, 12)], 1421)
     g2 = floor(p, [(-0.05, .955), (.3, .94), (.62, .925), (.85, .945), (1.05, .93)], 0.70, 1411)
     blades(p, g2, 150, 1416, density=0.6, width=0.0015, length=(0.03, 0.04), clump=-0.2)
     return p.finish()
@@ -148,8 +172,8 @@ def variant_c() -> np.ndarray:
     trunk(p, .262, 0.83, -0.2, .034, 0.56, 1551, lean=-0.006)
     floor(p, [(-0.05, .87), (.2, .855), (.45, .875), (.75, .86), (1.05, .875)], 0.46, 1561, (0.08, 0.87, 0.98))
     trunk(p, .105, 0.94, -0.2, .082, 0.86, 1571, lean=0.008, flare=0.7, bark=0.26)
-    bough(p, .185, .20, .330, .13, 48, 1575, density=0.8, needle=0.048, width=0.0015)
-    bough(p, .292, .36, .400, .32, 32, 1578, density=0.56, needle=0.038, width=0.0014)
+    framing_branch(p, [(1.03, .06), (.92, .11), (.82, .19), (.74, .30)],
+                   [(.16, -.090, .005, 13), (.36, -.015, .115, 12), (.56, -.105, .035, 14), (.76, -.005, .120, 11), (1.0, -.065, .090, 12)], 1591)
     g2 = floor(p, [(-0.05, .955), (.3, .94), (.6, .93), (1.05, .95)], 0.70, 1581)
     blades(p, g2, 150, 1586, density=0.6, width=0.0015, length=(0.03, 0.04), clump=-0.2)
     return p.finish()
