@@ -219,3 +219,19 @@ Still to do in step 5: the Bold Text weight pair for each style, the upstream fi
 Owner feedback, 16 November 2026, on the Pencil rows under Increase Contrast: the marks look scratchy. Cause: the flat black render turned each stroke end into a hard saw-tooth. Change: under Increase Contrast the Pencil mark's edge is smoothed, so the stroke ends show as a soft scallop. `docs/mockups/png/m4-pencil-ic-smooth.png`. Accessibility and low vision has not measured this version. The owner also said the control does not read as a radio button to them. The human factors gate stays, because the reviewer's radio button finding was about the Watercolor ring.
 
 Owner, 16 November 2026: the smoothed Pencil marks read better and more like pencil. On Watercolor under Increase Contrast, the varied line weight of the ring keeps the control from reading as a radio button. The ring's thick start and thin end is therefore kept as a rule, not a detail. The human factors gate still runs before the build, with this view recorded beside it.
+
+## Step 6: the style picker. Rule written, drawn, in review
+
+Areas: adding a screen, layout, marks and type. It lives on the Appearance page that `docs/spec.md` already describes, in the "Style" row's place. Milestones 1 to 3 have one style, so nothing on `main` conflicts.
+
+The rule:
+- Three tiles, one per style, in the order Pen and ink, Pencil, Watercolor. Each tile is the full width of the page and they sit one under another at every text size. One layout serves the phone, the Mac and the largest text.
+- A tile is that style's own paper in the current appearance, with its grain. On it, from the left: the style's display font showing "Aa 0O 1l" at 28 points or more, then the done, part-done and paused marks at 24 points in the user's mark colour. The style's name sits under the sample in the system font.
+- Watercolor's sample is drawn at 1.15 times the size, as its habit names are.
+- The chosen tile has a 2 point border in the text colour and a checkmark at its top right. The others have a 1 point border in the rule colour. Selection is never shown by colour alone.
+- A tap chooses the style at once. Nothing is confirmed, because choosing again undoes it. The preview row at the top of the page redraws in the new style.
+- Each tile is one button of at least 76 points in height. VoiceOver says the name, then "style", then "selected" for the chosen one.
+- Under Increase Contrast the marks on the tiles are drawn as step 4 says.
+- No tile shows a scene. Scenes are parked.
+
+Drawing: `docs/mockups/png/m4-style-picker.png`, from `tools/marks/style_picker.py`. New York is not on this machine, so the Pen and ink sample is set in a stand-in serif.
