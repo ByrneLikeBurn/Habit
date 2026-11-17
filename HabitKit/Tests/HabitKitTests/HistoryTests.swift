@@ -591,6 +591,14 @@ struct NoSetDaysOrderingTests {
 
 @Suite("Symbols")
 struct SymbolCatalogTests {
+    /// People search by what a habit is for, as well as by what a symbol shows.
+    @Test func searchFindsIntentWords() {
+        for word in ["teeth", "meds", "medication", "therapy", "chores", "laundry", "sleep"] {
+            #expect(!SymbolCatalog.search(word).isEmpty, "\(word)")
+        }
+        #expect(SymbolCatalog.search("teeth").contains { $0.name == "hands.and.sparkles" })
+    }
+
     @Test func elevenGroupsOfTwelveWithNoRepeats() {
         let groups = SymbolCatalog.groups
         #expect(groups.count == 11)
@@ -679,17 +687,73 @@ struct NoSetDaysMarksAndRunsTests {
         #expect(habit.runSummary(today: today).longest == 2)
     }
 
-    /// Recorded behaviour, put to the behavioural scientist: choosing no set days today, after logging
-    /// today, makes today's log neutral, so Longest run falls by one until days are set again.
-    @Test func choosingNoSetDaysAfterLoggingTodayLowersLongestRunByOne() throws {
+    /// Settled by the behavioural scientist and the returning user: choosing no set days on a day already
+    /// logged applies from tomorrow, so Longest run never falls. Any other edit applies from today.
+    @Test func choosingNoSetDaysAfterLoggingTodayAppliesFromTomorrow() throws {
         let context = try makeContext()
         let habit = addHabit("Walk", schedule: .all, firstDay: today.adding(days: -20), in: context)
         for offset in -9 ... 0 { try log(.markDone, habit, day: today.adding(days: offset), context) }
+        #expect(habit.noSetDaysWaitsForTomorrow([], today: today))
+        #expect(habit.applyEdit(target: 1, schedule: [], today: today) == today.adding(days: 1))
+        #expect(habit.rule(on: today).schedule == .all)
+        #expect(habit.rule(on: today.adding(days: 1)).schedule.isEmpty)
+        #expect(habit.ruleForEditing(today: today).schedule.isEmpty)
         #expect(habit.runSummary(today: today).longest == 10)
-        habit.setRule(target: 1, schedule: [], from: today)
-        #expect(habit.runSummary(today: today).longest == 9)
-        habit.setRule(target: 1, schedule: .all, from: today)
+        #expect(habit.runSummary(today: today.adding(days: 1)).longest == 10)
+    }
+
+    @Test func choosingNoSetDaysWithNoLogTodayAppliesFromToday() throws {
+        let context = try makeContext()
+        let habit = addHabit("Walk", schedule: .all, firstDay: today.adding(days: -20), in: context)
+        try log(.markDone, habit, day: today.adding(days: -1), context)
+        #expect(!habit.noSetDaysWaitsForTomorrow([], today: today))
+        #expect(habit.applyEdit(target: 1, schedule: [], today: today) == today)
+        #expect(habit.state(on: today, today: today) == .noSetDays)
+    }
+
+    @Test func loweringTargetOnALoggedDayAppliesFromToday() throws {
+        let context = try makeContext()
+        let water = addHabit("Water", .counted, target: 8, schedule: .all, firstDay: today.adding(days: -5), in: context)
+        try log(.add(5), water, day: today, context)
+        #expect(water.applyEdit(target: 5, schedule: .all, today: today) == today)
+        #expect(water.state(on: today, today: today) == .done)
+        // A target change and no set days together: the target applies today, the days tomorrow.
+        #expect(water.applyEdit(target: 4, schedule: [], today: today) == today.adding(days: 1))
+        #expect(water.rule(on: today).target == 4)
+        #expect(water.rule(on: today).schedule == .all)
+    }
+
+    /// Several edits on one day never stack: back to every day removes the change waiting for tomorrow.
+    @Test func editsOnOneDayEndWithTheLastChoice() throws {
+        let context = try makeContext()
+        let habit = addHabit("Walk", schedule: .all, firstDay: today.adding(days: -20), in: context)
+        for offset in -9 ... 0 { try log(.markDone, habit, day: today.adding(days: offset), context) }
+        habit.applyEdit(target: 1, schedule: [], today: today)
+        habit.applyEdit(target: 1, schedule: .all, today: today)
+        #expect(habit.rule(on: today.adding(days: 1)).schedule == .all)
         #expect(habit.runSummary(today: today).longest == 10)
+        habit.applyEdit(target: 1, schedule: [], today: today)
+        #expect(habit.rule(on: today.adding(days: 1)).schedule.isEmpty)
+        #expect(habit.runSummary(today: today).longest == 10)
+    }
+
+    /// The returning user's guard: a paused log under no set days never lowers a run.
+    @Test func pausedLogUnderNoSetDaysNeverLowersLongest() throws {
+        let context = try makeContext()
+        let habit = addHabit("Walk", schedule: .all, firstDay: today.adding(days: -40), in: context)
+        for offset in -40 ... -31 { try log(.markDone, habit, day: today.adding(days: offset), context) }
+        habit.setRule(target: 1, schedule: [], from: today.adding(days: -30))
+        context.insert(Pause(habit: habit, start: today.adding(days: -5), end: today.adding(days: -5), reason: .manual))
+        try log(.markDone, habit, day: today.adding(days: -5), context)
+        #expect(habit.runSummary(today: today).longest >= 10)
+    }
+
+    /// A no-set-days habit is never owed, so before a log its row shows the target alone.
+    @Test func noSetDaysRowShowsTheTargetAloneBeforeALog() {
+        let en = Locale(identifier: "en_GB")
+        #expect(CountText.todayLine(total: 0, target: 20, unit: "minutes", noSetDays: true, locale: en) == "20 minutes")
+        #expect(CountText.todayLine(total: 10, target: 20, unit: "minutes", noSetDays: true, locale: en) == "10 of 20 minutes")
+        #expect(CountText.todayLine(total: 0, target: 20, unit: "minutes", noSetDays: false, locale: en) == "0 of 20 minutes")
     }
 
     @Test func aRuleChangeMidWeekKeepsEachSideItsOwnMark() throws {

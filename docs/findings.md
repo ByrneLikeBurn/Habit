@@ -21,6 +21,12 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 8 | Nudges make no reminder for a habit whose rule on that day has no set days. Test: the nudge schedule for a mask 0 habit is empty | Nudges skip `hasNoSetDays(on:)` days | Senior software engineer, QA, neurodiversity, 16 Nov. `Habit+Logic.swift` |
 | 13 | The system offers to save an export password that has no account or domain | The export screen does not mention saving | Security and privacy, 15 Nov |
 
+## For the owner
+
+| Question | Lenses | Recorded by |
+|---|---|---|
+| Under no set days, a paused day with a log extends a run (invariant 3), while a plain log is neutral. Two paused logs twenty days apart read as Longest run 2. The behavioural scientist and the neurodiversity expert recommend that a paused log under no set days be neutral, as an unpaused one is. Pausing would still never give less than not pausing. Invariant 3 would read: "A paused set day with a log extends it. Under no set days a pause changes nothing." The returning user accepts either, if a pause never lowers a run | Behavioural scientist, neurodiversity, returning user, 16 Nov | `pausedLogsApartUnderNoSetDaysChain`, `pausedLogUnderNoSetDaysNeverLowersLongest` |
+
 ## Gates passed
 
 | Milestone | Test | Result |
@@ -54,6 +60,8 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 3 | Tests for travel across a pause edge | `docs/spec.md`, Milestone 3 screens |
 | 13 | Habit detail for a no-set-days habit says nothing about why Current run is missing. A line such as "Runs count set days. This habit has none." waits for the wording lenses | Behavioural scientist, content designer, 16 Nov. `HabitDetailView.swift`, StatsBlock |
 | 13 | The marks board and the small keys have no "No set days" entry. The dot's entry reads "Not scheduled" | Accessibility, 16 Nov. `YouView.swift`, `CalendarParts.swift` |
+| 13 | No UI run covers the form opened after travel or a day-start change, where today's rule differs from the latest one. The kit covers `ruleForEditing` and `rule(on:)` | QA, 16 Nov. `HabitFormView.swift` init |
+| 13 | Package tests run on iOS only when run on the simulator (`xcodebuild test -scheme HabitKit`). Add that run to the definition-of-done walk | Senior software engineer, 16 Nov |
 | 4 | Pencil dark version and Pencil marks board | `docs/spec.md`, Pencil |
 | After MVP | Habit detail in two columns on the Mac, and a popover for a past day | `docs/spec.md`, Mac window |
 

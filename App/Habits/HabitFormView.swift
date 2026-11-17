@@ -38,7 +38,7 @@ struct HabitFormView: View {
     init(habit: Habit?, today: DayKey) {
         self.habit = habit
         // The form starts from the rule Today shows, not the latest stored values, which may begin later.
-        let rule = habit?.rule(on: today)
+        let rule = habit?.ruleForEditing(today: today)
         let startCounted = habit == nil && LaunchOptions.current.screen == .newCount
         let snapshot = Snapshot(
             name: habit?.name ?? (startCounted ? "Drink water" : ""),
@@ -204,7 +204,9 @@ struct HabitFormView: View {
             FieldLabel("Logging")
             if kindLocked {
                 Text(kind == .counted ? "Count" : "Mark done").font(style.label(.body))
-                hint(String(localized: "This cannot change once the habit has logs."))
+                hint(kind == .counted
+                     ? String(localized: "This is fixed once a habit has logs. To mark it done instead, add a new habit.")
+                     : String(localized: "This is fixed once a habit has logs. To count instead, add a new habit."))
             } else {
                 KindChooser(kind: $kind)
                 hint(kind == .counted
@@ -261,7 +263,11 @@ struct HabitFormView: View {
             DayButtons(selection: $schedule, calendar: calendar)
             hint(Self.summary(for: schedule, calendar: calendar))
             DayShortcuts(selection: $schedule, calendar: calendar)
-            if isEdit { hint(String(localized: "A change applies from today. Earlier days keep what they had.")) }
+            if let habit {
+                hint(habit.noSetDaysWaitsForTomorrow(schedule, today: settings.clock.today)
+                     ? String(localized: "Today is logged, so this applies from tomorrow.", comment: "Edit habit, under the days, when no set days is chosen on a day already logged. The change starts the next day.")
+                     : String(localized: "A change applies from today. Earlier days keep what they had."))
+            }
         }
     }
 
@@ -362,7 +368,7 @@ struct HabitFormView: View {
             if !kindLocked { habit.kind = kind }
             habit.unit = unit.trimmingCharacters(in: .whitespaces)
             habit.tapAmount = resolvedTap
-            habit.setRule(target: resolvedTarget, schedule: schedule, from: clock.today)
+            habit.applyEdit(target: resolvedTarget, schedule: schedule, today: clock.today)
         } else {
             let new = Habit(
                 name: draft.trimmedName,

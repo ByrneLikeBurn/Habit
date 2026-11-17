@@ -6,6 +6,13 @@ public enum CountText {
     public static let maximumAmount = 1_000_000
 
     /// The count line under a counted habit, for example "3 of 8 glasses" or "3 glasses".
+    /// Today's line on a row. A habit with no set days and nothing logged today is never owed, so it shows
+    /// its target alone ("20 minutes"), not "0 of 20 minutes". Once logged it reads like any other row.
+    public static func todayLine(total: Int, target: Int?, unit: String, noSetDays: Bool, locale: Locale = .autoupdatingCurrent) -> String {
+        if noSetDays, total == 0, let target { return line(total: target, target: nil, unit: unit, locale: locale) }
+        return line(total: total, target: target, unit: unit, locale: locale)
+    }
+
     public static func line(total: Int, target: Int?, unit: String, locale: Locale = .autoupdatingCurrent) -> String {
         let n = total.formatted(.number.locale(locale))
         let unit = unit.trimmingCharacters(in: .whitespaces)

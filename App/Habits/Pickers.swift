@@ -275,8 +275,13 @@ struct SymbolPickerSheet: View {
                 VStack(alignment: .leading, spacing: 16) {
                     chips
                     if !query.trimmingCharacters(in: .whitespaces).isEmpty {
-                        grid(SymbolCatalog.search(query))
-                        countLine
+                        let found = SymbolCatalog.search(query)
+                        if found.isEmpty {
+                            noMatch
+                        } else {
+                            grid(found)
+                            countLine
+                        }
                     } else if let group, let found = groups.first(where: { $0.key == group }) {
                         grid(found.symbols)
                         countLine
@@ -377,6 +382,29 @@ struct SymbolPickerSheet: View {
         .accessibilityLabel(Text(verbatim: title))
         .accessibilityValue(Text("\(position) of \(count)", comment: "VoiceOver: the chip's place in the row, for example 7 of 12"))
         .accessibilityAddTraits(on ? .isSelected : [])
+    }
+
+    /// A search with no match is not a dead end: None is offered beside the line.
+    private var noMatch: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("No symbols match. A habit works without one.")
+                .font(style.label(.subheadline))
+                .foregroundStyle(style.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Button { draft = "" } label: {
+                Text("None")
+                    .font(style.label(.subheadline))
+                    .foregroundStyle(style.text)
+                    .padding(.horizontal, 12)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .overlay {
+                        if draft.isEmpty { RoundedRectangle(cornerRadius: 10).strokeBorder(style.text, lineWidth: style.outlineWidth) }
+                    }
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(draft.isEmpty ? .isSelected : [])
+        }
     }
 
     private func grid(_ symbols: [SymbolCatalog.Symbol]) -> some View {

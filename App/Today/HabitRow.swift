@@ -149,7 +149,7 @@ struct HabitRow: View {
     }
 
     private var countLine: String {
-        CountText.line(total: shown, target: target, unit: habit.unit)
+        CountText.todayLine(total: shown, target: target, unit: habit.unit, noSetDays: state == .noSetDays)
     }
 
     // MARK: Control

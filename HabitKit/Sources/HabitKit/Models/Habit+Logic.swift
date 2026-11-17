@@ -27,11 +27,40 @@ extension Habit {
         let resolvedTarget = kind == .binary ? 1 : newTarget
         target = resolvedTarget
         scheduleMask = newSchedule.rawValue
+        // A rule dated later, such as one an earlier edit today set for tomorrow, gives way to this one.
+        rules.removeAll { $0.fromDay > day.rawValue }
         let current = rule(on: day)
         if current.target == resolvedTarget, current.scheduleMask == newSchedule.rawValue { return }
         rules.removeAll { $0.fromDay >= day.rawValue }
         rules.append(HabitRule(fromDay: day, target: resolvedTarget, schedule: newSchedule))
         rules.sort { $0.fromDay < $1.fromDay }
+    }
+
+    /// True when an edit to `schedule` would wait until tomorrow: today is logged, today has set days,
+    /// and the edit sets no set days. Applied today, it would take today's log out of a run, so Longest run
+    /// would fall. Any other edit, a target change included, applies from today.
+    public func noSetDaysWaitsForTomorrow(_ schedule: Weekdays, today: DayKey) -> Bool {
+        schedule.isEmpty && total(on: today) > 0 && !rule(on: today).schedule.isEmpty
+    }
+
+    /// The rule Edit habit opens on: one that starts tomorrow, if an edit is waiting, otherwise today's.
+    public func ruleForEditing(today: DayKey) -> HabitRule {
+        let tomorrow = today.adding(days: 1)
+        return rules.first { $0.fromDay == tomorrow.rawValue } ?? rule(on: today)
+    }
+
+    /// The form's Save. The target applies from today. The schedule applies from today, or from tomorrow
+    /// when `noSetDaysWaitsForTomorrow` holds. Returns the day the schedule takes effect.
+    @discardableResult
+    public func applyEdit(target newTarget: Int?, schedule newSchedule: Weekdays, today: DayKey) -> DayKey {
+        guard noSetDaysWaitsForTomorrow(newSchedule, today: today) else {
+            setRule(target: newTarget, schedule: newSchedule, from: today)
+            return today
+        }
+        let tomorrow = today.adding(days: 1)
+        setRule(target: newTarget, schedule: rule(on: today).schedule, from: today)
+        setRule(target: newTarget, schedule: newSchedule, from: tomorrow)
+        return tomorrow
     }
 
     /// The sum of every delta logged for `day`. May be negative after edits on two devices.
