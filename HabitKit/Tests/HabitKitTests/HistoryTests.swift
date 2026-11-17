@@ -468,3 +468,83 @@ struct HistoryReviewFixTests {
         }
     }
 }
+
+/// No set days: scheduleMask 0. A valid habit that is never scheduled.
+@Suite("No set days")
+@MainActor
+struct NoSetDaysTests {
+    @Test func theFormRuleAcceptsNoDaysAndRefusesAnEmptyName() {
+        #expect(HabitForm.problems(HabitDraft(name: "Read", kind: .binary, schedule: [])).isEmpty)
+        #expect(HabitForm.problems(HabitDraft(name: "  ", kind: .binary, schedule: .all)) == [.emptyName])
+        #expect(HabitForm.problems(HabitDraft(name: "", kind: .binary, schedule: [])) == [.emptyName])
+        #expect(HabitForm.problems(HabitDraft(name: "Water", kind: .counted, targetText: "0", tapText: "x")) == [.target, .tapAmount])
+        #expect(HabitForm.problems(HabitDraft(name: "Water", kind: .counted, targetText: "", tapText: "")).isEmpty)
+    }
+
+    @Test func statesForAHabitWithNoDays() throws {
+        let context = try makeContext()
+        let habit = addHabit("Read", schedule: [], firstDay: today.adding(days: -10), in: context)
+        #expect(habit.state(on: today.adding(days: -2), today: today) == .offSchedule)
+        #expect(habit.state(on: today, today: today) == .offSchedule)
+        #expect(habit.state(on: today.adding(days: 1), today: today) == .blank)
+        #expect(habit.state(on: today.adding(days: -11), today: today) == .blank)
+        try log(.markDone, habit, day: today.adding(days: -3), context)
+        #expect(habit.state(on: today.adding(days: -3), today: today) == .loggedOffSchedule)
+        let pause = Pause(habit: habit, start: today.adding(days: -5), end: today.adding(days: -4), reason: .manual)
+        context.insert(pause)
+        try log(.markDone, habit, day: today.adding(days: -4), context)
+        #expect(habit.state(on: today.adding(days: -4), today: today) == .loggedWhilePaused)
+    }
+
+    @Test func noDaysIsStoredAsZeroAndEditsApplyFromToday() throws {
+        let context = try makeContext()
+        let empty = addHabit("Read", schedule: [], in: context)
+        #expect(empty.scheduleMask == 0)
+        #expect(empty.rules.first?.scheduleMask == 0)
+
+        let habit = addHabit("Walk", schedule: .all, firstDay: today.adding(days: -30), in: context)
+        habit.setRule(target: 1, schedule: [], from: today)
+        #expect(habit.scheduleMask == 0)
+        #expect(habit.isScheduled(on: today.adding(days: -7)))
+        #expect(!habit.isScheduled(on: today))
+        habit.setRule(target: 1, schedule: [], from: today)
+        #expect(habit.rules.filter { $0.fromDay == today.rawValue }.count == 1)
+        #expect(habit.rules.count == 2)
+    }
+
+    private func file(schedule: Int) throws -> Data {
+        let context = try makeContext()
+        let habit = addHabit("Read", schedule: [], in: context)
+        try log(.markDone, habit, day: today.adding(days: -2), context)
+        try context.save()
+        var file = try ExportFile.make(from: context, appBuild: "1", now: now)
+        file.habits[0].schedule = schedule
+        file.habits[0].rules = file.habits[0].rules.map { var r = $0; r.schedule = schedule; return r }
+        return try file.encoded()
+    }
+
+    @Test func aFileWithNoDaysImportsExportsTheSameAndImportsOnce() throws {
+        let data = try file(schedule: 0)
+        let target = try makeContext()
+        let plan = try ImportPlan.make(from: data, in: target)
+        _ = try LogWriter.importEvents(plan, in: target)
+        let habit = try #require(try target.fetch(FetchDescriptor<Habit>()).first)
+        #expect(habit.scheduleMask == 0)
+        #expect(try ExportFile.make(from: target, appBuild: "1", now: now).encoded() == data)
+        let again = try ImportPlan.make(from: data, in: target)
+        #expect(again.isEmpty)
+        _ = try LogWriter.importEvents(again, in: target)
+        #expect(try target.fetchCount(FetchDescriptor<Habit>()) == 1)
+        #expect(try target.fetchCount(FetchDescriptor<LogEvent>()) == 1)
+    }
+
+    @Test func schedulesOutsideTheWeekAreRefusedWithNothingWritten() throws {
+        for bad in [128, -1] {
+            let data = try file(schedule: bad)
+            let target = try makeContext()
+            #expect(throws: ImportProblem.damaged) { _ = try ImportPlan.make(from: data, in: target) }
+            #expect(try target.fetchCount(FetchDescriptor<Habit>()) == 0)
+            #expect(try target.fetchCount(FetchDescriptor<LogEvent>()) == 0)
+        }
+    }
+}

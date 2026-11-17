@@ -65,7 +65,8 @@ extension HabitSchemaV1 {
         public var target: Int? = 1
         /// Shown as typed. Empty for none.
         public var unit: String = ""
-        /// The current schedule. Earlier days read `rules`.
+        /// The current schedule, one bit per weekday. Earlier days read `rules`.
+        /// 0 means no set days: a valid habit that is never scheduled, not a missing value.
         public var scheduleMask: Int = 127
         /// What one tap on Today adds. nil means a tap opens the count sheet.
         public var tapAmount: Int? = 1
