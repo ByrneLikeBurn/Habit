@@ -71,13 +71,14 @@ def clip_line(px, py, dx, dy, pts):
         else: t1 = min(t1, t)
     return (t0, t1) if t1 - t0 > 0.4 else None
 
-def pencil_strokes(shapes, n=11, cut=False):
+def pencil_strokes(shapes, n=11, cut=False, open_=False):
     """Parallel strokes at 56 degrees, each drawn by hand: a little bowed, uneven in length, ends 1 to 2 points past the shape.
 
     Returns (alpha, core). The core is the solid middle of every stroke, at least 1.5 points wide.
     """
     dx, dy, nx, ny = math.cos(TH), -math.sin(TH), math.sin(TH), math.cos(TH)
     pitch = SIZE * 1.04 / n; w = pitch + 0.25; core_w = max(1.5, w * 0.8)       # strokes overlap a little, so no gap opens between two of them, so done blurs to a solid; the eroded edges still show each stroke
+    if open_: w = pitch * 0.55; core_w = max(1.5, w * 0.8)                      # part done: paper shows between the strokes, so it reads as hatched and not as a solid wedge
     segs = []
     for k in range(n):
         o = (k - (n - 1) / 2) * pitch + (rng.random() - 0.5) * 0.12; px, py = nx * o, ny * o
@@ -101,7 +102,7 @@ def hand_line(x0, y0, x1, y1, w=1.5):
 
 def pencil(state):
     if state == "done": return pencil_strokes([SQUARE])
-    if state == "part": return pencil_strokes([LOWER])
+    if state == "part": return pencil_strokes([LOWER], n=6, open_=True)
     if state == "diamond": return pencil_strokes([[(0, -H), (H, 0), (-H, 0)], [(H, 0), (0, H), (-H, 0)]], cut=True)
     if state == "paused":
         a = math.radians(-10); L = SIZE * 0.34; m = mask(lambda d: stamp(d, bowed(-L * math.cos(a), -L * math.sin(a), L * math.cos(a), L * math.sin(a), 0.25), taper(2.6, 0.6, 0.1))); return m, m
