@@ -20,6 +20,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 3 | The widget follows the no-set-days rule: a no-set-days habit shows on the widget every day, its mark is the dot until logged, and a log is done or part done. Test: a widget timeline entry for a mask 0 habit with no log holds `.noSetDays` | Build the widget from `Habit.state(on:today:)` and `Ordering.today`, not its own schedule check | Senior software engineer, QA, 16 Nov. `Ordering.swift`, `DayState.swift` |
 | 8 | Nudges make no reminder for a habit whose rule on that day has no set days. Test: the nudge schedule for a mask 0 habit is empty | Nudges skip `hasNoSetDays(on:)` days | Senior software engineer, QA, neurodiversity, 16 Nov. `Habit+Logic.swift` |
 | 13 | New habit, Edit habit and the symbol picker in Arabic and Hebrew, and in a double-length pseudo-locale: right-to-left order of the symbol row and More, the day buttons, and chips at 40% longer text | Fix the layout found. Day labels already fall back where letters repeat (`dayButtonTextsDifferInEveryLocale`) | Content designer, 16 Nov. `Pickers.swift`, `HabitFormView.swift` |
+| 13 | The day list in German and Finnish at AX5: no weekday name ("Donnerstag", "keskiviikko") breaks inside the word | Apply `.minimumScaleFactor` with one shared scale for all seven names | Typographer, 16 Nov. `Pickers.swift`, DayButtons list |
 | 13 | The system offers to save an export password that has no account or domain | The export screen does not mention saving | Security and privacy, 15 Nov |
 
 ## For the owner

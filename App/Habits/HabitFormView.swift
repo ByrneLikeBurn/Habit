@@ -343,6 +343,15 @@ struct HabitFormView: View {
         .foregroundStyle(style.text, style.secondary, style.tertiary)
         .paperBackground(style)
         .navigationTitle("Unit and log amount")
+        #if os(iOS)
+        // A pushed page does not show the form's keyboard Done, so it has its own.
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") { tapFocused = false }
+            }
+        }
+        #endif
     }
 
     private var unitFields: some View {
