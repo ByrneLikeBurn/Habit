@@ -181,22 +181,25 @@ private struct HabitDetailPage: View {
 
     /// "8 glasses a day. Every day except Thursday."
     /// Today's rule, which may differ from the latest stored values when a change waits for tomorrow.
+    /// Each case is one whole sentence, so every language places its own punctuation.
     private func ruleSentence(clock: HabitClock) -> String {
-        let today = habit.rule(on: clock.today)
-        let schedule = WeekdayText.sentence(for: today.schedule, calendar: clock.calendar)
-        var sentence: String
-        if habit.kind == .counted, let target = today.target {
+        let rule = habit.rule(on: clock.today)
+        let schedule = WeekdayText.sentence(for: rule.schedule, calendar: clock.calendar)
+        let sentence: String
+        if habit.kind == .counted, let target = rule.target {
             let amount = CountText.line(total: target, target: nil, unit: habit.unit)
-            sentence = String(localized: "\(amount) a day. \(schedule).", comment: "Habit detail subtitle. The daily target with its unit, then the schedule, for example: 8 glasses a day. Every day except Thursday.")
+            if rule.schedule.isEmpty {
+                sentence = String(localized: "Target \(amount). \(schedule).", comment: "Habit detail subtitle for a habit with no set days. The target with its unit, then \"No set days\". Not a daily quota. For example: Target 20 minutes. No set days.")
+            } else {
+                sentence = String(localized: "\(amount) a day. \(schedule).", comment: "Habit detail subtitle. The daily target with its unit, then the schedule, for example: 8 glasses a day. Every day except Thursday.")
+            }
         } else {
-            sentence = schedule + "."
+            sentence = String(localized: "\(schedule).", comment: "Habit detail subtitle: the schedule as a sentence, for example: Every day except Thursday.")
         }
         let waiting = habit.ruleForEditing(today: clock.today)
-        if waiting.fromDay != today.fromDay, waiting.scheduleMask != today.scheduleMask {
-            let next = WeekdayText.sentence(for: waiting.schedule, calendar: clock.calendar)
-            sentence += " " + String(localized: "From tomorrow: \(next).", comment: "Habit detail subtitle, after the schedule, when an edit starts tomorrow. For example: From tomorrow: No set days.")
-        }
-        return sentence
+        guard waiting.fromDay != rule.fromDay, waiting.scheduleMask != rule.scheduleMask else { return sentence }
+        let next = WeekdayText.sentence(for: waiting.schedule, calendar: clock.calendar)
+        return String(localized: "\(sentence) From tomorrow: \(next).", comment: "Habit detail subtitle when an edit starts tomorrow. The first part is today's sentence, ending in its own full stop. Then the schedule from tomorrow, for example: From tomorrow: No set days.")
     }
 }
 

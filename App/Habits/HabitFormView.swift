@@ -257,8 +257,8 @@ struct HabitFormView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            #endif
             if let tapProblem { hint(tapProblem) }
+            #endif
             FieldRule()
         }
     }
