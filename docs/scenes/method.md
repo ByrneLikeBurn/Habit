@@ -55,3 +55,11 @@ Cause: the study let every edge wander and drew a line round each backrun. A tru
 Known faults: two dark blots among the ferns, and the ferns are faint at card size. Not blind tested or reviewed.
 
 Stop rule agreed with myself and put to the owner: if this does not read as both redwoods and paint to the owner, computed scenes are parked until after user testing of milestones 1 to 3.
+
+## Owner on the third experiment, 16 November 2026
+
+"It's a little better but the densities are off and the ferns look like sea urchins."
+
+Tried and reverted the same evening: ferns as low mounds of a few broad arching fronds, and one even step of value from far trunks to near. The mounds read as mushroom caps or helmets, and the near trunks lost their dark. The change was a test and it failed, so the code and the picture are back to the third experiment.
+
+Open: what "the densities are off" refers to. Asked of the owner. Idea not yet tried for the ferns: no fronds at all, only loose soft masses of undergrowth along the floor, as in the owner's first reference painting.
