@@ -59,3 +59,5 @@ Repainted after that, to the illustrator's round one notes on A and C:
 Blind naming test on the repainted cards: A "Mountain range, misty foothills", sure 5, told by the snow-lit ridge. C "Mountain lake", sure 5, told by the mirrored peaks. The reader called them two different kinds of place. Nothing was read as an object, a building or an animal. The reader called A's valley mist "weather of a kind". The Lake has the same mist and is approved, so this is recorded and not changed.
 
 Not yet done: the illustrator has not seen the repainted A and C. `mountains-massif-tarn.jpg` shows both in all five palettes.
+
+**Approved by the owner, 16 November 2026:** the repainted A, Massif, and C, Tarn. "I find these delightful. I can't tell there's snow but I'm ok with it." The snow is recorded as not reading as snow. It stays as light on the summits.
