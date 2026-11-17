@@ -589,6 +589,24 @@ struct NoSetDaysOrderingTests {
     }
 }
 
+@Suite("Plus and dot")
+struct PlusAndDotTests {
+    /// A counted habit with no set days shows a dot under its plus. They stay 1.5 points apart and inside
+    /// the mark, at Today's sizes, with and without Increase Contrast.
+    @Test(arguments: [(28.0, 1.5), (28.0, 2.0), (44.0, 1.5), (44.0, 2.0)])
+    func theDotClearsThePlus(size: Double, lineWidth: Double) {
+        let size = CGFloat(size), lineWidth = CGFloat(lineWidth)
+        let offsets = MarkView.plusAndDot(size: size, lineWidth: lineWidth)
+        let dot = SmallMark.dotSize(cell: size)
+        let plusBottom = offsets.plus + (size * 0.28 + lineWidth) / 2
+        let dotTop = offsets.dot - dot / 2
+        #expect(dotTop - plusBottom >= 1.5 - 0.001)
+        let inner = size - size * 0.32
+        #expect(offsets.dot + dot / 2 <= inner / 2)
+        #expect(offsets.plus - (size * 0.28 + lineWidth) / 2 >= -inner / 2)
+    }
+}
+
 @Suite("Symbols")
 struct SymbolCatalogTests {
     /// People search by what a habit is for, as well as by what a symbol shows.
@@ -599,12 +617,18 @@ struct SymbolCatalogTests {
         #expect(SymbolCatalog.search("teeth").contains { $0.name == "hands.and.sparkles" })
     }
 
-    @Test func elevenGroupsOfTwelveWithNoRepeats() {
+    /// Eleven groups, no symbol twice, no label twice, and none of the symbols cut for reading badly
+    /// at row size or for meaning a streak.
+    @Test func elevenGroupsWithNoRepeats() {
         let groups = SymbolCatalog.groups
         #expect(groups.count == 11)
-        #expect(groups.allSatisfy { $0.symbols.count == 12 })
+        #expect(groups.allSatisfy { !$0.symbols.isEmpty && $0.symbols.count <= 12 })
         let names = SymbolCatalog.symbols.map(\.name)
-        #expect(Set(names).count == 132)
+        #expect(Set(names).count == names.count)
+        let labels = SymbolCatalog.symbols.map(\.label)
+        #expect(Set(labels).count == labels.count)
+        #expect(!names.contains("flame"))
+        #expect(!names.contains("guitars"))
         #expect(SymbolCatalog.firstRow.allSatisfy { names.contains($0) })
         #expect(groups.map(\.title) == groups.map(\.title).sorted { $0.localizedStandardCompare($1) == .orderedAscending })
     }
@@ -623,7 +647,7 @@ struct SymbolCatalogTests {
     @Test func searchMatchesLabelsAndGroups() {
         #expect(SymbolCatalog.search("dice").map(\.name) == ["dice"])
         #expect(SymbolCatalog.search("Play").count == 12)
-        #expect(SymbolCatalog.search("").count == 132)
+        #expect(SymbolCatalog.search("").count == SymbolCatalog.symbols.count)
     }
 }
 

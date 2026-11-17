@@ -71,7 +71,9 @@ final class TodayUITests: XCTestCase {
         XCTAssertFalse(add.isEnabled)
         XCTAssertTrue(app.staticTexts["Add a name to continue."].exists)
         sleep(1)
-        app.typeText("Floss")
+        // Return finishes the name, as the keyboard's Done key says, and adds no second line.
+        app.typeText("Floss\n")
+        XCTAssertFalse(app.keyboards.firstMatch.waitForExistence(timeout: 1))
         XCTAssertTrue(add.isEnabled)
         add.tap()
         XCTAssertTrue(control("Floss").waitForExistence(timeout: 2))

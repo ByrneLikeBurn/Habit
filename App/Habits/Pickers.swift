@@ -161,8 +161,10 @@ struct DayShortcuts: View {
         shortcut("Set no days", matches: selection.isEmpty) { selection = [] }
     }
 
+    /// A shortcut that already matches stays in tertiary text, which keeps the floor. It is not disabled,
+    /// because a disabled control dims a second time, below every floor. A tap on it changes nothing.
     private func shortcut(_ title: LocalizedStringKey, matches: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button { if !matches { action() } } label: {
             Text(title)
                 .underline(!matches)
                 .font(style.label(.subheadline, weight: .medium))
@@ -171,7 +173,7 @@ struct DayShortcuts: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .disabled(matches)
+        .accessibilityValue(matches ? Text("Already set") : Text(verbatim: ""))
     }
 }
 

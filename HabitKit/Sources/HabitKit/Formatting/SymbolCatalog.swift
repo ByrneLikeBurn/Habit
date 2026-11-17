@@ -1,6 +1,7 @@
 import Foundation
 
-/// The symbols a habit can use, from Apple's own set. Eleven groups of twelve, each symbol in one group.
+/// The symbols a habit can use, from Apple's own set. Eleven groups, each symbol in one group. A group holds
+/// only symbols that read clearly at row size and differ from each other; none is padded to a count.
 /// No group ranks above another: the picker lists them in alphabetical order in the user's language.
 public enum SymbolCatalog {
     public struct Symbol: Identifiable, Sendable, Hashable {
@@ -82,12 +83,12 @@ public enum SymbolCatalog {
         g("making", "Making", [
             s("pencil", "Pencil", "write, journal, draw"), s("paintbrush", "Paintbrush"), s("paintpalette", "Palette"), s("scissors", "Scissors"),
             s("hammer", "Hammer"), s("ruler", "Ruler"), s("camera", "Camera"), s("film", "Film"),
-            s("pianokeys", "Piano"), s("guitars", "Guitar"), s("music.note", "Music"), s("mic", "Microphone"),
+            s("pianokeys", "Piano"), s("music.note", "Music"), s("mic", "Microphone"),
         ]),
         g("mind", "Mind", [
             s("brain", "Brain"), s("brain.head.profile", "Thinking"), s("figure.mind.and.body", "Meditation", "mindfulness, calm, breathe"), s("sunrise", "Sunrise"),
-            s("flame", "Candle"), s("sparkles", "Sparkles"), s("wind", "Breathing"), s("face.smiling", "Smile"),
-            s("heart.text.square", "Gratitude", "journal, thanks"), s("quote.bubble", "Quote"), s("lightbulb.max", "Idea"), s("eye", "Noticing"),
+            s("sparkles", "Sparkles"), s("wind", "Breathing"), s("face.smiling", "Smile"),
+            s("heart.text.square", "Gratitude", "journal, thanks"), s("eye", "Noticing"),
         ]),
         g("movement", "Movement", [
             s("figure.walk", "Walking", "walk, steps, exercise"), s("figure.run", "Running"), s("figure.roll", "Wheelchair"), s("bicycle", "Cycling"),
@@ -97,12 +98,12 @@ public enum SymbolCatalog {
         g("outdoors", "Outdoors", [
             s("leaf", "Leaf"), s("tree", "Tree"), s("sun.max", "Sun"), s("cloud.sun", "Sky"),
             s("mountain.2", "Mountains"), s("figure.hiking", "Hiking"), s("binoculars", "Binoculars"), s("camera.macro", "Flower"),
-            s("bird", "Bird"), s("water.waves", "Water"), s("sailboat", "Boat"), s("map", "Map"),
+            s("bird", "Bird"), s("water.waves", "Waves"), s("sailboat", "Boat"), s("map", "Map"),
         ]),
         g("people", "People", [
-            s("person.2", "Two people"), s("person.3", "Group"), s("figure.2.and.child.holdinghands", "Family"), s("figure.2.arms.open", "Hug"),
+            s("person.2", "Two people"), s("figure.2.and.child.holdinghands", "Family"), s("figure.2.arms.open", "Hug"),
             s("hand.wave", "Wave"), s("phone", "Phone call", "call, family, friend"), s("envelope", "Letter"), s("bubble.left.and.bubble.right", "Conversation"),
-            s("gift", "Gift"), s("pawprint", "Paw"), s("dog", "Dog"), s("cat", "Cat"),
+            s("gift", "Gift"), s("dog", "Dog"), s("cat", "Cat"),
         ]),
         g("play", "Play", [
             s("gamecontroller", "Game controller"), s("dice", "Dice"), s("suit.spade", "Playing cards"), s("puzzlepiece", "Puzzle"),
@@ -112,7 +113,7 @@ public enum SymbolCatalog {
         g("rest", "Rest", [
             s("moon", "Moon"), s("moon.stars", "Night"), s("bed.double", "Bed", "sleep, bedtime"), s("zzz", "Sleep"),
             s("powersleep", "Nap"), s("alarm", "Alarm"), s("hourglass", "Hourglass"), s("beach.umbrella", "Beach"),
-            s("bathtub", "Bath"), s("iphone.slash", "Phone away", "screen time, social media, offline"), s("sun.horizon", "Sunset"), s("cloud.moon", "Evening"),
+            s("bathtub", "Bath"), s("iphone.slash", "Phone away", "screen time, social media, offline"),
         ]),
         g("work", "Work and study", [
             s("book", "Book", "read, reading"), s("books.vertical", "Books"), s("graduationcap", "Study"), s("character.book.closed", "Language", "learn, vocabulary"),

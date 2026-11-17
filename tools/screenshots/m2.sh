@@ -3,7 +3,10 @@
 # (Saturday 14 November 2026, 09:41, London), animations off, fixed status bar.
 # Usage: tools/screenshots/m2.sh [only-name-prefix]   (run from the repo root)
 set -e
-DEVICE_NAME="iPhone 17 Pro"
+# Another device may be named for its own shots, but only into its own folder, so the iPhone shots
+# are never overwritten: DEVICE_NAME="iPad Air 11-inch (M4)" OUT=/some/folder tools/screenshots/m2.sh
+if [[ -n "${DEVICE_NAME:-}" && -z "${OUT:-}" ]]; then echo "Set OUT when DEVICE_NAME is set"; exit 1; fi
+DEVICE_NAME=${DEVICE_NAME:-"iPhone 17 Pro"}
 RUNTIME="iOS 26.5"   # the screenshots in the repo were taken on this runtime
 OUT=${OUT:-docs/screenshots/m2}
 ONLY=${1:-}

@@ -31,18 +31,25 @@ struct LaunchOptions: Sendable {
         return .frozen(at: instant, timeZone: TimeZone(identifier: "Europe/London")!)
     }
 
+    /// Read only in debug builds, and a screen only with a fixture store, so no launch argument can open
+    /// a form on the user's own habits or change their data.
     nonisolated static let current: LaunchOptions = {
+        #if DEBUG
         let arguments = ProcessInfo.processInfo.arguments
         func value(_ flag: String) -> String? {
             guard let index = arguments.firstIndex(of: flag), index + 1 < arguments.count else { return nil }
             return arguments[index + 1]
         }
+        let fixture = value("-fixture").flatMap(Fixture.init(rawValue:))
         return LaunchOptions(
-            fixture: value("-fixture").flatMap(Fixture.init(rawValue:)),
-            screen: value("-screen").flatMap(Screen.init(rawValue:)),
+            fixture: fixture,
+            screen: fixture == nil ? nil : value("-screen").flatMap(Screen.init(rawValue:)),
             appearance: value("-appearance").flatMap(AppearanceChoice.init(rawValue:)),
             showRuns: arguments.contains("-showRuns"),
             showDaysNotLogged: arguments.contains("-showDaysNotLogged")
         )
+        #else
+        return LaunchOptions()
+        #endif
     }()
 }

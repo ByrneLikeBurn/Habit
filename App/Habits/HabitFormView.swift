@@ -145,12 +145,11 @@ struct HabitFormView: View {
             #if os(iOS)
             // The number pad has no return key, so Done above the keyboard puts it away.
             .toolbar {
+                // Only the number pad lacks a return key, so Done shows for Target alone.
                 ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button("Done") {
-                        nameFocused = false
-                        targetFocused = false
-                        tapFocused = false
+                    if targetFocused {
+                        Spacer()
+                        Button("Done") { targetFocused = false }
                     }
                 }
             }
@@ -198,6 +197,12 @@ struct HabitFormView: View {
                     .submitLabel(.done)
                     // The same length import accepts, so a habit made here always exports and imports.
                     .onChange(of: name) { _, value in
+                        // The field wraps but a name is one line: Return finishes it, as the Done key says.
+                        if value.contains(where: \.isNewline) {
+                            name = value.filter { !$0.isNewline }
+                            nameFocused = false
+                            return
+                        }
                         if value.count > ImportLimits.maxTextLength { name = String(value.prefix(ImportLimits.maxTextLength)) }
                     }
                     .accessibilityHint(Text("For example, stretch after brushing teeth"))
@@ -291,7 +296,8 @@ struct HabitFormView: View {
             DayButtons(selection: $schedule, calendar: calendar)
             hint(Self.summary(for: schedule, calendar: calendar))
             DayShortcuts(selection: $schedule, calendar: calendar)
-            if let habit {
+            // Said once the days or the target change, not before.
+            if let habit, schedule != original.schedule || targetText != original.targetText {
                 hint(habit.noSetDaysWaitsForTomorrow(schedule, today: settings.clock.today)
                      ? String(localized: "Today is logged, so this applies from tomorrow.", comment: "Edit habit, under the days, when no set days is chosen on a day already logged. The change starts the next day.")
                      : String(localized: "A change applies from today. Earlier days keep what they had."))
@@ -314,11 +320,15 @@ struct HabitFormView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .confirmationDialog("Archive with your changes?", isPresented: $confirmArchive, titleVisibility: .visible) {
+            .confirmationDialog(
+                canSave ? String(localized: "Archive with your changes?") : String(localized: "Archive without your changes?", comment: "Edit habit, Archive with unsaved changes that cannot be saved, such as an empty name"),
+                isPresented: $confirmArchive,
+                titleVisibility: .visible
+            ) {
                 if canSave {
                     Button("Save changes and archive") { applyChanges(); archive(habit) }
                 }
-                Button("Archive without changes") { archive(habit) }
+                Button("Archive without changes", role: .destructive) { archive(habit) }
                 Button("Keep editing", role: .cancel) {}
             }
             hint(String(localized: "You can bring it back at any time. Its history is kept."))
@@ -347,8 +357,10 @@ struct HabitFormView: View {
         // A pushed page does not show the form's keyboard Done, so it has its own.
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button("Done") { tapFocused = false }
+                if tapFocused {
+                    Spacer()
+                    Button("Done") { tapFocused = false }
+                }
             }
         }
         #endif

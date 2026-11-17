@@ -21,13 +21,20 @@ public struct MarkView: View {
 
     private var inset: CGFloat { size * 0.16 }
     private var inner: CGFloat { size - inset * 2 }
-    /// The dot's centre below the plus: half the plus, its round cap, a 1.5-point gap, then half the dot.
-    /// Capped so the dot stays inside the mark.
-    private var dotOffsetUnderPlus: CGFloat {
+    /// The gap between a plus and the dot under it.
+    public static let plusDotGap: CGFloat = 1.5
+
+    /// With a dot under a plus, the two are centred as one group: the plus moves up and the dot down,
+    /// with `plusDotGap` between the plus's round cap and the dot. Offsets are from the mark's centre.
+    public static func plusAndDot(size: CGFloat, lineWidth: CGFloat) -> (plus: CGFloat, dot: CGFloat) {
         let dot = SmallMark.dotSize(cell: size)
-        let wanted = size * 0.14 + style.markLineWidth / 2 + 1.5 + dot / 2
-        return min(wanted, inner / 2 - dot / 2)
+        let plus = size * 0.28 + lineWidth
+        let total = plus + plusDotGap + dot
+        return (plus: -total / 2 + plus / 2, dot: total / 2 - dot / 2)
     }
+
+    private var dotUnderPlus: Bool { showsPlus && (state == .noSetDays || state == .offSchedule) }
+    private var group: (plus: CGFloat, dot: CGFloat) { Self.plusAndDot(size: size, lineWidth: style.markLineWidth) }
 
     public var body: some View {
         ZStack {
@@ -49,6 +56,7 @@ public struct MarkView: View {
                         .stroke(style.text, style: StrokeStyle(lineWidth: style.markLineWidth, lineCap: .round))
                 }
                 .frame(width: size * 0.28, height: size * 0.28)
+                .offset(y: dotUnderPlus ? group.plus : 0)
             }
         }
         .frame(width: size, height: size)
@@ -76,7 +84,7 @@ public struct MarkView: View {
             // A small dot, so a day the habit is not set for never reads as a gap.
             // Under a plus it sits low, so the plus never covers it.
             Circle().fill(style.tertiary).frame(width: SmallMark.dotSize(cell: size), height: SmallMark.dotSize(cell: size))
-                .offset(y: showsPlus ? dotOffsetUnderPlus : 0)
+                .offset(y: dotUnderPlus ? group.dot : 0)
         case .blank:
             // A future day shows its date alone.
             Color.clear
