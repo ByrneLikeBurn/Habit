@@ -27,3 +27,17 @@ The earth ramps in the experiment are not in `docs/tokens.json`. They are brown,
 ## Status
 
 Not decided. This is a rule later work builds on and it changes a locked decision, so it goes to the illustrator, senior designer, colour vision and performance lenses, and then to the owner. No further scene is painted until it is settled. Scenes are milestone 5 and do not hold up milestones 1 to 3.
+
+## Owner, later on 16 November 2026
+
+"The two pigments is confusing. The issue is not the pigments but the lack of the distinguishing features of a water color. What you created was a passable drawing, but not a water color. How close can we get to replicating those distinctive features?"
+
+The two-pigment idea is dropped. The second layer and the second ramp are not needed.
+
+## Second experiment: the marks of watercolour, one pigment
+
+`tools/scenes/wc.py`, picture `docs/scenes/watercolour-marks.jpg`. A loose study of conifer trunks in the current one-layer format, so it needs no change to the locked decision. It tries eight marks: wet into wet, the dried edge, pooling, backruns, granulation, glazing, dry brush, and shapes made of a few loose strokes.
+
+What the earlier scenes did that reads as drawing: every shape had the same crisp, toothed edge; every wash was filled evenly; an even fine stipple covered everything; shapes were built from many small exact strokes.
+
+Known faults in this study: the fringe of each backrun is a thin even line and reads as drawn; the trunks wobble too much; the ferns read as agave. It has not had a blind test or a review.
