@@ -17,6 +17,8 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 3 | The widget's mark sizes are added to the diamond cut test (`everyFullSizeMarkIsAboveTheCutThreshold`), so no widget mark sits near the 12 point jump | Size the widget mark clear of 12 points | Colour vision and low vision, 16 Nov. `SmallMark.diamondCut` |
 | 7 | The Watch's mark sizes are added to the same test | Size the Watch mark clear of 12 points | Colour vision and low vision, 16 Nov |
 | 3 | On a device with VoiceOver, "Not scheduled today" reads "Not scheduled today, 1 habit, button, collapsed", and "expanded" once open. XCUITest finds the button and its disclosure triangle but cannot read the open state | Add `.accessibilityValue` with "Collapsed" or "Expanded" and check it is not read twice | Accessibility (PR #7 review), 16 Nov. `TodayView.swift`, `testTheNotScheduledGroupReadsItsCountAndOpens` |
+| 3 | The widget follows the no-set-days rule: a no-set-days habit shows on the widget every day, its mark is the dot until logged, and a log is done or part done. Test: a widget timeline entry for a mask 0 habit with no log holds `.noSetDays` | Build the widget from `Habit.state(on:today:)` and `Ordering.today`, not its own schedule check | Senior software engineer, QA, 16 Nov. `Ordering.swift`, `DayState.swift` |
+| 8 | Nudges make no reminder for a habit whose rule on that day has no set days. Test: the nudge schedule for a mask 0 habit is empty | Nudges skip `hasNoSetDays(on:)` days | Senior software engineer, QA, neurodiversity, 16 Nov. `Habit+Logic.swift` |
 | 13 | The system offers to save an export password that has no account or domain | The export screen does not mention saving | Security and privacy, 15 Nov |
 
 ## Gates passed
@@ -50,6 +52,8 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 13 | A file picker that fails to open a file shows nothing | UI and UX designer, 15 Nov. `ImportExport.swift`, `ImportPresenter` |
 | 3 | "Pause for dates" can be reached from Habit detail, where a returning user looks at a gap | Neurodiversity, 15 Nov |
 | 3 | Tests for travel across a pause edge | `docs/spec.md`, Milestone 3 screens |
+| 13 | Habit detail for a no-set-days habit says nothing about why Current run is missing. A line such as "Runs count set days. This habit has none." waits for the wording lenses | Behavioural scientist, content designer, 16 Nov. `HabitDetailView.swift`, StatsBlock |
+| 13 | The marks board and the small keys have no "No set days" entry. The dot's entry reads "Not scheduled" | Accessibility, 16 Nov. `YouView.swift`, `CalendarParts.swift` |
 | 4 | Pencil dark version and Pencil marks board | `docs/spec.md`, Pencil |
 | After MVP | Habit detail in two columns on the Mac, and a popover for a past day | `docs/spec.md`, Mac window |
 

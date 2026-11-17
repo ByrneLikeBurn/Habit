@@ -66,6 +66,27 @@ done
 for screen in history historyMonth detailWeek detailMonth detailYear; do
   shot "notlogged-$screen-paper" light large disabled -fixture today -screen $screen -showDaysNotLogged
 done
+# A habit with no set days ("Practise guitar"), in Today, History month and Habit detail.
+for appearance in light dark; do
+  tag=$([ $appearance = light ] && echo paper || echo ink)
+  shot "nodays-today-$tag"         $appearance large disabled -fixture no-days
+  shot "nodays-history-month-$tag" $appearance large disabled -fixture no-days -screen historyMonth
+  shot "nodays-detail-year-$tag"   $appearance large disabled -fixture no-days -screen detailYear
+  shot "nodays-detail-week-$tag"   $appearance large disabled -fixture no-days -screen detailRuns -showRuns
+  shot "ax5-nodays-today-$tag"     $appearance accessibility-extra-extra-extra-large disabled -fixture no-days
+done
+# New habit and Edit habit, at the standard size, the largest size and with Increase Contrast.
+for appearance in light dark; do
+  tag=$([ $appearance = light ] && echo paper || echo ink)
+  shot "form-new-$tag"       $appearance large disabled -fixture today -screen new
+  shot "form-new-count-$tag" $appearance large disabled -fixture today -screen newCount
+  shot "form-edit-$tag"      $appearance large disabled -fixture today -screen edit
+  shot "form-symbols-$tag"   $appearance large disabled -fixture today -screen symbols
+  shot "ax5-form-new-$tag"   $appearance accessibility-extra-extra-extra-large disabled -fixture today -screen new
+  shot "ax5-form-edit-$tag"  $appearance accessibility-extra-extra-extra-large disabled -fixture today -screen edit
+  shot "ax5-form-days-$tag"  $appearance accessibility-extra-extra-extra-large disabled -fixture today -screen editDays
+  shot "contrast-form-edit-$tag" $appearance large enabled -fixture today -screen edit
+done
 shot "contrast-history-paper" light large enabled -fixture today -screen history
 shot "contrast-detail-month-ink" dark large enabled -fixture today -screen detailMonth
 

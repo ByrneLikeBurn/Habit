@@ -12,6 +12,7 @@ struct HabitFormView: View {
     @Environment(\.style) private var style
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    @Environment(\.dynamicTypeSize) private var typeSize
     @Query private var habits: [Habit]
 
     @State private var name: String
@@ -88,6 +89,7 @@ struct HabitFormView: View {
 
     var body: some View {
         NavigationStack {
+          ScrollViewReader { reader in
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     #if os(macOS)
@@ -98,7 +100,7 @@ struct HabitFormView: View {
                     nameSection
                     symbolSection
                     loggingSection
-                    daysSection
+                    daysSection.id("days")
                     if let habit { archiveSection(habit) }
                 }
                 .padding(.horizontal, 24)
@@ -107,6 +109,11 @@ struct HabitFormView: View {
                 .frame(maxWidth: .infinity)
             }
             .scrollDismissesKeyboard(.interactively)
+            .onAppear {
+                // The editDays screenshot opens the form at Repeats on.
+                if LaunchOptions.current.screen == .editDays { reader.scrollTo("days", anchor: .top) }
+            }
+          }
             .foregroundStyle(style.text, style.secondary, style.tertiary)
             .paperBackground(style)
             .navigationTitle(title)
@@ -135,7 +142,7 @@ struct HabitFormView: View {
                 if !tapEdited { tapText = CountText.defaultTapAmount(forTarget: target)?.formatted() ?? "" }
             }
             .task {
-                guard !isEdit else { return }
+                guard !isEdit, LaunchOptions.current.screen != .symbols else { return }
                 // Focus after the sheet has settled; earlier focus is dropped.
                 try? await Task.sleep(for: .milliseconds(350))
                 nameFocused = true
@@ -153,23 +160,31 @@ struct HabitFormView: View {
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             FieldLabel("Name")
-            TextField(
-                String(localized: "Name"),
-                text: $name,
-                prompt: Text("For example, stretch after brushing teeth").foregroundStyle(style.tertiary),
-                axis: .vertical
-            )
-            .lineLimit(1...4)
-            .textFieldStyle(.plain)
-            .font(style.display(.body))
-            .focused($nameFocused)
-            .submitLabel(.done)
-            // The same length import accepts, so a habit made here always exports and imports.
-            .onChange(of: name) { _, value in
-                if value.count > ImportLimits.maxTextLength { name = String(value.prefix(ImportLimits.maxTextLength)) }
+            // A prompt is cut to one line, so the example is drawn under the empty field, where it wraps.
+            // Both sit in one stack, so the field is as tall as the example.
+            ZStack(alignment: .topLeading) {
+                if name.isEmpty {
+                    Text("For example, stretch after brushing teeth")
+                        .font(style.display(.body))
+                        .foregroundStyle(style.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityHidden(true)
+                }
+                TextField(String(localized: "Name"), text: $name, prompt: Text(verbatim: ""), axis: .vertical)
+                    .lineLimit(1...4)
+                    .textFieldStyle(.plain)
+                    .font(style.display(.body))
+                    .focused($nameFocused)
+                    .submitLabel(.done)
+                    // The same length import accepts, so a habit made here always exports and imports.
+                    .onChange(of: name) { _, value in
+                        if value.count > ImportLimits.maxTextLength { name = String(value.prefix(ImportLimits.maxTextLength)) }
+                    }
+                    .accessibilityHint(Text("For example, stretch after brushing teeth"))
+                    .accessibilityIdentifier("habit-name")
             }
-            .frame(minHeight: 44)
-            .accessibilityIdentifier("habit-name")
+            .frame(minHeight: 44, alignment: .leading)
             FieldRule()
             if let nameProblem, !isEdit || hasChanges { hint(nameProblem) }
         }
@@ -178,7 +193,7 @@ struct HabitFormView: View {
     private var symbolSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             FieldLabel("Symbol")
-            SymbolRow(selection: $symbol)
+            SymbolRow(selection: $symbol, willChoose: { nameFocused = false })
         }
     }
 
@@ -200,14 +215,18 @@ struct HabitFormView: View {
 
     private var countFields: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
+            // At accessibility sizes the label sits above the field, so neither is split.
+            let targetLayout = typeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
+                : AnyLayout(HStackLayout())
+            targetLayout {
                 Text("Target each day").font(style.label(.body))
-                Spacer(minLength: 12)
+                if !typeSize.isAccessibilitySize { Spacer(minLength: 12) }
                 TextField(String(localized: "Target each day"), text: $targetText, prompt: Text("None").foregroundStyle(style.tertiary))
                     .textFieldStyle(.plain)
                     .font(style.count(.body))
-                    .multilineTextAlignment(.trailing)
-                    .frame(maxWidth: 90)
+                    .multilineTextAlignment(typeSize.isAccessibilitySize ? .leading : .trailing)
+                    .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : 90)
                     #if os(iOS)
                     .keyboardType(.numberPad)
                     #endif

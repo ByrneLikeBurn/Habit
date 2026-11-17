@@ -3,7 +3,7 @@ import HabitKit
 
 /// Launch arguments for deterministic screenshots: a fixture store, a frozen clock, a screen to open.
 ///
-/// `-fixture today|empty|none-today|long` `-screen new|newCount|count|edit|you|appearance|archived|marks|notScheduled`
+/// `-fixture today|empty|none-today|long` `-screen new|newCount|symbols|count|edit|editDays|you|appearance|archived|marks|notScheduled`
 /// `-appearance paper|ink`
 struct LaunchOptions: Sendable {
     enum Fixture: String, Sendable {
@@ -11,7 +11,7 @@ struct LaunchOptions: Sendable {
     }
 
     enum Screen: String, Sendable {
-        case new, newCount, count, edit, you, appearance, archived, marks, notScheduled, undo, undoLong, undoLongPast, undoCount
+        case new, newCount, symbols, count, edit, editDays, you, appearance, archived, marks, notScheduled, undo, undoLong, undoLongPast, undoCount
         case history, historyMonth, detailWeek, detailMonth, detailYear, detailEmpty, detailRuns
         case day, dayCount, dayOff, dayDone, export, importPreview, importDone, importNothing, importNotHabit, importNewer, contrast
     }

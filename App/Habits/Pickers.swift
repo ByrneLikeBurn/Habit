@@ -49,8 +49,38 @@ struct DayButtons: View {
     @Binding var selection: Weekdays
     let calendar: Calendar
     @Environment(\.style) private var style
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
+        // Two letters do not fit a 44-point circle at accessibility sizes, so the days become a list of
+        // full names, each with a checkmark when chosen, as Logging does.
+        if typeSize.isAccessibilitySize { list } else { circles }
+    }
+
+    private var list: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(WeekdayText.labels(calendar: calendar)) { label in
+                let on = selection.contains(weekday: label.weekday)
+                Button {
+                    selection.formSymmetricDifference(Weekdays(weekday: label.weekday))
+                } label: {
+                    HStack {
+                        Text(label.full).font(style.label(.body, weight: on ? .semibold : .regular))
+                        Spacer(minLength: 8)
+                        Image(systemName: "checkmark").opacity(on ? 1 : 0).accessibilityHidden(true)
+                    }
+                    .foregroundStyle(on ? style.text : style.secondary)
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityValue(on ? Text("Selected") : Text("Not selected"))
+                .accessibilityIdentifier("day-\(label.weekday)")
+            }
+        }
+    }
+
+    private var circles: some View {
         HStack(spacing: 4) {
             ForEach(WeekdayText.labels(calendar: calendar)) { label in
                 let on = selection.contains(weekday: label.weekday)
@@ -68,7 +98,6 @@ struct DayButtons: View {
                             .lineLimit(1)
                     }
                     .foregroundStyle(on ? style.text : style.secondary)
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                     .frame(maxWidth: 44, minHeight: 44)
                     .aspectRatio(1, contentMode: .fit)
                     .background {
@@ -144,7 +173,11 @@ struct DayShortcuts: View {
 /// The form's one row: None, five symbols and "More…". A symbol chosen from More takes the fifth slot.
 struct SymbolRow: View {
     @Binding var selection: String
-    @State private var choosing = false
+    /// Called before the picker opens, so the form can put its keyboard away.
+    var willChoose: () -> Void = {}
+    @Environment(\.dynamicTypeSize) private var typeSize
+    // The symbols screenshot opens the picker at once.
+    @State private var choosing = LaunchOptions.current.screen == .symbols
     @Environment(\.style) private var style
 
     private var shown: [String] {
@@ -154,9 +187,13 @@ struct SymbolRow: View {
     }
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 0) { cells }
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 52), spacing: 4)], alignment: .leading, spacing: 4) { cells }
+        Group {
+            // At accessibility sizes the row wraps, so nothing runs off the screen.
+            if typeSize.isAccessibilitySize {
+                FlowLayout(spacing: 12, lineSpacing: 8) { cells }
+            } else {
+                HStack(spacing: 0) { cells }
+            }
         }
         .sheet(isPresented: $choosing) {
             SymbolPickerSheet(selection: $selection)
@@ -174,7 +211,7 @@ struct SymbolRow: View {
                 Image(systemName: name).font(style.label(.body)).frame(minWidth: 28)
             }
         }
-        Button { choosing = true } label: {
+        Button { willChoose(); choosing = true } label: {
             Text("More…")
                 .underline()
                 .lineLimit(1)
@@ -201,7 +238,7 @@ struct SymbolRow: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: typeSize.isAccessibilitySize ? nil : .infinity)
         .accessibilityLabel(label)
         .accessibilityAddTraits(on ? .isSelected : [])
     }
