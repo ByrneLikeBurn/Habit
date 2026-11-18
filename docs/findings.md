@@ -49,6 +49,9 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 13 | No screen was checked on a phone smaller than 393 by 852 points | `sheet-ax.png` |
 | 3 | The marks board has no Paused or "Logged while paused" row, while the small keys name both. When pausing is built, the board gains the Paused row. The diamond row reads "Logged on a paused day or a day off" since 16 Nov | Senior designer, 16 Nov. `YouView.swift`, MarksBoardView. Seen in `marks-paper.jpg` |
 | 3 | On the Mac, History shows its title twice, in the toolbar and as the heading | Owner, signed Mac run, 16 Nov. `HistoryView.swift` |
+| 3 | In New habit and Edit habit, the Target and Unit fields show "None" as placeholder text, which reads like a value already set. For the content designer, neurodiversity expert and tired daily user lenses | Owner, Mac test, 17 Nov. `HabitFormView.swift`, Target and Unit fields |
+| 3 | On the Mac, the New habit sheet shows its title twice, in the bar and as the heading. Same issue as the History title above | Owner, Mac test, 17 Nov. `HabitFormView.swift`, title |
+| 3 | The import result "Nothing new in this file" sits in a sheet that is mostly empty space. For the UI and UX designer and Apple industrial designer lenses | Owner, Mac test, 17 Nov. `ImportExport.swift`, import result sheet |
 | 3 | The Undo line for a counted habit on a past day names no habit at standard sizes ("7 November: 4 of 8 glasses"). At accessibility sizes its date could be short, to save a line. Check: `ax5-undo-long-past-paper.jpg` shows four rows, not five | QA and UI and UX, 16 Nov. `AppModel.swift`, `ax5-undo-long-past-paper.jpg` |
 | 3 | The Mac View menu lacks Week, Month, Year, Back, Previous and Next Period, and Go to Today | Apple industrial designer, 15 Nov. `App/HabitApp.swift` |
 | 3 | On the Mac, Export a Copy opens a sheet and then the save panel. The Mac way is the save panel at once, with the warning in it | Apple industrial designer, 15 Nov. `ImportExport.swift`, ExportSheet |
@@ -68,7 +71,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 13 | Package tests run on iOS only when run on the simulator (`xcodebuild test -scheme HabitKit`). Add that run to the definition-of-done walk | Senior software engineer, 16 Nov |
 | 13 | At accessibility sizes a Today row's control sits on its own line below the name and count, where it can read as part of the next row. This came before the form work | First-day user, 16 Nov. `ax5-nodays-today-paper.jpg` |
 | 13 | `.disabled` on controls drawn in a style colour dims them a second time, below the text floor. Check DaySheet.swift:149 and :155 and CalendarParts.swift:121 and :127, as the day shortcuts were fixed | Colour vision and low vision, 16 Nov |
-| Next stop | Mac form, for the owner's test after the merge gate: the title shown twice, the segmented Logging control's width, a focus ring on plain fields and day buttons, `.searchable` and the title in the symbol picker sheet | Apple industrial designer, 16 Nov. `HabitFormView.swift`, `Pickers.swift` |
+| Next stop | Mac form, for the owner's test after the merge gate: the segmented Logging control's width, a focus ring on plain fields and day buttons, `.searchable` and the title in the symbol picker sheet | Apple industrial designer, 16 Nov. `HabitFormView.swift`, `Pickers.swift` |
 | 4 | Pencil dark version and Pencil marks board | `docs/spec.md`, Pencil |
 | After MVP | Habit detail in two columns on the Mac, and a popover for a past day | `docs/spec.md`, Mac window |
 
