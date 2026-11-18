@@ -8,10 +8,13 @@ public enum Ordering {
         }
     }
 
-    /// Splits Today: habits set for today, then the ones that are not.
+    /// Splits Today: habits for today, then the ones set for other days.
+    /// A habit with no set days belongs to every day, so it stays in the first list in the user's order.
+    /// Every surface that shows today's habits takes the split from here.
     public static func today(_ habits: [Habit], day: DayKey) -> (scheduled: [Habit], notScheduled: [Habit]) {
         let ordered = sorted(habits)
-        return (ordered.filter { $0.isScheduled(on: day) }, ordered.filter { !$0.isScheduled(on: day) })
+        func forToday(_ habit: Habit) -> Bool { habit.isScheduled(on: day) || habit.hasNoSetDays(on: day) }
+        return (ordered.filter(forToday), ordered.filter { !forToday($0) })
     }
 
     /// Moves `source` rows to `destination` within `subset` and rewrites sort indexes for all active habits.

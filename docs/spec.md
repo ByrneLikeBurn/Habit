@@ -12,7 +12,7 @@ This file records decisions. Items marked **Guess** were made where the brief is
 
 ## Status
 
-Phase 2. Milestone 1, the core loop in Pen and ink, is on `feat/core-loop`. The owner approved Lake variant A. No other scene is started. Phase 1 review findings are in `docs/reviews/phase-1.md`.
+Phase 2. Milestone 1, the core loop in Pen and ink, is merged. Milestone 2, History, Habit detail, export and import, is on `feat/history`. The owner approved Lake variant A. No other scene is started. Phase 1 review findings are in `docs/reviews/phase-1.md`.
 
 ## Creative direction
 
@@ -105,12 +105,11 @@ One drawing has one meaning.
 | Extra credit | Diamond, as large as a done mark | The day is paused and has a log |
 | Dot | A small dot | The habit is not scheduled that day |
 | Blank | Nothing | The day has no log |
-| To come | Dashed outline, faint | The day is in the future and scheduled |
 | Not logged | Empty outline | A past scheduled day with no log, and only when Show days not logged is on |
 
 **Today** is an outline in the text colour around the day's mark. On the Today screen every control has it, so the control is visible in every state, including paused. A today with nothing logged is the outline alone.
 
-**Days not logged. Owner.** By default a past day with no log draws nothing, and Habit detail shows Days done, Longest run and Extra credit. One switch in You, "Show days not logged", turns on the empty outline for those days and adds Current run to Habit detail. This replaces the brief's default of drawing a missed day as an empty outline.
+**Days not logged. Owner, changed by the reviews on 15 November 2026.** By default a past day with no log draws nothing, and Habit detail shows Days logged and, for a counted habit, its total. One switch in You, "Show days not logged", turns on the empty outline for those days and shows the "Since" date. "Show runs" adds Days done, Current run and Longest run (changed on 15 November 2026, see `docs/decisions.md`). This replaces the brief's default of drawing a missed day as an empty outline.
 
 **Year view. Owner.** Cells are too small to hatch. Each state is a small shape: a full square for done, a half square cut on the diagonal for part done, a short bar for paused, a diamond for extra credit, nothing otherwise. Today has an outline. In Watercolor the square is a disc and the half square is a half disc. This replaces the brief's four opacity steps, which carried state by intensity.
 
@@ -118,7 +117,7 @@ One drawing has one meaning.
 
 **Month view.** Each day shows its date under the mark. An off-schedule day shows the date alone.
 
-**VoiceOver.** A day is read as date then state, for example "Tuesday 10 November. Done." State names: Done, Part done, Paused, Extra credit, To come. A day with no log and an off-schedule day are read as the date alone. "Not logged" is spoken only when Show days not logged is on. Today is read as "Today" before the date. The heat map groups by week with a summary. The scene card is one element, read as scene then palette name, for example "Lake, blue hour".
+**VoiceOver.** A day is read as date then state, for example "Tuesday 10 November. Done." State names: Done, Part done, Paused, Logged while paused. A day with no log and an off-schedule day are read as the date alone. "Not logged" is spoken only when Show days not logged is on. Today is read as "Today" before the date. The heat map groups by week with a summary. The scene card is one element, read as scene then palette name, for example "Lake, blue hour".
 
 **Where the key lives.** Habit detail has a key. You has a row, "What the marks mean", that opens the marks board.
 
@@ -171,7 +170,7 @@ One drawing has one meaning.
 
 **First run.** Today shows the scene card, one line of text and one button, "Add a habit".
 
-**Shared store.** Widgets, App Intents and the Watch app need the SwiftData store in an App Group container. An `.entitlements` file is allowed for the App Group only (**Owner**). The owner has a free Apple account. Before milestone 1, a throwaway project checks that an App Group works with free signing.
+**Shared store.** Widgets, App Intents and the Watch app need the SwiftData store in an App Group container. An `.entitlements` file is allowed for the App Group, and on the Mac for files the user picks in a save or open panel (**Owner**, 15 November 2026). The owner has a free Apple account. Before milestone 1, a throwaway project checks that an App Group works with free signing.
 
 **Shared-store test.** Run on 15 November 2026 with Xcode 27.2. Free signing gave both the app and a widget extension a profile with the App Group. On an iPhone, a value written by the app in shared UserDefaults, a file and a SwiftData store was read by the widget. It works. The profiles expire after 7 days. SwiftData logs errors if `Library/Application Support` does not exist in the group container, so the app creates that folder before it opens the store.
 
@@ -302,7 +301,7 @@ The day key is an `Int`, yyyymmdd, computed in the user's calendar with a settab
 
 The behavioural scientist, neurodiversity and returning-user lenses reviewed `docs/mockups/png/sheet-m1.png`. The owner defers to the reviews on design, so these are adopted. All four items that were owed are now drawn.
 
-**Reaching Edit and Archive.** A tap on a habit's name logs. A swipe left on a row shows Edit and Archive. Touch and hold on the name opens a menu with Edit, Archive and Move. VoiceOver offers the same three as actions on the row. The owner decided this on 15 November 2026. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows until the next action. The menu is drawn in `sheet-m1.png`.
+**Reaching Edit and Archive.** A tap on a habit's name logs. A swipe left on a row shows Details, Edit and Archive. Touch and hold on the name opens a menu with Details, Edit, Move and Archive, in that order. VoiceOver offers the same four as actions on the row, with Move up and Move down. The owner decided this on 15 November 2026. The Archived list in You has "Bring back" from milestone 1. After Archive, one line with Undo shows until the next action. The menu is drawn in `sheet-m1.png`.
 
 **Order.** Manual reorder is in milestone 1, using the system list edit mode and VoiceOver move actions. Done rows stay where they are, so a row never moves under a thumb.
 
@@ -316,7 +315,7 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 
 **Day boundary.** Between midnight and the day-start hour, Today shows "Until 04:00" under the date. The day-start setting has the caption "Logs before this time count for the day before."
 
-**Stats.** Habit detail leads with Days done, with its start date, and for a counted habit a total in the user's unit. Longest run and Current run are behind one switch, "Show runs". "Show days not logged" is a separate switch. A run row is never hidden at zero.
+**Stats.** Habit detail leads with Days logged, and for a counted habit a total in the user's unit. Days done comes with Show runs and the start date with Show days not logged. Longest run and Current run are behind one switch, "Show runs". "Show days not logged" is a separate switch. Current run is never hidden. Longest run shows once it is 1 day or more. It is always quiet and comes last.
 
 **Pausing one habit.** Milestone 3 adds "Pause this habit" to the Edit form and the row menu, open-ended, with Resume in the same place. Gentle Mode is reachable from Today as well as from You. The Vacation form says the start can be in the past.
 
@@ -335,7 +334,7 @@ The behavioural scientist, neurodiversity and returning-user lenses reviewed `do
 
 ## Milestone 2 screens
 
-Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Redrawn on 15 November to the rules below. Still owed: History in month and year, History with no habits and with 30, the largest text size, and the Mac and Watch versions.
+Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Redrawn on 15 November to the rules below. Built in milestone 2 and captured in `docs/screenshots/m2/`. The Watch is milestone 7.
 
 - Habit detail in month, week and year views. A future day shows its date alone. The year starts in the month the habit was added and labels its months.
 - Stats: Days done, Days logged, and a total in the user's unit, with the start date. Current run and Longest run appear only when "Show runs" is on.
@@ -349,7 +348,7 @@ Drawn in `docs/mockups/png/sheet-m2.png`, in Pen and ink. Redrawn on 15 November
 
 Accessibility, UI and UX, and a combined behavioural and returning-user review looked at `sheet-m2.png`. These are adopted. The drawings do not show them all yet.
 
-**Stats.** Order is Days logged, then the unit total, then Days done. A counted habit with no target shows the first two only. There is never a rate, a percentage or "of N days". The same stats mean the same thing in week, month and year: all time, under the label "Since 28 April 2026". The week view adds one line for the week's total, and only when the week has a log. A week with no log shows no zeros.
+**Stats.** Order is Days logged, then the unit total. With Show runs on, Current run, Longest run and Days done follow. The "Since" date shows only with Show days not logged on (changed by the neurodiversity and behavioural reviews, see `docs/decisions.md`). There is never a rate, a percentage or "of N days". The same stats mean the same thing in week, month and year: all time. The week view adds one line for the week's total, and only when the week has a log. A week with no log shows no zeros.
 
 **Place.** Habit detail keeps one anchor date per visit. Switching between week, month and year opens the period that holds it. The period title is a button that returns to the current period. Opened from History, detail shows the same range and period, and Back reads "History".
 
@@ -451,7 +450,7 @@ Drawn in `m2-hist-month.png`, `m2-hist-many.png` and `m2-hist-empty.png`. The pr
 
 **Many habits.** The list scrolls in Today's order. The control, the period title and the weekday or date header stay pinned. There is no totals row, no search and no filter. The hint sits once, after the last row. An archived habit is off the list. It appears under a plain "Archived" heading at the end only in a period where it has a log (**Guess**).
 
-**After the low-vision and tired-user check.** The month strip stays. Its dash is thicker and as wide as the cell, the diamond fills the cell, and the dot is 4 points. The same shapes are used in the year view. Month shows the year view's key under the hint, because part done is a triangle here and hatching in Week. Days to come draw nothing in Week and in Month. An archived row has no today outline, because it cannot be logged. Not drawn: Month with many rows.
+**After the low-vision and tired-user check.** The month strip stays. Its dash is thicker and as wide as the cell, the diamond fills the cell, and the dot is 4 points. The same shapes are used in the year view. Month shows the year view's key above the rows, because part done is a triangle here and hatching in Week, and the change of shape needs its key in view. The diamond's entry reads "Logged while paused or on a day off", because both states draw it. The key adds "Not logged" when Show days not logged is on, and "Today". Days to come draw nothing in Week and in Month. An archived row has no today outline, because it cannot be logged. Not drawn: Month with many rows.
 
 **The product owner's test, run on 15 November.** The product owner had said to cut Month if the strip cannot be read in Pencil or Watercolor. The strip was drawn in all three styles, light and dark, in `sheet-hist-month.png`, and measured. Marks are 4.1:1 to 4.4:1 and the dot is 4.9:1 to 5.4:1 in all six. Pen and ink and Pencil keep all five states apart. Watercolor was weakest: its part-done shape was a low half-round that sat beside the paused dash. It is now a half-disc split top to bottom, at full mark height, here and in the year view. Verdict: Month stays, because it is the only screen that shows every habit across a month. Conditions for milestone 4: check the strip at the largest text size and with a blur test in all three styles. If either fails, Month moves to milestone 13 and History becomes Week only, with no control. Measured again against the worst grain pixel in an empty band of each frame: marks are 3.96:1 or better and the dot is 4.85:1 or better in all six, against a floor of 3:1. These are drawings at twice size with 256 colours, so the build measures again on a simulator. The low-vision reviewer measured the new Watercolor part-done shape: 4.24:1 on paper and 4.37:1 on ink, and it stays apart from done and from the dash under a blur test. Its nearest neighbour under heavy blur is the 4 point dot, told apart mainly by blue against grey. The dash is now the width of the square, so a dash, a diamond and a dash in a row do not join.
 
@@ -463,7 +462,7 @@ Drawn in `docs/mockups/png/sheet-ax.png`. The accessibility and low-vision revie
 
 - Week, Month and Year become one row, "View: Month", that opens a list. The whole row is the target.
 - Month is a list of weeks at accessibility sizes, each with its counts in words. The grid stays up to the largest standard size. The two reviews disagreed on keeping the grid and both accepted this.
-- Week is a list of all seven days: mark, date and the day's count in words. The mark sits in a column of fixed width. A day to come shows the dashed outline.
+- Week is a list of all seven days: mark, date and the day's count in words. The mark sits in a column of fixed width. A day to come shows no mark.
 - Year is a list of months as text.
 - Marks, symbols and arrows are sized from the text style. The dot for a day not scheduled is at least 8 points.
 - Stats stack the label over the value.
@@ -505,6 +504,7 @@ Each needs the owner. The recommendation is mine.
 | 3 | The usage data page | Build it in milestone 13 from the existing log fields | Milestone 13 |
 | 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
 | 5 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
+| 6 | Keep the span a habit was archived, so Bring back can treat it as a pause and not break a run. This needs a new optional field or model, so it is a schema change | Offer to pause the span on Bring back in milestone 3 first, with no schema change, and decide this only if that is not enough | Milestone 3 |
 
 Decided on 14 November 2026 and now written into this file and `CLAUDE.md`: whole-number deltas and typed numbers, the `.entitlements` file for the App Group, the milestone order, export in milestone 2, three review lenses per milestone, red allowed as a user's accent, and three more lenses (UI and UX, human factors, senior designer).
 

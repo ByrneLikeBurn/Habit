@@ -56,6 +56,17 @@ public enum WeekdayText {
         }
     }
 
+    /// The text inside each day button, by Gregorian weekday (index 0 is Sunday). Two letters of the short
+    /// name where all seven differ, as drawn. Where they repeat, as in Arabic and Hebrew, the very short
+    /// names, and where those repeat too, the short names in full.
+    public static func buttonTexts(calendar: Calendar) -> [String] {
+        let twoLetters = calendar.shortStandaloneWeekdaySymbols.map { String($0.prefix(2)) }
+        if Set(twoLetters).count == 7 { return twoLetters }
+        let veryShort = calendar.veryShortStandaloneWeekdaySymbols
+        if Set(veryShort).count == 7 { return veryShort }
+        return calendar.shortStandaloneWeekdaySymbols
+    }
+
     /// A sentence that restates a schedule, for example "Every day except Thursday".
     public static func sentence(for days: Weekdays, calendar: Calendar) -> String {
         let labels = labels(calendar: calendar)
@@ -66,7 +77,7 @@ public enum WeekdayText {
         case 7:
             return String(localized: "Every day", bundle: .module)
         case 0:
-            return String(localized: "No days chosen", bundle: .module)
+            return String(localized: "No set days", bundle: .module, comment: "Habit detail. The habit has no set days and can be logged on any day.")
         case 4...6:
             let list = missing.formatted(.list(type: .and).locale(locale))
             return String(localized: "Every day except \(list)", bundle: .module, comment: "The list names the days the habit is not set for")

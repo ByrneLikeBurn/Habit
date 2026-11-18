@@ -6,6 +6,7 @@ struct HabitRow: View {
     struct Actions {
         var log: (LogAction) -> Void
         var openCount: () -> Void
+        var details: () -> Void
         var edit: () -> Void
         var archive: () -> Void
         var move: () -> Void
@@ -67,13 +68,13 @@ struct HabitRow: View {
 
     // MARK: Name
 
-    /// A tap on the name or symbol logs, the same as the control. Edit, Archive and Move are in the
+    /// A tap on the name or symbol logs, the same as the control. Details, Edit, Move and Archive are in the
     /// row's menu and its swipe actions. For VoiceOver the name and the control both log and both carry the menu.
     private var nameButton: some View {
         Button { actions.log(.tap) } label: {
             if typeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 8) {
-                    symbol
+                    if !habit.symbolName.isEmpty { symbol }
                     name
                 }
             } else {
@@ -94,7 +95,7 @@ struct HabitRow: View {
     }
 
     private var symbol: some View {
-        Image(systemName: habit.symbolName)
+        HabitSymbolImage(name: habit.symbolName)
             .font(style.label(.body))
             .foregroundStyle(style.text)
             .accessibilityHidden(true)
@@ -112,9 +113,10 @@ struct HabitRow: View {
 
     @ViewBuilder
     private var menu: some View {
+        Button("Details", systemImage: "calendar", action: actions.details)
         Button("Edit", systemImage: "pencil", action: actions.edit)
-        Button("Archive", systemImage: "archivebox", action: actions.archive)
         Button("Move", systemImage: "arrow.up.arrow.down", action: actions.move)
+        Button("Archive", systemImage: "archivebox", action: actions.archive)
     }
 
     @ViewBuilder
@@ -147,7 +149,7 @@ struct HabitRow: View {
     }
 
     private var countLine: String {
-        CountText.line(total: shown, target: target, unit: habit.unit)
+        CountText.todayLine(total: shown, target: target, unit: habit.unit, noSetDays: state == .noSetDays)
     }
 
     // MARK: Control
@@ -187,6 +189,7 @@ struct HabitRow: View {
         case .partDone: parts.append(String(localized: "Part done"))
         case .loggedOffSchedule: parts.append(String(localized: "Logged on a day off"))
         case .loggedWhilePaused: parts.append(String(localized: "Logged while paused"))
+        case .noSetDays: parts.append(String(localized: "No set days"))
         default: break
         }
         return parts.joined(separator: ", ")

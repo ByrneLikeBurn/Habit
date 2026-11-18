@@ -3,7 +3,7 @@ import Foundation
 /// Runs and day counts for one habit.
 ///
 /// Invariant 3: pausing only ever helps. A paused day with no log never breaks a run and
-/// never extends it. A paused day with a log extends it.
+/// never extends it. A paused set day with a log extends it. Under no set days a pause changes nothing.
 /// Something is better than nothing: any logged day extends a run, a part-done day included.
 public struct RunSummary: Sendable, Equatable {
     public var current: Int
@@ -30,8 +30,15 @@ public enum Runs {
     }
 
     public static func effect(of input: DayInput) -> Effect {
-        if input.total > 0 { return .extend }
-        if input.paused || !input.scheduled { return .neutral }
+        if input.total > 0 {
+            // No set days: a run is measured against set days, so a log there neither extends nor breaks,
+            // paused or not (invariant 3). Logs months apart never read as a run. Its logs still count in
+            // days logged and days done.
+            if input.noSetDays { return .neutral }
+            // Invariant 3: a paused set day with a log extends a run.
+            return .extend
+        }
+        if input.paused || !input.scheduled || input.noSetDays { return .neutral }
         // Today is not over, so an empty today never breaks a run.
         if input.relation != .past { return .neutral }
         return .break
@@ -81,7 +88,8 @@ extension Habit {
                 target: rule.target,
                 scheduled: rule.schedule.contains(day),
                 paused: isPaused(on: day, sharedPauses: sharedPauses),
-                relation: day < today ? .past : .today
+                relation: day < today ? .past : .today,
+                noSetDays: rule.schedule.isEmpty
             )
         }
         return Runs.summarise(days)

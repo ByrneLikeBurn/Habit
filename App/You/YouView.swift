@@ -3,7 +3,10 @@ import SwiftData
 import HabitKit
 
 struct YouView: View {
+    /// On the Mac this is the Settings window. Export and Import are in the File menu there.
+    var isMacSettings = false
     @Environment(Settings.self) private var settings
+    @Environment(AppModel.self) private var model
     @Environment(\.style) private var style
     @Query private var habits: [Habit]
     @State private var path: [Page] = LaunchOptions.current.screen.flatMap(Page.init(screen:)).map { [$0] } ?? []
@@ -27,12 +30,14 @@ struct YouView: View {
 
         NavigationStack(path: $path) {
             List {
-                Text("You")
-                    .font(style.display(.largeTitle, weight: .semibold))
-                    .foregroundStyle(style.text, style.secondary, style.tertiary)
-                    .accessibilityAddTraits(.isHeader)
-                    .listRowBackground(style.paper)
-                    .listRowSeparator(.hidden)
+                if !isMacSettings {
+                    Text("You")
+                        .font(style.display(.largeTitle, weight: .semibold))
+                        .foregroundStyle(style.text, style.secondary, style.tertiary)
+                        .accessibilityAddTraits(.isHeader)
+                        .listRowBackground(style.paper)
+                        .listRowSeparator(.hidden)
+                }
 
                 Section("Look") {
                     NavigationLink(value: Page.appearance) {
@@ -40,7 +45,28 @@ struct YouView: View {
                     }
                 }
                 Section {
-                    Toggle("Controls on the left", isOn: $settings.controlsLeading)
+                    SettingSwitch(title: "Show runs", isOn: $settings.showRuns)
+                    SettingSwitch(title: "Show days not logged", isOn: $settings.showDaysNotLogged)
+                } header: {
+                    Text("History")
+                } footer: {
+                    Text("Show runs adds runs and days done to each habit. A run counts the days in a row with any log, even a small one. Days off don't break it. Show days not logged adds an empty outline to past days and the date each habit began.")
+                }
+                if !isMacSettings {
+                    Section {
+                        Button("Export a copy") { model.showExport = true }
+                        Button("Import a copy") { model.choosingImportFile = true }
+                    } header: {
+                        Text("Your data")
+                    } footer: {
+                        Text("Your data lives on this device only.")
+                    }
+                }
+                Section {
+                    if !isMacSettings {
+                        // Thumb reach has no meaning on the Mac.
+                        Toggle("Controls on the left", isOn: $settings.controlsLeading)
+                    }
                     NavigationLink(value: Page.dayStart) {
                         LabeledContent("Day starts at", value: DayStartView.label(settings.dayStartHour, clock: settings.clock))
                     }
@@ -68,6 +94,28 @@ struct YouView: View {
                 case .marks: MarksBoardView()
                 case .archived: ArchivedView()
                 }
+            }
+        }
+    }
+
+    /// The system switch. At accessibility sizes it sits on its own line with "On" or "Off" in words.
+    private struct SettingSwitch: View {
+        let title: LocalizedStringKey
+        @Binding var isOn: Bool
+        @Environment(\.dynamicTypeSize) private var typeSize
+
+        var body: some View {
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                    HStack {
+                        Toggle(title, isOn: $isOn).labelsHidden()
+                        Text(isOn ? "On" : "Off").accessibilityHidden(true)
+                    }
+                }
+                .accessibilityElement(children: .combine)
+            } else {
+                Toggle(title, isOn: $isOn)
             }
         }
     }
@@ -141,7 +189,7 @@ struct ArchivedView: View {
             }
             ForEach(archived) { habit in
                 HStack(spacing: 12) {
-                    Image(systemName: habit.symbolName).accessibilityHidden(true)
+                    HabitSymbolImage(name: habit.symbolName)
                     Text(habit.name).font(style.display(.body))
                     Spacer()
                     Button("Bring back") {
@@ -161,7 +209,7 @@ struct ArchivedView: View {
     }
 }
 
-/// The marks board. Only marks that milestone 1 can draw are listed.
+/// The marks board. Only marks the app can draw so far are listed. Pausing comes in milestone 3.
 struct MarksBoardView: View {
     @Environment(\.style) private var style
 
@@ -170,7 +218,8 @@ struct MarksBoardView: View {
             (.done, true, false, "Done", "The target was met, or a yes-or-no habit was logged."),
             (.partDone, true, true, "Part done", "Some logged, under the target. It still counts."),
             (.blank, true, true, "Adds", "A plus means a tap adds to the count."),
-            (.loggedOffSchedule, true, false, "Logged on a day off", "Logged on a day the habit is not set for. It still counts."),
+            (.loggedOffSchedule, true, false, LocalizedStringResource("Logged on a paused day or a\u{00A0}day\u{00A0}off", comment: "Marks key title. The spaces in \"a day off\" do not break, so it stays on one line in English. Use ordinary spaces if your language needs them."), "A log on a day the habit was paused or not set for. It still counts."),
+            (.offSchedule, false, false, "Not scheduled", "A dot is a day the habit is not set for."),
             (.blank, true, false, "Today", "The outline marks today. Empty means nothing logged yet."),
         ]
     }
@@ -180,7 +229,15 @@ struct MarksBoardView: View {
             ForEach(rows.indices, id: \.self) { index in
                 let row = rows[index]
                 HStack(spacing: 16) {
-                    MarkView(state: row.0, isToday: row.1, showsPlus: row.2)
+                    HStack(spacing: 6) {
+                        MarkView(state: row.0, isToday: row.1, showsPlus: row.2)
+                        // The year view and History month draw this mark smaller and split, so both are shown.
+                        // Every row keeps the column, so the labels stay aligned.
+                        Group {
+                            if row.0 == .loggedOffSchedule { SmallMarkView(state: row.0, size: 12) } else { Color.clear }
+                        }
+                        .frame(width: 16, height: 16)
+                    }
                     VStack(alignment: .leading, spacing: 2) {
                         Text(row.3).font(style.label(.body, weight: .semibold))
                         Text(row.4).font(style.label(.subheadline)).foregroundStyle(style.secondary)

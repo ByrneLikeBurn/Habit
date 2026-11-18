@@ -38,6 +38,14 @@ public struct ResolvedStyle: Sendable, Equatable {
     public var markLineWidth: CGFloat { increaseContrast ? 2 : 1.5 }
     public var outlineWidth: CGFloat { increaseContrast ? 1.75 : 1.25 }
     public var ruleWidth: CGFloat { increaseContrast ? 1 : 0.5 }
+    /// A chosen option drawn as an outline, such as a day in the form. Heavier than a today outline.
+    /// Twice the open width, so chosen and open stay apart with Increase Contrast too.
+    public var chosenOutlineWidth: CGFloat { openOutlineWidth * 2 }
+    /// An option that is not chosen, drawn as an outline.
+    public var openOutlineWidth: CGFloat { ruleWidth * 2 }
+
+    /// Letter spacing for small uppercase labels, so caps at caption size do not crowd.
+    public var capsTracking: CGFloat { 0.4 }
 
     // MARK: Type
 

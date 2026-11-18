@@ -33,14 +33,16 @@ struct DayStateTests {
 
     @Test func aLogOnAnOffScheduleDayIsCredited() {
         #expect(DayState.resolve(day(1, scheduled: false)) == .loggedOffSchedule)
-        #expect(DayState.resolve(day(0, scheduled: false)) == .blank)
+        #expect(DayState.resolve(day(0, scheduled: false)) == .offSchedule)
+        #expect(DayState.resolve(day(0, scheduled: false, .future)) == .blank)
     }
 
     @Test func aPastDayWithNoLogDrawsNothingUnlessTheUserOptsIn() {
         #expect(DayState.resolve(day(0, .past)) == .blank)
         #expect(DayState.resolve(day(0, .past), showDaysNotLogged: true) == .notLogged)
         #expect(DayState.resolve(day(0, .today), showDaysNotLogged: true) == .blank)
-        #expect(DayState.resolve(day(0, .future)) == .toCome)
+        // A day to come draws nothing.
+        #expect(DayState.resolve(day(0, .future)) == .blank)
     }
 }
 

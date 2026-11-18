@@ -76,11 +76,25 @@ struct TodayView: View {
                         Ordering.move(split.notScheduled, from: source, to: destination, all: active)
                         try? context.save()
                     }
-                } label: {
-                    Text("Not scheduled today")
-                        .font(style.label(.body))
+                    Text("A log here still counts.")
+                        .font(style.label(.footnote))
                         .foregroundStyle(style.secondary)
-                        .frame(minHeight: 44)
+                        .padding(.vertical, 8)
+                        .plainRow(style)
+                } label: {
+                    HStack {
+                        Text("Not scheduled today")
+                        Spacer(minLength: 12)
+                        Text(split.notScheduled.count.formatted())
+                            .monospacedDigit()
+                    }
+                    .font(style.label(.body))
+                    .foregroundStyle(style.secondary)
+                    .frame(minHeight: 44)
+                    .accessibilityElement(children: .ignore)
+                    // Voice Control matches the words on screen.
+                    .accessibilityInputLabels([Text("Not scheduled today")])
+                    .accessibilityLabel(Text("Not scheduled today, \(split.notScheduled.count) habits", comment: "VoiceOver label for the group of habits not set for today. The number is how many."))
                 }
                 .listRowBackground(style.paper)
                 .listRowSeparatorTint(style.rule)
@@ -118,11 +132,6 @@ struct TodayView: View {
                 }
             }
         }
-        .safeAreaInset(edge: .bottom) {
-            if let line = model.undoLine {
-                UndoLineView(line: line)
-            }
-        }
         .sensoryFeedback(.impact(weight: .light), trigger: model.feedback)
         .task(id: scenePhase) {
             // Redraw when the day turns over or passes midnight. Nothing is drawn per frame.
@@ -144,6 +153,7 @@ struct TodayView: View {
                 model.log(action, habit: habit, day: day, context: context, clock: clock, undoManager: undoManager)
             },
             openCount: { model.counting = CountRequest(habit: habit, day: day) },
+            details: { model.openDetail(habit, kind: .month, anchor: day, from: .today) },
             edit: { model.editing = habit },
             archive: { model.archive(habit, context: context, clock: clock) },
             move: { model.isReordering = true },
@@ -221,39 +231,117 @@ struct FirstRunView: View {
                 .buttonBorderShape(.capsule)
                 .foregroundStyle(style.paper)
                 .controlSize(.large)
+            // A second, quiet way in for someone moving from another device.
+            Button {
+                model.choosingImportFile = true
+            } label: {
+                Text("Import a copy")
+                    .underline()
+                    .font(style.label(.subheadline))
+                    .foregroundStyle(style.text)
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
         }
         .padding(.bottom, 12)
     }
 }
 
-/// One line with Undo. It stays until the next action, so no one has to beat a timer to reach it.
+/// One line with Undo, drawn as a capsule in reversed ink and paper. It stays until the next
+/// action, so no one has to beat a timer to reach it.
 struct UndoLineView: View {
     let line: UndoLine
     @Environment(AppModel.self) private var model
     @Environment(\.style) private var style
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// The sentence's height and three lines' height, measured in the style's own font at the width
+    /// the sentence gets. A sentence taller than three lines splits.
+    @State private var sentenceHeight: CGFloat = 0
+    @State private var threeLines: CGFloat = .infinity
 
     var body: some View {
-        HStack(spacing: 12) {
-            Text(line.message)
-                .font(style.label(.subheadline))
-                .foregroundStyle(style.text)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            if let undo = line.undo {
-                Button("Undo") {
-                    undo()
-                    model.undoLine = nil
-                }
-                .font(style.label(.subheadline, weight: .semibold))
-                .frame(minWidth: 44, minHeight: 44)
+        Group {
+            if let name = line.name, typeSize.isAccessibilitySize || sentenceHeight > threeLines + 1 {
+                split(name)
+            } else {
+                sentence
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 4)
-        .background(style.paper)
-        .overlay(alignment: .top) {
-            Rectangle().fill(style.rule).frame(height: style.ruleWidth)
+        // Not drawn. Measures the sentence and three lines at the width the sentence would get,
+        // whichever form is showing, so a line that fits again goes back to one sentence.
+        .background {
+            HStack(spacing: 12) {
+                ZStack {
+                    Text(line.message).fixedSize(horizontal: false, vertical: true)
+                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { sentenceHeight = $0 }
+                    Text(verbatim: "A\nA\nA").fixedSize(horizontal: false, vertical: true)
+                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { threeLines = $0 }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                if line.undo != nil {
+                    Text("Undo").font(style.label(.subheadline, weight: .semibold)).frame(minWidth: 44)
+                }
+            }
+            .hidden()
+            .accessibilityHidden(true)
         }
+        .font(style.label(.subheadline))
+        // Reversed text and paper keep the fixed text contrast in both appearances.
+        .foregroundStyle(style.paper)
+        .padding(.leading, 20)
+        .padding(.trailing, 12)
+        .padding(.vertical, 2)
+        .background(style.text, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
         .frame(maxWidth: 393)
+    }
+
+    private var sentence: some View {
+        HStack(spacing: 12) {
+            Text(line.message)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            undoButton
+        }
+    }
+
+    /// The name across the full width, two lines at most, cut in the middle so its start and end
+    /// both show. The status below is never cut. Undo has its own row at the leading edge, always
+    /// in the same place and away from the column of controls. VoiceOver reads the whole line.
+    private func split(_ name: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(name)
+                .lineLimit(2)
+                .truncationMode(.middle)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 10)
+                .accessibilityHidden(true)
+            Text(line.status)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityLabel(Text(verbatim: line.message))
+                .accessibilityIdentifier("undo-status")
+            undoButton
+        }
+    }
+
+    @ViewBuilder
+    private var undoButton: some View {
+        if let undo = line.undo {
+            Button {
+                undo()
+                model.undoLine = nil
+            } label: {
+                // The frame sits inside the label, so the whole 44-point square takes the tap.
+                Text("Undo").underline()
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .font(style.label(.subheadline, weight: .semibold))
+        }
     }
 }
 
@@ -264,12 +352,13 @@ extension View {
             .moveDisabled(true)
     }
 
-    /// Edit and Archive, the visible way to reach them now that a tap on the name logs.
+    /// Details, Edit and Archive, the visible way to reach them now that a tap on the name logs.
     /// Neither uses the destructive role: the app never picks red, and Archive can be undone.
     func rowSwipeActions(_ actions: HabitRow.Actions) -> some View {
         swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button("Archive", systemImage: "archivebox", action: actions.archive)
             Button("Edit", systemImage: "pencil", action: actions.edit)
+            Button("Details", systemImage: "calendar", action: actions.details)
         }
     }
 

@@ -65,7 +65,8 @@ extension HabitSchemaV1 {
         public var target: Int? = 1
         /// Shown as typed. Empty for none.
         public var unit: String = ""
-        /// The current schedule. Earlier days read `rules`.
+        /// The current schedule, one bit per weekday. Earlier days read `rules`.
+        /// 0 means no set days: a valid habit that is never scheduled, not a missing value.
         public var scheduleMask: Int = 127
         /// What one tap on Today adds. nil means a tap opens the count sheet.
         public var tapAmount: Int? = 1
@@ -120,7 +121,8 @@ extension HabitSchemaV1 {
         public var timestamp: Date = Date.now
         public var deviceID: String = ""
 
-        public init(delta: Int, habit: Habit, day: DayKey, source: LogSource, timestamp: Date, deviceID: String) {
+        /// Import passes nil and attaches a habit's events in one assignment, which keeps a large import linear.
+        public init(delta: Int, habit: Habit?, day: DayKey, source: LogSource, timestamp: Date, deviceID: String) {
             self.delta = delta
             self.habit = habit
             self.dayKey = day.rawValue

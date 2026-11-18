@@ -29,6 +29,55 @@ struct SourceChecks {
         #expect(files.contains { $0.path == Self.intentFile }, "The app sources were not found")
     }
 
+    /// The diamond's cut jumps from the wide gap to the hairline at 12 points. Every full-size mark the app draws must sit
+    /// clearly above it, so one screen never mixes the two drawings. MarkView's diamond is 68% of its size, so 18 is the floor.
+    /// Each `MarkView(state:` call is read to its closing bracket, across lines. A size the test cannot read as numbers fails.
+    @Test func everyFullSizeMarkIsAboveTheCutThreshold() throws {
+        let start = try Regex(#"(?:^|[^A-Za-z])MarkView\(\s*state:"#)
+        let number = try Regex(#"[0-9]+(?:\.[0-9]+)?"#)
+        var checked = 0
+        for file in try swiftFiles() {
+            for match in file.text.matches(of: start) {
+                // From the opening bracket to the one that closes it.
+                let open = file.text[match.range].lastIndex(of: "(")!
+                var depth = 0, index = open, close = open
+                while index < file.text.endIndex {
+                    let c = file.text[index]
+                    if c == "(" { depth += 1 } else if c == ")" { depth -= 1; if depth == 0 { close = index; break } }
+                    index = file.text.index(after: index)
+                }
+                let arguments = file.text[file.text.index(after: open)..<close]
+                guard let sizeLabel = arguments.range(of: "size:") else {
+                    checked += 1 // the default, 28
+                    continue
+                }
+                // The size runs to the next argument or the end.
+                var expression = arguments[sizeLabel.upperBound...]
+                if let comma = expression.firstIndex(of: ",") { expression = expression[..<comma] }
+                let sizes = expression.matches(of: number).compactMap { Double(expression[$0.range]) }
+                #expect(!sizes.isEmpty, "\(file.path): a MarkView size the test cannot read: \(expression)")
+                for size in sizes {
+                    #expect(size * 0.68 > 12, "\(file.path): a MarkView of \(size) points draws its diamond under 12 points")
+                }
+                checked += 1
+            }
+        }
+        #expect(checked > 3, "Too few MarkView calls were found")
+    }
+
+    /// The plural VoiceOver label for the "Not scheduled today" group has both English forms.
+    /// The UI test reaches only "one", on the fixture's Saturday.
+    @Test func theNotScheduledLabelHasBothPluralForms() throws {
+        let data = try Data(contentsOf: repoRoot.appending(path: "App/Localizable.xcstrings"))
+        let catalog = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let strings = try #require(catalog["strings"] as? [String: Any])
+        let entry = try #require(strings["Not scheduled today, %lld habits"] as? [String: Any])
+        let plural = try #require(((((entry["localizations"] as? [String: Any])?["en"] as? [String: Any])?["variations"] as? [String: Any])?["plural"]) as? [String: Any])
+        func value(_ form: String) -> String? { ((plural[form] as? [String: Any])?["stringUnit"] as? [String: Any])?["value"] as? String }
+        #expect(value("one") == "Not scheduled today, %lld habit")
+        #expect(value("other") == "Not scheduled today, %lld habits")
+    }
+
     /// Tokens live in the style files only. A view that computes a colour or names a font is a bug.
     @Test func coloursAndFontsAreNamedOnlyInTheStyleFiles() throws {
         // `Color(` as a call, not as the end of a name such as `swatchColor(`.
@@ -69,7 +118,8 @@ struct SourceChecks {
 
     /// Invariant 5: every LogEvent is written by LogHabitIntent, in any target.
     static var writePatterns: [Regex<Substring>] { [
-        try! Regex(#"LogWriter\.log\("#),
+        // The name, not the call, so a space or a stored reference is caught too.
+        try! Regex(#"(?:^|[^A-Za-z0-9_])LogWriter\s*\.\s*log(?![A-Za-z0-9_])"#),
         try! Regex(#"(?:^|[^A-Za-z_.])LogEvent\("#),
         try! Regex(#"\.delta\s*[-+]?=[^=]"#),
     ] }
@@ -78,6 +128,27 @@ struct SourceChecks {
         "HabitKit/Sources/HabitKit/Logic/LogWriter.swift",
         "HabitKit/Sources/HabitKit/Models/Schema.swift",
     ]
+
+    /// Invariant 5, second entry: only the app's import file calls `importEvents`.
+    static let importFile = "App/Data/ImportExport.swift"
+    static var importPattern: Regex<Substring> { try! Regex(#"(?:^|[^A-Za-z0-9_])importEvents(?![A-Za-z0-9_])"#) }
+
+    @Test func onlyTheImportFileImports() throws {
+        let allowed: Set<String> = [Self.importFile, "HabitKit/Sources/HabitKit/Logic/LogWriter.swift"]
+        var offences: [String] = []
+        var found = false
+        for file in try swiftFiles() where !file.path.hasPrefix("HabitKit/Tests/") {
+            for (number, line) in file.text.split(separator: "\n", omittingEmptySubsequences: false).enumerated() where line.contains(Self.importPattern) {
+                if file.path == Self.importFile { found = true }
+                if !allowed.contains(file.path) { offences.append("\(file.path):\(number + 1)") }
+            }
+        }
+        #expect(found, "The import file does not call importEvents")
+        #expect(offences.isEmpty, "\(offences)")
+        #expect("try LogWriter.importEvents(plan, in: context)".contains(Self.importPattern))
+        #expect("let w = LogWriter.importEvents; try w(plan, ctx)".contains(Self.importPattern))
+        #expect("LogWriter.importEvents (plan, in: ctx)".contains(Self.importPattern))
+    }
 
     @Test func onlyTheIntentWritesLogs() throws {
         var offences: [String] = []
@@ -92,7 +163,7 @@ struct SourceChecks {
     }
 
     @Test func theWriteCheckCanFail() {
-        let samples = ["try LogWriter.log(.tap, habit: h)", "context.insert(LogEvent(delta: 1))", "event.delta = 4", "event.delta += 1"]
+        let samples = ["try LogWriter.log(.tap, habit: h)", "try LogWriter.log (.tap, habit: h)", "let write = LogWriter.log", "context.insert(LogEvent(delta: 1))", "event.delta = 4", "event.delta += 1"]
         for sample in samples {
             #expect(Self.writePatterns.contains { sample.contains($0) }, "\(sample)")
         }
@@ -116,7 +187,7 @@ struct SourceChecks {
 
     /// No network calls, analytics or logging of user actions.
     @Test func noNetworkOrLogging() throws {
-        let banned = ["URLSession", "URLRequest", "NWConnection", "os_log(", "Logger(", "print("]
+        let banned = ["URLSession", "URLRequest", "NWConnection", "os_log(", "Logger(", "print(", "NSLog(", "debugPrint(", "dump("]
         var offences: [String] = []
         for file in try swiftFiles() {
             for token in banned where file.text.contains(token) {

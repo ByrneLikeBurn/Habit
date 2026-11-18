@@ -21,6 +21,20 @@ public struct MarkView: View {
 
     private var inset: CGFloat { size * 0.16 }
     private var inner: CGFloat { size - inset * 2 }
+    /// The gap between a plus and the dot under it.
+    public static let plusDotGap: CGFloat = 1.5
+
+    /// With a dot under a plus, the two are centred as one group: the plus moves up and the dot down,
+    /// with `plusDotGap` between the plus's round cap and the dot. Offsets are from the mark's centre.
+    public static func plusAndDot(size: CGFloat, lineWidth: CGFloat) -> (plus: CGFloat, dot: CGFloat) {
+        let dot = SmallMark.dotSize(cell: size)
+        let plus = size * 0.28 + lineWidth
+        let total = plus + plusDotGap + dot
+        return (plus: -total / 2 + plus / 2, dot: total / 2 - dot / 2)
+    }
+
+    private var dotUnderPlus: Bool { showsPlus && (state == .noSetDays || state == .offSchedule) }
+    private var group: (plus: CGFloat, dot: CGFloat) { Self.plusAndDot(size: size, lineWidth: style.markLineWidth) }
 
     public var body: some View {
         ZStack {
@@ -42,6 +56,7 @@ public struct MarkView: View {
                         .stroke(style.text, style: StrokeStyle(lineWidth: style.markLineWidth, lineCap: .round))
                 }
                 .frame(width: size * 0.28, height: size * 0.28)
+                .offset(y: dotUnderPlus ? group.plus : 0)
             }
         }
         .frame(width: size, height: size)
@@ -65,9 +80,13 @@ public struct MarkView: View {
             Capsule().fill(style.mark).frame(width: inner * 0.7, height: style.markLineWidth * 2)
         case .notLogged:
             Rectangle().strokeBorder(style.secondary, lineWidth: style.markLineWidth)
-        case .toCome:
-            Rectangle().strokeBorder(style.tertiary, style: StrokeStyle(lineWidth: style.markLineWidth, dash: [3, 3]))
+        case .offSchedule, .noSetDays:
+            // A small dot, so a day the habit is not set for never reads as a gap.
+            // Under a plus it sits low, so the plus never covers it.
+            Circle().fill(style.tertiary).frame(width: SmallMark.dotSize(cell: size), height: SmallMark.dotSize(cell: size))
+                .offset(y: dotUnderPlus ? group.dot : 0)
         case .blank:
+            // A future day shows its date alone.
             Color.clear
         }
     }
@@ -99,15 +118,10 @@ struct HatchShape: Shape {
     }
 }
 
+/// The diamond with its cut, the same rule as the small marks.
 struct DiamondShape: Shape {
     func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
-        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.midY))
-        path.closeSubpath()
-        return path
+        SmallMark.cutDiamond(in: rect)
     }
 }
 

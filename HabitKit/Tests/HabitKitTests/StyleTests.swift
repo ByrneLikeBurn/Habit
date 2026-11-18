@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import SwiftUI
 @testable import HabitKit
 
 /// The repo root, found from this file's path.
@@ -131,5 +132,41 @@ struct CountTextTests {
         #expect(CountText.defaultTapAmount(forTarget: 8) == 1)
         #expect(CountText.defaultTapAmount(forTarget: 20) == 1)
         #expect(CountText.defaultTapAmount(forTarget: 21) == nil)
+    }
+}
+
+/// The small "logged" diamond is split by a flat gap, so it blurs apart from the done square. See docs/m4-blur-test.md.
+@Suite struct SmallDiamondTests {
+    @Test func theSmallDiamondHasAFlatGapOfTwoAndAHalfUnitsInTwelve() {
+        let box = CGRect(x: 0, y: 0, width: 12, height: 12)
+        let path = SmallMark.cutDiamond(in: box)
+        // The gap runs from 4.75 to 7.25 across the middle and holds nothing.
+        for x in stride(from: 0.5, through: 11.5, by: 0.5) {
+            #expect(!path.contains(CGPoint(x: x, y: 6)))
+            #expect(!path.contains(CGPoint(x: x, y: 4.8)))
+            #expect(!path.contains(CGPoint(x: x, y: 7.2)))
+        }
+        // Each half is a triangle that reaches the cell's edge at its point.
+        #expect(path.contains(CGPoint(x: 6, y: 0.5)))
+        #expect(path.contains(CGPoint(x: 6, y: 11.5)))
+        #expect(path.contains(CGPoint(x: 6, y: 4.5)))
+        #expect(path.contains(CGPoint(x: 6, y: 7.5)))
+        // At the gap's edge the half-width follows the diamond: 6 × (1 − 2.5/12) = 4.75.
+        #expect(path.contains(CGPoint(x: 1.4, y: 4.7)))
+        #expect(!path.contains(CGPoint(x: 1.0, y: 4.7)))
+        #expect(path.boundingRect.minY == 0 && path.boundingRect.maxY == 12)
+    }
+
+    @Test func theCutIsAFifthOfTheMarkUpToTwelvePointsAndAHairlineAbove() {
+        #expect(SmallMark.diamondCut(width: 6) == 1.25)
+        #expect(SmallMark.diamondCut(width: 12) == 2.5)
+        #expect(SmallMark.diamondCut(width: 12.5) == 1.25)
+        #expect(SmallMark.diamondCut(width: 19) == 1.25)
+        // A full-size diamond, 19 points wide, is cut by a 1.25 point line and nothing wider.
+        let path = SmallMark.cutDiamond(in: CGRect(x: 0, y: 0, width: 19, height: 19))
+        #expect(!path.contains(CGPoint(x: 9.5, y: 9.5)))
+        #expect(!path.contains(CGPoint(x: 9.5, y: 8.95)))
+        #expect(path.contains(CGPoint(x: 9.5, y: 8.8)))
+        #expect(path.contains(CGPoint(x: 9.5, y: 10.2)))
     }
 }
