@@ -47,7 +47,10 @@ struct TodayWidgetView: View {
         let style = style
         VStack(alignment: .leading, spacing: 4) {
             header(style)
+            // Habit names can be health details. On a locked device, in StandBy and on the lock screen,
+            // the system redacts the rows. The "Today" header stays.
             content(style)
+                .privacySensitive()
             Spacer(minLength: 0)
         }
         .environment(\.style, style)

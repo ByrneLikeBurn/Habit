@@ -450,12 +450,16 @@ struct ImportPresenter: ViewModifier {
                     exportFailed = true
                 }
             }
-            .fileExporter(isPresented: Binding(get: { exporting != nil }, set: { if !$0 { exporting = nil } }),
-                          document: exporting, contentType: .json, defaultFilename: DataTransfer.fileName(clock: settings.clock)) { result in
-                if case .failure = result { exportFailed = true }
+            // In its own view, so the panel's message and label never reach the import panel.
+            .background {
+                Color.clear
+                    .fileExporter(isPresented: Binding(get: { exporting != nil }, set: { if !$0 { exporting = nil } }),
+                                  document: exporting, contentType: .json, defaultFilename: DataTransfer.fileName(clock: settings.clock)) { result in
+                        if case .failure = result { exportFailed = true }
+                    }
+                    .fileDialogMessage(Text("A copy of your habits, logs and pauses, as one file. This copy is not encrypted. Anyone who has it can read your habits."))
+                    .fileDialogConfirmationLabel(Text("Export"))
             }
-            .fileDialogMessage(Text("A copy of your habits, logs and pauses, as one file. This copy is not encrypted. Anyone who has it can read your habits."))
-            .fileDialogConfirmationLabel(Text("Export"))
             .alert("The copy could not be made", isPresented: $exportFailed) {
                 Button("OK") {}
             } message: {
