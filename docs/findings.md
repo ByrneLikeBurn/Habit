@@ -55,6 +55,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 4 | The tired daily user and the behavioural scientist used both rounds before the widget's rows became chosen once a day. Their concerns (a row moving under the thumb, prompting what is left) are what the rule answers. They see it at the next stop | `WidgetSnapshot.shownRows` |
 | 4 | The widget's rows are stored for each day ahead, so the first tap of a day keeps the rows drawn (`theFirstTapOfADayKeepsTheRowsDrawnAhead`). Made after the neurodiversity expert's second round, to that lens's fix. No lens has seen it | `Shared/WidgetRows.swift`, `Widget/HabitWidget.swift` |
 | 4 | A screenshot of Remove on an earlier pause that no other pause covers, showing its impact lines | Neurodiversity, 18 Nov. `pause-form-paper.jpg` shows only "You can undo this." because Pause everything covers its days |
+| 13 | The Pause for dates list with about 20 earlier pauses stays scannable | Returning user, 18 Nov. `pause-dates-paper.jpg` |
 | 13 | History month with many habits has no screenshot | `m2-hist-many.png` is Week only |
 | 4 | Marks in a History row are small beside text at the largest size. If the cells grow, lift the cap on the week header letters (`.dynamicTypeSize(...xxxLarge)` in `HistoryWeekHeader`) | `ax-history.png`, `ax5-history-paper.jpg` |
 | 13 | No screen was checked on a phone smaller than 393 by 852 points | `sheet-ax.png` |
