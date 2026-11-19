@@ -41,6 +41,8 @@ struct WidgetLogIntent: AppIntent {
         }
         let intent = LogHabitIntent(habitID: habit.id, name: habit.name, action: .tap, source: .widget, day: clock.today)
         try intent.execute(in: context, clock: clock)
+        // The rows stay as they are for a while after a tap; then rows all done give way to what is left.
+        WidgetRows.noteTap(at: clock.now())
         return .result()
     }
 }

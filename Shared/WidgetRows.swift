@@ -19,6 +19,27 @@ enum WidgetRows {
         return result
     }
 
+    private static let lastTapKey = "widgetLastTap"
+    /// How long after a widget tap the rows stay as they are before settled rows give way to rows still to do.
+    static let settleTime: TimeInterval = 30 * 60
+
+    /// Called by a widget tap that wrote.
+    static func noteTap(at date: Date) { SharedStore.defaults.set(date.timeIntervalSince1970, forKey: lastTapKey) }
+
+    static var lastTap: Date? {
+        let t = SharedStore.defaults.double(forKey: lastTapKey)
+        return t > 0 ? Date(timeIntervalSince1970: t) : nil
+    }
+
+    /// A log or change made outside the widget (in the app, Shortcuts or NFC) lets today's rows be chosen
+    /// again at the next draw, rows still to do first. Rows are kept only between widget taps, where a
+    /// moving row would be under the thumb. Days ahead keep theirs.
+    static func forget(_ day: DayKey) {
+        var all = stored
+        all[String(day.rawValue)] = nil
+        SharedStore.defaults.set(all, forKey: key)
+    }
+
     /// Saves the rows for `days`, keeping no day before `today`.
     static func keep(_ rows: [DayKey: [Int: [UUID]]], today: DayKey) {
         var all = stored.filter { (Int($0.key) ?? 0) >= today.rawValue }

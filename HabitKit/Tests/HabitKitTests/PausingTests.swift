@@ -360,9 +360,9 @@ struct WidgetSnapshotTests {
         #expect(after.shownRows(room: 2).map(\.name) == ["D", "A"])
         #expect(after.shownRows(room: 2, kept: kept[2] ?? []).map(\.name) == ["C", "D"])
         #expect(after.chosenRows(kept: kept)[2] == kept[2])
-        // A kept row that has gone, such as an archived habit, means the rows are chosen again.
+        // A kept row that has gone, such as an archived habit, leaves its place to the next row; D stays put.
         let fewer = WidgetSnapshot.make(habits: [habits[0], habits[1], habits[3]], sharedPauses: [], today: today)
-        #expect(fewer.shownRows(room: 2, kept: kept[2] ?? []).map(\.name) == ["D", "A"])
+        #expect(fewer.shownRows(room: 2, kept: kept[2] ?? []).map(\.name) == ["A", "D"])
     }
 
     /// A negative raw total, from edits on two devices, draws as 0 in the count line, as on Today.
@@ -391,6 +391,57 @@ struct WidgetSnapshotTests {
         try log(.tap, habits[0], day: today, context)
         let after = WidgetSnapshot.make(habits: habits, sharedPauses: [], today: today)
         #expect(after.shownRows(room: 2, kept: ahead[2] ?? []).map(\.name) == ["A", "B"])
+    }
+
+    /// Once every kept row is done and the last widget tap is a while past, the rows go back to what is
+    /// left to do. Before then they stay, so a row never moves straight after its tap.
+    @Test func settledRowsGiveWayToWhatIsLeft() throws {
+        let context = try makeContext()
+        var habits: [Habit] = []
+        for (i, name) in ["A", "B", "C", "D"].enumerated() {
+            let habit = addHabit(name, in: context)
+            habit.sortIndex = i
+            habits.append(habit)
+        }
+        let ahead = WidgetSnapshot.make(habits: habits, sharedPauses: [], today: today).chosenRows(kept: [:])
+        try log(.tap, habits[0], day: today, context)
+        try log(.tap, habits[1], day: today, context)
+        let done = WidgetSnapshot.make(habits: habits, sharedPauses: [], today: today)
+        #expect(done.hasSettledRoom(kept: ahead))
+        #expect(done.chosenRows(kept: ahead)[2] == ahead[2])
+        let later = done.chosenRows(kept: ahead, rechooseSettled: true)
+        #expect(done.shownRows(room: 2, kept: later[2] ?? []).map(\.name) == ["C", "D"])
+    }
+
+    /// A habit paused on its own is not owed, so it does not take a place ahead of one still to do.
+    @Test func aPausedHabitIsNotToDo() throws {
+        let context = try makeContext()
+        var habits: [Habit] = []
+        for (i, name) in ["Run", "Water", "Read"].enumerated() {
+            let habit = addHabit(name, in: context)
+            habit.sortIndex = i
+            habits.append(habit)
+        }
+        try PauseWriter.pause(habits[0], today: today, in: context)
+        try log(.tap, habits[2], day: today, context)
+        let snapshot = WidgetSnapshot.make(habits: habits, sharedPauses: [], today: today)
+        #expect(snapshot.shownRows(room: 2).map(\.name) == ["Water", "Run"])
+    }
+
+    /// A kept row that has gone leaves its place to the next row still to do; the others stay put.
+    @Test func aLostKeptRowIsFilledInItsPlace() throws {
+        let context = try makeContext()
+        var habits: [Habit] = []
+        for (i, name) in ["A", "B", "C", "D"].enumerated() {
+            let habit = addHabit(name, in: context)
+            habit.sortIndex = i
+            habits.append(habit)
+        }
+        try log(.tap, habits[0], day: today, context)
+        let kept = [habits[0].id, habits[1].id]
+        habits[1].archivedAt = Date(timeIntervalSince1970: 0)
+        let snapshot = WidgetSnapshot.make(habits: habits, sharedPauses: [], today: today)
+        #expect(snapshot.shownRows(room: 2, kept: kept).map(\.name) == ["A", "C"])
     }
 
     /// While paused nothing is owed, so the rows keep Today's order.

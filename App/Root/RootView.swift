@@ -77,6 +77,7 @@ struct RootView: View {
         }
         // Every save in the app redraws the widget: logs, pauses, edits, order and import.
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in
+            WidgetRows.forget(settings.clock.today)
             WidgetReload.now()
         }
         // A widget tap that cannot log opens the place it names.

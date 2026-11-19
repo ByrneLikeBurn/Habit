@@ -334,4 +334,13 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - Not adopted: cutting the widget's New habit and Today places (product owner). The intent and its fresh-place handling are needed for the count sheet; the other two places are one enum case each, and the UI and UX designer and first-day user asked for them.
 - The illustrator found nothing built toward scenes. At AX5 a scene card above the pause line would crowd the first row; that is a gate for milestone 5.
 - Round two. Today's pause line hides its button only while the Undo line is about a pause that covers every habit; a line about one habit leaves it. A cancelled undo is taken off the Edit menu as well. A widget tap never closes New habit or Edit habit, which may hold typed changes; the place is dropped. The outlined capsule turns to a rounded rectangle at accessibility sizes. Asked for by the senior designer and the UI and UX designer.
+- The Pause for dates form also stays open on a widget tap (first-day user). Each pause undo is held by its Command-Z handler, because the undo manager does not retain its target (UI and UX designer).
+
+**Milestone 3 stop: the widget's rows, tired daily user and behavioural scientist, 18 November 2026.**
+- Both lenses found that the day-ahead entry chooses rows before anything is logged, so "still to do first" gave Today's order and the widget then showed the same done rows all day. Their fixes cover different paths, and together keep both earlier concerns: no row moves under the thumb, and the widget keeps prompting what is left.
+  - A log or change made outside the widget (in the app, Shortcuts or NFC) lets today's rows be chosen again at the next draw (tired daily user). `WidgetRows.forget`.
+  - Once every kept row is settled and thirty minutes have passed since the last widget tap, the rows are chosen again, rows still to do first. The widget asks for a reload at that time (behavioural scientist). `WidgetSnapshot.chosenRows(rechooseSettled:)`, `hasSettledRoom`.
+- A kept row that has gone leaves its place to the next row still to do; the others stay put (tired daily user).
+- A habit paused on its own does not count as still to do (behavioural scientist).
+- Tested: `settledRowsGiveWayToWhatIsLeft`, `aPausedHabitIsNotToDo`, `aLostKeptRowIsFilledInItsPlace`.
 

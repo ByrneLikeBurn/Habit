@@ -74,6 +74,8 @@ struct LogHabitIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let (outcome, model) = try execute()
+        // A Shortcut or NFC log is made away from the widget, so its rows are chosen again.
+        WidgetRows.forget(SharedStore.clock.today)
         WidgetReload.now()
         let line: String
         switch outcome {

@@ -30,20 +30,21 @@ struct TodayProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (TodayEntry) -> Void) {
-        Task { @MainActor in completion(Self.entries().first ?? placeholder(in: context)) }
+        Task { @MainActor in completion(Self.timeline().entries.first ?? placeholder(in: context)) }
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<TodayEntry>) -> Void) {
         Task { @MainActor in
-            let entries = Self.entries()
-            let reload = entries.last?.date ?? .now.addingTimeInterval(3600)
+            let (entries, settleAt) = Self.timeline()
+            let reload = [entries.last?.date, settleAt].compactMap { $0 }.min() ?? .now.addingTimeInterval(3600)
             completion(Timeline(entries: entries, policy: .after(reload)))
         }
     }
 
+    /// The entries, and when settled rows should give way to rows still to do, if that is later today.
     @MainActor
-    static func entries() -> [TodayEntry] {
-        guard case .success(let container) = SharedStore.container else { return [] }
+    static func timeline() -> (entries: [TodayEntry], settleAt: Date?) {
+        guard case .success(let container) = SharedStore.container else { return ([], nil) }
         // A fresh context each time, so writes from the app are read, not a cached copy.
         let context = ModelContext(container)
         let habits = (try? context.fetch(FetchDescriptor<Habit>())) ?? []
@@ -51,17 +52,25 @@ struct TodayProvider: TimelineProvider {
         let clock = SharedStore.clock
         // Each day's rows are chosen once, the first time it is in a timeline, and kept, so the first tap
         // of a day finds the rows it drew.
+        // Rows that are all done give way to rows still to do once the last widget tap is a while past.
+        let now = clock.now()
+        let settleAt = WidgetRows.lastTap.map { $0.addingTimeInterval(WidgetRows.settleTime) }
+        let settled = settleAt.map { now >= $0 } ?? true
         var chosen: [DayKey: [Int: [UUID]]] = [:]
+        var askLater = false
         let entries = WidgetSnapshot.entryDates(clock: clock).map { date in
             let day = clock.dayKey(for: date)
             // Only the day's events are fetched; the widget's memory stays flat as history grows.
             let snapshot = WidgetSnapshot.make(habits: habits, sharedPauses: shared, today: day,
                                                totals: (try? LogWriter.dayTotals(on: day, in: context)) ?? [:])
-            let kept = chosen[day] ?? snapshot.chosenRows(kept: WidgetRows.kept(on: day))
+            let stored = WidgetRows.kept(on: day)
+            let isToday = day == clock.today
+            let kept = chosen[day] ?? snapshot.chosenRows(kept: stored, rechooseSettled: isToday && settled)
+            if isToday && !settled && snapshot.hasSettledRoom(kept: kept) { askLater = true }
             chosen[day] = kept
             return TodayEntry(date: date, snapshot: snapshot, kept: kept)
         }
         WidgetRows.keep(chosen, today: clock.today)
-        return entries
+        return (entries, askLater ? settleAt : nil)
     }
 }

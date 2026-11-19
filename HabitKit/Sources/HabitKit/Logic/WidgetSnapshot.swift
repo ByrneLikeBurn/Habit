@@ -48,16 +48,47 @@ public struct WidgetSnapshot: Equatable, Sendable {
     public func shownRows(room: Int, kept: [UUID] = []) -> [Row] {
         guard rows.count > room else { return rows }
         let byID = Dictionary(rows.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
-        let still = kept.compactMap { byID[$0] }
-        if still.count == room { return still }
-        if paused { return Array(rows.prefix(room)) }
-        let isToDo: (Row) -> Bool = { $0.total <= 0 || $0.state == .partDone }
-        return Array((rows.filter(isToDo) + rows.filter { !isToDo($0) }).prefix(room))
+        if paused && kept.isEmpty { return Array(rows.prefix(room)) }
+        let ranked = paused ? rows : rows.filter(isToDo) + rows.filter { !isToDo($0) }
+        // A kept row that has gone (archived, or not scheduled after an edit) leaves its place to the next
+        // row still to do; the others stay where they were.
+        var shown: [Row] = []
+        var filler = ranked.filter { row in !kept.contains(row.id) }.makeIterator()
+        for id in kept.prefix(room) {
+            if let row = byID[id] { shown.append(row) } else if let next = filler.next() { shown.append(next) }
+        }
+        while shown.count < room, let next = filler.next() { shown.append(next) }
+        return shown
     }
 
-    /// The rows chosen for each room size, 1 to 4, given what was kept earlier today.
-    public func chosenRows(kept: [Int: [UUID]]) -> [Int: [UUID]] {
-        Dictionary(uniqueKeysWithValues: (1...4).map { room in (room, shownRows(room: room, kept: kept[room] ?? []).map(\.id)) })
+    /// A row that asks for a tap: nothing logged, or part done. A habit paused on its own is not owed.
+    private func isToDo(_ row: Row) -> Bool { !row.paused && (row.total <= 0 || row.state == .partDone) }
+
+    /// The rows chosen for each room size, 1 to 4, given what was kept earlier today. With `rechooseSettled`,
+    /// a room whose kept rows are all settled (none left to do) is chosen again, so the widget goes back to
+    /// prompting what is left. The provider passes it only a while after the last widget tap, so a row
+    /// never moves straight after the tap that logged it.
+    public func chosenRows(kept: [Int: [UUID]], rechooseSettled: Bool = false) -> [Int: [UUID]] {
+        let byID = Dictionary(rows.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        return Dictionary(uniqueKeysWithValues: (1...4).map { room in
+            var keep = kept[room] ?? []
+            if rechooseSettled, !keep.isEmpty, hasSettled(keep, byID: byID) { keep = [] }
+            return (room, shownRows(room: room, kept: keep).map(\.id))
+        })
+    }
+
+    /// True when some room's kept rows are all settled while other rows are still to do, so a later draw
+    /// would choose again. The provider uses it to ask for a reload then.
+    public func hasSettledRoom(kept: [Int: [UUID]]) -> Bool {
+        let byID = Dictionary(rows.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        return kept.values.contains { !$0.isEmpty && hasSettled($0, byID: byID) }
+    }
+
+    private func hasSettled(_ ids: [UUID], byID: [UUID: Row]) -> Bool {
+        let shown = Set(ids)
+        let noneToDo = ids.allSatisfy { byID[$0].map { !isToDo($0) } ?? true }
+        let othersToDo = rows.contains { !shown.contains($0.id) && isToDo($0) }
+        return noneToDo && othersToDo
     }
 
     /// The widget's mark size. Its diamond (68% of the mark) sits well above the 12 point jump in the cut.
