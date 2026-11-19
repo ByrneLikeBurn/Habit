@@ -5,7 +5,7 @@ import Testing
 @Suite("Source checks")
 struct SourceChecks {
     private static let styleFolder = "HabitKit/Sources/HabitKit/Style/"
-    private static let intentFile = "App/Intents/LogHabitIntent.swift"
+    private static let intentFile = "Shared/LogHabitIntent.swift"
 
     /// Every Swift source in the repo except build output and tools. New targets are covered without a change here.
     private func swiftFiles() throws -> [(path: String, text: String)] {
@@ -76,6 +76,19 @@ struct SourceChecks {
         func value(_ form: String) -> String? { ((plural[form] as? [String: Any])?["stringUnit"] as? [String: Any])?["value"] as? String }
         #expect(value("one") == "Not scheduled today, %lld habit")
         #expect(value("other") == "Not scheduled today, %lld habits")
+    }
+
+    /// The widget is its own bundle, so it needs its own catalog for "1 more habit". The typographer found
+    /// it reading "1 more habits" when the plurals lived only in the app's catalog.
+    @Test func theWidgetCatalogHasTheMoreLineSingular() throws {
+        let data = try Data(contentsOf: repoRoot.appending(path: "Widget/Localizable.xcstrings"))
+        let catalog = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let strings = try #require(catalog["strings"] as? [String: Any])
+        for (key, one) in ["%lld more habits": "%lld more habit", "%lld more": "%lld more"] {
+            let entry = try #require(strings[key] as? [String: Any], "\(key)")
+            let plural = try #require(((((entry["localizations"] as? [String: Any])?["en"] as? [String: Any])?["variations"] as? [String: Any])?["plural"]) as? [String: Any])
+            #expect(((plural["one"] as? [String: Any])?["stringUnit"] as? [String: Any])?["value"] as? String == one)
+        }
     }
 
     /// Tokens live in the style files only. A view that computes a colour or names a font is a bug.
@@ -172,12 +185,12 @@ struct SourceChecks {
 
     @Test func checksSeeEveryTarget() throws {
         let folders = Set(try swiftFiles().map { String($0.path.split(separator: "/").first ?? "") })
-        #expect(folders.isSuperset(of: ["App", "AppUITests", "HabitKit"]), "\(folders)")
+        #expect(folders.isSuperset(of: ["App", "AppUITests", "HabitKit", "Shared", "Widget"]), "\(folders)")
     }
 
     /// The app's container is built through the migration plan, never a bare Schema.
     @Test func theContainerUsesTheMigrationPlan() throws {
-        let app = try swiftFiles().filter { $0.path.hasPrefix("App/") }
+        let app = try swiftFiles().filter { $0.path.hasPrefix("App/") || $0.path.hasPrefix("Shared/") || $0.path.hasPrefix("Widget/") }
         let builders = app.filter { $0.text.contains("ModelContainer(") }
         #expect(!builders.isEmpty)
         for file in builders {

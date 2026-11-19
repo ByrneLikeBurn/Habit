@@ -12,11 +12,13 @@ struct YouView: View {
     @State private var path: [Page] = LaunchOptions.current.screen.flatMap(Page.init(screen:)).map { [$0] } ?? []
 
     nonisolated enum Page: Hashable {
-        case appearance, dayStart, marks, archived
+        case appearance, dayStart, marks, archived, pauseDates
 
         init?(screen: LaunchOptions.Screen) {
             switch screen {
             case .appearance: self = .appearance
+            case .pauseDates, .pauseDatesNew, .pauseForm: self = .pauseDates
+            case .bringBack: self = .archived
             case .archived: self = .archived
             case .marks: self = .marks
             default: return nil
@@ -44,6 +46,7 @@ struct YouView: View {
                         LabeledContent("Appearance", value: appearanceSummary)
                     }
                 }
+                GentleModeSection(datesPage: .pauseDates)
                 Section {
                     SettingSwitch(title: "Show runs", isOn: $settings.showRuns)
                     SettingSwitch(title: "Show days not logged", isOn: $settings.showDaysNotLogged)
@@ -83,16 +86,23 @@ struct YouView: View {
                 }
             }
             .listRowBackground(style.paper)
-            .frame(maxWidth: 393)
+            .frame(maxWidth: WideLayout.listWidth)
             .frame(maxWidth: .infinity)
             .paperBackground(style)
             .foregroundStyle(style.text, style.secondary, style.tertiary)
+            .onChange(of: model.showArchived, initial: true) { _, show in
+                if show {
+                    path = [.archived]
+                    model.showArchived = false
+                }
+            }
             .navigationDestination(for: Page.self) { page in
                 switch page {
                 case .appearance: AppearanceView()
                 case .dayStart: DayStartView()
                 case .marks: MarksBoardView()
                 case .archived: ArchivedView()
+                case .pauseDates: PauseDatesView()
                 }
             }
         }
@@ -179,6 +189,7 @@ struct ArchivedView: View {
     @Environment(\.style) private var style
     @Environment(\.modelContext) private var context
     @Query private var habits: [Habit]
+    @State private var broughtBackForScreenshot = false
 
     var body: some View {
         let archived = habits.filter { $0.isArchived && $0.deletedAt == nil }.sorted { $0.name < $1.name }
@@ -193,7 +204,7 @@ struct ArchivedView: View {
                     Text(habit.name).font(style.display(.body))
                     Spacer()
                     Button("Bring back") {
-                        model.bringBack(habit, context: context, all: habits)
+                        model.bringBack(habit, context: context, all: habits, clock: settings.clock)
                     }
                     .buttonStyle(.bordered)
                     .buttonBorderShape(.capsule)
@@ -206,10 +217,18 @@ struct ArchivedView: View {
         .foregroundStyle(style.text, style.secondary, style.tertiary)
         .paperBackground(style)
         .navigationTitle("Archived")
+        .task {
+            // Screenshots: the line after Bring back.
+            if LaunchOptions.current.screen == .bringBack, !broughtBackForScreenshot,
+               let habit = habits.first(where: { $0.isArchived && $0.deletedAt == nil }) {
+                broughtBackForScreenshot = true
+                model.bringBack(habit, context: context, all: habits, clock: settings.clock)
+            }
+        }
     }
 }
 
-/// The marks board. Only marks the app can draw so far are listed. Pausing comes in milestone 3.
+/// The marks board: every mark the app draws.
 struct MarksBoardView: View {
     @Environment(\.style) private var style
 
@@ -219,6 +238,7 @@ struct MarksBoardView: View {
             (.partDone, true, true, "Part done", "Some logged, under the target. It still counts."),
             (.blank, true, true, "Adds", "A plus means a tap adds to the count."),
             (.loggedOffSchedule, true, false, LocalizedStringResource("Logged on a paused day or a\u{00A0}day\u{00A0}off", comment: "Marks key title. The spaces in \"a day off\" do not break, so it stays on one line in English. Use ordinary spaces if your language needs them."), "A log on a day the habit was paused or not set for. It still counts."),
+            (.paused, true, false, "Paused", "A dash is a paused day. It leaves runs as they are."),
             (.offSchedule, false, false, "Not scheduled", "A dot is a day the habit is not set for."),
             (.blank, true, false, "Today", "The outline marks today. Empty means nothing logged yet."),
         ]
@@ -234,7 +254,7 @@ struct MarksBoardView: View {
                         // The year view and History month draw this mark smaller and split, so both are shown.
                         // Every row keeps the column, so the labels stay aligned.
                         Group {
-                            if row.0 == .loggedOffSchedule { SmallMarkView(state: row.0, size: 12) } else { Color.clear }
+                            if row.0 == .loggedOffSchedule || row.0 == .paused { SmallMarkView(state: row.0, size: 12) } else { Color.clear }
                         }
                         .frame(width: 16, height: 16)
                     }

@@ -15,6 +15,11 @@ struct UndoLine: Identifiable {
     let undo: (@MainActor () -> Void)?
     /// The tab the action was made in. The line shows there only, so Undo never acts out of sight.
     var tab: AppTab = .today
+    /// The habit logged, so Today can scroll its row clear of the line when the line covers it.
+    var habitID: UUID?
+    /// A line after a change to a pause that covers every habit. While it shows, Today's pause line hides
+    /// its button, so one action has one undo. A line about one habit leaves that button alone.
+    var changesSharedPause = false
 
     init(message: String, name: String? = nil, status: String? = nil, undo: (@MainActor () -> Void)? = nil) {
         self.message = message
@@ -38,6 +43,12 @@ struct DayRequest: Identifiable {
     var id: String { "\(habit.id)-\(day)" }
 }
 
+/// The Pause for dates form's subject: nil for a new pause.
+struct PauseRequest: Identifiable {
+    let pause: Pause?
+    var id: String { pause.map { "\($0.id)" } ?? "new" }
+}
+
 /// Habit detail, opened on one period around one anchor day.
 struct DetailRoute: Hashable {
     let habitID: UUID
@@ -46,6 +57,13 @@ struct DetailRoute: Hashable {
 }
 
 enum AppTab: Hashable { case today, history, you }
+
+/// A View menu command for the period on screen: History, or Habit detail.
+struct PeriodRequest: Equatable {
+    enum Command: Equatable { case show(PeriodKind), move(Int), current }
+    let command: Command
+    let id = UUID()
+}
 
 /// Screen state shared by Today, the sheets and the menu commands.
 @MainActor
@@ -67,6 +85,22 @@ final class AppModel {
     var importStage: ImportStage?
     var undoLine: UndoLine?
     var isReordering = false
+    /// Today asks You to open Archived.
+    var showArchived = false
+    /// The Mac: the row selected on Today, which the Habit menu acts on.
+    var selectedHabit: Habit?
+    /// The habit Habit detail shows, while it is on screen.
+    var detailHabit: Habit?
+    /// "Pause for dates" from the Mac Habit menu.
+    var pauseForm: PauseRequest?
+    var periodRequest: PeriodRequest?
+    /// The window's undo manager, so a log from the Mac Habit menu can be undone with Command-Z.
+    @ObservationIgnored weak var undoManager: UndoManager?
+    /// The pause change whose Undo line is showing, and the pause it made, if any. Undoing that pause by
+    /// any other control is the same undo: the line goes and no new line comes.
+    @ObservationIgnored var pauseLine: PauseLineUndo?
+    /// Pauses ended today from Today, for "Keep paused".
+    var resumedShared: [ResumedPause] = []
     /// Changes on every log and take-back, for one haptic.
     var feedback = 0
 
@@ -107,13 +141,15 @@ final class AppModel {
                 case .binary: delta < 0
                     ? String(localized: "\(habit.name) cleared, \(date)", comment: "Undo line. The habit's name, then the past day whose log was cleared, for example: Read cleared, 7 November.")
                     : String(localized: "\(habit.name) logged, \(date)", comment: "Undo line. The habit's name, then the past day it was logged for, for example: Read logged, 7 November.")
-                case .counted: String(localized: "\(date): \(count)", comment: "Undo line for a counted habit on a past day. The day, then the new total, for example: 7 November: 4 of 8 glasses.")
+                case .counted: String(localized: "\(habit.name), \(date): \(count)", comment: "Undo line for a counted habit on a past day. The habit's name, the day, then the new total, for example: Drink water, 7 November: 4 of 8 glasses.")
                 }
+                // At large sizes the status sits under the name, so a short date saves a line.
+                let shortDate = clock.date(for: logDay).formatted(Date.FormatStyle(timeZone: clock.calendar.timeZone).day().month(.abbreviated).locale(clock.calendar.locale ?? .autoupdatingCurrent))
                 status = switch habit.kind {
                 case .binary: delta < 0
                     ? String(localized: "Cleared, \(date)", comment: "Undo line status under the habit's name, at large text sizes. The past day whose log was cleared, for example: Cleared, 7 November.")
                     : String(localized: "Logged, \(date)", comment: "Undo line status under the habit's name, at large text sizes. The past day it was logged for, for example: Logged, 7 November.")
-                case .counted: message
+                case .counted: String(localized: "\(shortDate): \(count)", comment: "Undo line status under a counted habit's name, at large text sizes. The past day, short, then the new total, for example: 7 Nov: 4 of 8 glasses.")
                 }
             } else {
                 message = switch habit.kind {
@@ -126,9 +162,11 @@ final class AppModel {
                 }
             }
             if let message, let inverse = outcome.inverse {
-                show(UndoLine(message: message, name: habit.name, status: status) { [weak self] in
+                var line = UndoLine(message: message, name: habit.name, status: status) { [weak self] in
                     self?.log(inverse, habit: habit, day: logDay, context: context, clock: clock, undoManager: undoManager)
-                })
+                }
+                line.habitID = habit.id
+                show(line)
             } else {
                 undoLine = nil
             }
@@ -145,15 +183,27 @@ final class AppModel {
         })
     }
 
-    func bringBack(_ habit: Habit, context: ModelContext, all: [Habit]) {
+    /// Brings a habit back. The days it was archived, up to yesterday, are paused, so its run is as it was.
+    /// Nothing could be logged while it was archived, so the pause only helps. Undo takes back both.
+    func bringBack(_ habit: Habit, context: ModelContext, all: [Habit], clock: HabitClock) {
         let archivedAt = habit.archivedAt, sortIndex = habit.sortIndex
+        var added: Pause?
+        if let archivedAt, let span = PauseWriter.archivedSpan(of: habit, archivedOn: clock.dayKey(for: archivedAt), today: clock.today) {
+            added = try? PauseWriter.pauseArchivedSpan(habit, span: span, in: context)
+        }
         habit.archivedAt = nil
         habit.sortIndex = Ordering.nextIndex(all)
         try? context.save()
-        show(UndoLine(message: String(localized: "\(habit.name) brought back", comment: "Undo line, a status, not a command. The placeholder is the habit's name, for example: Read brought back."),
-                      name: habit.name, status: String(localized: "Brought back", comment: "Undo line status under the habit's name, at large text sizes. A status, not a command.")) {
+        let message = added == nil
+            ? String(localized: "\(habit.name) brought back", comment: "Undo line, a status, not a command. The placeholder is the habit's name, for example: Read brought back.")
+            : String(localized: "\(habit.name) brought back. Its archived days are paused.", comment: "Undo line after Bring back. The days it was archived are paused, so its run is as it was. The placeholder is the habit's name.")
+        let status = added == nil
+            ? String(localized: "Brought back", comment: "Undo line status under the habit's name, at large text sizes. A status, not a command.")
+            : String(localized: "Brought back. Its archived days are paused.", comment: "Undo line status under the habit's name, at large text sizes.")
+        show(UndoLine(message: message, name: habit.name, status: status) {
             habit.archivedAt = archivedAt
             habit.sortIndex = sortIndex
+            if let added { context.delete(added) }
             try? context.save()
         })
     }
@@ -164,6 +214,35 @@ final class AppModel {
         undoLine = line
         let spoken = line.undo == nil ? line.message : String(localized: "\(line.message). Undo available")
         AccessibilityNotification.Announcement(spoken).post()
+    }
+
+    /// The current tab's pushed pages.
+    var currentPath: [DetailRoute] {
+        switch tab {
+        case .today: todayPath
+        case .history: historyPath
+        case .you: []
+        }
+    }
+
+    /// The Habit menu's subject: the habit detail shows, or else the row selected on Today.
+    var menuHabit: Habit? {
+        if !currentPath.isEmpty { return detailHabit }
+        return tab == .today ? selectedHabit : nil
+    }
+
+    /// The periods the View menu offers for what is on screen. Empty when no period is shown.
+    var periodKinds: [PeriodKind] {
+        if !currentPath.isEmpty { return PeriodKind.allCases }
+        return tab == .history ? [.week, .month] : []
+    }
+
+    func goBack() {
+        switch tab {
+        case .today: if !todayPath.isEmpty { todayPath.removeLast() }
+        case .history: if !historyPath.isEmpty { historyPath.removeLast() }
+        case .you: break
+        }
     }
 
     /// Opens Habit detail in the tab that asked for it.

@@ -8,7 +8,7 @@ import HabitKit
 struct LogHabitIntent: AppIntent {
     static let title: LocalizedStringResource = "Log a habit"
     static let description = IntentDescription("Logs a habit for today. Leave the amount empty to log one tap.")
-    static let openAppWhenRun = false
+    static let supportedModes: IntentModes = .background
     /// Habit names can be health details. Siri and Shortcuts never read or log them on a locked device.
     static let authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
@@ -58,7 +58,7 @@ struct LogHabitIntent: AppIntent {
         guard let model = try context.fetch(fetch).first, model.deletedAt == nil else {
             throw LogError.habitNotFound
         }
-        let clock = clock ?? Settings().clock
+        let clock = clock ?? SharedStore.clock
         let outcome = try LogWriter.log(
             resolvedAction(for: model),
             habit: model,
@@ -74,11 +74,14 @@ struct LogHabitIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let (outcome, model) = try execute()
+        // A Shortcut or NFC log is made away from the widget, so its rows are chosen again.
+        WidgetRows.forget(SharedStore.clock.today)
+        WidgetReload.now()
         let line: String
         switch outcome {
         case .wrote(_, let total), .unchanged(let total):
             if model.kind == .counted {
-                line = CountText.line(total: total, target: model.rule(on: Settings().clock.today).target, unit: model.unit)
+                line = CountText.line(total: total, target: model.rule(on: SharedStore.clock.today).target, unit: model.unit)
             } else if case .unchanged = outcome, total > 0 {
                 line = String(localized: "Already logged today.")
             } else {
@@ -98,7 +101,7 @@ enum LogError: Error, CustomLocalizedStringResourceConvertible {
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
-        case .habitNotFound: "That habit is not in Habit any more."
+        case .habitNotFound: LocalizedStringResource("That habit is not in Habit any more.", comment: "Shortcuts and Siri. The second \"Habit\" is the app's name. Do not translate it.")
         }
     }
 }

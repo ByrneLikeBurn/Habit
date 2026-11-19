@@ -112,6 +112,17 @@ struct ImportSheet: View {
     @Query private var habits: [Habit]
     /// Set on the first tap, so a double tap cannot write the file twice.
     @State private var importing = false
+    /// The content's height, so a short result opens a sheet that fits it, not a half-empty one.
+    @State private var contentHeight: CGFloat = 0
+
+    /// One heading and one line: nothing new, or a file that could not be read.
+    private var isShort: Bool {
+        switch stage {
+        case .preview(let plan): plan.isEmpty
+        case .done: false
+        case .problem: true
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -122,6 +133,7 @@ struct ImportSheet: View {
                 .padding(20)
                 .frame(maxWidth: 480)
                 .frame(maxWidth: .infinity)
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
             }
             .paperBackground(style)
             .navigationTitle("Import")
@@ -131,9 +143,10 @@ struct ImportSheet: View {
             .toolbar { toolbar }
         }
         #if os(iOS)
-        .presentationDetents([.medium, .large])
+        // The bar and the grabber add about 80 points above the content.
+        .presentationDetents(isShort && contentHeight > 0 ? [.height(contentHeight + 80), .large] : [.medium, .large])
         #else
-        .frame(minWidth: 440, idealWidth: 480, minHeight: 360)
+        .frame(minWidth: 440, idealWidth: 480, minHeight: isShort ? 200 : 360)
         #endif
     }
 
@@ -172,6 +185,7 @@ struct ImportSheet: View {
         case .preview(let plan) where plan.isEmpty:
             heading("Nothing new in this file")
             caption("Everything in it is already here. Nothing was changed.")
+            chooseButton
         case .preview(let plan):
             // What will change comes first, in the same rows the result shows, so the numbers match.
             heading("Importing adds")
@@ -278,7 +292,9 @@ extension Result where Success == ImportStage, Failure == ImportProblem {
     }
 }
 
+#if os(iOS)
 /// The export screen: what the copy holds, the warning, and the button that hands it to the system.
+/// The Mac opens the save panel at once instead, from `ImportPresenter`.
 struct ExportSheet: View {
     @Environment(Settings.self) private var settings
     @Environment(\.style) private var style
@@ -289,9 +305,6 @@ struct ExportSheet: View {
     /// This sheet's own file, removed when the share closes.
     @State private var written: URL?
     @State private var failed = false
-    #if os(macOS)
-    @State private var exporting: ExportDocument?
-    #endif
 
     var body: some View {
         NavigationStack {
@@ -324,21 +337,14 @@ struct ExportSheet: View {
             }
             .paperBackground(style)
             .navigationTitle("Export a copy")
-            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                 }
             }
         }
-        #if os(iOS)
         .presentationDetents([.medium, .large])
-        #else
-        .frame(minWidth: 440, idealWidth: 480, minHeight: 360)
-        #endif
-        #if os(iOS)
         .sheet(item: $shareURL, onDismiss: { written.map(DataTransfer.remove) }) { url in
             ShareSheet(url: url) { completed, error in
                 // A finished share closes the export screen. A cancel leaves it open to try again.
@@ -347,21 +353,10 @@ struct ExportSheet: View {
             }
                 .presentationDetents([.medium, .large])
         }
-        #else
-        .fileExporter(isPresented: Binding(get: { exporting != nil }, set: { if !$0 { exporting = nil } }),
-                      document: exporting, contentType: .json, defaultFilename: DataTransfer.fileName(clock: settings.clock)) { result in
-            // A failed save keeps the screen open with the message, so nobody believes they have a copy.
-            switch result {
-            case .success: dismiss()
-            case .failure: failed = true
-            }
-        }
-        #endif
     }
 
     private func export() {
         failed = false
-        #if os(iOS)
         do {
             let url = try DataTransfer.writeTemporaryFile(context: context, clock: settings.clock)
             written = url
@@ -369,15 +364,9 @@ struct ExportSheet: View {
         } catch {
             failed = true
         }
-        #else
-        do {
-            exporting = ExportDocument(data: try DataTransfer.exportData(context: context, clock: settings.clock))
-        } catch {
-            failed = true
-        }
-        #endif
     }
 }
+#endif
 
 extension URL: @retroactive Identifiable {
     public var id: String { absoluteString }
@@ -420,6 +409,12 @@ struct ExportDocument: FileDocument {
 struct ImportPresenter: ViewModifier {
     @Environment(AppModel.self) private var model
     @Environment(\.modelContext) private var context
+    #if os(macOS)
+    @Environment(Settings.self) private var settings
+    /// The Mac opens the save panel at once, with the warning in it.
+    @State private var exporting: ExportDocument?
+    @State private var exportFailed = false
+    #endif
 
     func body(content: Content) -> some View {
         @Bindable var model = model
@@ -441,9 +436,36 @@ struct ImportPresenter: ViewModifier {
                     }
                 }
             }
+            #if os(iOS)
             .sheet(isPresented: $model.showExport) {
                 ExportSheet()
             }
+            #else
+            .onChange(of: model.showExport) { _, show in
+                guard show else { return }
+                model.showExport = false
+                do {
+                    exporting = ExportDocument(data: try DataTransfer.exportData(context: context, clock: settings.clock))
+                } catch {
+                    exportFailed = true
+                }
+            }
+            // In its own view, so the panel's message and label never reach the import panel.
+            .background {
+                Color.clear
+                    .fileExporter(isPresented: Binding(get: { exporting != nil }, set: { if !$0 { exporting = nil } }),
+                                  document: exporting, contentType: .json, defaultFilename: DataTransfer.fileName(clock: settings.clock)) { result in
+                        if case .failure = result { exportFailed = true }
+                    }
+                    .fileDialogMessage(Text("A copy of your habits, logs and pauses, as one file. This copy is not encrypted. Anyone who has it can read your habits."))
+                    .fileDialogConfirmationLabel(Text("Export"))
+            }
+            .alert("The copy could not be made", isPresented: $exportFailed) {
+                Button("OK") {}
+            } message: {
+                Text("Nothing was saved. Try again.")
+            }
+            #endif
     }
 }
 

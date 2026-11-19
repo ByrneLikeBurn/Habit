@@ -266,3 +266,81 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - Launch arguments are read in debug builds only, and a screen only with a fixture store, so no argument can open a form on the user's own habits. The screenshot script refuses another device unless its own output folder is named. Asked for by the release engineer.
 
 **Invariant 3 reworded, 16 November 2026.** The owner decided that under no set days a pause changes nothing. A paused log there neither extends nor breaks a run, the same as an unpaused log. Invariant 3 now reads: "A paused day with no log never breaks a run and never extends it. A paused set day with a log extends it. Under no set days a pause changes nothing." The day still reads "Logged while paused" and still counts in Days logged and Days done. Before, two paused logs twenty days apart read as Longest run 2. Proposed by the behavioural scientist and the neurodiversity expert. The returning user's condition, that a pause never lowers a run, holds. Tests: `pausedLogUnderNoSetDaysLeavesTheRunUnchanged`, `aPausedDayWithALogChangesNothingUnderNoSetDays`, `pausedLogUnderNoSetDaysNeverLowersLongest`.
+
+**Milestone 3 build, 18 November 2026.** These were decided while building, before the lenses ran. Each is checked by the lenses at the stop.
+- Pause and resume act at once in Edit, without waiting for Save. Cancel does not undo them. A pause is not a field of the habit, and "Undo pause" sits in the same place.
+- The Target and Unit fields read "Optional" when empty. "None" read as a value already set. Asked for by the owner.
+- The Pause for dates impact line counts calendar days, the future included, and skips days another pause already covers.
+- In the dated pause list, a pause that covers today sits under Coming.
+- "Keep paused" puts back the last day a pause had before "Resume tomorrow", within the session. After a relaunch it opens "Pause everything" again.
+- Pause dates use the system's interval format, and leave out the year when it is this year.
+- "Pause everything" leaves the Not scheduled group as it is.
+- The widget is iOS only, small and medium. Each row logs through `WidgetLogIntent`, which calls `LogHabitIntent` and writes nothing if the day or the total changed since the widget drew. A counted habit with no tap amount opens the app.
+- Today and You use a 560 point column on iPad and the Mac. History keeps 720. Asked for by the Apple industrial designer.
+- With every habit archived, Today says "Nothing on Today" and offers "Show archived habits" and "Add a habit". Asked for by the returning user.
+- On the Mac, the page heading in History and the form is left out, because the window title names it. Asked for by the owner.
+- On the Mac, Export a Copy opens the save panel at once, with the warning in the panel. The export sheet is iOS only. Asked for by the Apple industrial designer.
+- The Undo line's inset is on Today's list, so a logged row it covers scrolls clear. Asked for by accessibility and the UI and UX designer.
+- Mac shortcuts: Week, Month and Year are Option-Command-1 to 3, Previous and Next Period are Command-Left and Command-Right, Go to Today is Command-T, Back is Command-[, Log is Command-L, Add an Amount is Option-Command-L, Show Details is Command-I and Edit Habit is Command-E. Archive and the pause items have no shortcut.
+
+**Milestone 3 lens round one, 18 November 2026.**
+- Days to come draw nothing, paused or not. An open pause drew a dash on every day left in the month, which read as a forecast of giving up. Asked for by the behavioural scientist.
+- Bring back always pauses the days the habit was archived, up to yesterday, and says so in its Undo line. If the archive day holds a log, the pause starts the day after, so a done day stays done (neurodiversity expert). The question is gone. Nothing could be logged while the habit was archived, so the pause only helps, and the other answer could only break a run. This replaces the offer in `docs/spec.md`, open decision 6. Asked for by the behavioural scientist.
+- The widget keeps Today's order when every row fits. When rows must be dropped, they are chosen at the day's first draw and kept all day: rows still to do (nothing logged, or part done) take the places first, and a line says how many more there are. While paused, Today's order. The tired daily user asked for the line, so done marks never read as the whole day. The behavioural scientist asked that the widget keep prompting what is left. In round two both found that choosing again after every tap moved a row under the thumb, so a second tap logged a different habit and the logged mark was never seen. The neurodiversity expert proposed choosing once a day, which meets all three. `WidgetSnapshot.shownRows`, `Shared/WidgetRows.swift`.
+- The small widget's paused header is the symbol alone. At accessibility sizes the small widget shows one row and the medium two, the header keeps to one line, and the empty widget shows "Add a habit" alone. Asked for by the tired daily user.
+- While paused, the pause line at the top holds the one Undo pause or Resume tomorrow button. The bottom "Pause everything" button goes, so the same button never shows twice. Asked for by the tired daily user.
+- The dated pause list heads its first group "Now and coming" and no longer marks pauses from Pause everything. Every pause in the list pauses every habit. Asked for by the tired daily user.
+- A counted row logged on a paused day says "Logged while paused", as a yes-or-no row does. Asked for by the behavioural scientist.
+- VoiceOver hears "Resumes tomorrow.", "Pause undone." and "Paused again.", and nothing when a save fails. A paused row's name carries the same value as its control. The dates form's impact lines are the Save button's hint. The pause line's full sentence is read at every size. Asked for by the accessibility expert.
+- Remove on a dated pause shows what it changes: how many days will no longer be paused, how many logged days draw as before, and, for days before today, "A run through these days may get shorter." "Days lose their pause" now reads "days will no longer be paused." Asked for by the neurodiversity expert.
+
+**Milestone 3 lens round one, continued, 18 November 2026.**
+- Wording, asked for by the content designer: "Undo pause ends it, and today shows as it did before."; "%lld more days will be paused."; the widget's line reads "%lld more habits" and is its own VoiceOver element; the widget's counted hint reads "Adds 250 ml" with the unit, or "Opens the app to add an amount"; the Mac View menu's item reads "Undo Pause"; "Habit" as the app's name carries a comment not to translate it.
+- Habit detail's link reads "Pause every habit for dates", because it pauses every habit. "Choose a date" for the last day picks yesterday when the first day is in the past. The dates form's footer says paused days leave runs as they are. Asked for by the returning user.
+- Not adopted: a "Paused" status line on every row under Pause everything (returning user). The pause line at the top says it once. A line on each row would repeat it, which the tired daily user asked to avoid.
+
+**Milestone 3 lens round one: UI and UX designer, human factors, first-day user, 18 November 2026.**
+- Every pause change shows a line with Undo, as logs do, and Command-Z undoes it: Pause everything, Pause this habit, Resume tomorrow, Undo pause, new and changed dates, Remove. The line and Command-Z share one undo that runs once. Asked for by the UI and UX designer and human factors. The UI and UX designer found that "Undo pause" on a planned dated pause that begins today deleted all its days with no way back; Undo now puts it back whole. Human factors found that a slip on Pause everything, at the bottom of a long list, had its only Undo off screen; the line now shows where the tap was.
+- Resume tomorrow in the dates form keeps the old last day, so Today offers Keep paused, as it does after Resume tomorrow on Today (UI and UX designer, human factors).
+- The dates form says why Save is off: "Choose a last day to save." or that the last day is before the first (UI and UX designer, first-day user).
+- The Habit menu's Pause everything item reads "Resume Everything Now" for a pause begun today. Human factors found two "Undo Pause" items when a habit and everything were both paused today. The content designer had asked for a name other than "Undo Pause Everything" and offered this one.
+- Edit's hint after Pause this habit says it was paused "without Save", because Cancel does not undo it (human factors).
+- Widget taps that cannot log open the app at the right place, through an intent that records the place in shared settings: a counted row with no tap amount opens its count sheet, "Add a habit" opens New habit, and the more line opens Today. No URL scheme. Asked for by the UI and UX designer and the first-day user.
+- Counted widget rows show their count under the name, so a tap that leaves the mark hatched still shows what changed (first-day user).
+- The pause helper names the dash: "A dash marks a paused day." It names runs only when Show runs is on (first-day user).
+- On the Mac, "Show archived habits" opens the Settings window on Archived (UI and UX designer).
+- Round two. A widget place is stored with its time and opened only within ten seconds, on the intent's notification or when the app becomes active, so a place the app missed never opens hours later (UI and UX designer). A sheet already up is closed and the place opens once it has gone (UI and UX designer, first-day user). The more line's tap area is 44 points high (first-day user). Turning off the Pause everything switch in You shows the Undo line too (UI and UX designer).
+
+**Milestone 3 lens round one: Apple industrial designer, typographer, colour vision and low vision, 18 November 2026.**
+- At accessibility sizes a widget row shows the name only, on two lines, as `ax-widget.png` draws it; VoiceOver reads the count. At standard sizes the count line stays under a counted name, as the first-day user asked. The industrial designer, typographer and colour vision lens all found the count at AX5 cut the name and overprinted the header.
+- At accessibility sizes the widget's "N more" sits in the header in both sizes, and the medium widget tries two rows, then one, and shows what fits (`ViewThatFits`). Round one's "the medium shows two" held only where two fit. Asked for by the typographer.
+- The widget has its own string catalog, `Widget/Localizable.xcstrings`, with the plural forms, so it reads "1 more habit". Tested. Asked for by the typographer.
+- In tinted and clear modes the widget draws marks as Increase Contrast does, in the text colour with heavier ink, and quiet text in the system's secondary level. A mid-blue mark turns faint where the system maps luminance to opacity. Asked for by the colour vision lens.
+- The Mac's custom menu is named "Habits", so it is not a second "Habit" beside the app menu (industrial designer).
+- A Today row with a pause note sits its name low in the target, as a counted row does (industrial designer). "Logged while paused" wraps at AX5 (colour vision, typographer). Edit's "Paused since" uses the day and month form used elsewhere, under its label at AX sizes (typographer). Counts use tabular digits in the widget (typographer).
+- Not adopted: a done yes-or-no widget row opening Today instead of taking the log back (industrial designer). A second tap logs it again, so the row is its own undo, as on Today. Human factors and the UI and UX designer passed this toggle in their reviews.
+
+**Milestone 3 lens round one: performance and app size, release engineer, 18 November 2026.**
+- The widget reads only the day's events, through one day-filtered fetch per entry, and its tap check reads the day's total the same way, so its memory does not grow with history. The Pause for dates form reads each habit's totals in one pass, only when a day changes, and works the impact out once per draw. A pause lookup no longer builds an array. Asked for by the performance lens.
+- Not adopted: removing the widget reload in `LogHabitIntent.perform` because the app's save observer also reloads (performance). A Shortcut or NFC log can run with no app view alive, and then the intent's reload is the only one.
+- The intents declare `supportedModes` in place of `openAppWhenRun`, which the iOS 26 SDK deprecates (release engineer).
+
+**Milestone 3 lens round one: senior designer, product owner, illustrator, 18 November 2026.**
+- One undo per pause change. While a pause change's Undo line shows, Today's pause line hides its button. Ending the pause just made, from Edit or anywhere else, is that same undo: the line goes and no new line comes. Keep paused closes a resume's line the same way. "Undo pause" on a pause made earlier still shows its own line, so the UI and UX designer's planned pause is never lost to one tap. The senior designer found two undos for one action and an undo that could itself be undone; this meets that and the UI and UX designer's and human factors' concerns. Tested in `PausingUITests`.
+- Pause buttons use the style's outlined capsule (`OutlinedCapsuleButtonStyle`), the same capsule as "Add a past day", in place of the system's grey bordered fill, so later styles restyle them (senior designer).
+- The helper sentence is said once on the You path: in Gentle Mode's footer, not again in the dates list or the form. An existing pause's form drops "The dates can be in the past." and Remove drops "You can undo this.", which the Undo line says (senior designer).
+- Habit detail has no Pause for dates link. On a page about one habit it was the only control that acted on every habit (senior designer, product owner, and the returning user's second option). Pausing one habit for past dates is owed to 13.
+- `docs/spec.md` now describes milestone 3 as built: status, Gentle Mode, pausing, the widget's rows, Undo, and the Mac Habits menu (product owner).
+- Not adopted: cutting the widget's New habit and Today places (product owner). The intent and its fresh-place handling are needed for the count sheet; the other two places are one enum case each, and the UI and UX designer and first-day user asked for them.
+- The illustrator found nothing built toward scenes. At AX5 a scene card above the pause line would crowd the first row; that is a gate for milestone 5.
+- Round two. Today's pause line hides its button only while the Undo line is about a pause that covers every habit; a line about one habit leaves it. A cancelled undo is taken off the Edit menu as well. A widget tap never closes New habit or Edit habit, which may hold typed changes; the place is dropped. The outlined capsule turns to a rounded rectangle at accessibility sizes. Asked for by the senior designer and the UI and UX designer.
+- The Pause for dates form also stays open on a widget tap (first-day user). Each pause undo is held by its Command-Z handler, because the undo manager does not retain its target (UI and UX designer).
+
+**Milestone 3 stop: the widget's rows, tired daily user and behavioural scientist, 18 November 2026.**
+- Both lenses found that the day-ahead entry chooses rows before anything is logged, so "still to do first" gave Today's order and the widget then showed the same done rows all day. Their fixes cover different paths, and together keep both earlier concerns: no row moves under the thumb, and the widget keeps prompting what is left.
+  - A log or change made outside the widget (in the app, Shortcuts or NFC) lets today's rows be chosen again at the next draw (tired daily user). `WidgetRows.forget`.
+  - Once every kept row is settled and thirty minutes have passed since the last widget tap, the rows are chosen again, rows still to do first. The widget asks for a reload at that time (behavioural scientist). `WidgetSnapshot.chosenRows(rechooseSettled:)`, `hasSettledRoom`.
+- A kept row that has gone leaves its place to the next row still to do; the others stay put (tired daily user).
+- A habit paused on its own does not count as still to do (behavioural scientist).
+- Tested: `settledRowsGiveWayToWhatIsLeft`, `aPausedHabitIsNotToDo`, `aLostKeptRowIsFilledInItsPlace`.
+

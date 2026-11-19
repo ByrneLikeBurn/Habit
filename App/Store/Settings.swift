@@ -1,17 +1,6 @@
 import SwiftUI
 import HabitKit
 
-enum SettingKey {
-    static let style = "style"
-    static let appearance = "appearance"
-    static let accent = "accent"
-    static let controlsLeading = "controlsLeading"
-    static let dayStartHour = "dayStartHour"
-    static let deviceID = "deviceID"
-    static let showRuns = "showRuns"
-    static let showDaysNotLogged = "showDaysNotLogged"
-}
-
 /// The user's settings, read and written through the shared defaults.
 /// Unknown stored values fall back to Pen and ink, System and Blue.
 @MainActor
@@ -23,7 +12,7 @@ final class Settings {
     var appearance: AppearanceChoice { didSet { defaults.set(appearance.rawValue, forKey: SettingKey.appearance) } }
     var accent: Swatch { didSet { defaults.set(accent.rawValue, forKey: SettingKey.accent) } }
     var controlsLeading: Bool { didSet { defaults.set(controlsLeading, forKey: SettingKey.controlsLeading) } }
-    var dayStartHour: Int { didSet { defaults.set(dayStartHour, forKey: SettingKey.dayStartHour) } }
+    var dayStartHour: Int { didSet { defaults.set(dayStartHour, forKey: SettingKey.dayStartHour); WidgetReload.now() } }
     /// Adds Current run and Longest run to Habit detail. Off by default.
     var showRuns: Bool { didSet { defaults.set(showRuns, forKey: SettingKey.showRuns) } }
     /// Draws an empty outline for a past scheduled day with no log. Off by default.

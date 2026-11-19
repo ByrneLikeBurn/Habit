@@ -97,16 +97,14 @@ struct HabitFormView: View {
           ScrollViewReader { reader in
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    #if os(macOS)
-                    Text(title)
-                        .font(style.label(.headline, weight: .semibold))
-                        .accessibilityAddTraits(.isHeader)
-                    #endif
                     nameSection
                     symbolSection
                     loggingSection
                     daysSection.id("days")
-                    if let habit { archiveSection(habit) }
+                    if let habit {
+                        pauseSection(habit).id("pause")
+                        archiveSection(habit)
+                    }
                 }
                 .padding(.horizontal, 24)
                 .padding(.vertical, 20)
@@ -117,6 +115,7 @@ struct HabitFormView: View {
             .onAppear {
                 // The editDays screenshot opens the form at Repeats on.
                 if [.editDays, .editWaits].contains(LaunchOptions.current.screen) { reader.scrollTo("days", anchor: .top) }
+                if LaunchOptions.current.screen == .editPaused { reader.scrollTo("pause", anchor: .top) }
             }
           }
             .foregroundStyle(style.text, style.secondary, style.tertiary)
@@ -248,7 +247,7 @@ struct HabitFormView: View {
             targetLayout {
                 Text("Target").font(style.label(.body))
                 if !typeSize.isAccessibilitySize { Spacer(minLength: 12) }
-                TextField(String(localized: "Target"), text: $targetText, prompt: Text("None").foregroundStyle(style.tertiary))
+                TextField(String(localized: "Target"), text: $targetText, prompt: Text("Optional", comment: "Placeholder in an empty Target field. Says the field may stay empty, not that a value is set.").foregroundStyle(style.tertiary))
                     .textFieldStyle(.plain)
                     .font(style.label(.body).monospacedDigit())
                     .multilineTextAlignment(typeSize.isAccessibilitySize ? .leading : .trailing)
@@ -303,6 +302,49 @@ struct HabitFormView: View {
                      : String(localized: "A change applies from today. Earlier days keep what they had."))
             }
         }
+    }
+
+    /// Pause acts at once, as Archive does, and needs no Save. Its own section, away from Archive, so a slip
+    /// between the two does not happen.
+    private func pauseSection(_ habit: Habit) -> some View {
+        let clock = settings.clock
+        let status = habit.ownPauseStatus(today: clock.today)
+        return VStack(alignment: .leading, spacing: 8) {
+            FieldRule()
+            FieldLabel("Pause")
+            switch status {
+            case .none:
+                pauseButton("Pause this habit") { model.pause(habit, context: context, clock: clock) }
+                hint(String(localized: "It stays paused until you resume it.") + " " + PauseText.helper(showRuns: settings.showRuns))
+            case .paused(let since, let startedToday):
+                if !startedToday {
+                    // One date form for pauses across screens. At accessibility sizes the date sits under its label.
+                    let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 2)) : AnyLayout(HStackLayout())
+                    layout {
+                        Text("Paused since")
+                        if !typeSize.isAccessibilitySize { Spacer() }
+                        Text(PauseText.dayMonth(since, clock: clock)).foregroundStyle(style.secondary)
+                    }
+                    .font(style.label(.body))
+                    .frame(minHeight: 44)
+                    .accessibilityElement(children: .combine)
+                }
+                pauseButton(startedToday ? "Undo pause" : "Resume tomorrow") { model.resume(habit, context: context, clock: clock) }
+                hint(startedToday
+                     ? String(localized: "Paused from today, without Save. Undo pause ends it, and today shows as it did before.")
+                     : String(localized: "It starts again tomorrow. You can still log today."))
+            case .resumesTomorrow:
+                pauseButton("Keep paused") { model.pause(habit, context: context, clock: clock) }
+                hint(String(localized: "Resumes tomorrow. Today stays paused. You can still log."))
+            }
+        }
+        .padding(.top, 16)
+    }
+
+    private func pauseButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
+        Button(title, action: action)
+            .buttonStyle(.outlinedCapsule)
+            .accessibilityIdentifier("habit-pause")
     }
 
     private func archiveSection(_ habit: Habit) -> some View {
@@ -370,7 +412,7 @@ struct HabitFormView: View {
         VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 8) {
                     FieldLabel("Unit")
-                    TextField(String(localized: "Unit"), text: $unit, prompt: Text("None").foregroundStyle(style.tertiary))
+                    TextField(String(localized: "Unit"), text: $unit, prompt: Text("Optional", comment: "Placeholder in an empty Unit field. Says the field may stay empty, not that a value is set.").foregroundStyle(style.tertiary))
                         .textFieldStyle(.plain)
                         .font(style.label(.body))
                         .frame(minHeight: 44)

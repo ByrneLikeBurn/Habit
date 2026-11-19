@@ -6,11 +6,16 @@ struct RootView: View {
     @Environment(Settings.self) private var settings
     @Environment(AppModel.self) private var model
     @Environment(\.modelContext) private var context
+    @Environment(\.scenePhase) private var scenePhase
+    /// A widget place waiting for an open sheet to finish closing.
+    @State private var pendingPlace: WidgetPlace?
     @Query(filter: #Predicate<Pause> { $0.habit == nil }) private var sharedPauses: [Pause]
 
     var body: some View {
         if LaunchOptions.current.screen == .contrast {
             StyledScreen { ContrastBoard() }
+        } else if LaunchOptions.current.screen == .widget {
+            StyledScreen { WidgetBoard() }
         } else {
             main
         }
@@ -23,9 +28,8 @@ struct RootView: View {
                 Tab("Today", systemImage: "calendar", value: AppTab.today) {
                     NavigationStack(path: $model.todayPath) {
                         TodayScreen()
-                            .navigationDestination(for: DetailRoute.self) { HabitDetailView(route: $0, tab: .today) }
+                            .navigationDestination(for: DetailRoute.self) { HabitDetailView(route: $0, tab: .today).undoLineInset(.today) }
                     }
-                    .undoLineInset(.today)
                 }
                 Tab("History", systemImage: "square.grid.2x2", value: AppTab.history) {
                     NavigationStack(path: $model.historyPath) {
@@ -37,22 +41,26 @@ struct RootView: View {
                 #if !os(macOS)
                 Tab("You", systemImage: "person.crop.circle", value: AppTab.you) {
                     YouView()
+                        .undoLineInset(.you)
                 }
                 #endif
             }
             .tabViewStyle(.sidebarAdaptable)
             .environment(\.sharedPauses, sharedPauses)
             .modifier(ImportPresenter())
-            .sheet(isPresented: $model.showNewHabit) {
+            .sheet(isPresented: $model.showNewHabit, onDismiss: openPending) {
                 HabitFormView(habit: nil, today: settings.clock.today)
             }
-            .sheet(item: $model.editing) { habit in
+            .sheet(item: $model.editing, onDismiss: openPending) { habit in
                 HabitFormView(habit: habit, today: settings.clock.today)
             }
-            .sheet(item: $model.counting) { request in
+            .sheet(item: $model.counting, onDismiss: openPending) { request in
                 CountSheet(habit: request.habit, day: request.day)
             }
-            .sheet(item: $model.daySheet) { request in
+            .sheet(item: $model.pauseForm, onDismiss: openPending) { request in
+                PauseDatesForm(pause: request.pause, clock: settings.clock)
+            }
+            .sheet(item: $model.daySheet, onDismiss: openPending) { request in
                 DaySheet(habit: request.habit, day: request.day)
             }
             .sheet(item: $model.pickingPastDay, onDismiss: {
@@ -60,16 +68,67 @@ struct RootView: View {
                 if let next = model.pastDayChosen {
                     model.pastDayChosen = nil
                     model.daySheet = next
+                } else {
+                    openPending()
                 }
             }) { habit in
                 PastDayPicker(habit: habit)
             }
+        }
+        // Every save in the app redraws the widget: logs, pauses, edits, order and import.
+        .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { note in
+            // Only the app's own writes let the widget choose its rows again. A widget tap run in this
+            // process saves through its own context, and its rows must stay put.
+            if (note.object as? ModelContext) === context { WidgetRows.forget(settings.clock.today) }
+            WidgetReload.now()
+        }
+        // A widget tap that cannot log opens the place it names.
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            if phase == .active, let place = WidgetPlace.take() { open(place) }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: WidgetPlace.recorded)) { _ in
+            if let place = WidgetPlace.take() { open(place) }
         }
         .onAppear {
             if LaunchOptions.current.screen?.opensYou == true { model.tab = .you }
             if LaunchOptions.current.screen?.opensHistory == true { model.tab = .history }
             openLaunchScreen()
         }
+    }
+
+    /// Opens a widget place. A sheet already up is closed first, and the place opens once it has gone,
+    /// because a second sheet cannot show over the first.
+    private func open(_ place: WidgetPlace) {
+        // A habit form or the dates form may hold typed changes. It stays open, and the place is dropped.
+        if model.showNewHabit || model.editing != nil || model.pauseForm != nil { return }
+        let sheetOpen = model.showNewHabit || model.editing != nil || model.counting != nil
+            || model.daySheet != nil || model.pickingPastDay != nil
+        guard !sheetOpen else {
+            pendingPlace = place
+            model.pastDayChosen = nil
+            model.counting = nil
+            model.daySheet = nil
+            model.pickingPastDay = nil
+            return
+        }
+        model.tab = .today
+        model.todayPath = []
+        switch place {
+        case .today: break
+        case .newHabit: model.showNewHabit = true
+        case .count(let id):
+            var fetch = FetchDescriptor<Habit>(predicate: #Predicate { $0.id == id })
+            fetch.fetchLimit = 1
+            if let habit = try? context.fetch(fetch).first, habit.deletedAt == nil {
+                model.counting = CountRequest(habit: habit, day: settings.clock.today)
+            }
+        }
+    }
+
+    private func openPending() {
+        guard let place = pendingPlace else { return }
+        pendingPlace = nil
+        open(place)
     }
 
     /// Opens the screen named by `-screen`, for screenshots.
@@ -82,6 +141,8 @@ struct RootView: View {
             model.showNewHabit = true
         case .edit, .editDays, .editWaits, .symbols:
             model.editing = habits.first
+        case .editPaused:
+            model.editing = habits.first { $0.name == "Walk outside" } ?? habits.first
         case .count:
             if let habit = habits.first(where: { $0.kind == .counted }) {
                 model.counting = CountRequest(habit: habit, day: clock.today)
@@ -105,6 +166,9 @@ struct RootView: View {
                     model.log(.tap, habit: habit, day: day, context: context, clock: clock, undoManager: nil)
                 }
             }
+        case .pauseUndo:
+            // A real Pause everything, so the Undo line and the pause line agree.
+            model.pauseEverything(context: context, clock: clock)
         case .undoCount:
             if let habit = habits.first(where: { $0.kind == .counted && !$0.isArchived }) {
                 model.log(.tap, habit: habit, day: clock.today, context: context, clock: clock, undoManager: nil)
@@ -153,7 +217,7 @@ struct RootView: View {
 extension LaunchOptions.Screen {
     var opensYou: Bool {
         switch self {
-        case .you, .appearance, .archived, .marks, .export, .importPreview, .importDone, .importNothing, .importNotHabit, .importNewer: true
+        case .you, .appearance, .archived, .marks, .pauseDates, .pauseDatesNew, .pauseForm, .bringBack, .export, .importPreview, .importDone, .importNothing, .importNotHabit, .importNewer: true
         default: false
         }
     }

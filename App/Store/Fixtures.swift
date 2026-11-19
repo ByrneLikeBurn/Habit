@@ -29,6 +29,10 @@ enum Fixtures {
         switch fixture {
         case .empty:
             return []
+        case .paused, .pausedToday, .onePaused:
+            return specs(.today)
+        case .allArchived:
+            return specs(.today).map { var spec = $0; spec.archived = true; return spec }
         case .today:
             // History runs from 28 April 2026, 200 days before the frozen today. All made up.
             return [
@@ -108,9 +112,32 @@ enum Fixtures {
                 }
             }
         }
-        if fixture == .today {
+        if fixture == .today || fixture == .onePaused {
             // Two days paused for everything, so the month shows the dash and the diamond.
             context.insert(Pause(habit: nil, start: today.adding(days: -9), end: today.adding(days: -8), reason: .vacation))
+        }
+        let habits = (try? context.fetch(FetchDescriptor<Habit>())) ?? []
+        switch fixture {
+        case .paused:
+            // Everything paused since Wednesday, a dated pause coming, and two earlier ones.
+            context.insert(Pause(habit: nil, start: today.adding(days: -3), end: nil, reason: .gentle))
+            context.insert(Pause(habit: nil, start: DayKey(rawValue: 20261120), end: DayKey(rawValue: 20261127), reason: .vacation))
+            context.insert(Pause(habit: nil, start: DayKey(rawValue: 20261003), end: DayKey(rawValue: 20261005), reason: .vacation))
+            context.insert(Pause(habit: nil, start: DayKey(rawValue: 20260814), end: DayKey(rawValue: 20260822), reason: .gentle))
+        case .pausedToday:
+            context.insert(Pause(habit: nil, start: today, end: nil, reason: .gentle))
+        case .onePaused:
+            // Walk outside paused since Tuesday. Water the plants archived six days ago, for Bring back.
+            if let walk = habits.first(where: { $0.name == "Walk outside" }) {
+                let pause = Pause(habit: walk, start: today.adding(days: -4), end: nil, reason: .manual)
+                context.insert(pause)
+                walk.pauses = [pause]
+                // First on Today, so the AX5 shot shows the paused row.
+                walk.sortIndex = -1
+            }
+            habits.first { $0.isArchived }?.archivedAt = clock.now().addingTimeInterval(-86_400 * 6)
+        default:
+            break
         }
         try? context.save()
     }

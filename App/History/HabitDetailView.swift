@@ -40,7 +40,10 @@ private struct HabitDetailPage: View {
     @State private var kind: PeriodKind
     @State private var anchor: DayKey
 
+    private let route: DetailRoute
+
     init(habit: Habit, route: DetailRoute, tab: AppTab) {
+        self.route = route
         self.habit = habit
         self.tab = tab
         _kind = State(initialValue: route.kind)
@@ -123,7 +126,7 @@ private struct HabitDetailPage: View {
                 }
                 Button {
                     if habit.isArchived {
-                        model.bringBack(habit, context: context, all: (try? context.fetch(FetchDescriptor<Habit>())) ?? [])
+                        model.bringBack(habit, context: context, all: (try? context.fetch(FetchDescriptor<Habit>())) ?? [], clock: clock)
                     } else {
                         model.pickingPastDay = habit
                     }
@@ -165,6 +168,26 @@ private struct HabitDetailPage: View {
             .frame(maxWidth: .infinity)
         }
         .paperBackground(style)
+        .onAppear { model.detailHabit = habit }
+        .onChange(of: model.currentPath) { _, path in
+            // Back from a page pushed on top: this habit is the menu's subject again.
+            if path.last == route { model.detailHabit = habit }
+        }
+        .onChange(of: model.periodRequest) { _, request in
+            // The View menu, while this page is the one on screen.
+            guard let request, model.tab == tab, model.currentPath.last == route else { return }
+            let today = settings.clock.today
+            let first = settings.clock.calendar.firstWeekday
+            switch request.command {
+            case .show(let k): kind = k
+            case .move(let step):
+                if step > 0 && (Periods.same(anchor, today, kind: kind, firstWeekday: first) || anchor >= today) { return }
+                let moved = Periods.move(anchor, by: step, kind: kind)
+                if step < 0 && kind != .year && moved < Periods.earliest { return }
+                anchor = moved
+            case .current: anchor = today
+            }
+        }
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

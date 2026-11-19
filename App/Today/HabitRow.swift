@@ -9,6 +9,10 @@ struct HabitRow: View {
         var details: () -> Void
         var edit: () -> Void
         var archive: () -> Void
+        /// "Pause this habit", and "Keep paused" after a resume today.
+        var pause: () -> Void
+        /// "Resume tomorrow", or "Undo pause" for a pause that began today.
+        var resume: () -> Void
         var move: () -> Void
         var moveUp: (() -> Void)?
         var moveDown: (() -> Void)?
@@ -23,6 +27,7 @@ struct HabitRow: View {
     @Environment(Settings.self) private var settings
     @Environment(\.style) private var style
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.sharedPauses) private var sharedPauses
 
     var body: some View {
         if typeSize.isAccessibilitySize {
@@ -42,6 +47,7 @@ struct HabitRow: View {
     private var largeLayout: some View {
         VStack(alignment: .leading, spacing: 8) {
             nameButton
+            if let note = pauseNote { noteText(note) }
             if habit.kind == .counted { countButton }
             control
                 .frame(maxWidth: .infinity, alignment: settings.controlsLeading ? .leading : .trailing)
@@ -55,15 +61,37 @@ struct HabitRow: View {
         // Name and count line each keep a 44-point target. They do not overlap.
         VStack(alignment: .leading, spacing: 0) {
             nameButton
+            if let note = pauseNote {
+                noteText(note).padding(.leading, 36).padding(.bottom, habit.kind == .counted ? 0 : 6)
+            }
             if habit.kind == .counted {
                 countButton.padding(.leading, 36)
             }
         }
-        .padding(.vertical, habit.kind == .counted ? 0 : 6)
+        .padding(.vertical, habit.kind == .counted || pauseNote != nil ? 0 : 6)
     }
 
     private var shown: Int { max(0, total) }
-    private var state: DayState { habit.state(on: day, today: day, total: shown) }
+    private var state: DayState { habit.state(on: day, today: day, total: shown, sharedPauses: sharedPauses) }
+    private var isPaused: Bool { habit.isPaused(on: day, sharedPauses: sharedPauses) }
+    private var ownPause: HabitPauseStatus { habit.ownPauseStatus(today: day) }
+
+    /// A second line only when it says something about today. "Paused" for this habit's own pause, since
+    /// a pause of everything is said once at the top. "Logged while paused" for any log on a paused day.
+    private var pauseNote: String? {
+        if state == .loggedWhilePaused { return String(localized: "Logged while paused") }
+        if state == .paused && ownPause != .none { return String(localized: "Paused") }
+        return nil
+    }
+
+    private func noteText(_ note: String) -> some View {
+        Text(note)
+            .font(style.label(.footnote))
+            .foregroundStyle(style.secondary)
+            // "Logged while paused" wraps at the largest sizes rather than being cut.
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityHidden(true)
+    }
     private var target: Int? { habit.rule(on: day).target }
 
     // MARK: Name
@@ -85,10 +113,11 @@ struct HabitRow: View {
             }
         }
         .buttonStyle(.plain)
-        // On a counted row the name sits low in its target, so the count line reads as part of it.
-        .frame(maxWidth: .infinity, minHeight: 44, alignment: habit.kind == .counted && !typeSize.isAccessibilitySize ? .bottomLeading : .leading)
+        // On a counted row, or one with a pause note, the name sits low in its target, so the line under it reads as part of it.
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: (habit.kind == .counted || pauseNote != nil) && !typeSize.isAccessibilitySize ? .bottomLeading : .leading)
         .contentShape(Rectangle())
         .contextMenu { menu }
+        .accessibilityValue(Text(accessibilityValue))
         .accessibilityHint(Text(accessibilityHint))
         .accessibilityIdentifier("name-\(habit.name)")
         .accessibilityActions { rowActions }
@@ -116,6 +145,14 @@ struct HabitRow: View {
         Button("Details", systemImage: "calendar", action: actions.details)
         Button("Edit", systemImage: "pencil", action: actions.edit)
         Button("Move", systemImage: "arrow.up.arrow.down", action: actions.move)
+        switch ownPause {
+        case .none:
+            Button("Pause this habit", systemImage: "pause.circle", action: actions.pause)
+        case .paused(_, let startedToday):
+            Button(startedToday ? "Undo pause" : "Resume tomorrow", systemImage: "play.circle", action: actions.resume)
+        case .resumesTomorrow:
+            Button("Keep paused", systemImage: "pause.circle", action: actions.pause)
+        }
         Button("Archive", systemImage: "archivebox", action: actions.archive)
     }
 
@@ -149,7 +186,7 @@ struct HabitRow: View {
     }
 
     private var countLine: String {
-        CountText.todayLine(total: shown, target: target, unit: habit.unit, noSetDays: state == .noSetDays)
+        CountText.todayLine(total: shown, target: target, unit: habit.unit, noSetDays: state == .noSetDays, paused: isPaused)
     }
 
     // MARK: Control
@@ -160,7 +197,8 @@ struct HabitRow: View {
         return MarkView(
             state: state,
             isToday: true,
-            showsPlus: habit.kind == .counted && state != .done,
+            // While paused the control shows the dash, then the diamond. A plus would cover either.
+            showsPlus: habit.kind == .counted && state != .done && !isPaused,
             size: large ? 44 : 28
         )
         .frame(width: 76)
@@ -190,6 +228,7 @@ struct HabitRow: View {
         case .loggedOffSchedule: parts.append(String(localized: "Logged on a day off"))
         case .loggedWhilePaused: parts.append(String(localized: "Logged while paused"))
         case .noSetDays: parts.append(String(localized: "No set days"))
+        case .paused: parts.append(String(localized: "Paused"))
         default: break
         }
         return parts.joined(separator: ", ")

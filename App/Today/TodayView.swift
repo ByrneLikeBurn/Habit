@@ -9,6 +9,7 @@ struct TodayView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.undoManager) private var undoManager
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.sharedPauses) private var sharedPauses
 
     @Query private var habits: [Habit]
     /// Only today's events are fetched, so Today costs the same on day 1 and day 1,000.
@@ -19,6 +20,9 @@ struct TodayView: View {
     @State private var dayMark = ""
     #if os(iOS)
     @State private var editMode: EditMode = .inactive
+    #else
+    /// The Mac: the selected row, moved with the arrow keys. The Habit menu acts on it.
+    @State private var selection: UUID?
     #endif
 
     /// The day this list shows. TodayScreen rebuilds the view when it changes.
@@ -36,13 +40,23 @@ struct TodayView: View {
         let split = Ordering.today(habits, day: today)
         let active = Ordering.sorted(habits)
         let totals = DayTotals(day: today, events: todaysEvents).totals
+        let pauseStatus = SharedPauseStatus.of(sharedPauses, today: today)
 
-        List {
+        ScrollViewReader { proxy in
+        listView {
             TodayHeading(clock: clock)
                 .plainRow(style)
                 .id(dayMark)
 
-            if active.isEmpty {
+            if !active.isEmpty && pauseStatus.isPaused {
+                PauseLineView(status: pauseStatus, clock: clock)
+                    .plainRow(style)
+            }
+
+            if active.isEmpty && habits.contains(where: { $0.isArchived && $0.deletedAt == nil }) {
+                AllArchivedView()
+                    .plainRow(style)
+            } else if active.isEmpty {
                 FirstRunView()
                     .plainRow(style)
             } else if split.scheduled.isEmpty {
@@ -58,6 +72,8 @@ struct TodayView: View {
                 HabitRow(habit: habit, day: today, total: totals[habit.id] ?? 0, actions: rowActions)
                     .habitRow(style, leading: settings.controlsLeading)
                     .rowSwipeActions(rowActions)
+                    .tag(habit.id)
+                    .id(habit.id)
             }
             .onMove { source, destination in
                 Ordering.move(split.scheduled, from: source, to: destination, all: active)
@@ -71,6 +87,8 @@ struct TodayView: View {
                         HabitRow(habit: habit, day: today, total: totals[habit.id] ?? 0, actions: rowActions)
                             .habitRow(style, leading: settings.controlsLeading)
                             .rowSwipeActions(rowActions)
+                            .tag(habit.id)
+                            .id(habit.id)
                     }
                     .onMove { source, destination in
                         Ordering.move(split.notScheduled, from: source, to: destination, all: active)
@@ -99,9 +117,25 @@ struct TodayView: View {
                 .listRowBackground(style.paper)
                 .listRowSeparatorTint(style.rule)
             }
+
+            if !active.isEmpty {
+                PauseEverythingButton(status: pauseStatus, clock: clock)
+                    .plainRow(style)
+            }
         }
         .listStyle(.plain)
-        .frame(maxWidth: 393)
+        .undoLineInset(.today)
+        .onChange(of: model.undoLine?.id) {
+            // The line takes room at the bottom. If it now covers the row just logged, scroll that row
+            // clear by the least amount, after the line has taken its place. A row in view does not move.
+            guard let id = model.undoLine?.habitID, model.undoLine?.tab == .today else { return }
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(100))
+                proxy.scrollTo(id)
+            }
+        }
+        }
+        .frame(maxWidth: WideLayout.listWidth)
         .frame(maxWidth: .infinity)
         .paperBackground(style)
         .onScrollGeometryChange(for: Bool.self) { geometry in
@@ -133,6 +167,12 @@ struct TodayView: View {
             }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: model.feedback)
+        #if os(macOS)
+        .onAppear { model.undoManager = undoManager }
+        .onChange(of: selection) { _, id in
+            model.selectedHabit = id.flatMap { id in habits.first { $0.id == id } }
+        }
+        #endif
         .task(id: scenePhase) {
             // Redraw when the day turns over or passes midnight. Nothing is drawn per frame.
             while !Task.isCancelled {
@@ -142,6 +182,16 @@ struct TodayView: View {
                 try? await Task.sleep(for: .seconds(30))
             }
         }
+    }
+
+    /// The Mac list takes a selection, so the arrow keys move between rows and the Habit menu has a subject.
+    @ViewBuilder
+    private func listView<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        #if os(macOS)
+        List(selection: $selection) { content() }
+        #else
+        List { content() }
+        #endif
     }
 
     private func actions(for habit: Habit, in list: [Habit], day: DayKey, clock: HabitClock) -> HabitRow.Actions {
@@ -156,6 +206,8 @@ struct TodayView: View {
             details: { model.openDetail(habit, kind: .month, anchor: day, from: .today) },
             edit: { model.editing = habit },
             archive: { model.archive(habit, context: context, clock: clock) },
+            pause: { model.pause(habit, context: context, clock: clock) },
+            resume: { model.resume(habit, context: context, clock: clock) },
             move: { model.isReordering = true },
             moveUp: index.flatMap { $0 > 0 ? $0 : nil }.map { i in
                 { Ordering.move(list, from: IndexSet(integer: i), to: i - 1, all: active); try? context.save() }
@@ -248,6 +300,51 @@ struct FirstRunView: View {
     }
 }
 
+/// Every habit is archived: say where they are, with a way there and a way to start a new one.
+struct AllArchivedView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.style) private var style
+    #if os(macOS)
+    @Environment(\.openSettings) private var openSettings
+    #endif
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            EmptyLine(
+                title: String(localized: "Nothing on Today"),
+                detail: String(localized: "Your habits are archived, with their history. You can bring any of them back.")
+            )
+            Button("Show archived habits") {
+                #if os(macOS)
+                // The Settings window has its own model. It opens on Archived.
+                SettingsOpens.archived = true
+                NotificationCenter.default.post(name: .showArchivedInSettings, object: nil)
+                openSettings()
+                #else
+                model.tab = .you
+                model.showArchived = true
+                #endif
+            }
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.capsule)
+            .foregroundStyle(style.paper)
+            .controlSize(.large)
+            Button {
+                model.showNewHabit = true
+            } label: {
+                Text("Add a habit")
+                    .underline()
+                    .font(style.label(.subheadline))
+                    .foregroundStyle(style.text)
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.bottom, 12)
+    }
+}
+
 /// One line with Undo, drawn as a capsule in reversed ink and paper. It stays until the next
 /// action, so no one has to beat a timer to reach it.
 struct UndoLineView: View {
@@ -294,6 +391,8 @@ struct UndoLineView: View {
         .padding(.trailing, 12)
         .padding(.vertical, 2)
         .background(style.text, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("undo-line")
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: 393)

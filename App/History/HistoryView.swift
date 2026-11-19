@@ -28,11 +28,14 @@ struct HistoryView: View {
 
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                #if !os(macOS)
+                // On the Mac the window's title bar names the page, so the heading would say it twice.
                 Text("History")
                     .font(style.display(.largeTitle, weight: .semibold))
                     .foregroundStyle(style.text)
                     .accessibilityAddTraits(.isHeader)
                     .padding(.bottom, 8)
+                #endif
 
                 if active.isEmpty && archived.isEmpty {
                     VStack(alignment: .leading, spacing: 14) {
@@ -92,6 +95,23 @@ struct HistoryView: View {
             .frame(maxWidth: .infinity)
         }
         .paperBackground(style)
+        .onChange(of: model.periodRequest) { _, request in
+            // The View menu, while History itself is on screen.
+            guard let request, model.tab == .history, model.historyPath.isEmpty else { return }
+            let today = settings.clock.today
+            let first = settings.clock.calendar.firstWeekday
+            switch request.command {
+            case .show(let k) where k != .year: kind = k
+            case .show: break
+            case .move(let step):
+                let current = self.anchor ?? today
+                if step > 0 && (Periods.same(current, today, kind: kind, firstWeekday: first) || current >= today) { return }
+                let moved = Periods.move(current, by: step, kind: kind)
+                if step < 0 && moved < Periods.earliest { return }
+                self.anchor = moved
+            case .current: self.anchor = today
+            }
+        }
         .navigationTitle("History")
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
@@ -362,4 +382,7 @@ private struct HabitSymbol: View {
 /// Content width for History and Habit detail: the phone column on a phone, about 720 points on iPad and Mac.
 enum WideLayout {
     static let contentWidth: CGFloat = 720
+    /// Today and You on iPad and the Mac: wide enough to use the window, narrow enough that a row's name
+    /// and its mark stay in one glance.
+    static let listWidth: CGFloat = 560
 }
