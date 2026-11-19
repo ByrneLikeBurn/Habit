@@ -81,6 +81,13 @@ struct TodayWidgetView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// The small widget at accessibility sizes: one row, the name above its mark.
+    private var stacked: Bool { typeSize.isAccessibilitySize && family == .systemSmall }
+
+    private func moreText(_ more: Int) -> String {
+        String(localized: "\(more) more", comment: "Widget, under the rows: how many of today's habits did not fit. For example: 3 more.")
+    }
+
     @ViewBuilder
     private func content(_ style: ResolvedStyle) -> some View {
         let all = entry.snapshot.rows
@@ -102,14 +109,19 @@ struct TodayWidgetView: View {
             }
         } else {
             VStack(spacing: 0) {
-                ForEach(rows) { WidgetRow(row: $0, day: entry.snapshot.day, showsSymbol: !typeSize.isAccessibilitySize) }
+                ForEach(rows) {
+                    WidgetRow(row: $0, day: entry.snapshot.day, showsSymbol: !typeSize.isAccessibilitySize,
+                              stacked: stacked, moreLine: more > 0 ? moreText(more) : nil)
+                }
             }
         }
-        if more > 0 {
+        if more > 0 && !stacked {
             // How many more, not how many are left to do. A tap here opens Today.
-            Text("\(more) more", comment: "Widget, under the rows: how many of today's habits did not fit. For example: 3 more.")
+            Text(moreText(more))
                 .font(style.label(.caption))
                 .foregroundStyle(style.secondary)
+                // A short, quiet line. It keeps to one line so the row above keeps its room.
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         }
     }
 }
@@ -119,10 +131,14 @@ struct WidgetRow: View {
     let row: WidgetSnapshot.Row
     let day: DayKey
     let showsSymbol: Bool
+    var stacked = false
+    var moreLine: String?
     @Environment(\.style) private var style
 
     var body: some View {
-        let label = HStack(spacing: 8) {
+        // At accessibility sizes in a narrow widget the name takes the full width, with the mark below it.
+        let layout = stacked ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4)) : AnyLayout(HStackLayout(spacing: 8))
+        let label = layout {
             if showsSymbol && !row.symbolName.isEmpty {
                 Image(systemName: row.symbolName)
                     .font(style.label(.caption))
@@ -134,9 +150,22 @@ struct WidgetRow: View {
                 .font(style.label(.footnote))
                 .foregroundStyle(style.text)
                 .lineLimit(2)
+                .minimumScaleFactor(stacked ? 0.8 : 1)
+                .fixedSize(horizontal: false, vertical: stacked)
+                .layoutPriority(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            MarkView(state: row.state, isToday: true, showsPlus: false, size: 24)
-                .widgetAccentable()
+            HStack(spacing: 8) {
+                MarkView(state: row.state, isToday: true, showsPlus: false, size: 24)
+                    .widgetAccentable()
+                // In the stacked row, "N more" shares the mark's line, so it fits the small widget.
+                if stacked, let more = moreLine {
+                    Text(more)
+                        .font(style.label(.caption))
+                        .foregroundStyle(style.secondary)
+                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        .accessibilityHidden(true)
+                }
+            }
         }
         .frame(minHeight: 44)
         .contentShape(Rectangle())
@@ -168,6 +197,7 @@ struct WidgetRow: View {
         case .noSetDays: parts.append(String(localized: "No set days"))
         default: break
         }
+        if stacked, let moreLine { parts.append(moreLine) }
         return parts.joined(separator: ", ")
     }
 
