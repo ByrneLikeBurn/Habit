@@ -20,6 +20,9 @@ struct TodayView: View {
     @State private var dayMark = ""
     #if os(iOS)
     @State private var editMode: EditMode = .inactive
+    #else
+    /// The Mac: the selected row, moved with the arrow keys. The Habit menu acts on it.
+    @State private var selection: UUID?
     #endif
 
     /// The day this list shows. TodayScreen rebuilds the view when it changes.
@@ -39,7 +42,7 @@ struct TodayView: View {
         let totals = DayTotals(day: today, events: todaysEvents).totals
         let pauseStatus = SharedPauseStatus.of(sharedPauses, today: today)
 
-        List {
+        listView {
             TodayHeading(clock: clock)
                 .plainRow(style)
                 .id(dayMark)
@@ -68,6 +71,7 @@ struct TodayView: View {
                 HabitRow(habit: habit, day: today, total: totals[habit.id] ?? 0, actions: rowActions)
                     .habitRow(style, leading: settings.controlsLeading)
                     .rowSwipeActions(rowActions)
+                    .tag(habit.id)
             }
             .onMove { source, destination in
                 Ordering.move(split.scheduled, from: source, to: destination, all: active)
@@ -81,6 +85,7 @@ struct TodayView: View {
                         HabitRow(habit: habit, day: today, total: totals[habit.id] ?? 0, actions: rowActions)
                             .habitRow(style, leading: settings.controlsLeading)
                             .rowSwipeActions(rowActions)
+                            .tag(habit.id)
                     }
                     .onMove { source, destination in
                         Ordering.move(split.notScheduled, from: source, to: destination, all: active)
@@ -116,7 +121,7 @@ struct TodayView: View {
             }
         }
         .listStyle(.plain)
-        .frame(maxWidth: 393)
+        .frame(maxWidth: WideLayout.listWidth)
         .frame(maxWidth: .infinity)
         .paperBackground(style)
         .onScrollGeometryChange(for: Bool.self) { geometry in
@@ -148,6 +153,11 @@ struct TodayView: View {
             }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: model.feedback)
+        #if os(macOS)
+        .onChange(of: selection) { _, id in
+            model.selectedHabit = id.flatMap { id in habits.first { $0.id == id } }
+        }
+        #endif
         .task(id: scenePhase) {
             // Redraw when the day turns over or passes midnight. Nothing is drawn per frame.
             while !Task.isCancelled {
@@ -157,6 +167,16 @@ struct TodayView: View {
                 try? await Task.sleep(for: .seconds(30))
             }
         }
+    }
+
+    /// The Mac list takes a selection, so the arrow keys move between rows and the Habit menu has a subject.
+    @ViewBuilder
+    private func listView<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        #if os(macOS)
+        List(selection: $selection) { content() }
+        #else
+        List { content() }
+        #endif
     }
 
     private func actions(for habit: Habit, in list: [Habit], day: DayKey, clock: HabitClock) -> HabitRow.Actions {

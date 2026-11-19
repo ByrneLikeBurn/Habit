@@ -86,7 +86,7 @@ struct YouView: View {
                 }
             }
             .listRowBackground(style.paper)
-            .frame(maxWidth: 393)
+            .frame(maxWidth: WideLayout.listWidth)
             .frame(maxWidth: .infinity)
             .paperBackground(style)
             .foregroundStyle(style.text, style.secondary, style.tertiary)

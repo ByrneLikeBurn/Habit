@@ -53,6 +53,13 @@ struct DetailRoute: Hashable {
 
 enum AppTab: Hashable { case today, history, you }
 
+/// A View menu command for the period on screen: History, or Habit detail.
+struct PeriodRequest: Equatable {
+    enum Command: Equatable { case show(PeriodKind), move(Int), current }
+    let command: Command
+    let id = UUID()
+}
+
 /// Screen state shared by Today, the sheets and the menu commands.
 @MainActor
 @Observable
@@ -75,6 +82,13 @@ final class AppModel {
     var isReordering = false
     /// Today asks You to open Archived.
     var showArchived = false
+    /// The Mac: the row selected on Today, which the Habit menu acts on.
+    var selectedHabit: Habit?
+    /// The habit Habit detail shows, while it is on screen.
+    var detailHabit: Habit?
+    /// "Pause for dates" from the Mac Habit menu.
+    var pauseForm: PauseRequest?
+    var periodRequest: PeriodRequest?
     /// Pauses ended today from Today, for "Keep paused".
     var resumedShared: [ResumedPause] = []
     /// Changes on every log and take-back, for one haptic.
@@ -181,6 +195,35 @@ final class AppModel {
         undoLine = line
         let spoken = line.undo == nil ? line.message : String(localized: "\(line.message). Undo available")
         AccessibilityNotification.Announcement(spoken).post()
+    }
+
+    /// The current tab's pushed pages.
+    var currentPath: [DetailRoute] {
+        switch tab {
+        case .today: todayPath
+        case .history: historyPath
+        case .you: []
+        }
+    }
+
+    /// The Habit menu's subject: the habit detail shows, or else the row selected on Today.
+    var menuHabit: Habit? {
+        if !currentPath.isEmpty { return detailHabit }
+        return tab == .today ? selectedHabit : nil
+    }
+
+    /// The periods the View menu offers for what is on screen. Empty when no period is shown.
+    var periodKinds: [PeriodKind] {
+        if !currentPath.isEmpty { return PeriodKind.allCases }
+        return tab == .history ? [.week, .month] : []
+    }
+
+    func goBack() {
+        switch tab {
+        case .today: if !todayPath.isEmpty { todayPath.removeLast() }
+        case .history: if !historyPath.isEmpty { historyPath.removeLast() }
+        case .you: break
+        }
     }
 
     /// Opens Habit detail in the tab that asked for it.

@@ -54,6 +54,9 @@ struct RootView: View {
             .sheet(item: $model.counting) { request in
                 CountSheet(habit: request.habit, day: request.day)
             }
+            .sheet(item: $model.pauseForm) { request in
+                PauseDatesForm(pause: request.pause, clock: settings.clock)
+            }
             .sheet(item: $model.daySheet) { request in
                 DaySheet(habit: request.habit, day: request.day)
             }
