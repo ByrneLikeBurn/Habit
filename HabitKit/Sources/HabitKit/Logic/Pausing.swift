@@ -236,12 +236,15 @@ public struct PauseImpact: Equatable, Sendable {
         let highest = min(span.upperBound, today)
         guard lowest <= highest else { return result }
         for habit in habits where habit.isActive {
+            // One pass over the events per habit, read only when some day changes.
+            var totals: [Int: Int]?
             var day = lowest
             while day <= highest {
                 defer { day = day.adding(days: 1) }
                 let was = inRange(old, day), will = inRange(new, day)
                 guard was != will, !habit.isPaused(on: day, sharedPauses: otherShared) else { continue }
-                guard habit.total(on: day) > 0 else { continue }
+                if totals == nil { totals = habit.dayTotals() }
+                guard (totals?[day.rawValue] ?? 0) > 0 else { continue }
                 if will { result.logsGainPause += 1 } else { result.logsLosePause += 1 }
             }
         }

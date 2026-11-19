@@ -63,11 +63,14 @@ public struct WidgetSnapshot: Equatable, Sendable {
     /// The widget's mark size. Its diamond (68% of the mark) sits well above the 12 point jump in the cut.
     public static let markSize: CGFloat = 24
 
+    /// `totals` is the day's raw totals by habit, from one day-filtered fetch, so the widget never loads
+    /// a habit's whole history. nil reads them from each habit, for tests.
     @MainActor
-    public static func make(habits: [Habit], sharedPauses: [Pause], today: DayKey, locale: Locale = .autoupdatingCurrent) -> WidgetSnapshot {
+    public static func make(habits: [Habit], sharedPauses: [Pause], today: DayKey, totals: [UUID: Int]? = nil,
+                            locale: Locale = .autoupdatingCurrent) -> WidgetSnapshot {
         let split = Ordering.today(habits, day: today)
         let rows = split.scheduled.map { habit -> Row in
-            let total = habit.total(on: today)
+            let total = totals.map { $0[habit.id] ?? 0 } ?? habit.total(on: today)
             let state = habit.state(on: today, today: today, total: total, sharedPauses: sharedPauses)
             let paused = habit.isPaused(on: today, sharedPauses: sharedPauses)
             let count = habit.kind == .counted

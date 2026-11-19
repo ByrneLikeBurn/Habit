@@ -8,7 +8,7 @@ import HabitKit
 struct LogHabitIntent: AppIntent {
     static let title: LocalizedStringResource = "Log a habit"
     static let description = IntentDescription("Logs a habit for today. Leave the amount empty to log one tap.")
-    static let openAppWhenRun = false
+    static let supportedModes: IntentModes = .background
     /// Habit names can be health details. Siri and Shortcuts never read or log them on a locked device.
     static let authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 

@@ -175,6 +175,8 @@ struct PauseDatesForm: View {
         let firstDay = clock.dayKey(for: first)
         let lastDay = last.map { clock.dayKey(for: $0) }
         let canSave = lastDay.map { $0 >= firstDay } ?? (pause != nil && pause?.endDay == nil)
+        // Worked out once per draw, for the footer and for Save's VoiceOver hint.
+        let impact = lastDay.flatMap { $0 >= firstDay ? impactLines(firstDay...$0, clock: clock) : nil } ?? []
         NavigationStack {
             Form {
                 Section {
@@ -206,9 +208,7 @@ struct PauseDatesForm: View {
                         } else if let lastDay, lastDay < firstDay {
                             Text("The last day is before the first day. Move one of them to save.")
                         }
-                        if let lastDay, lastDay >= firstDay {
-                            ForEach(impactLines(firstDay...lastDay, clock: clock), id: \.self) { Text($0) }
-                        }
+                        ForEach(impact, id: \.self) { Text($0) }
                     }
                 }
                 .listRowBackground(style.paper)
@@ -229,7 +229,7 @@ struct PauseDatesForm: View {
                     // The impact lines change as dates are picked. VoiceOver hears them on Save.
                     Button("Save") { save(firstDay, lastDay) }
                         .disabled(!canSave)
-                        .accessibilityHint(Text(lastDay.map { $0 >= firstDay ? impactLines(firstDay...$0, clock: clock).joined(separator: " ") : "" } ?? ""))
+                        .accessibilityHint(Text(impact.joined(separator: " ")))
                 }
             }
         }

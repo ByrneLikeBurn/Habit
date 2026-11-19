@@ -10,7 +10,7 @@ import HabitKit
 struct WidgetLogIntent: AppIntent {
     static let title: LocalizedStringResource = "Log from the widget"
     static let isDiscoverable = false
-    static let openAppWhenRun = false
+    static let supportedModes: IntentModes = .background
     /// A tap on a locked device changes nothing until it is unlocked.
     static let authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
@@ -36,7 +36,7 @@ struct WidgetLogIntent: AppIntent {
         var fetch = FetchDescriptor<Habit>(predicate: #Predicate { $0.id == id })
         fetch.fetchLimit = 1
         guard let habit = try context.fetch(fetch).first, habit.isActive,
-              WidgetSnapshot.accepts(shownDay: day, shownTotal: total, today: clock.today, currentTotal: habit.total(on: clock.today)) else {
+              WidgetSnapshot.accepts(shownDay: day, shownTotal: total, today: clock.today, currentTotal: (try? LogWriter.rawTotal(of: habit, on: clock.today, in: context)) ?? -1) else {
             return .result()
         }
         let intent = LogHabitIntent(habitID: habit.id, name: habit.name, action: .tap, source: .widget, day: clock.today)

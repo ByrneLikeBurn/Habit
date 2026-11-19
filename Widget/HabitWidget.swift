@@ -54,7 +54,9 @@ struct TodayProvider: TimelineProvider {
         var chosen: [DayKey: [Int: [UUID]]] = [:]
         let entries = WidgetSnapshot.entryDates(clock: clock).map { date in
             let day = clock.dayKey(for: date)
-            let snapshot = WidgetSnapshot.make(habits: habits, sharedPauses: shared, today: day)
+            // Only the day's events are fetched; the widget's memory stays flat as history grows.
+            let snapshot = WidgetSnapshot.make(habits: habits, sharedPauses: shared, today: day,
+                                               totals: (try? LogWriter.dayTotals(on: day, in: context)) ?? [:])
             let kept = chosen[day] ?? snapshot.chosenRows(kept: WidgetRows.kept(on: day))
             chosen[day] = kept
             return TodayEntry(date: date, snapshot: snapshot, kept: kept)

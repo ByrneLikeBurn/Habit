@@ -7,7 +7,7 @@ import Foundation
 struct WidgetOpenIntent: AppIntent {
     static let title: LocalizedStringResource = "Open Habit"
     static let isDiscoverable = false
-    static let openAppWhenRun = true
+    static let supportedModes: IntentModes = .foreground
     /// Opening the app needs an unlocked device, as every intent here does.
     static let authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 

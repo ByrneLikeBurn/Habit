@@ -84,7 +84,7 @@ extension Habit {
     }
 
     public func isPaused(on day: DayKey, sharedPauses: [Pause] = []) -> Bool {
-        ((pauses ?? []) + sharedPauses).contains { $0.covers(day) }
+        (pauses ?? []).contains { $0.covers(day) } || sharedPauses.contains { $0.covers(day) }
     }
 
     /// The state of one day, drawn as a mark.

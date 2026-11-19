@@ -320,3 +320,8 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - A Today row with a pause note sits its name low in the target, as a counted row does (industrial designer). "Logged while paused" wraps at AX5 (colour vision, typographer). Edit's "Paused since" uses the day and month form used elsewhere, under its label at AX sizes (typographer). Counts use tabular digits in the widget (typographer).
 - Not adopted: a done yes-or-no widget row opening Today instead of taking the log back (industrial designer). A second tap logs it again, so the row is its own undo, as on Today. Human factors and the UI and UX designer passed this toggle in their reviews.
 
+**Milestone 3 lens round one: performance and app size, release engineer, 18 November 2026.**
+- The widget reads only the day's events, through one day-filtered fetch per entry, and its tap check reads the day's total the same way, so its memory does not grow with history. The Pause for dates form reads each habit's totals in one pass, only when a day changes, and works the impact out once per draw. A pause lookup no longer builds an array. Asked for by the performance lens.
+- Not adopted: removing the widget reload in `LogHabitIntent.perform` because the app's save observer also reloads (performance). A Shortcut or NFC log can run with no app view alive, and then the intent's reload is the only one.
+- The intents declare `supportedModes` in place of `openAppWhenRun`, which the iOS 26 SDK deprecates (release engineer).
+
