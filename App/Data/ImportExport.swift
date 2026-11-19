@@ -112,6 +112,17 @@ struct ImportSheet: View {
     @Query private var habits: [Habit]
     /// Set on the first tap, so a double tap cannot write the file twice.
     @State private var importing = false
+    /// The content's height, so a short result opens a sheet that fits it, not a half-empty one.
+    @State private var contentHeight: CGFloat = 0
+
+    /// One heading and one line: nothing new, or a file that could not be read.
+    private var isShort: Bool {
+        switch stage {
+        case .preview(let plan): plan.isEmpty
+        case .done: false
+        case .problem: true
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -122,6 +133,7 @@ struct ImportSheet: View {
                 .padding(20)
                 .frame(maxWidth: 480)
                 .frame(maxWidth: .infinity)
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
             }
             .paperBackground(style)
             .navigationTitle("Import")
@@ -131,9 +143,10 @@ struct ImportSheet: View {
             .toolbar { toolbar }
         }
         #if os(iOS)
-        .presentationDetents([.medium, .large])
+        // The bar and the grabber add about 80 points above the content.
+        .presentationDetents(isShort && contentHeight > 0 ? [.height(contentHeight + 80), .large] : [.medium, .large])
         #else
-        .frame(minWidth: 440, idealWidth: 480, minHeight: 360)
+        .frame(minWidth: 440, idealWidth: 480, minHeight: isShort ? 200 : 360)
         #endif
     }
 
@@ -172,6 +185,7 @@ struct ImportSheet: View {
         case .preview(let plan) where plan.isEmpty:
             heading("Nothing new in this file")
             caption("Everything in it is already here. Nothing was changed.")
+            chooseButton
         case .preview(let plan):
             // What will change comes first, in the same rows the result shows, so the numbers match.
             heading("Importing adds")

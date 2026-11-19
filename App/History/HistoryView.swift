@@ -28,11 +28,14 @@ struct HistoryView: View {
 
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                #if !os(macOS)
+                // On the Mac the window's title bar names the page, so the heading would say it twice.
                 Text("History")
                     .font(style.display(.largeTitle, weight: .semibold))
                     .foregroundStyle(style.text)
                     .accessibilityAddTraits(.isHeader)
                     .padding(.bottom, 8)
+                #endif
 
                 if active.isEmpty && archived.isEmpty {
                     VStack(alignment: .leading, spacing: 14) {

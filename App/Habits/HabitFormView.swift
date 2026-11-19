@@ -97,11 +97,6 @@ struct HabitFormView: View {
           ScrollViewReader { reader in
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    #if os(macOS)
-                    Text(title)
-                        .font(style.label(.headline, weight: .semibold))
-                        .accessibilityAddTraits(.isHeader)
-                    #endif
                     nameSection
                     symbolSection
                     loggingSection

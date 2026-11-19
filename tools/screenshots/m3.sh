@@ -54,6 +54,7 @@ for look in light:paper dark:ink; do
   shot "bring-back-$tag"          $appearance large disabled -fixture one-paused -screen bringBack
   shot "marks-$tag"               $appearance large disabled -fixture today -screen marks
   shot "detail-paused-$tag"       $appearance large disabled -fixture paused -screen detailMonth
+  shot "import-nothing-$tag"      $appearance large disabled -fixture today -screen importNothing
   shot "widget-$tag"              $appearance large disabled -fixture today -screen widget
   shot "widget-paused-$tag"       $appearance large disabled -fixture paused -screen widget
   shot "widget-nodays-$tag"       $appearance large disabled -fixture no-days -screen widget
