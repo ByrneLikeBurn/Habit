@@ -75,6 +75,8 @@ extension DayState {
             if !input.scheduled { return .loggedOffSchedule }
             return input.targetMet ? .done : .partDone
         }
+        // Days to come draw nothing, paused or not, so an open pause never reads as a forecast.
+        if input.relation == .future { return .blank }
         if input.paused { return .paused }
         // No set days: the dot today, so it is never shown as owed, and nothing on any other day,
         // whether or not Show days not logged is on.

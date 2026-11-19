@@ -189,9 +189,7 @@ struct ArchivedView: View {
     @Environment(\.style) private var style
     @Environment(\.modelContext) private var context
     @Query private var habits: [Habit]
-    /// The habit Bring back asks about, when it was archived before today.
-    @State private var asking: Habit?
-    @State private var askedForScreenshot = false
+    @State private var broughtBackForScreenshot = false
 
     var body: some View {
         let archived = habits.filter { $0.isArchived && $0.deletedAt == nil }.sorted { $0.name < $1.name }
@@ -206,12 +204,11 @@ struct ArchivedView: View {
                     Text(habit.name).font(style.display(.body))
                     Spacer()
                     Button("Bring back") {
-                        if BringBackOffer.span(of: habit, clock: settings.clock) != nil { asking = habit } else { model.bringBack(habit, context: context, all: habits) }
+                        model.bringBack(habit, context: context, all: habits, clock: settings.clock)
                     }
                     .buttonStyle(.bordered)
                     .buttonBorderShape(.capsule)
                     .accessibilityLabel(Text("Bring back \(habit.name)"))
-                    .bringBackOffer($asking, for: habit)
                 }
                 .frame(minHeight: 44)
             }
@@ -221,9 +218,11 @@ struct ArchivedView: View {
         .paperBackground(style)
         .navigationTitle("Archived")
         .task {
-            if LaunchOptions.current.screen == .bringBack, !askedForScreenshot {
-                askedForScreenshot = true
-                asking = habits.first { $0.isArchived && BringBackOffer.span(of: $0, clock: settings.clock) != nil }
+            // Screenshots: the line after Bring back.
+            if LaunchOptions.current.screen == .bringBack, !broughtBackForScreenshot,
+               let habit = habits.first(where: { $0.isArchived && $0.deletedAt == nil }) {
+                broughtBackForScreenshot = true
+                model.bringBack(habit, context: context, all: habits, clock: settings.clock)
             }
         }
     }

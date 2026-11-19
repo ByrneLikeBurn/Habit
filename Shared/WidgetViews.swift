@@ -37,10 +37,13 @@ struct TodayWidgetView: View {
                              increaseContrast: contrast == .increased)
     }
 
-    /// A row is dropped before text shrinks. Two rows at accessibility sizes.
-    private var rowLimit: Int {
-        if typeSize.isAccessibilitySize { return 2 }
-        return family == .systemMedium ? 4 : 3
+    /// A row is dropped before text shrinks. When rows are dropped, one row's place goes to a line that
+    /// says how many more there are, so a full set of marks never reads as the whole day.
+    private func shownCount(of total: Int) -> Int {
+        let room = typeSize.isAccessibilitySize ? (family == .systemMedium ? 2 : 1) : (family == .systemMedium ? 4 : 3)
+        if total <= room { return total }
+        // The medium grid has two columns, so the line takes no row there.
+        return family == .systemMedium && !typeSize.isAccessibilitySize ? room : max(room - 1, 1)
     }
 
     var body: some View {
@@ -62,7 +65,9 @@ struct TodayWidgetView: View {
             Text("Today").font(style.display(.subheadline, weight: .semibold)).foregroundStyle(style.text)
             Spacer(minLength: 4)
             if entry.snapshot.paused {
+                // The small widget has room for the symbol only. VoiceOver reads "Paused".
                 Label("Paused", systemImage: "pause.circle")
+                    .labelStyle(family == .systemSmall ? AnyLabelStyle(.iconOnly) : AnyLabelStyle(.titleAndIcon))
                     .font(style.label(.caption))
                     .foregroundStyle(style.secondary)
             } else if family == .systemMedium && !typeSize.isAccessibilitySize {
@@ -71,15 +76,21 @@ struct TodayWidgetView: View {
                     .foregroundStyle(style.secondary)
             }
         }
+        // The header keeps to one line at every size, so the rows get the room.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .accessibilityElement(children: .combine)
     }
 
     @ViewBuilder
     private func content(_ style: ResolvedStyle) -> some View {
-        let rows = Array(entry.snapshot.rows.prefix(rowLimit))
+        let all = entry.snapshot.rows
+        let rows = entry.snapshot.shownRows(room: shownCount(of: all.count))
+        let more = all.count - rows.count
         if !entry.snapshot.hasHabits {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Nothing to track yet.").font(style.label(.footnote)).foregroundStyle(style.secondary)
+                if !typeSize.isAccessibilitySize {
+                    Text("Nothing to track yet.").font(style.label(.footnote)).foregroundStyle(style.secondary)
+                }
                 Text("Add a habit").font(style.label(.footnote, weight: .semibold)).foregroundStyle(style.text)
             }
         } else if rows.isEmpty {
@@ -93,6 +104,12 @@ struct TodayWidgetView: View {
             VStack(spacing: 0) {
                 ForEach(rows) { WidgetRow(row: $0, day: entry.snapshot.day, showsSymbol: !typeSize.isAccessibilitySize) }
             }
+        }
+        if more > 0 {
+            // How many more, not how many are left to do. A tap here opens Today.
+            Text("\(more) more", comment: "Widget, under the rows: how many of today's habits did not fit. For example: 3 more.")
+                .font(style.label(.caption))
+                .foregroundStyle(style.secondary)
         }
     }
 }
@@ -161,4 +178,11 @@ struct WidgetRow: View {
             if let amount = row.tapAmount, amount > 0 { String(localized: "Adds \(amount.formatted())") } else { String(localized: "Opens Habit") }
         }
     }
+}
+
+/// A label style chosen at run time.
+struct AnyLabelStyle: LabelStyle {
+    private let make: (Configuration) -> AnyView
+    init<S: LabelStyle>(_ style: S) { make = { AnyView(Label($0).labelStyle(style)) } }
+    func makeBody(configuration: Configuration) -> some View { make(configuration) }
 }

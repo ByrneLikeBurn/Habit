@@ -77,9 +77,9 @@ struct HabitRow: View {
     private var ownPause: HabitPauseStatus { habit.ownPauseStatus(today: day) }
 
     /// A second line only when it says something about today. "Paused" for this habit's own pause, since
-    /// a pause of everything is said once at the top. "Logged while paused" for a yes-or-no log on a paused day.
+    /// a pause of everything is said once at the top. "Logged while paused" for any log on a paused day.
     private var pauseNote: String? {
-        if state == .loggedWhilePaused && habit.kind == .binary { return String(localized: "Logged while paused") }
+        if state == .loggedWhilePaused { return String(localized: "Logged while paused") }
         if state == .paused && ownPause != .none { return String(localized: "Paused") }
         return nil
     }
@@ -115,6 +115,7 @@ struct HabitRow: View {
         .frame(maxWidth: .infinity, minHeight: 44, alignment: habit.kind == .counted && !typeSize.isAccessibilitySize ? .bottomLeading : .leading)
         .contentShape(Rectangle())
         .contextMenu { menu }
+        .accessibilityValue(Text(accessibilityValue))
         .accessibilityHint(Text(accessibilityHint))
         .accessibilityIdentifier("name-\(habit.name)")
         .accessibilityActions { rowActions }

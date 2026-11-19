@@ -18,6 +18,8 @@ struct PauseLineView: View {
                 sentence
                     .font(style.label(.subheadline))
                     .fixedSize(horizontal: false, vertical: true)
+                    // At accessibility sizes the helper is not drawn. VoiceOver still reads it.
+                    .accessibilityLabel(Text("\(title) \(helper)"))
                     .accessibilityAddTraits(.isHeader)
                 if let button = buttonTitle {
                     Button(button) { act() }
@@ -73,8 +75,8 @@ struct PauseLineView: View {
     }
 }
 
-/// The quiet button under Today's last row. It asks for no confirmation: a pause that began today is
-/// undone whole by the same button, which reads "Undo pause" in its place.
+/// The quiet button under Today's last row. It asks for no confirmation. Once pressed it goes, and the
+/// pause line at the top offers "Undo pause".
 struct PauseEverythingButton: View {
     let status: SharedPauseStatus
     let clock: HabitClock
@@ -109,7 +111,7 @@ struct PauseEverythingButton: View {
     private var title: LocalizedStringKey? {
         switch status {
         case .none: "Pause everything"
-        case .everything(startedToday: true): "Undo pause"
+        // While paused, the pause line at the top holds the one button, so it is never shown twice.
         default: nil
         }
     }

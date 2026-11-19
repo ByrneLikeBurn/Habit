@@ -102,7 +102,7 @@ struct HabitFormView: View {
                     loggingSection
                     daysSection.id("days")
                     if let habit {
-                        pauseSection(habit)
+                        pauseSection(habit).id("pause")
                         archiveSection(habit)
                     }
                 }
@@ -115,6 +115,7 @@ struct HabitFormView: View {
             .onAppear {
                 // The editDays screenshot opens the form at Repeats on.
                 if [.editDays, .editWaits].contains(LaunchOptions.current.screen) { reader.scrollTo("days", anchor: .top) }
+                if LaunchOptions.current.screen == .editPaused { reader.scrollTo("pause", anchor: .top) }
             }
           }
             .foregroundStyle(style.text, style.secondary, style.tertiary)

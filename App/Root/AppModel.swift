@@ -177,16 +177,24 @@ final class AppModel {
         })
     }
 
-    /// Brings a habit back. With `pausing`, the days it was archived are paused first, so its run is kept.
-    func bringBack(_ habit: Habit, context: ModelContext, all: [Habit], pausing span: ClosedRange<DayKey>? = nil) {
+    /// Brings a habit back. The days it was archived, up to yesterday, are paused, so its run is as it was.
+    /// Nothing could be logged while it was archived, so the pause only helps. Undo takes back both.
+    func bringBack(_ habit: Habit, context: ModelContext, all: [Habit], clock: HabitClock) {
         let archivedAt = habit.archivedAt, sortIndex = habit.sortIndex
         var added: Pause?
-        if let span { added = try? PauseWriter.pauseArchivedSpan(habit, span: span, in: context) }
+        if let archivedAt, let span = PauseWriter.archivedSpan(of: habit, archivedOn: clock.dayKey(for: archivedAt), today: clock.today) {
+            added = try? PauseWriter.pauseArchivedSpan(habit, span: span, in: context)
+        }
         habit.archivedAt = nil
         habit.sortIndex = Ordering.nextIndex(all)
         try? context.save()
-        show(UndoLine(message: String(localized: "\(habit.name) brought back", comment: "Undo line, a status, not a command. The placeholder is the habit's name, for example: Read brought back."),
-                      name: habit.name, status: String(localized: "Brought back", comment: "Undo line status under the habit's name, at large text sizes. A status, not a command.")) {
+        let message = added == nil
+            ? String(localized: "\(habit.name) brought back", comment: "Undo line, a status, not a command. The placeholder is the habit's name, for example: Read brought back.")
+            : String(localized: "\(habit.name) brought back. Its archived days are paused.", comment: "Undo line after Bring back. The days it was archived are paused, so its run is as it was. The placeholder is the habit's name.")
+        let status = added == nil
+            ? String(localized: "Brought back", comment: "Undo line status under the habit's name, at large text sizes. A status, not a command.")
+            : String(localized: "Brought back. Its archived days are paused.", comment: "Undo line status under the habit's name, at large text sizes.")
+        show(UndoLine(message: message, name: habit.name, status: status) {
             habit.archivedAt = archivedAt
             habit.sortIndex = sortIndex
             if let added { context.delete(added) }

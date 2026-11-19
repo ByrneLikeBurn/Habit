@@ -39,6 +39,14 @@ public struct WidgetSnapshot: Equatable, Sendable {
         shownDay == today.rawValue && shownTotal == currentTotal
     }
 
+    /// The rows that fit in `room`. When all fit, Today's order. When some must be dropped, rows not yet
+    /// logged take the places first, each group in Today's order, so the widget keeps prompting what is left.
+    public func shownRows(room: Int) -> [Row] {
+        guard rows.count > room else { return rows }
+        let open = rows.filter { $0.total <= 0 }, logged = rows.filter { $0.total > 0 }
+        return Array((open + logged).prefix(room))
+    }
+
     /// The widget's mark size. Its diamond (68% of the mark) sits well above the 12 point jump in the cut.
     public static let markSize: CGFloat = 24
 

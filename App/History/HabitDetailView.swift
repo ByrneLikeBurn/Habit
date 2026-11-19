@@ -39,7 +39,6 @@ private struct HabitDetailPage: View {
     @Environment(\.modelContext) private var context
     @State private var kind: PeriodKind
     @State private var anchor: DayKey
-    @State private var bringingBack: Habit?
     @State private var choosingDates = false
 
     private let route: DetailRoute
@@ -128,11 +127,7 @@ private struct HabitDetailPage: View {
                 }
                 Button {
                     if habit.isArchived {
-                        if BringBackOffer.span(of: habit, clock: clock) != nil {
-                            bringingBack = habit
-                        } else {
-                            model.bringBack(habit, context: context, all: (try? context.fetch(FetchDescriptor<Habit>())) ?? [])
-                        }
+                        model.bringBack(habit, context: context, all: (try? context.fetch(FetchDescriptor<Habit>())) ?? [], clock: clock)
                     } else {
                         model.pickingPastDay = habit
                     }
@@ -213,7 +208,6 @@ private struct HabitDetailPage: View {
             case .current: anchor = today
             }
         }
-        .bringBackOffer($bringingBack)
         .sheet(isPresented: $choosingDates) { PauseDatesForm(pause: nil, clock: settings.clock) }
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)

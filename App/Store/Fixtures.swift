@@ -132,6 +132,8 @@ enum Fixtures {
                 let pause = Pause(habit: walk, start: today.adding(days: -4), end: nil, reason: .manual)
                 context.insert(pause)
                 walk.pauses = [pause]
+                // First on Today, so the AX5 shot shows the paused row.
+                walk.sortIndex = -1
             }
             habits.first { $0.isArchived }?.archivedAt = clock.now().addingTimeInterval(-86_400 * 6)
         default:

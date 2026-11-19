@@ -63,6 +63,17 @@ struct PauseStatusTests {
         #expect(dates.endDay == today.rawValue)
     }
 
+    /// Days to come draw nothing under an open pause, so it never reads as a forecast.
+    @Test func daysToComeDrawNothingUnderAPause() throws {
+        let context = try makeContext()
+        let habit = addHabit("Read", in: context)
+        try PauseWriter.pauseEverything(today: today.adding(days: -2), in: context)
+        let pauses = try shared(context)
+        #expect(habit.state(on: today, today: today, sharedPauses: pauses) == .paused)
+        #expect(habit.state(on: today.adding(days: 1), today: today, sharedPauses: pauses) == .blank)
+        #expect(habit.state(on: today.adding(days: 20), today: today, sharedPauses: pauses) == .blank)
+    }
+
     @Test func removeThenRestorePutsTheSameDatesBack() throws {
         let context = try makeContext()
         let dates = try PauseWriter.addDates(first: today.adding(days: -9), last: today.adding(days: -3), in: context)
@@ -300,6 +311,24 @@ struct WidgetSnapshotTests {
         #expect(!WidgetSnapshot.accepts(shownDay: today.adding(days: -1).rawValue, shownTotal: 0, today: today, currentTotal: 0))
         // Logged in the app since the widget drew: a tap would take that log back.
         #expect(!WidgetSnapshot.accepts(shownDay: today.rawValue, shownTotal: 0, today: today, currentTotal: 1))
+    }
+
+    /// When rows are dropped, habits not yet logged take the places first, each group in Today's order.
+    @Test func droppedRowsKeepWhatIsLeftToDo() throws {
+        let context = try makeContext()
+        let names = ["A", "B", "C", "D"]
+        var habits: [Habit] = []
+        for (i, name) in names.enumerated() {
+            let habit = addHabit(name, in: context)
+            habit.sortIndex = i
+            habits.append(habit)
+        }
+        try log(.tap, habits[0], day: today, context)
+        try log(.tap, habits[1], day: today, context)
+        let snapshot = WidgetSnapshot.make(habits: habits, sharedPauses: [], today: today)
+        #expect(snapshot.shownRows(room: 4).map(\.name) == names)
+        #expect(snapshot.shownRows(room: 2).map(\.name) == ["C", "D"])
+        #expect(snapshot.shownRows(room: 3).map(\.name) == ["C", "D", "A"])
     }
 
     @Test func noHabitsAtAll() throws {

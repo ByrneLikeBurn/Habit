@@ -99,7 +99,7 @@ struct PauseDatesView: View {
                 .padding(.vertical, 8)
             }
             if !coming.isEmpty {
-                Section("Coming") { rows(coming, clock: clock) }
+                Section("Now and coming") { rows(coming, clock: clock) }
             }
             if !earlier.isEmpty {
                 Section {
@@ -139,9 +139,6 @@ struct PauseDatesView: View {
                 HStack {
                     Text(PauseText.range(pause, clock: clock)).font(style.label(.body))
                     Spacer(minLength: 12)
-                    if pause.isEverything {
-                        Text("Everything", comment: "Pause for dates list: this pause came from Pause everything").font(style.label(.subheadline)).foregroundStyle(style.secondary)
-                    }
                     Image(systemName: "chevron.forward").font(style.label(.footnote)).foregroundStyle(style.tertiary).accessibilityHidden(true)
                 }
                 .frame(minHeight: 44)
@@ -220,7 +217,10 @@ struct PauseDatesForm: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { save(firstDay, lastDay) }.disabled(!canSave)
+                    // The impact lines change as dates are picked. VoiceOver hears them on Save.
+                    Button("Save") { save(firstDay, lastDay) }
+                        .disabled(!canSave)
+                        .accessibilityHint(Text(lastDay.map { $0 >= firstDay ? impactLines(firstDay...$0, clock: clock).joined(separator: " ") : "" } ?? ""))
                 }
             }
         }
@@ -288,47 +288,3 @@ struct PauseDatesForm: View {
     }
 }
 
-/// Bring back, for a habit archived before today: offers to pause the days it was archived, so its run is kept.
-struct BringBackOffer: ViewModifier {
-    @Binding var asking: Habit?
-    /// The row the question belongs to, so it opens from that row's Bring back. nil for a screen with one habit.
-    var habit: Habit? = nil
-    @Environment(Settings.self) private var settings
-    @Environment(AppModel.self) private var model
-    @Environment(\.modelContext) private var context
-
-    func body(content: Content) -> some View {
-        content.confirmationDialog(
-            String(localized: "Pause the days it was archived?"),
-            isPresented: Binding(get: { asking != nil && (habit == nil || asking?.id == habit?.id) }, set: { if !$0 { asking = nil } }),
-            titleVisibility: .visible,
-            presenting: asking
-        ) { habit in
-            let all = (try? context.fetch(FetchDescriptor<Habit>())) ?? []
-            Button("Bring back and pause those days") {
-                model.bringBack(habit, context: context, all: all, pausing: Self.span(of: habit, clock: settings.clock))
-            }
-            Button("Bring back without a pause") {
-                model.bringBack(habit, context: context, all: all)
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: { habit in
-            if let span = Self.span(of: habit, clock: settings.clock) {
-                let clock = settings.clock
-                Text("\(PauseText.dayMonth(span.lowerBound, clock: clock)) to \(PauseText.dayMonth(span.upperBound, clock: clock)). Paused days leave its run as it was.", comment: "Bring back: the days the habit was archived, first and last, then what a pause does.")
-            }
-        }
-    }
-
-    /// The days it was archived, up to yesterday. nil when it was archived today.
-    static func span(of habit: Habit, clock: HabitClock) -> ClosedRange<DayKey>? {
-        guard let archivedAt = habit.archivedAt else { return nil }
-        return PauseWriter.archivedSpan(of: habit, archivedOn: clock.dayKey(for: archivedAt), today: clock.today)
-    }
-}
-
-extension View {
-    func bringBackOffer(_ asking: Binding<Habit?>, for habit: Habit? = nil) -> some View {
-        modifier(BringBackOffer(asking: asking, habit: habit))
-    }
-}

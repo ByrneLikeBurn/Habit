@@ -504,7 +504,7 @@ Each needs the owner. The recommendation is mine.
 | 3 | The usage data page | Build it in milestone 13 from the existing log fields | Milestone 13 |
 | 4 | Display fonts for Pencil and Watercolor | Decide after the Pencil design pass | Milestone 4 |
 | 5 | The items marked Guess in this file | Accept as written | The milestone that first uses each |
-| 6 | Keep the span a habit was archived, so Bring back can treat it as a pause and not break a run. This needs a new optional field or model, so it is a schema change | Offer to pause the span on Bring back in milestone 3 first, with no schema change, and decide this only if that is not enough | Milestone 3 |
+| 6 | Keep the span a habit was archived, so Bring back can treat it as a pause and not break a run. This needs a new optional field or model, so it is a schema change | Built in milestone 3 with no schema change: Bring back pauses the span from the day it was archived through yesterday, with Undo. Decide the schema question only if that is not enough | Milestone 3, built |
 
 Decided on 14 November 2026 and now written into this file and `CLAUDE.md`: whole-number deltas and typed numbers, the `.entitlements` file for the App Group, the milestone order, export in milestone 2, three review lenses per milestone, red allowed as a user's accent, and three more lenses (UI and UX, human factors, senior designer).
 

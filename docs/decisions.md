@@ -282,3 +282,14 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - On the Mac, Export a Copy opens the save panel at once, with the warning in the panel. The export sheet is iOS only. Asked for by the Apple industrial designer.
 - The Undo line's inset is on Today's list, so a logged row it covers scrolls clear. Asked for by accessibility and the UI and UX designer.
 - Mac shortcuts: Week, Month and Year are Option-Command-1 to 3, Previous and Next Period are Command-Left and Command-Right, Go to Today is Command-T, Back is Command-[, Log is Command-L, Add an Amount is Option-Command-L, Show Details is Command-I and Edit Habit is Command-E. Archive and the pause items have no shortcut.
+
+**Milestone 3 lens round one, 18 November 2026.**
+- Days to come draw nothing, paused or not. An open pause drew a dash on every day left in the month, which read as a forecast of giving up. Asked for by the behavioural scientist.
+- Bring back always pauses the days the habit was archived, up to yesterday, and says so in its Undo line. The question is gone. Nothing could be logged while the habit was archived, so the pause only helps, and the other answer could only break a run. This replaces the offer in `docs/spec.md`, open decision 6. Asked for by the behavioural scientist.
+- The widget keeps Today's order. When rows must be dropped, habits not yet logged take the places first, and a line says how many more there are. The tired daily user asked for the line, so three done marks never read as the whole day. The behavioural scientist asked that the widget keep prompting what is left. This one rule meets both.
+- The small widget's paused header is the symbol alone. At accessibility sizes the small widget shows one row and the medium two, the header keeps to one line, and the empty widget shows "Add a habit" alone. Asked for by the tired daily user.
+- While paused, the pause line at the top holds the one Undo pause or Resume tomorrow button. The bottom "Pause everything" button goes, so the same button never shows twice. Asked for by the tired daily user.
+- The dated pause list heads its first group "Now and coming" and no longer marks pauses from Pause everything. Every pause in the list pauses every habit. Asked for by the tired daily user.
+- A counted row logged on a paused day says "Logged while paused", as a yes-or-no row does. Asked for by the behavioural scientist.
+- VoiceOver hears "Resumes tomorrow.", "Pause undone." and "Paused again.", and nothing when a save fails. A paused row's name carries the same value as its control. The dates form's impact lines are the Save button's hint. The pause line's full sentence is read at every size. Asked for by the accessibility expert.
+
