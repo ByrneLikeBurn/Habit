@@ -140,7 +140,7 @@ The PR body lists the areas touched, which lenses saw the final version, and wha
 | Marks, colour, contrast and type | Accessibility expert, Color vision and low vision, Typographer, Senior designer |
 | Behaviour: runs, pausing, nudges, targets | Behavioural scientist, Neurodiversity expert, Returning user |
 | Adding or cutting a screen or feature | Product owner, Senior designer |
-| Platform conventions: Mac, iPad, Watch, widgets | Apple industrial designer, Accessibility expert, Release engineer |
+| Platform conventions: Mac, iPad, Watch, widgets | Apple industrial designer, Accessibility expert, Release engineer. For a widget, also Typographer and Performance and app size |
 | Data rules, schema and sync | Senior software engineer, QA engineer, then the owner for the schema |
 | Files, permissions, dependencies, anything leaving the device | Security and privacy expert, Release engineer, then the owner |
 | Code | Senior software engineer, QA engineer. Performance and app size when scrolling, launch or assets change |

@@ -106,3 +106,18 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | An archived habit shows in History under "Archived" only in a period where it has a log | Product owner, Returning user, by milestone 13 | `m2-hist-many.png` |
 | An imported habit that differs keeps this device's version | Senior software engineer, QA engineer, by milestone 13 | `docs/spec.md`, Export |
 | The export file keeps complete protection, though a share still running when the phone locks can then fail. The release engineer suggested complete-unless-open | Security and privacy, by milestone 13 | `App/Data/ImportExport.swift`, `writeTemporaryFile` |
+
+## What the routed lenses missed, milestone 3 stop, 19 November 2026
+
+The milestone 3 build was routed to the senior software engineer, QA engineer, tired daily user, accessibility expert and security and privacy expert. At the stop, the other lenses found these, which the routed ones did not:
+
+| Missed | Found by | Change to the routing table |
+|---|---|---|
+| The widget at AX5 cut names and overprinted its header | Apple industrial designer, typographer, colour vision and low vision | Widgets now also route to the typographer |
+| The widget had no string catalog, so it read "1 more habits" | Typographer | As above |
+| The widget loaded every log of every habit shown, against its memory ceiling | Performance and app size | Widgets now also route to performance and app size |
+| A planned pause could be deleted with no Undo; a pause slip had its Undo off screen | UI and UX designer, human factors | None: pausing is behaviour and layout, which already route to them; the build was not tagged with layout |
+| One pause change had two undos | Senior designer | None: the same tagging gap |
+| The day-ahead entry kept done rows on the widget all day | Tired daily user and behavioural scientist, on a second look at the stop | None |
+
+The tagging gap: the milestone 3 build touched layout and flows, so the layout lenses should have run before the stop. At milestone 4 the build is tagged with every area it touches.
