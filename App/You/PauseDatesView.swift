@@ -181,8 +181,9 @@ struct PauseDatesForm: View {
         NavigationStack {
             Form {
                 Section {
-                    if pause != nil && pause?.endDay == nil && last == nil {
-                        // A pause with no last day has begun. Its first day cannot move past today.
+                    if let pause, pause.start <= clock.today {
+                        // A pause that has begun keeps its first day on or before today, so ending it
+                        // always goes through the ending rule.
                         DatePicker("First day", selection: $first, in: ...clock.date(for: clock.today), displayedComponents: .date)
                     } else {
                         DatePicker("First day", selection: $first, displayedComponents: .date)
