@@ -153,7 +153,7 @@ struct RootView: View {
 extension LaunchOptions.Screen {
     var opensYou: Bool {
         switch self {
-        case .you, .appearance, .archived, .marks, .export, .importPreview, .importDone, .importNothing, .importNotHabit, .importNewer: true
+        case .you, .appearance, .archived, .marks, .pauseDates, .pauseDatesNew, .bringBack, .export, .importPreview, .importDone, .importNothing, .importNotHabit, .importNewer: true
         default: false
         }
     }

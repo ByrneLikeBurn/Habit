@@ -106,7 +106,10 @@ struct HabitFormView: View {
                     symbolSection
                     loggingSection
                     daysSection.id("days")
-                    if let habit { archiveSection(habit) }
+                    if let habit {
+                        pauseSection(habit)
+                        archiveSection(habit)
+                    }
                 }
                 .padding(.horizontal, 24)
                 .padding(.vertical, 20)
@@ -248,7 +251,7 @@ struct HabitFormView: View {
             targetLayout {
                 Text("Target").font(style.label(.body))
                 if !typeSize.isAccessibilitySize { Spacer(minLength: 12) }
-                TextField(String(localized: "Target"), text: $targetText, prompt: Text("None").foregroundStyle(style.tertiary))
+                TextField(String(localized: "Target"), text: $targetText, prompt: Text("Optional", comment: "Placeholder in an empty Target field. Says the field may stay empty, not that a value is set.").foregroundStyle(style.tertiary))
                     .textFieldStyle(.plain)
                     .font(style.label(.body).monospacedDigit())
                     .multilineTextAlignment(typeSize.isAccessibilitySize ? .leading : .trailing)
@@ -303,6 +306,49 @@ struct HabitFormView: View {
                      : String(localized: "A change applies from today. Earlier days keep what they had."))
             }
         }
+    }
+
+    /// Pause acts at once, as Archive does, and needs no Save. Its own section, away from Archive, so a slip
+    /// between the two does not happen.
+    private func pauseSection(_ habit: Habit) -> some View {
+        let clock = settings.clock
+        let status = habit.ownPauseStatus(today: clock.today)
+        return VStack(alignment: .leading, spacing: 8) {
+            FieldRule()
+            FieldLabel("Pause")
+            switch status {
+            case .none:
+                pauseButton("Pause this habit") { model.pause(habit, context: context, clock: clock) }
+                hint(String(localized: "It stays paused until you resume it. Paused days leave your runs as they are. You can still log."))
+            case .paused(let since, let startedToday):
+                if !startedToday {
+                    LabeledContent {
+                        Text(PauseText.short(since, clock: clock)).foregroundStyle(style.secondary)
+                    } label: {
+                        Text("Paused since")
+                    }
+                    .font(style.label(.body))
+                    .frame(minHeight: 44)
+                }
+                pauseButton(startedToday ? "Undo pause" : "Resume tomorrow") { model.resume(habit, context: context, clock: clock) }
+                hint(startedToday
+                     ? String(localized: "Paused from today. Undo pause takes it away, and today draws as it was.")
+                     : String(localized: "It starts again tomorrow. You can still log today."))
+            case .resumesTomorrow:
+                pauseButton("Keep paused") { model.pause(habit, context: context, clock: clock) }
+                hint(String(localized: "Resumes tomorrow. Today stays paused. You can still log."))
+            }
+        }
+        .padding(.top, 16)
+    }
+
+    private func pauseButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
+        Button(title, action: action)
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.capsule)
+            .font(style.label(.body, weight: .semibold))
+            .frame(minHeight: 44)
+            .accessibilityIdentifier("habit-pause")
     }
 
     private func archiveSection(_ habit: Habit) -> some View {
@@ -370,7 +416,7 @@ struct HabitFormView: View {
         VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 8) {
                     FieldLabel("Unit")
-                    TextField(String(localized: "Unit"), text: $unit, prompt: Text("None").foregroundStyle(style.tertiary))
+                    TextField(String(localized: "Unit"), text: $unit, prompt: Text("Optional", comment: "Placeholder in an empty Unit field. Says the field may stay empty, not that a value is set.").foregroundStyle(style.tertiary))
                         .textFieldStyle(.plain)
                         .font(style.label(.body))
                         .frame(minHeight: 44)

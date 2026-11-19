@@ -39,6 +39,8 @@ private struct HabitDetailPage: View {
     @Environment(\.modelContext) private var context
     @State private var kind: PeriodKind
     @State private var anchor: DayKey
+    @State private var bringingBack: Habit?
+    @State private var choosingDates = false
 
     init(habit: Habit, route: DetailRoute, tab: AppTab) {
         self.habit = habit
@@ -123,7 +125,11 @@ private struct HabitDetailPage: View {
                 }
                 Button {
                     if habit.isArchived {
-                        model.bringBack(habit, context: context, all: (try? context.fetch(FetchDescriptor<Habit>())) ?? [])
+                        if BringBackOffer.span(of: habit, clock: clock) != nil {
+                            bringingBack = habit
+                        } else {
+                            model.bringBack(habit, context: context, all: (try? context.fetch(FetchDescriptor<Habit>())) ?? [])
+                        }
                     } else {
                         model.pickingPastDay = habit
                     }
@@ -140,6 +146,25 @@ private struct HabitDetailPage: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+
+                if !habit.isArchived {
+                    // A gap can be paused from here, where a returning user looks at it.
+                    Button {
+                        choosingDates = true
+                    } label: {
+                        Label {
+                            Text("Pause for dates").underline()
+                        } icon: {
+                            Image(systemName: "pause.circle").accessibilityHidden(true)
+                        }
+                        .font(style.label(.subheadline))
+                        .foregroundStyle(style.text)
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint(Text("Pauses every habit on the days you choose"))
+                }
 
                 if hasLogs {
                     StatsBlock(habit: habit, stats: stats, words: words, showRuns: settings.showRuns, showDaysNotLogged: settings.showDaysNotLogged, noSetDaysToday: habit.hasNoSetDays(on: today))
@@ -165,6 +190,8 @@ private struct HabitDetailPage: View {
             .frame(maxWidth: .infinity)
         }
         .paperBackground(style)
+        .bringBackOffer($bringingBack)
+        .sheet(isPresented: $choosingDates) { PauseDatesForm(pause: nil, clock: settings.clock) }
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

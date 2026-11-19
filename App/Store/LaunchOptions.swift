@@ -14,6 +14,7 @@ struct LaunchOptions: Sendable {
         case new, newCount, symbols, symbolsNew, count, edit, editDays, editWaits, you, appearance, archived, marks, notScheduled, undo, undoLong, undoLongPast, undoCount
         case history, historyMonth, detailWeek, detailMonth, detailYear, detailEmpty, detailRuns
         case day, dayCount, dayOff, dayDone, export, importPreview, importDone, importNothing, importNotHabit, importNewer, contrast
+        case pauseDates, pauseDatesNew, pauseForm, editPaused, menu, bringBack, widget
     }
 
     var fixture: Fixture?

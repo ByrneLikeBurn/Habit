@@ -197,38 +197,38 @@ public struct PauseImpact: Equatable, Sendable {
     public var logsGainPause: Int
     /// Logged days that will no longer be paused, and draw as normal marks again.
     public var logsLosePause: Int
-    /// Days, across all habits, that gain a pause. Each habit-day counts once.
+    /// Calendar days that gain a pause, today and later included. Days another pause covers do not count.
     public var daysGainPause: Int
     public var daysLosePause: Int
 
     public static let none = PauseImpact(logsGainPause: 0, logsLosePause: 0, daysGainPause: 0, daysLosePause: 0)
 
-    /// Compares `old` (the saved dates, nil for a new pause) with `new`. Days after today do not count:
-    /// nothing is logged there yet. Days other pauses already cover do not change.
+    /// Compares `old` (the saved dates, nil for a new pause) with `new`. Logged days count up to today:
+    /// nothing is logged after it yet. Days other pauses already cover do not change.
     @MainActor
     public static func of(old: ClosedRange<DayKey>?, new: ClosedRange<DayKey>, habits: [Habit], otherShared: [Pause], today: DayKey) -> PauseImpact {
         var result = PauseImpact.none
         func inRange(_ range: ClosedRange<DayKey>?, _ day: DayKey) -> Bool { range?.contains(day) ?? false }
+        func coveredElsewhere(_ day: DayKey) -> Bool { otherShared.contains { $0.covers(day) } }
+        var calendarDay = min(old?.lowerBound ?? new.lowerBound, new.lowerBound)
+        let lastCalendarDay = max(old?.upperBound ?? new.upperBound, new.upperBound)
+        while calendarDay <= lastCalendarDay {
+            defer { calendarDay = calendarDay.adding(days: 1) }
+            let was = inRange(old, calendarDay), will = inRange(new, calendarDay)
+            guard was != will, !coveredElsewhere(calendarDay) else { continue }
+            if will { result.daysGainPause += 1 } else { result.daysLosePause += 1 }
+        }
         let lowest = min(old?.lowerBound ?? new.lowerBound, new.lowerBound)
         let highest = min(max(old?.upperBound ?? new.upperBound, new.upperBound), today)
         guard lowest <= highest else { return result }
         for habit in habits where habit.isActive {
-            let firstDay = DayKey(rawValue: habit.rules.map(\.fromDay).min() ?? lowest.rawValue)
             var day = lowest
             while day <= highest {
                 defer { day = day.adding(days: 1) }
                 let was = inRange(old, day), will = inRange(new, day)
                 guard was != will, !habit.isPaused(on: day, sharedPauses: otherShared) else { continue }
-                let logged = habit.total(on: day) > 0
-                // Before a habit began there is nothing to pause, unless it was logged there.
-                guard logged || day >= firstDay else { continue }
-                if will {
-                    result.daysGainPause += 1
-                    if logged { result.logsGainPause += 1 }
-                } else {
-                    result.daysLosePause += 1
-                    if logged { result.logsLosePause += 1 }
-                }
+                guard habit.total(on: day) > 0 else { continue }
+                if will { result.logsGainPause += 1 } else { result.logsLosePause += 1 }
             }
         }
         return result

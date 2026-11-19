@@ -176,7 +176,7 @@ struct PauseImpactTests {
         let impact = PauseImpact.of(old: nil, new: today.adding(days: -6)...today.adding(days: -3),
                                     habits: [read, walk], otherShared: [], today: today)
         #expect(impact.logsGainPause == 2)
-        #expect(impact.daysGainPause == 8)
+        #expect(impact.daysGainPause == 4)
         #expect(impact.logsLosePause == 0)
     }
 
@@ -189,8 +189,8 @@ struct PauseImpactTests {
                                     habits: [read], otherShared: [], today: today)
         #expect(impact.logsLosePause == 1)
         #expect(impact.daysLosePause == 3)
-        // -2, -1 and today. Days after today do not count yet.
-        #expect(impact.daysGainPause == 3)
+        // Calendar days -2 to 5, today and later included.
+        #expect(impact.daysGainPause == 8)
     }
 
     @Test func daysAnotherPauseCoversDoNotChange() throws {

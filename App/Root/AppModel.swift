@@ -75,10 +75,6 @@ final class AppModel {
     var isReordering = false
     /// Pauses ended today from Today, for "Keep paused".
     var resumedShared: [ResumedPause] = []
-    /// The habit Bring back asks about, when it was archived before today.
-    var bringingBack: Habit?
-    /// Pause for dates: a new pause, or one to change.
-    var editingPause: PauseRequest?
     /// Changes on every log and take-back, for one haptic.
     var feedback = 0
 
