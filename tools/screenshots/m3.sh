@@ -54,7 +54,11 @@ for look in light:paper dark:ink; do
   shot "bring-back-$tag"          $appearance large disabled -fixture one-paused -screen bringBack
   shot "marks-$tag"               $appearance large disabled -fixture today -screen marks
   shot "detail-paused-$tag"       $appearance large disabled -fixture paused -screen detailMonth
+  shot "widget-$tag"              $appearance large disabled -fixture today -screen widget
+  shot "widget-paused-$tag"       $appearance large disabled -fixture paused -screen widget
+  shot "widget-nodays-$tag"       $appearance large disabled -fixture no-days -screen widget
 done
+shot "ax5-widget-paper" light accessibility-extra-extra-extra-large disabled -fixture today -screen widget
 for name in paused paused-today one-paused; do
   shot "ax5-today-$name-paper" light accessibility-extra-extra-extra-large disabled -fixture $name
 done

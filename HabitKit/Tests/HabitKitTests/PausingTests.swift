@@ -268,6 +268,15 @@ struct WidgetSnapshotTests {
         #expect(snapshot.rows.last?.countLine == "0 glasses")
     }
 
+    /// The intent carries the day the widget showed and the total it drew. On a mismatch it writes nothing.
+    @Test func aStaleWidgetTapWritesNothing() {
+        #expect(WidgetSnapshot.accepts(shownDay: today.rawValue, shownTotal: 0, today: today, currentTotal: 0))
+        // Drawn yesterday, tapped after the day turned over.
+        #expect(!WidgetSnapshot.accepts(shownDay: today.adding(days: -1).rawValue, shownTotal: 0, today: today, currentTotal: 0))
+        // Logged in the app since the widget drew: a tap would take that log back.
+        #expect(!WidgetSnapshot.accepts(shownDay: today.rawValue, shownTotal: 0, today: today, currentTotal: 1))
+    }
+
     @Test func noHabitsAtAll() throws {
         let snapshot = WidgetSnapshot.make(habits: [], sharedPauses: [], today: today)
         #expect(!snapshot.hasHabits)

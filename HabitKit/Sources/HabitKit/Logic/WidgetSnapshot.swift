@@ -32,6 +32,13 @@ public struct WidgetSnapshot: Equatable, Sendable {
         self.hasHabits = hasHabits
     }
 
+    /// A widget tap logs only if the widget still shows today and the total it drew. Otherwise the widget
+    /// redraws and nothing is written, so a row drawn before midnight never logs the new day, and a second
+    /// tap on a row not yet redrawn never takes the first log back.
+    public static func accepts(shownDay: Int, shownTotal: Int, today: DayKey, currentTotal: Int) -> Bool {
+        shownDay == today.rawValue && shownTotal == currentTotal
+    }
+
     /// The widget's mark size. Its diamond (68% of the mark) sits well above the 12 point jump in the cut.
     public static let markSize: CGFloat = 24
 

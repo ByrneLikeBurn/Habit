@@ -11,6 +11,8 @@ struct RootView: View {
     var body: some View {
         if LaunchOptions.current.screen == .contrast {
             StyledScreen { ContrastBoard() }
+        } else if LaunchOptions.current.screen == .widget {
+            StyledScreen { WidgetBoard() }
         } else {
             main
         }

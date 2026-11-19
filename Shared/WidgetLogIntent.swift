@@ -34,7 +34,8 @@ struct WidgetLogIntent: AppIntent {
         let context = try SharedStore.container.get().mainContext
         var fetch = FetchDescriptor<Habit>(predicate: #Predicate { $0.id == id })
         fetch.fetchLimit = 1
-        guard let habit = try context.fetch(fetch).first, habit.isActive, habit.total(on: clock.today) == total else {
+        guard let habit = try context.fetch(fetch).first, habit.isActive,
+              WidgetSnapshot.accepts(shownDay: day, shownTotal: total, today: clock.today, currentTotal: habit.total(on: clock.today)) else {
             return .result()
         }
         let intent = LogHabitIntent(habitID: habit.id, name: habit.name, action: .tap, source: .widget, day: clock.today)
