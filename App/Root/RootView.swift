@@ -76,8 +76,10 @@ struct RootView: View {
             }
         }
         // Every save in the app redraws the widget: logs, pauses, edits, order and import.
-        .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in
-            WidgetRows.forget(settings.clock.today)
+        .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { note in
+            // Only the app's own writes let the widget choose its rows again. A widget tap run in this
+            // process saves through its own context, and its rows must stay put.
+            if (note.object as? ModelContext) === context { WidgetRows.forget(settings.clock.today) }
             WidgetReload.now()
         }
         // A widget tap that cannot log opens the place it names.
