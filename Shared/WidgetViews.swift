@@ -79,7 +79,8 @@ struct TodayWidgetView: View {
     private func layout(room: Int, _ style: ResolvedStyle) -> some View {
         let all = entry.snapshot.rows.count
         let hidden = all - shownCount(of: all, room: room)
-        return VStack(alignment: .leading, spacing: 4) {
+        // At accessibility sizes a tall first letter of the name would touch the header's baseline.
+        return VStack(alignment: .leading, spacing: typeSize.isAccessibilitySize ? 8 : 4) {
             header(style, hidden: hidden)
             // Habit names can be health details. On a locked device, in StandBy and on the lock screen,
             // the system redacts the rows. The "Today" header stays.
@@ -140,6 +141,7 @@ struct TodayWidgetView: View {
                         Text("Nothing to track yet.").font(style.label(.footnote)).foregroundStyle(quiet)
                     }
                     Text("Add a habit").font(style.label(.footnote, weight: .semibold)).foregroundStyle(style.text)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(minHeight: 44, alignment: .leading)
                 .contentShape(Rectangle())
