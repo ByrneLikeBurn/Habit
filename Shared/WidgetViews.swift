@@ -72,7 +72,6 @@ struct TodayWidgetView: View {
                     .font(style.label(.caption))
                     .foregroundStyle(style.secondary)
                     .lineLimit(1)
-                    .accessibilityHidden(true)
             }
             if entry.snapshot.paused {
                 // The small widget has room for the symbol only. VoiceOver reads "Paused".
@@ -100,7 +99,7 @@ struct TodayWidgetView: View {
     private var stacked: Bool { typeSize.isAccessibilitySize && family == .systemSmall }
 
     private func moreText(_ more: Int) -> String {
-        String(localized: "\(more) more", comment: "Widget, under the rows: how many of today's habits did not fit. For example: 3 more.")
+        String(localized: "\(more) more habits", comment: "Widget: how many of today's habits did not fit. Plural variations in the String Catalog. For example: 3 more habits.")
     }
 
     @ViewBuilder
@@ -127,7 +126,7 @@ struct TodayWidgetView: View {
             VStack(spacing: 0) {
                 ForEach(rows) {
                     WidgetRow(row: $0, day: entry.snapshot.day, showsSymbol: !typeSize.isAccessibilitySize,
-                              stacked: stacked, moreLine: more > 0 ? moreText(more) : nil)
+                              stacked: stacked)
                 }
             }
         }
@@ -148,7 +147,6 @@ struct WidgetRow: View {
     let day: DayKey
     let showsSymbol: Bool
     var stacked = false
-    var moreLine: String?
     @Environment(\.style) private var style
 
     var body: some View {
@@ -205,7 +203,6 @@ struct WidgetRow: View {
         case .noSetDays: parts.append(String(localized: "No set days"))
         default: break
         }
-        if stacked, let moreLine { parts.append(moreLine) }
         return parts.joined(separator: ", ")
     }
 
@@ -213,7 +210,11 @@ struct WidgetRow: View {
         switch row.kind {
         case .binary: row.total > 0 ? String(localized: "Takes the log back") : String(localized: "Logs it")
         case .counted:
-            if let amount = row.tapAmount, amount > 0 { String(localized: "Adds \(amount.formatted())") } else { String(localized: "Opens Habit") }
+            if let amount = row.tapAmount, amount > 0 {
+                String(localized: "Adds \(CountText.line(total: amount, target: nil, unit: row.unit))", comment: "Widget, VoiceOver hint for a counted habit. The amount with its unit, for example: Adds 250 ml.")
+            } else {
+                String(localized: "Opens the app to add an amount")
+            }
         }
     }
 }

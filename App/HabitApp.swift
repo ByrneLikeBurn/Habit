@@ -218,7 +218,7 @@ private struct HabitCommands: View {
             case .none:
                 Button("Pause Everything") { model.pauseEverything(context: context, clock: clock) }
             case .everything(let startedToday), .until(_, let startedToday):
-                Button(startedToday ? "Undo Pause Everything" : "Resume Everything Tomorrow") { model.resumeShared(context: context, clock: clock) }
+                Button(startedToday ? "Undo Pause" : "Resume Everything Tomorrow") { model.resumeShared(context: context, clock: clock) }
             case .resumesTomorrow(let canKeep):
                 Button("Keep Everything Paused") { model.keepShared(context: context, clock: clock, status: status) }
                     .disabled(!canKeep && model.resumedShared.isEmpty)

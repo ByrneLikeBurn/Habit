@@ -16,6 +16,8 @@ public struct WidgetSnapshot: Equatable, Sendable {
         public var countLine: String?
         public var tapAmount: Int?
         public var paused: Bool
+        /// The unit, for VoiceOver's "Adds 250 ml".
+        public var unit: String = ""
     }
 
     public var day: DayKey
@@ -73,7 +75,7 @@ public struct WidgetSnapshot: Equatable, Sendable {
                                       noSetDays: state == .noSetDays, paused: paused, locale: locale)
                 : nil
             return Row(id: habit.id, name: habit.name, symbolName: habit.symbolName, kind: habit.kind, state: state,
-                       total: total, countLine: count, tapAmount: habit.tapAmount, paused: paused)
+                       total: total, countLine: count, tapAmount: habit.tapAmount, paused: paused, unit: habit.unit)
         }
         return WidgetSnapshot(day: today, paused: SharedPauseStatus.of(sharedPauses, today: today).isPaused,
                               rows: rows, hasHabits: !Ordering.sorted(habits).isEmpty)

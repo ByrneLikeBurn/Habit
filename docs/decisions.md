@@ -293,3 +293,9 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - A counted row logged on a paused day says "Logged while paused", as a yes-or-no row does. Asked for by the behavioural scientist.
 - VoiceOver hears "Resumes tomorrow.", "Pause undone." and "Paused again.", and nothing when a save fails. A paused row's name carries the same value as its control. The dates form's impact lines are the Save button's hint. The pause line's full sentence is read at every size. Asked for by the accessibility expert.
 - Remove on a dated pause shows what it changes: how many days will no longer be paused, how many logged days draw as before, and, for days before today, "A run through these days may get shorter." "Days lose their pause" now reads "days will no longer be paused." Asked for by the neurodiversity expert.
+
+**Milestone 3 lens round one, continued, 18 November 2026.**
+- Wording, asked for by the content designer: "Undo pause ends it, and today shows as it did before."; "%lld more days will be paused."; the widget's line reads "%lld more habits" and is its own VoiceOver element; the widget's counted hint reads "Adds 250 ml" with the unit, or "Opens the app to add an amount"; the Mac View menu's item reads "Undo Pause"; "Habit" as the app's name carries a comment not to translate it.
+- Habit detail's link reads "Pause every habit for dates", because it pauses every habit. "Choose a date" for the last day picks yesterday when the first day is in the past. The dates form's footer says paused days leave runs as they are. Asked for by the returning user.
+- Not adopted: a "Paused" status line on every row under Pause everything (returning user). The pause line at the top says it once. A line on each row would repeat it, which the tired daily user asked to avoid.
+

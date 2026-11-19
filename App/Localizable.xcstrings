@@ -47,30 +47,6 @@
         }
       }
     },
-    "%lld days gain a pause.": {
-      "comment": "Pause for dates form, when changing dates. The number is calendar days.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld day gains a pause."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld days gain a pause."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "%lld days logged": {
       "extractionState": "manual",
       "localizations": {
@@ -227,6 +203,54 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld logged days will show as they were before the pause."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld more days will be paused.": {
+      "comment": "Pause for dates form, when changing dates. The number is calendar days.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more day will be paused."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more days will be paused."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld more habits": {
+      "comment": "Widget: how many of today's habits did not fit. For example: 3 more habits.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more habit"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more habits"
                 }
               }
             }

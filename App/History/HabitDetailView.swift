@@ -151,7 +151,8 @@ private struct HabitDetailPage: View {
                         choosingDates = true
                     } label: {
                         Label {
-                            Text("Pause for dates").underline()
+                            // This pauses every habit, so the label says so before the form opens.
+                            Text("Pause every habit for dates").underline()
                         } icon: {
                             Image(systemName: "pause.circle").accessibilityHidden(true)
                         }

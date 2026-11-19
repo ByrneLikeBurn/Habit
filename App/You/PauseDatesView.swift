@@ -189,14 +189,17 @@ struct PauseDatesForm: View {
                         DatePicker("Last day", selection: lastBinding, in: first..., displayedComponents: .date)
                     } else {
                         LabeledContent("Last day") {
-                            Button("Choose a date") { last = first }
+                            // A first day in the past most often starts a gap that ran to yesterday.
+                            Button("Choose a date") {
+                                last = clock.dayKey(for: first) < clock.today ? clock.date(for: clock.today.adding(days: -1)) : first
+                            }
                                 .buttonStyle(.bordered)
                                 .accessibilityIdentifier("choose-last-day")
                         }
                     }
                 } footer: {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Every habit is paused on these days. The dates can be in the past.")
+                        Text("Every habit is paused on these days. The dates can be in the past. Paused days leave your runs as they are.")
                         if let lastDay, lastDay >= firstDay {
                             ForEach(impactLines(firstDay...lastDay, clock: clock), id: \.self) { Text($0) }
                         }
@@ -273,7 +276,7 @@ struct PauseDatesForm: View {
         }
         if pause != nil {
             if impact.daysGainPause > 0 {
-                lines.append(String(localized: "\(impact.daysGainPause) days gain a pause.", comment: "Pause for dates form, when changing dates. The number is calendar days."))
+                lines.append(String(localized: "\(impact.daysGainPause) more days will be paused.", comment: "Pause for dates form, when changing dates. The number is calendar days."))
             }
             if impact.daysLosePause > 0 {
                 lines.append(String(localized: "\(impact.daysLosePause) days will no longer be paused.", comment: "Pause for dates form, when changing or removing dates. The number is calendar days."))

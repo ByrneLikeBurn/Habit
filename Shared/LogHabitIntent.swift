@@ -99,7 +99,7 @@ enum LogError: Error, CustomLocalizedStringResourceConvertible {
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
-        case .habitNotFound: "That habit is not in Habit any more."
+        case .habitNotFound: LocalizedStringResource("That habit is not in Habit any more.", comment: "Shortcuts and Siri. The second \"Habit\" is the app's name. Do not translate it.")
         }
     }
 }
