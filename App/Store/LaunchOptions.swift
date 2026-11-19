@@ -8,6 +8,7 @@ import HabitKit
 struct LaunchOptions: Sendable {
     enum Fixture: String, Sendable {
         case today, empty, noneToday = "none-today", allDone = "all-done", long, noDays = "no-days"
+        case paused, pausedToday = "paused-today", onePaused = "one-paused", allArchived = "all-archived"
     }
 
     enum Screen: String, Sendable {

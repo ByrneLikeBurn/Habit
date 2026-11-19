@@ -82,6 +82,8 @@ struct RootView: View {
             model.showNewHabit = true
         case .edit, .editDays, .editWaits, .symbols:
             model.editing = habits.first
+        case .editPaused:
+            model.editing = habits.first { $0.name == "Walk outside" } ?? habits.first
         case .count:
             if let habit = habits.first(where: { $0.kind == .counted }) {
                 model.counting = CountRequest(habit: habit, day: clock.today)
@@ -153,7 +155,7 @@ struct RootView: View {
 extension LaunchOptions.Screen {
     var opensYou: Bool {
         switch self {
-        case .you, .appearance, .archived, .marks, .pauseDates, .pauseDatesNew, .bringBack, .export, .importPreview, .importDone, .importNothing, .importNotHabit, .importNewer: true
+        case .you, .appearance, .archived, .marks, .pauseDates, .pauseDatesNew, .pauseForm, .bringBack, .export, .importPreview, .importDone, .importNothing, .importNotHabit, .importNewer: true
         default: false
         }
     }

@@ -125,6 +125,10 @@ struct PauseDatesView: View {
             }
         }
         .sheet(item: $request) { PauseDatesForm(pause: $0.pause, clock: clock) }
+        .task {
+            // Screenshots: the form for the coming pause.
+            if LaunchOptions.current.screen == .pauseForm, request == nil, let first = coming.first(where: \.isDates) { request = PauseRequest(pause: first) }
+        }
     }
 
     private func rows(_ pauses: [Pause], clock: HabitClock) -> some View {
@@ -277,6 +281,8 @@ struct PauseDatesForm: View {
 /// Bring back, for a habit archived before today: offers to pause the days it was archived, so its run is kept.
 struct BringBackOffer: ViewModifier {
     @Binding var asking: Habit?
+    /// The row the question belongs to, so it opens from that row's Bring back. nil for a screen with one habit.
+    var habit: Habit? = nil
     @Environment(Settings.self) private var settings
     @Environment(AppModel.self) private var model
     @Environment(\.modelContext) private var context
@@ -284,7 +290,7 @@ struct BringBackOffer: ViewModifier {
     func body(content: Content) -> some View {
         content.confirmationDialog(
             String(localized: "Pause the days it was archived?"),
-            isPresented: Binding(get: { asking != nil }, set: { if !$0 { asking = nil } }),
+            isPresented: Binding(get: { asking != nil && (habit == nil || asking?.id == habit?.id) }, set: { if !$0 { asking = nil } }),
             titleVisibility: .visible,
             presenting: asking
         ) { habit in
@@ -312,7 +318,7 @@ struct BringBackOffer: ViewModifier {
 }
 
 extension View {
-    func bringBackOffer(_ asking: Binding<Habit?>) -> some View {
-        modifier(BringBackOffer(asking: asking))
+    func bringBackOffer(_ asking: Binding<Habit?>, for habit: Habit? = nil) -> some View {
+        modifier(BringBackOffer(asking: asking, habit: habit))
     }
 }

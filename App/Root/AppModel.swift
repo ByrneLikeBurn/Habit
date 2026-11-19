@@ -73,6 +73,8 @@ final class AppModel {
     var importStage: ImportStage?
     var undoLine: UndoLine?
     var isReordering = false
+    /// Today asks You to open Archived.
+    var showArchived = false
     /// Pauses ended today from Today, for "Keep paused".
     var resumedShared: [ResumedPause] = []
     /// Changes on every log and take-back, for one haptic.

@@ -17,7 +17,8 @@ struct YouView: View {
         init?(screen: LaunchOptions.Screen) {
             switch screen {
             case .appearance: self = .appearance
-            case .pauseDates, .pauseDatesNew: self = .pauseDates
+            case .pauseDates, .pauseDatesNew, .pauseForm: self = .pauseDates
+            case .bringBack: self = .archived
             case .archived: self = .archived
             case .marks: self = .marks
             default: return nil
@@ -89,6 +90,12 @@ struct YouView: View {
             .frame(maxWidth: .infinity)
             .paperBackground(style)
             .foregroundStyle(style.text, style.secondary, style.tertiary)
+            .onChange(of: model.showArchived, initial: true) { _, show in
+                if show {
+                    path = [.archived]
+                    model.showArchived = false
+                }
+            }
             .navigationDestination(for: Page.self) { page in
                 switch page {
                 case .appearance: AppearanceView()
@@ -184,6 +191,7 @@ struct ArchivedView: View {
     @Query private var habits: [Habit]
     /// The habit Bring back asks about, when it was archived before today.
     @State private var asking: Habit?
+    @State private var askedForScreenshot = false
 
     var body: some View {
         let archived = habits.filter { $0.isArchived && $0.deletedAt == nil }.sorted { $0.name < $1.name }
@@ -203,6 +211,7 @@ struct ArchivedView: View {
                     .buttonStyle(.bordered)
                     .buttonBorderShape(.capsule)
                     .accessibilityLabel(Text("Bring back \(habit.name)"))
+                    .bringBackOffer($asking, for: habit)
                 }
                 .frame(minHeight: 44)
             }
@@ -211,7 +220,12 @@ struct ArchivedView: View {
         .foregroundStyle(style.text, style.secondary, style.tertiary)
         .paperBackground(style)
         .navigationTitle("Archived")
-        .bringBackOffer($asking)
+        .task {
+            if LaunchOptions.current.screen == .bringBack, !askedForScreenshot {
+                askedForScreenshot = true
+                asking = habits.first { $0.isArchived && BringBackOffer.span(of: $0, clock: settings.clock) != nil }
+            }
+        }
     }
 }
 

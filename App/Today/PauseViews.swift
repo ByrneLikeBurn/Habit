@@ -132,13 +132,13 @@ enum PauseText {
             return String(localized: "Since \(dayMonth(pause.start, clock: clock))", comment: "A pause with no last day, for example: Since 3 October.")
         }
         let first = clock.date(for: pause.start), last = clock.date(for: end)
-        let style = Date.IntervalFormatStyle(date: .long, time: .omitted, locale: clock.calendar.locale ?? .autoupdatingCurrent,
+        let style = Date.IntervalFormatStyle(locale: clock.calendar.locale ?? .autoupdatingCurrent,
                                              calendar: clock.calendar, timeZone: clock.calendar.timeZone)
         // Same year as today: the year is left out.
         let thisYear = clock.date(for: clock.today)
         let sameYear = clock.calendar.isDate(first, equalTo: thisYear, toGranularity: .year) && clock.calendar.isDate(last, equalTo: thisYear, toGranularity: .year)
         let interval = first..<last.addingTimeInterval(1)
-        return sameYear ? interval.formatted(style.day().month(.wide)) : interval.formatted(style)
+        return sameYear ? interval.formatted(style.day().month(.wide)) : interval.formatted(style.day().month(.wide).year())
     }
 
     private static func format(_ clock: HabitClock) -> Date.FormatStyle {

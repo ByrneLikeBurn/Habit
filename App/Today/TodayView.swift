@@ -49,7 +49,10 @@ struct TodayView: View {
                     .plainRow(style)
             }
 
-            if active.isEmpty {
+            if active.isEmpty && habits.contains(where: { $0.isArchived && $0.deletedAt == nil }) {
+                AllArchivedView()
+                    .plainRow(style)
+            } else if active.isEmpty {
                 FirstRunView()
                     .plainRow(style)
             } else if split.scheduled.isEmpty {
@@ -250,6 +253,48 @@ struct FirstRunView: View {
                 model.choosingImportFile = true
             } label: {
                 Text("Import a copy")
+                    .underline()
+                    .font(style.label(.subheadline))
+                    .foregroundStyle(style.text)
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.bottom, 12)
+    }
+}
+
+/// Every habit is archived: say where they are, with a way there and a way to start a new one.
+struct AllArchivedView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.style) private var style
+    #if os(macOS)
+    @Environment(\.openSettings) private var openSettings
+    #endif
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            EmptyLine(
+                title: String(localized: "Nothing on Today"),
+                detail: String(localized: "Your habits are archived, with their history. You can bring any of them back.")
+            )
+            Button("Show archived habits") {
+                #if os(macOS)
+                openSettings()
+                #else
+                model.tab = .you
+                model.showArchived = true
+                #endif
+            }
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.capsule)
+            .foregroundStyle(style.paper)
+            .controlSize(.large)
+            Button {
+                model.showNewHabit = true
+            } label: {
+                Text("Add a habit")
                     .underline()
                     .font(style.label(.subheadline))
                     .foregroundStyle(style.text)
