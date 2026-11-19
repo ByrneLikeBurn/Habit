@@ -58,7 +58,7 @@ struct LogHabitIntent: AppIntent {
         guard let model = try context.fetch(fetch).first, model.deletedAt == nil else {
             throw LogError.habitNotFound
         }
-        let clock = clock ?? Settings().clock
+        let clock = clock ?? SharedStore.clock
         let outcome = try LogWriter.log(
             resolvedAction(for: model),
             habit: model,
@@ -78,7 +78,7 @@ struct LogHabitIntent: AppIntent {
         switch outcome {
         case .wrote(_, let total), .unchanged(let total):
             if model.kind == .counted {
-                line = CountText.line(total: total, target: model.rule(on: Settings().clock.today).target, unit: model.unit)
+                line = CountText.line(total: total, target: model.rule(on: SharedStore.clock.today).target, unit: model.unit)
             } else if case .unchanged = outcome, total > 0 {
                 line = String(localized: "Already logged today.")
             } else {

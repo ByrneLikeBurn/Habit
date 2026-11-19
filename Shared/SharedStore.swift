@@ -3,16 +3,19 @@ import SwiftData
 import HabitKit
 
 /// The one SwiftData store, in the App Group container so widgets, intents and the Watch can share it.
+/// Compiled into the app and the widget. Fixtures and launch options exist in the app only.
 enum SharedStore {
     static let groupID = "group.dev.byrnelikeburn.Habit"
 
     /// Settings shared with the widget and intents. Screenshots use a separate, throwaway domain.
     static let defaults: UserDefaults = {
+        #if !WIDGET_EXTENSION
         if LaunchOptions.current.fixture != nil {
             let domain = "dev.byrnelikeburn.Habit.fixture"
             UserDefaults.standard.removePersistentDomain(forName: domain)
             return UserDefaults(suiteName: domain) ?? .standard
         }
+        #endif
         return UserDefaults(suiteName: groupID) ?? .standard
     }()
 
@@ -25,6 +28,7 @@ enum SharedStore {
 
     private static func makeContainer() -> Result<ModelContainer, StoreError> {
         let schema = Schema(versionedSchema: HabitSchemaV1.self)
+        #if !WIDGET_EXTENSION
         if let fixture = LaunchOptions.current.fixture {
             do {
                 let container = try ModelContainer(
@@ -38,6 +42,7 @@ enum SharedStore {
                 return .failure(.openFailed(String(describing: error)))
             }
         }
+        #endif
         guard let groupURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID) else {
             return .failure(.noGroupContainer)
         }
@@ -65,5 +70,17 @@ enum SharedStore {
         let id = UUID().uuidString
         defaults.set(id, forKey: SettingKey.deviceID)
         return id
+    }
+
+    /// The clock for intents and the widget: the device's calendar and the stored day-start hour.
+    /// Screenshots freeze it in the app.
+    static var clock: HabitClock {
+        #if !WIDGET_EXTENSION
+        let base = LaunchOptions.current.clock ?? HabitClock()
+        #else
+        let base = HabitClock()
+        #endif
+        let stored = defaults.object(forKey: SettingKey.dayStartHour) as? Int
+        return HabitClock(now: base.now, calendar: base.calendar, dayStartHour: stored ?? HabitClock.defaultDayStartHour)
     }
 }

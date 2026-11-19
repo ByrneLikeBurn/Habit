@@ -25,6 +25,13 @@ public struct WidgetSnapshot: Equatable, Sendable {
     /// False when there are no habits at all, for "Nothing to track yet".
     public var hasHabits: Bool
 
+    public init(day: DayKey, paused: Bool, rows: [Row], hasHabits: Bool) {
+        self.day = day
+        self.paused = paused
+        self.rows = rows
+        self.hasHabits = hasHabits
+    }
+
     /// The widget's mark size. Its diamond (68% of the mark) sits well above the 12 point jump in the cut.
     public static let markSize: CGFloat = 24
 

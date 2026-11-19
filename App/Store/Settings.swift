@@ -1,17 +1,6 @@
 import SwiftUI
 import HabitKit
 
-enum SettingKey {
-    static let style = "style"
-    static let appearance = "appearance"
-    static let accent = "accent"
-    static let controlsLeading = "controlsLeading"
-    static let dayStartHour = "dayStartHour"
-    static let deviceID = "deviceID"
-    static let showRuns = "showRuns"
-    static let showDaysNotLogged = "showDaysNotLogged"
-}
-
 /// The user's settings, read and written through the shared defaults.
 /// Unknown stored values fall back to Pen and ink, System and Blue.
 @MainActor

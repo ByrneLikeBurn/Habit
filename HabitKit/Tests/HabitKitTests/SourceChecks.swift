@@ -5,7 +5,7 @@ import Testing
 @Suite("Source checks")
 struct SourceChecks {
     private static let styleFolder = "HabitKit/Sources/HabitKit/Style/"
-    private static let intentFile = "App/Intents/LogHabitIntent.swift"
+    private static let intentFile = "Shared/LogHabitIntent.swift"
 
     /// Every Swift source in the repo except build output and tools. New targets are covered without a change here.
     private func swiftFiles() throws -> [(path: String, text: String)] {
@@ -172,12 +172,12 @@ struct SourceChecks {
 
     @Test func checksSeeEveryTarget() throws {
         let folders = Set(try swiftFiles().map { String($0.path.split(separator: "/").first ?? "") })
-        #expect(folders.isSuperset(of: ["App", "AppUITests", "HabitKit"]), "\(folders)")
+        #expect(folders.isSuperset(of: ["App", "AppUITests", "HabitKit", "Shared", "Widget"]), "\(folders)")
     }
 
     /// The app's container is built through the migration plan, never a bare Schema.
     @Test func theContainerUsesTheMigrationPlan() throws {
-        let app = try swiftFiles().filter { $0.path.hasPrefix("App/") }
+        let app = try swiftFiles().filter { $0.path.hasPrefix("App/") || $0.path.hasPrefix("Shared/") || $0.path.hasPrefix("Widget/") }
         let builders = app.filter { $0.text.contains("ModelContainer(") }
         #expect(!builders.isEmpty)
         for file in builders {
