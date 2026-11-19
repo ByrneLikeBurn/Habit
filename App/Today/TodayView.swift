@@ -42,6 +42,7 @@ struct TodayView: View {
         let totals = DayTotals(day: today, events: todaysEvents).totals
         let pauseStatus = SharedPauseStatus.of(sharedPauses, today: today)
 
+        ScrollViewReader { proxy in
         listView {
             TodayHeading(clock: clock)
                 .plainRow(style)
@@ -72,6 +73,7 @@ struct TodayView: View {
                     .habitRow(style, leading: settings.controlsLeading)
                     .rowSwipeActions(rowActions)
                     .tag(habit.id)
+                    .id(habit.id)
             }
             .onMove { source, destination in
                 Ordering.move(split.scheduled, from: source, to: destination, all: active)
@@ -86,6 +88,8 @@ struct TodayView: View {
                             .habitRow(style, leading: settings.controlsLeading)
                             .rowSwipeActions(rowActions)
                             .tag(habit.id)
+                            .id(habit.id)
+                    .id(habit.id)
                     }
                     .onMove { source, destination in
                         Ordering.move(split.notScheduled, from: source, to: destination, all: active)
@@ -121,6 +125,17 @@ struct TodayView: View {
             }
         }
         .listStyle(.plain)
+        .undoLineInset(.today)
+        .onChange(of: model.undoLine?.id) {
+            // The line takes room at the bottom. If it now covers the row just logged, scroll that row
+            // clear by the least amount, after the line has taken its place. A row in view does not move.
+            guard let id = model.undoLine?.habitID, model.undoLine?.tab == .today else { return }
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(100))
+                proxy.scrollTo(id)
+            }
+        }
+        }
         .frame(maxWidth: WideLayout.listWidth)
         .frame(maxWidth: .infinity)
         .paperBackground(style)
@@ -373,6 +388,8 @@ struct UndoLineView: View {
         .padding(.trailing, 12)
         .padding(.vertical, 2)
         .background(style.text, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("undo-line")
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: 393)

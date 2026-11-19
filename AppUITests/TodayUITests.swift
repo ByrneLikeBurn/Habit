@@ -136,6 +136,23 @@ final class TodayUITests: XCTestCase {
         XCTAssertFalse(undo.waitForExistence(timeout: 1))
     }
 
+    /// At the largest size the line is tall. A logged row it would cover scrolls clear, so a second tap
+    /// on the same control never lands on the line.
+    func testAtTheLargestSizeTheLoggedRowScrollsClearOfTheLine() {
+        app.terminate()
+        app.launchArguments = ["-fixture", "today", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        let water = control("Drink water")
+        XCTAssertTrue(water.waitForExistence(timeout: 5))
+        water.tap()
+        let line = app.otherElements["undo-line"]
+        XCTAssertTrue(line.waitForExistence(timeout: 2))
+        let deadline = Date().addingTimeInterval(2)
+        while water.frame.intersects(line.frame) && Date() < deadline { RunLoop.current.run(until: Date().addingTimeInterval(0.1)) }
+        XCTAssertFalse(water.frame.intersects(line.frame), "\(water.frame) \(line.frame)")
+        XCTAssertTrue(water.isHittable)
+    }
+
     private func chooseNoDays() {
         for weekday in 1...7 {
             let day = app.buttons["day-\(weekday)"]

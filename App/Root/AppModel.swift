@@ -15,6 +15,8 @@ struct UndoLine: Identifiable {
     let undo: (@MainActor () -> Void)?
     /// The tab the action was made in. The line shows there only, so Undo never acts out of sight.
     var tab: AppTab = .today
+    /// The habit logged, so Today can scroll its row clear of the line when the line covers it.
+    var habitID: UUID?
 
     init(message: String, name: String? = nil, status: String? = nil, undo: (@MainActor () -> Void)? = nil) {
         self.message = message
@@ -132,13 +134,15 @@ final class AppModel {
                 case .binary: delta < 0
                     ? String(localized: "\(habit.name) cleared, \(date)", comment: "Undo line. The habit's name, then the past day whose log was cleared, for example: Read cleared, 7 November.")
                     : String(localized: "\(habit.name) logged, \(date)", comment: "Undo line. The habit's name, then the past day it was logged for, for example: Read logged, 7 November.")
-                case .counted: String(localized: "\(date): \(count)", comment: "Undo line for a counted habit on a past day. The day, then the new total, for example: 7 November: 4 of 8 glasses.")
+                case .counted: String(localized: "\(habit.name), \(date): \(count)", comment: "Undo line for a counted habit on a past day. The habit's name, the day, then the new total, for example: Drink water, 7 November: 4 of 8 glasses.")
                 }
+                // At large sizes the status sits under the name, so a short date saves a line.
+                let shortDate = clock.date(for: logDay).formatted(Date.FormatStyle(timeZone: clock.calendar.timeZone).day().month(.abbreviated).locale(clock.calendar.locale ?? .autoupdatingCurrent))
                 status = switch habit.kind {
                 case .binary: delta < 0
                     ? String(localized: "Cleared, \(date)", comment: "Undo line status under the habit's name, at large text sizes. The past day whose log was cleared, for example: Cleared, 7 November.")
                     : String(localized: "Logged, \(date)", comment: "Undo line status under the habit's name, at large text sizes. The past day it was logged for, for example: Logged, 7 November.")
-                case .counted: message
+                case .counted: String(localized: "\(shortDate): \(count)", comment: "Undo line status under a counted habit's name, at large text sizes. The past day, short, then the new total, for example: 7 Nov: 4 of 8 glasses.")
                 }
             } else {
                 message = switch habit.kind {
@@ -151,9 +155,11 @@ final class AppModel {
                 }
             }
             if let message, let inverse = outcome.inverse {
-                show(UndoLine(message: message, name: habit.name, status: status) { [weak self] in
+                var line = UndoLine(message: message, name: habit.name, status: status) { [weak self] in
                     self?.log(inverse, habit: habit, day: logDay, context: context, clock: clock, undoManager: undoManager)
-                })
+                }
+                line.habitID = habit.id
+                show(line)
             } else {
                 undoLine = nil
             }

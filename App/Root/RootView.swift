@@ -25,9 +25,8 @@ struct RootView: View {
                 Tab("Today", systemImage: "calendar", value: AppTab.today) {
                     NavigationStack(path: $model.todayPath) {
                         TodayScreen()
-                            .navigationDestination(for: DetailRoute.self) { HabitDetailView(route: $0, tab: .today) }
+                            .navigationDestination(for: DetailRoute.self) { HabitDetailView(route: $0, tab: .today).undoLineInset(.today) }
                     }
-                    .undoLineInset(.today)
                 }
                 Tab("History", systemImage: "square.grid.2x2", value: AppTab.history) {
                     NavigationStack(path: $model.historyPath) {
