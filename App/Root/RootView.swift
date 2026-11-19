@@ -96,15 +96,14 @@ struct RootView: View {
     /// Opens a widget place. A sheet already up is closed first, and the place opens once it has gone,
     /// because a second sheet cannot show over the first.
     private func open(_ place: WidgetPlace) {
-        // A habit form may hold typed changes. It stays open, and the place is dropped.
-        if model.showNewHabit || model.editing != nil { return }
+        // A habit form or the dates form may hold typed changes. It stays open, and the place is dropped.
+        if model.showNewHabit || model.editing != nil || model.pauseForm != nil { return }
         let sheetOpen = model.showNewHabit || model.editing != nil || model.counting != nil || model.pauseForm != nil
             || model.daySheet != nil || model.pickingPastDay != nil
         guard !sheetOpen else {
             pendingPlace = place
             model.pastDayChosen = nil
             model.counting = nil
-            model.pauseForm = nil
             model.daySheet = nil
             model.pickingPastDay = nil
             return
