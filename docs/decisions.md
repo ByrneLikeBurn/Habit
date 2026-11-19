@@ -266,3 +266,19 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - Launch arguments are read in debug builds only, and a screen only with a fixture store, so no argument can open a form on the user's own habits. The screenshot script refuses another device unless its own output folder is named. Asked for by the release engineer.
 
 **Invariant 3 reworded, 16 November 2026.** The owner decided that under no set days a pause changes nothing. A paused log there neither extends nor breaks a run, the same as an unpaused log. Invariant 3 now reads: "A paused day with no log never breaks a run and never extends it. A paused set day with a log extends it. Under no set days a pause changes nothing." The day still reads "Logged while paused" and still counts in Days logged and Days done. Before, two paused logs twenty days apart read as Longest run 2. Proposed by the behavioural scientist and the neurodiversity expert. The returning user's condition, that a pause never lowers a run, holds. Tests: `pausedLogUnderNoSetDaysLeavesTheRunUnchanged`, `aPausedDayWithALogChangesNothingUnderNoSetDays`, `pausedLogUnderNoSetDaysNeverLowersLongest`.
+
+**Milestone 3 build, 18 November 2026.** These were decided while building, before the lenses ran. Each is checked by the lenses at the stop.
+- Pause and resume act at once in Edit, without waiting for Save. Cancel does not undo them. A pause is not a field of the habit, and "Undo pause" sits in the same place.
+- The Target and Unit fields read "Optional" when empty. "None" read as a value already set. Asked for by the owner.
+- The Pause for dates impact line counts calendar days, the future included, and skips days another pause already covers.
+- In the dated pause list, a pause that covers today sits under Coming.
+- "Keep paused" puts back the last day a pause had before "Resume tomorrow", within the session. After a relaunch it opens "Pause everything" again.
+- Pause dates use the system's interval format, and leave out the year when it is this year.
+- "Pause everything" leaves the Not scheduled group as it is.
+- The widget is iOS only, small and medium. Each row logs through `WidgetLogIntent`, which calls `LogHabitIntent` and writes nothing if the day or the total changed since the widget drew. A counted habit with no tap amount opens the app.
+- Today and You use a 560 point column on iPad and the Mac. History keeps 720. Asked for by the Apple industrial designer.
+- With every habit archived, Today says "Nothing on Today" and offers "Show archived habits" and "Add a habit". Asked for by the returning user.
+- On the Mac, the page heading in History and the form is left out, because the window title names it. Asked for by the owner.
+- On the Mac, Export a Copy opens the save panel at once, with the warning in the panel. The export sheet is iOS only. Asked for by the Apple industrial designer.
+- The Undo line's inset is on Today's list, so a logged row it covers scrolls clear. Asked for by accessibility and the UI and UX designer.
+- Mac shortcuts: Week, Month and Year are Option-Command-1 to 3, Previous and Next Period are Command-Left and Command-Right, Go to Today is Command-T, Back is Command-[, Log is Command-L, Add an Amount is Option-Command-L, Show Details is Command-I and Edit Habit is Command-E. Archive and the pause items have no shortcut.
