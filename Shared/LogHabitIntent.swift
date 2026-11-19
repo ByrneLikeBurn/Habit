@@ -74,6 +74,7 @@ struct LogHabitIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let (outcome, model) = try execute()
+        WidgetReload.now()
         let line: String
         switch outcome {
         case .wrote(_, let total), .unchanged(let total):

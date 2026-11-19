@@ -47,6 +47,9 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 
 | Milestone | Item | Where seen |
 |---|---|---|
+| 13 | `WidgetLogIntent.perform` has no test of its own: only the rule it calls (`accepts`) is tested. The owner's widget gate covers it on a device | QA, 18 Nov. `Shared/WidgetLogIntent.swift` |
+| 13 | The Pause for dates impact line counts active habits only. An archived habit's days change too, unseen | QA, 18 Nov. `Pausing.swift`, `PauseImpact.of` |
+| 13 | No UI test covers the dates form, Keep paused, the Bring back dialog or Remove with Undo. Kit tests cover the rules | QA, 18 Nov. `AppUITests` |
 | 13 | History month with many habits has no screenshot | `m2-hist-many.png` is Week only |
 | 4 | Marks in a History row are small beside text at the largest size. If the cells grow, lift the cap on the week header letters (`.dynamicTypeSize(...xxxLarge)` in `HistoryWeekHeader`) | `ax-history.png`, `ax5-history-paper.jpg` |
 | 13 | No screen was checked on a phone smaller than 393 by 852 points | `sheet-ax.png` |

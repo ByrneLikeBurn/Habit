@@ -44,7 +44,8 @@ struct TodayProvider: TimelineProvider {
     @MainActor
     static func entries() -> [TodayEntry] {
         guard case .success(let container) = SharedStore.container else { return [] }
-        let context = container.mainContext
+        // A fresh context each time, so writes from the app are read, not a cached copy.
+        let context = ModelContext(container)
         let habits = (try? context.fetch(FetchDescriptor<Habit>())) ?? []
         let shared = (try? PauseWriter.sharedPauses(in: context)) ?? []
         let clock = SharedStore.clock

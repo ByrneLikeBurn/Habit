@@ -91,6 +91,8 @@ final class AppModel {
     /// "Pause for dates" from the Mac Habit menu.
     var pauseForm: PauseRequest?
     var periodRequest: PeriodRequest?
+    /// The window's undo manager, so a log from the Mac Habit menu can be undone with Command-Z.
+    @ObservationIgnored weak var undoManager: UndoManager?
     /// Pauses ended today from Today, for "Keep paused".
     var resumedShared: [ResumedPause] = []
     /// Changes on every log and take-back, for one haptic.
@@ -114,7 +116,6 @@ final class AppModel {
             break
         case .wrote(let delta, let newTotal):
             feedback += 1
-            reloadWidgets()
             let logDay = day ?? clock.today
             if let inverse = outcome.inverse {
                 undoManager?.registerUndo(withTarget: self) { model in
@@ -169,7 +170,6 @@ final class AppModel {
     func archive(_ habit: Habit, context: ModelContext, clock: HabitClock) {
         habit.archivedAt = clock.now()
         try? context.save()
-        reloadWidgets()
         show(UndoLine(message: String(localized: "\(habit.name) archived", comment: "Undo line, a status, not a command. The placeholder is the habit's name, for example: Read archived."),
                       name: habit.name, status: String(localized: "Archived", comment: "Undo line status under the habit's name, at large text sizes. A status, not a command.")) {
             habit.archivedAt = nil
@@ -185,7 +185,6 @@ final class AppModel {
         habit.archivedAt = nil
         habit.sortIndex = Ordering.nextIndex(all)
         try? context.save()
-        reloadWidgets()
         show(UndoLine(message: String(localized: "\(habit.name) brought back", comment: "Undo line, a status, not a command. The placeholder is the habit's name, for example: Read brought back."),
                       name: habit.name, status: String(localized: "Brought back", comment: "Undo line status under the habit's name, at large text sizes. A status, not a command.")) {
             habit.archivedAt = archivedAt

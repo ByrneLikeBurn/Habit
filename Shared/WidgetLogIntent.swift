@@ -28,10 +28,11 @@ struct WidgetLogIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        defer { WidgetCenter.shared.reloadAllTimelines() }
+        defer { WidgetReload.now() }
         let clock = SharedStore.clock
         guard clock.today.rawValue == day, let id = UUID(uuidString: habitID) else { return .result() }
-        let context = try SharedStore.container.get().mainContext
+        // A fresh context, so the total compared is the one in the store now.
+        let context = ModelContext(try SharedStore.container.get())
         var fetch = FetchDescriptor<Habit>(predicate: #Predicate { $0.id == id })
         fetch.fetchLimit = 1
         guard let habit = try context.fetch(fetch).first, habit.isActive,

@@ -38,6 +38,7 @@ struct RootView: View {
                 #if !os(macOS)
                 Tab("You", systemImage: "person.crop.circle", value: AppTab.you) {
                     YouView()
+                        .undoLineInset(.you)
                 }
                 #endif
             }
@@ -68,6 +69,10 @@ struct RootView: View {
             }) { habit in
                 PastDayPicker(habit: habit)
             }
+        }
+        // Every save in the app redraws the widget: logs, pauses, edits, order and import.
+        .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in
+            WidgetReload.now()
         }
         .onAppear {
             if LaunchOptions.current.screen?.opensYou == true { model.tab = .you }

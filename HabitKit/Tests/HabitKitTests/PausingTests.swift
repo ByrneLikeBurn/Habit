@@ -48,6 +48,21 @@ struct PauseStatusTests {
         #expect(habit.state(on: today, today: today, sharedPauses: try shared(context)) == .blank)
     }
 
+    /// "Undo pause" on Pause everything, made by mistake during dated pauses: the dates keep their last day.
+    @Test func undoPauseEverythingLeavesDatedPausesAlone() throws {
+        let context = try makeContext()
+        let dates = try PauseWriter.addDates(first: today.adding(days: -4), last: today.adding(days: 13), in: context)
+        try PauseWriter.pauseEverything(today: today, in: context)
+        let endings = try PauseWriter.endShared(today: today, in: context)
+        #expect(endings.count == 1)
+        #expect(endings.first?.1 == .removed)
+        #expect(dates.endDay == today.adding(days: 13).rawValue)
+        #expect(SharedPauseStatus.of(try shared(context), today: today) == .until(today.adding(days: 13), startedToday: false))
+        // With no Pause everything, Resume tomorrow ends the dates.
+        #expect(try PauseWriter.endShared(today: today, in: context).count == 1)
+        #expect(dates.endDay == today.rawValue)
+    }
+
     @Test func resumeTomorrowKeepsTodayPausedAndKeepPausedOpensItAgain() throws {
         let context = try makeContext()
         let habit = addHabit("Read", in: context)
@@ -294,6 +309,29 @@ struct WidgetSnapshotTests {
         #expect(clock.dayKey(for: dates[1]) == DayKey(rawValue: 20261115))
         #expect(clock.dayKey(for: dates[1].addingTimeInterval(-1)) == DayKey(rawValue: 20261114))
         #expect(clock.dayKey(for: dates[2]) == DayKey(rawValue: 20261116))
+    }
+
+    /// Before the day start, today is still yesterday, and the next entry is this morning's day start.
+    @Test func beforeTheDayStartTheNextEntryIsThisMorning() {
+        let london = TimeZone(identifier: "Europe/London")!
+        // Saturday 14 November 2026, 03:00, with the day starting at 06:00.
+        let clock = HabitClock.frozen(at: Date(timeIntervalSince1970: 1_794_625_200), timeZone: london, dayStartHour: 6)
+        let dates = WidgetSnapshot.entryDates(clock: clock, days: 2)
+        #expect(clock.dayKey(for: dates[0]) == DayKey(rawValue: 20261113))
+        #expect(clock.dayKey(for: dates[1]) == DayKey(rawValue: 20261114))
+        #expect(dates[1].timeIntervalSince(dates[0]) == 3 * 3600)
+    }
+
+    /// The night clocks go back: 01:00 happens twice. The day turns over once.
+    @Test func aDayStartOnTheNightClocksGoBack() {
+        let newYork = TimeZone(identifier: "America/New_York")!
+        let saturdayEvening = Date(timeIntervalSince1970: 1_793_494_800) // 31 October 2026, 21:00 EDT
+        let clock = HabitClock.frozen(at: saturdayEvening, timeZone: newYork, dayStartHour: 1)
+        let dates = WidgetSnapshot.entryDates(clock: clock, days: 2)
+        #expect(dates.count == 3)
+        #expect(clock.dayKey(for: dates[1]) == DayKey(rawValue: 20261101))
+        #expect(clock.dayKey(for: dates[2]) == DayKey(rawValue: 20261102))
+        #expect(dates[2].timeIntervalSince(dates[1]) == 25 * 3600)
     }
 
     @Test func aDayStartOnTheDaylightSavingNight() {

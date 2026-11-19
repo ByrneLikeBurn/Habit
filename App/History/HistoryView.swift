@@ -106,7 +106,9 @@ struct HistoryView: View {
             case .move(let step):
                 let current = self.anchor ?? today
                 if step > 0 && (Periods.same(current, today, kind: kind, firstWeekday: first) || current >= today) { return }
-                self.anchor = Periods.move(current, by: step, kind: kind)
+                let moved = Periods.move(current, by: step, kind: kind)
+                if step < 0 && moved < Periods.earliest { return }
+                self.anchor = moved
             case .current: self.anchor = today
             }
         }

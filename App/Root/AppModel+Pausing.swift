@@ -1,6 +1,5 @@
 import SwiftUI
 import SwiftData
-import WidgetKit
 import HabitKit
 
 /// A pause ended today by "Resume tomorrow", kept so "Keep paused" can put its last day back.
@@ -65,8 +64,18 @@ extension AppModel {
         perform(context) { try PauseWriter.end(open, today: today, in: context) }
     }
 
+    /// Removing a pause changes how its days draw, so the line offers Undo, which puts the same dates back.
     func removePause(_ pause: Pause, context: ModelContext) {
-        perform(context) { try PauseWriter.remove(pause, in: context) }
+        let start = pause.start, end = pause.end, reason = pause.reason, habit = pause.habit
+        var removed = false
+        perform(context) { try PauseWriter.remove(pause, in: context); removed = true }
+        guard removed else { return }
+        show(UndoLine(message: String(localized: "Pause removed", comment: "Undo line, a status, not a command."), status: nil) { [weak self] in
+            self?.perform(context) {
+                context.insert(Pause(habit: habit, start: start, end: end, reason: reason))
+                try context.save()
+            }
+        })
     }
 
     /// Runs a pause write, tells the widget, and says plainly if the save failed.
@@ -77,10 +86,5 @@ extension AppModel {
             context.rollback()
             show(UndoLine(message: String(localized: "That change could not be saved. Try again.")))
         }
-        reloadWidgets()
-    }
-
-    func reloadWidgets() {
-        WidgetCenter.shared.reloadAllTimelines()
     }
 }

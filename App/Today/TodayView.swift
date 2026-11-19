@@ -89,7 +89,6 @@ struct TodayView: View {
                             .rowSwipeActions(rowActions)
                             .tag(habit.id)
                             .id(habit.id)
-                    .id(habit.id)
                     }
                     .onMove { source, destination in
                         Ordering.move(split.notScheduled, from: source, to: destination, all: active)
@@ -169,6 +168,7 @@ struct TodayView: View {
         }
         .sensoryFeedback(.impact(weight: .light), trigger: model.feedback)
         #if os(macOS)
+        .onAppear { model.undoManager = undoManager }
         .onChange(of: selection) { _, id in
             model.selectedHabit = id.flatMap { id in habits.first { $0.id == id } }
         }

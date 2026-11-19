@@ -72,11 +72,6 @@ extension Habit {
         }
         return covering.isEmpty ? .none : .resumesTomorrow
     }
-
-    /// True when today is paused by any pause, the habit's own or one with no habit.
-    public func isPausedToday(_ today: DayKey, sharedPauses: [Pause]) -> Bool {
-        isPaused(on: today, sharedPauses: sharedPauses)
-    }
 }
 
 /// Every pause write. Each returns what it did, so the caller can say it and offer Undo.
@@ -138,10 +133,13 @@ public enum PauseWriter {
         try context.save()
     }
 
-    /// Ends every pause with no habit that covers today: "Resume tomorrow" on Today.
+    /// "Resume tomorrow" or "Undo pause" on Today. While "Pause everything" is on, only it ends, and
+    /// dated pauses keep their dates. Otherwise every dated pause covering today ends.
     public static func endShared(today: DayKey, in context: ModelContext) throws -> [(Pause?, Ending)] {
         var results: [(Pause?, Ending)] = []
-        for pause in try sharedPauses(in: context) where pause.covers(today) && pause.endDay != today.rawValue {
+        let covering = try sharedPauses(in: context).filter { $0.covers(today) && $0.endDay != today.rawValue }
+        let everything = covering.filter { $0.isEverything && $0.endDay == nil }
+        for pause in everything.isEmpty ? covering : everything {
             let ending = try end(pause, today: today, in: context)
             results.append((ending == .removed ? nil : pause, ending))
         }

@@ -160,7 +160,7 @@ private struct HabitCommands: View {
             if habit.kind == .counted && (habit.tapAmount ?? 0) <= 0 {
                 model.counting = CountRequest(habit: habit, day: today)
             } else {
-                model.log(.tap, habit: habit, day: today, context: context, clock: clock, undoManager: nil)
+                model.log(.tap, habit: habit, day: today, context: context, clock: clock, undoManager: model.undoManager)
             }
         }
         .keyboardShortcut("l", modifiers: [.command])

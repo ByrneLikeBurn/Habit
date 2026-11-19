@@ -181,7 +181,12 @@ struct PauseDatesForm: View {
         NavigationStack {
             Form {
                 Section {
-                    DatePicker("First day", selection: $first, displayedComponents: .date)
+                    if pause != nil && pause?.endDay == nil && last == nil {
+                        // A pause with no last day has begun. Its first day cannot move past today.
+                        DatePicker("First day", selection: $first, in: ...clock.date(for: clock.today), displayedComponents: .date)
+                    } else {
+                        DatePicker("First day", selection: $first, displayedComponents: .date)
+                    }
                     if let lastBinding = Binding($last) {
                         DatePicker("Last day", selection: lastBinding, in: first..., displayedComponents: .date)
                     } else {
@@ -241,13 +246,17 @@ struct PauseDatesForm: View {
             .buttonBorderShape(.capsule)
             .accessibilityIdentifier("pause-form-end")
         } footer: {
-            if running { Text("Today stays paused. Every habit starts again tomorrow.") }
+            if running {
+                Text("Today stays paused. Every habit starts again tomorrow.")
+            } else {
+                Text("Its days will no longer be paused. You can undo this.")
+            }
         }
         .listRowBackground(style.paper)
     }
 
     private func impactLines(_ range: ClosedRange<DayKey>, clock: HabitClock) -> [String] {
-        let old = pause.map { $0.start...($0.end ?? clock.today) }
+        let old = pause.map { $0.start...max($0.start, $0.end ?? clock.today) }
         let others = shared.filter { $0.id != pause?.id }
         let impact = PauseImpact.of(old: old, new: range, habits: habits, otherShared: others, today: clock.today)
         var lines: [String] = []
