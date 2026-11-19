@@ -187,7 +187,7 @@ The signing team is not committed. It lives in `Config/Local.xcconfig`, which gi
 
 ## Product, from the brief
 
-**Tabs.** The brief had four: Today, Progress, Tags, You. There are now three, with Tags inside You. Today is the list, the check-offs and the scene card. Progress is the all-habit ledger with a heat map. Tags is the NFC walkthrough. You holds Nudges, Appearance, Gentle Mode, Vacation, Archive and Export.
+**Tabs.** The brief had four: Today, Progress, Tags, You. There are now three, with Tags inside You. Today is the list, the check-offs and the scene card. Progress is the all-habit ledger with a heat map. Tags is the NFC walkthrough. You holds Nudges, Appearance, Gentle Mode (with Pause for dates, which replaced Vacation in milestone 3), Archive and Export.
 
 **Pausing.** "Pause for dates" pauses every habit from a first to a last day, past days allowed. "Pause everything" has no end date until it is resumed. One habit is paused from today, from Edit or its row menu. (The brief's Vacation Mode became Pause for dates in milestone 3.)
 
