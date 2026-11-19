@@ -38,6 +38,12 @@ struct DayRequest: Identifiable {
     var id: String { "\(habit.id)-\(day)" }
 }
 
+/// The Pause for dates form's subject: nil for a new pause.
+struct PauseRequest: Identifiable {
+    let pause: Pause?
+    var id: String { pause.map { "\($0.id)" } ?? "new" }
+}
+
 /// Habit detail, opened on one period around one anchor day.
 struct DetailRoute: Hashable {
     let habitID: UUID
@@ -67,6 +73,12 @@ final class AppModel {
     var importStage: ImportStage?
     var undoLine: UndoLine?
     var isReordering = false
+    /// Pauses ended today from Today, for "Keep paused".
+    var resumedShared: [ResumedPause] = []
+    /// The habit Bring back asks about, when it was archived before today.
+    var bringingBack: Habit?
+    /// Pause for dates: a new pause, or one to change.
+    var editingPause: PauseRequest?
     /// Changes on every log and take-back, for one haptic.
     var feedback = 0
 
@@ -88,6 +100,7 @@ final class AppModel {
             break
         case .wrote(let delta, let newTotal):
             feedback += 1
+            reloadWidgets()
             let logDay = day ?? clock.today
             if let inverse = outcome.inverse {
                 undoManager?.registerUndo(withTarget: self) { model in
@@ -138,6 +151,7 @@ final class AppModel {
     func archive(_ habit: Habit, context: ModelContext, clock: HabitClock) {
         habit.archivedAt = clock.now()
         try? context.save()
+        reloadWidgets()
         show(UndoLine(message: String(localized: "\(habit.name) archived", comment: "Undo line, a status, not a command. The placeholder is the habit's name, for example: Read archived."),
                       name: habit.name, status: String(localized: "Archived", comment: "Undo line status under the habit's name, at large text sizes. A status, not a command.")) {
             habit.archivedAt = nil
@@ -145,15 +159,20 @@ final class AppModel {
         })
     }
 
-    func bringBack(_ habit: Habit, context: ModelContext, all: [Habit]) {
+    /// Brings a habit back. With `pausing`, the days it was archived are paused first, so its run is kept.
+    func bringBack(_ habit: Habit, context: ModelContext, all: [Habit], pausing span: ClosedRange<DayKey>? = nil) {
         let archivedAt = habit.archivedAt, sortIndex = habit.sortIndex
+        var added: Pause?
+        if let span { added = try? PauseWriter.pauseArchivedSpan(habit, span: span, in: context) }
         habit.archivedAt = nil
         habit.sortIndex = Ordering.nextIndex(all)
         try? context.save()
+        reloadWidgets()
         show(UndoLine(message: String(localized: "\(habit.name) brought back", comment: "Undo line, a status, not a command. The placeholder is the habit's name, for example: Read brought back."),
                       name: habit.name, status: String(localized: "Brought back", comment: "Undo line status under the habit's name, at large text sizes. A status, not a command.")) {
             habit.archivedAt = archivedAt
             habit.sortIndex = sortIndex
+            if let added { context.delete(added) }
             try? context.save()
         })
     }

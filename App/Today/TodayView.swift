@@ -9,6 +9,7 @@ struct TodayView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.undoManager) private var undoManager
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.sharedPauses) private var sharedPauses
 
     @Query private var habits: [Habit]
     /// Only today's events are fetched, so Today costs the same on day 1 and day 1,000.
@@ -36,11 +37,17 @@ struct TodayView: View {
         let split = Ordering.today(habits, day: today)
         let active = Ordering.sorted(habits)
         let totals = DayTotals(day: today, events: todaysEvents).totals
+        let pauseStatus = SharedPauseStatus.of(sharedPauses, today: today)
 
         List {
             TodayHeading(clock: clock)
                 .plainRow(style)
                 .id(dayMark)
+
+            if !active.isEmpty && pauseStatus.isPaused {
+                PauseLineView(status: pauseStatus, clock: clock)
+                    .plainRow(style)
+            }
 
             if active.isEmpty {
                 FirstRunView()
@@ -99,6 +106,11 @@ struct TodayView: View {
                 .listRowBackground(style.paper)
                 .listRowSeparatorTint(style.rule)
             }
+
+            if !active.isEmpty {
+                PauseEverythingButton(status: pauseStatus, clock: clock)
+                    .plainRow(style)
+            }
         }
         .listStyle(.plain)
         .frame(maxWidth: 393)
@@ -156,6 +168,8 @@ struct TodayView: View {
             details: { model.openDetail(habit, kind: .month, anchor: day, from: .today) },
             edit: { model.editing = habit },
             archive: { model.archive(habit, context: context, clock: clock) },
+            pause: { model.pause(habit, context: context, clock: clock) },
+            resume: { model.resume(habit, context: context, clock: clock) },
             move: { model.isReordering = true },
             moveUp: index.flatMap { $0 > 0 ? $0 : nil }.map { i in
                 { Ordering.move(list, from: IndexSet(integer: i), to: i - 1, all: active); try? context.save() }
