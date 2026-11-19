@@ -68,10 +68,12 @@ struct TodayWidgetView: View {
             Spacer(minLength: 4)
             if stacked, hiddenCount > 0 {
                 // At accessibility sizes the small widget says how many more here, away from the mark.
-                Text(moreText(hiddenCount))
+                // The short form fits beside "Today". VoiceOver reads the full words.
+                Text("\(hiddenCount) more", comment: "Small widget header at large text sizes: how many habits did not fit, short. For example: 5 more.")
                     .font(style.label(.caption))
                     .foregroundStyle(style.secondary)
                     .lineLimit(1)
+                    .accessibilityLabel(Text(moreText(hiddenCount)))
             }
             if entry.snapshot.paused {
                 // The small widget has room for the symbol only. VoiceOver reads "Paused".
