@@ -365,6 +365,18 @@ struct WidgetSnapshotTests {
         #expect(fewer.shownRows(room: 2, kept: kept[2] ?? []).map(\.name) == ["D", "A"])
     }
 
+    /// A negative raw total, from edits on two devices, draws as 0 in the count line, as on Today.
+    @Test func aNegativeDayTotalReadsAsNothingLogged() throws {
+        let context = try makeContext()
+        let habit = addHabit("Water", in: context)
+        habit.kindRaw = HabitKind.counted.rawValue
+        let row = try #require(WidgetSnapshot.make(habits: [habit], sharedPauses: [], today: today,
+                                                   totals: [habit.id: -1], locale: Locale(identifier: "en_GB")).rows.first)
+        #expect(row.total == -1)
+        #expect(row.countLine?.contains("-1") == false)
+        #expect(row.state == .blank)
+    }
+
     /// The day-ahead entry chooses its rows before anything is logged. The first tap of that day keeps them.
     @Test func theFirstTapOfADayKeepsTheRowsDrawnAhead() throws {
         let context = try makeContext()

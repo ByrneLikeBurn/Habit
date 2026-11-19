@@ -74,7 +74,8 @@ public struct WidgetSnapshot: Equatable, Sendable {
             let state = habit.state(on: today, today: today, total: total, sharedPauses: sharedPauses)
             let paused = habit.isPaused(on: today, sharedPauses: sharedPauses)
             let count = habit.kind == .counted
-                ? CountText.todayLine(total: total, target: habit.rule(on: today).target, unit: habit.unit,
+                // The raw total can be negative after edits on two devices; the line shows 0, as Today does.
+                ? CountText.todayLine(total: max(0, total), target: habit.rule(on: today).target, unit: habit.unit,
                                       noSetDays: state == .noSetDays, paused: paused, locale: locale)
                 : nil
             return Row(id: habit.id, name: habit.name, symbolName: habit.symbolName, kind: habit.kind, state: state,
