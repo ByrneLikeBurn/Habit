@@ -365,6 +365,22 @@ struct WidgetSnapshotTests {
         #expect(fewer.shownRows(room: 2, kept: kept[2] ?? []).map(\.name) == ["D", "A"])
     }
 
+    /// The day-ahead entry chooses its rows before anything is logged. The first tap of that day keeps them.
+    @Test func theFirstTapOfADayKeepsTheRowsDrawnAhead() throws {
+        let context = try makeContext()
+        var habits: [Habit] = []
+        for (i, name) in ["A", "B", "C"].enumerated() {
+            let habit = addHabit(name, in: context)
+            habit.sortIndex = i
+            habits.append(habit)
+        }
+        let ahead = WidgetSnapshot.make(habits: habits, sharedPauses: [], today: today).chosenRows(kept: [:])
+        #expect(ahead[2].map { $0.count } == 2)
+        try log(.tap, habits[0], day: today, context)
+        let after = WidgetSnapshot.make(habits: habits, sharedPauses: [], today: today)
+        #expect(after.shownRows(room: 2, kept: ahead[2] ?? []).map(\.name) == ["A", "B"])
+    }
+
     /// While paused nothing is owed, so the rows keep Today's order.
     @Test func whilePausedTheRowsKeepTodaysOrder() throws {
         let context = try makeContext()

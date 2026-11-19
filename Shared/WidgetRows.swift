@@ -1,24 +1,30 @@
 import Foundation
 import HabitKit
 
-/// The widget's rows for today, chosen at the day's first draw and kept all day. Stored in the shared
-/// settings by day, so a redraw after a tap keeps every row where it was. See `WidgetSnapshot.shownRows`.
+/// The widget's rows for each day, chosen the first time that day is drawn, including a day ahead in the
+/// timeline, and kept all day. Stored in the shared settings by day, so a redraw after a tap keeps every row
+/// where it was, the first tap of a day included. See `WidgetSnapshot.shownRows`.
 enum WidgetRows {
-    private static let dayKey = "widgetRowsDay"
-    private static let rowsKey = "widgetRows"
+    private static let key = "widgetRowsByDay"
+
+    private static var stored: [String: [String: [String]]] {
+        SharedStore.defaults.dictionary(forKey: key) as? [String: [String: [String]]] ?? [:]
+    }
 
     static func kept(on day: DayKey) -> [Int: [UUID]] {
-        let defaults = SharedStore.defaults
-        guard defaults.integer(forKey: dayKey) == day.rawValue,
-              let stored = defaults.dictionary(forKey: rowsKey) as? [String: [String]] else { return [:] }
         var result: [Int: [UUID]] = [:]
-        for (room, ids) in stored { if let room = Int(room) { result[room] = ids.compactMap(UUID.init(uuidString:)) } }
+        for (room, ids) in stored[String(day.rawValue)] ?? [:] {
+            if let room = Int(room) { result[room] = ids.compactMap(UUID.init(uuidString:)) }
+        }
         return result
     }
 
-    static func keep(_ rows: [Int: [UUID]], on day: DayKey) {
-        let defaults = SharedStore.defaults
-        defaults.set(day.rawValue, forKey: dayKey)
-        defaults.set(Dictionary(uniqueKeysWithValues: rows.map { (String($0.key), $0.value.map(\.uuidString)) }), forKey: rowsKey)
+    /// Saves the rows for `days`, keeping no day before `today`.
+    static func keep(_ rows: [DayKey: [Int: [UUID]]], today: DayKey) {
+        var all = stored.filter { (Int($0.key) ?? 0) >= today.rawValue }
+        for (day, byRoom) in rows {
+            all[String(day.rawValue)] = Dictionary(uniqueKeysWithValues: byRoom.map { (String($0.key), $0.value.map(\.uuidString)) })
+        }
+        SharedStore.defaults.set(all, forKey: key)
     }
 }
