@@ -17,9 +17,9 @@ struct UndoLine: Identifiable {
     var tab: AppTab = .today
     /// The habit logged, so Today can scroll its row clear of the line when the line covers it.
     var habitID: UUID?
-    /// A line after a pause change. While it shows, Today's pause line hides its button, so one action
-    /// has one undo.
-    var isPauseChange = false
+    /// A line after a change to a pause that covers every habit. While it shows, Today's pause line hides
+    /// its button, so one action has one undo. A line about one habit leaves that button alone.
+    var changesSharedPause = false
 
     init(message: String, name: String? = nil, status: String? = nil, undo: (@MainActor () -> Void)? = nil) {
         self.message = message

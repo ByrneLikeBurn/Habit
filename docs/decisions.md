@@ -333,4 +333,5 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - `docs/spec.md` now describes milestone 3 as built: status, Gentle Mode, pausing, the widget's rows, Undo, and the Mac Habits menu (product owner).
 - Not adopted: cutting the widget's New habit and Today places (product owner). The intent and its fresh-place handling are needed for the count sheet; the other two places are one enum case each, and the UI and UX designer and first-day user asked for them.
 - The illustrator found nothing built toward scenes. At AX5 a scene card above the pause line would crowd the first row; that is a gate for milestone 5.
+- Round two. Today's pause line hides its button only while the Undo line is about a pause that covers every habit; a line about one habit leaves it. A cancelled undo is taken off the Edit menu as well. A widget tap never closes New habit or Edit habit, which may hold typed changes; the place is dropped. The outlined capsule turns to a rounded rectangle at accessibility sizes. Asked for by the senior designer and the UI and UX designer.
 

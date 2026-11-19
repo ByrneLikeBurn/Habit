@@ -51,15 +51,16 @@ struct PauseLineUndo {
 extension AppModel {
     /// Shows the line and registers the same undo with the undo manager, so the line and Command-Z never both act.
     private func offerUndo(_ message: String, name: String? = nil, status: String? = nil, action: String,
-                           made: Pause? = nil, context: ModelContext, undo: @escaping () throws -> Void) {
+                           made: Pause? = nil, shared: Bool = false, context: ModelContext, undo: @escaping () throws -> Void) {
         let once = Once { [weak self] in
             self?.pauseLine = nil
             self?.perform(context) { try undo() }
         }
-        undoManager?.registerUndo(withTarget: self) { _ in MainActor.assumeIsolated { once.run() } }
+        // Registered on the Once, so a control that does the same undo can take this entry off the Edit menu.
+        undoManager?.registerUndo(withTarget: once) { once in MainActor.assumeIsolated { once.run() } }
         undoManager?.setActionName(action)
         var line = UndoLine(message: message, name: name, status: status) { once.run() }
-        line.isPauseChange = true
+        line.changesSharedPause = shared
         pauseLine = PauseLineUndo(lineID: line.id, once: once, made: made?.persistentModelID)
         show(line)
     }
@@ -75,6 +76,7 @@ extension AppModel {
     private func closePauseLine() {
         guard let pauseLine else { return }
         pauseLine.once.cancel()
+        undoManager?.removeAllActions(withTarget: pauseLine.once)
         if undoLine?.id == pauseLine.lineID { undoLine = nil }
         self.pauseLine = nil
     }
@@ -88,7 +90,7 @@ extension AppModel {
         }
         guard done, let pause else { return }
         // The line shows where the tap was, so a slip on the button is one tap from undone.
-        offerUndo(String(localized: "Everything is paused."), action: String(localized: "Pause Everything"), made: pause, context: context) {
+        offerUndo(String(localized: "Everything is paused."), action: String(localized: "Pause Everything"), made: pause, shared: true, context: context) {
             try PauseWriter.end(pause, today: today, in: context)
         }
     }
@@ -122,7 +124,7 @@ extension AppModel {
     /// so a planned pause that begins today is never lost to one tap.
     private func offerResumed(removed: [PauseCopy], resumed: [ResumedPause], name: String? = nil, context: ModelContext) {
         let message = resumed.isEmpty ? String(localized: "Pause undone.") : String(localized: "Resumes tomorrow.")
-        offerUndo(message, name: name, status: name == nil ? nil : message, action: String(localized: "Resume"), context: context) { [weak self] in
+        offerUndo(message, name: name, status: name == nil ? nil : message, action: String(localized: "Resume"), shared: name == nil, context: context) { [weak self] in
             for copy in removed { try copy.restore(in: context) }
             for item in resumed { try PauseWriter.keep(item.pause, previousEnd: item.previousEnd, in: context) }
             self?.resumedShared = []
@@ -157,8 +159,8 @@ extension AppModel {
             resumedShared = []
         }
         guard done else { return }
-        // Keep paused undoes a resume, so a resume's line that is still showing goes with it.
-        if undoLine?.isPauseChange == true { closePauseLine() }
+        // Keep paused undoes a resume of a shared pause, so that resume's line, if still showing, goes with it.
+        if undoLine?.changesSharedPause == true { closePauseLine() }
         announce(String(localized: "Paused again."))
     }
 

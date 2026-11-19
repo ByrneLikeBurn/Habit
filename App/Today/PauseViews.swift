@@ -23,7 +23,7 @@ struct PauseLineView: View {
                     .accessibilityLabel(Text("\(title) \(helper)"))
                     .accessibilityAddTraits(.isHeader)
                 // While the Undo line for a pause change shows, it is the one undo, so this button waits.
-                if let button = buttonTitle, model.undoLine?.isPauseChange != true {
+                if let button = buttonTitle, model.undoLine?.changesSharedPause != true {
                     Button(button) { act() }
                         .buttonStyle(.outlinedCapsule)
                         .accessibilityIdentifier("pause-line-button")

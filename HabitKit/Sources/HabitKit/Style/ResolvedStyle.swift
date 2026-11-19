@@ -99,6 +99,12 @@ public struct OutlinedCapsuleButtonStyle: ButtonStyle {
         let configuration: Configuration
         @Environment(\.style) private var style
         @Environment(\.isEnabled) private var isEnabled
+        @Environment(\.dynamicTypeSize) private var typeSize
+
+        /// At accessibility sizes a label can wrap, and a capsule's round ends would touch it.
+        private var shape: AnyShape {
+            typeSize.isAccessibilitySize ? AnyShape(RoundedRectangle(cornerRadius: 12)) : AnyShape(Capsule())
+        }
 
         var body: some View {
             configuration.label
@@ -108,7 +114,7 @@ public struct OutlinedCapsuleButtonStyle: ButtonStyle {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 6)
                 .frame(minHeight: 36)
-                .background { Capsule().strokeBorder(isEnabled ? style.text : style.tertiary, lineWidth: style.outlineWidth) }
+                .background { shape.stroke(isEnabled ? style.text : style.tertiary, lineWidth: style.outlineWidth) }
                 .opacity(configuration.isPressed ? 0.6 : 1)
                 .frame(minHeight: 44)
                 .contentShape(Rectangle())
