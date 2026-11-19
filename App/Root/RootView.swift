@@ -98,7 +98,7 @@ struct RootView: View {
     private func open(_ place: WidgetPlace) {
         // A habit form or the dates form may hold typed changes. It stays open, and the place is dropped.
         if model.showNewHabit || model.editing != nil || model.pauseForm != nil { return }
-        let sheetOpen = model.showNewHabit || model.editing != nil || model.counting != nil || model.pauseForm != nil
+        let sheetOpen = model.showNewHabit || model.editing != nil || model.counting != nil
             || model.daySheet != nil || model.pickingPastDay != nil
         guard !sheetOpen else {
             pendingPlace = place

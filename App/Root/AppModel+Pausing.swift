@@ -57,7 +57,9 @@ extension AppModel {
             self?.perform(context) { try undo() }
         }
         // Registered on the Once, so a control that does the same undo can take this entry off the Edit menu.
-        undoManager?.registerUndo(withTarget: once) { once in MainActor.assumeIsolated { once.run() } }
+        // The undo manager does not retain its target, so the handler holds the Once itself; an older entry
+        // still works after a later line replaces this one.
+        undoManager?.registerUndo(withTarget: once) { _ in MainActor.assumeIsolated { once.run() } }
         undoManager?.setActionName(action)
         var line = UndoLine(message: message, name: name, status: status) { once.run() }
         line.changesSharedPause = shared
