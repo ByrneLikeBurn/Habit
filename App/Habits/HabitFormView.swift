@@ -315,7 +315,7 @@ struct HabitFormView: View {
             switch status {
             case .none:
                 pauseButton("Pause this habit") { model.pause(habit, context: context, clock: clock) }
-                hint(String(localized: "It stays paused until you resume it. Paused days leave your runs as they are. You can still log."))
+                hint(String(localized: "It stays paused until you resume it.") + " " + PauseText.helper(showRuns: settings.showRuns))
             case .paused(let since, let startedToday):
                 if !startedToday {
                     LabeledContent {
@@ -328,7 +328,7 @@ struct HabitFormView: View {
                 }
                 pauseButton(startedToday ? "Undo pause" : "Resume tomorrow") { model.resume(habit, context: context, clock: clock) }
                 hint(startedToday
-                     ? String(localized: "Paused from today. Undo pause ends it, and today shows as it did before.")
+                     ? String(localized: "Paused from today, without Save. Undo pause ends it, and today shows as it did before.")
                      : String(localized: "It starts again tomorrow. You can still log today."))
             case .resumesTomorrow:
                 pauseButton("Keep paused") { model.pause(habit, context: context, clock: clock) }

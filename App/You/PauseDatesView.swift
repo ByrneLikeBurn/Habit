@@ -43,7 +43,7 @@ struct GentleModeSection: View {
                 Image(systemName: "pause.circle").accessibilityHidden(true)
             }
         } footer: {
-            Text("Paused days leave your runs as they are. You can still log.")
+            Text(PauseText.helper(showRuns: settings.showRuns))
         }
     }
 
@@ -107,7 +107,7 @@ struct PauseDatesView: View {
                 } header: {
                     Text("Earlier")
                 } footer: {
-                    Text("Open one to change its dates. Paused days leave your runs as they are. You can still log.")
+                    Text(String(localized: "Open one to change its dates.") + " " + PauseText.helper(showRuns: settings.showRuns))
                 }
             }
         }
@@ -199,7 +199,13 @@ struct PauseDatesForm: View {
                     }
                 } footer: {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Every habit is paused on these days. The dates can be in the past. Paused days leave your runs as they are.")
+                        Text(String(localized: "Every habit is paused on these days. The dates can be in the past.") + " " + PauseText.helper(showRuns: settings.showRuns))
+                        // Save is off until the dates make a pause. This says why.
+                        if lastDay == nil && pause == nil {
+                            Text("Choose a last day to save.")
+                        } else if let lastDay, lastDay < firstDay {
+                            Text("The last day is before the first day. Move one of them to save.")
+                        }
                         if let lastDay, lastDay >= firstDay {
                             ForEach(impactLines(firstDay...lastDay, clock: clock), id: \.self) { Text($0) }
                         }
@@ -240,7 +246,7 @@ struct PauseDatesForm: View {
         Section {
             Button(running ? "Resume tomorrow" : "Remove") {
                 if running {
-                    model.perform(context) { try PauseWriter.end(pause, today: today, in: context) }
+                    model.resumeDates(pause, context: context, clock: clock)
                 } else {
                     model.removePause(pause, context: context)
                 }
@@ -290,11 +296,7 @@ struct PauseDatesForm: View {
     }
 
     private func save(_ first: DayKey, _ last: DayKey?) {
-        if let pause {
-            model.perform(context) { try PauseWriter.change(pause, first: first, last: last, in: context) }
-        } else if let last {
-            model.perform(context) { try PauseWriter.addDates(first: first, last: last, in: context) }
-        }
+        model.saveDates(pause, first: first, last: last, context: context)
         dismiss()
     }
 }

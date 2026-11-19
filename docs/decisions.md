@@ -299,3 +299,14 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - Habit detail's link reads "Pause every habit for dates", because it pauses every habit. "Choose a date" for the last day picks yesterday when the first day is in the past. The dates form's footer says paused days leave runs as they are. Asked for by the returning user.
 - Not adopted: a "Paused" status line on every row under Pause everything (returning user). The pause line at the top says it once. A line on each row would repeat it, which the tired daily user asked to avoid.
 
+**Milestone 3 lens round one: UI and UX designer, human factors, first-day user, 18 November 2026.**
+- Every pause change shows a line with Undo, as logs do, and Command-Z undoes it: Pause everything, Pause this habit, Resume tomorrow, Undo pause, new and changed dates, Remove. The line and Command-Z share one undo that runs once. Asked for by the UI and UX designer and human factors. The UI and UX designer found that "Undo pause" on a planned dated pause that begins today deleted all its days with no way back; Undo now puts it back whole. Human factors found that a slip on Pause everything, at the bottom of a long list, had its only Undo off screen; the line now shows where the tap was.
+- Resume tomorrow in the dates form keeps the old last day, so Today offers Keep paused, as it does after Resume tomorrow on Today (UI and UX designer, human factors).
+- The dates form says why Save is off: "Choose a last day to save." or that the last day is before the first (UI and UX designer, first-day user).
+- The Habit menu's Pause everything item reads "Resume Everything Now" for a pause begun today. Human factors found two "Undo Pause" items when a habit and everything were both paused today. The content designer had asked for a name other than "Undo Pause Everything" and offered this one.
+- Edit's hint after Pause this habit says it was paused "without Save", because Cancel does not undo it (human factors).
+- Widget taps that cannot log open the app at the right place, through an intent that records the place in shared settings: a counted row with no tap amount opens its count sheet, "Add a habit" opens New habit, and the more line opens Today. No URL scheme. Asked for by the UI and UX designer and the first-day user.
+- Counted widget rows show their count under the name, so a tap that leaves the mark hatched still shows what changed (first-day user).
+- The pause helper names the dash: "A dash marks a paused day." It names runs only when Show runs is on (first-day user).
+- On the Mac, "Show archived habits" opens the Settings window on Archived (UI and UX designer).
+

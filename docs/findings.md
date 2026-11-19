@@ -56,6 +56,9 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 4 | The widget's rows are stored for each day ahead, so the first tap of a day keeps the rows drawn (`theFirstTapOfADayKeepsTheRowsDrawnAhead`). Made after the neurodiversity expert's second round, to that lens's fix. No lens has seen it | `Shared/WidgetRows.swift`, `Widget/HabitWidget.swift` |
 | 4 | A screenshot of Remove on an earlier pause that no other pause covers, showing its impact lines | Neurodiversity, 18 Nov. `pause-form-paper.jpg` shows only "You can undo this." because Pause everything covers its days |
 | 13 | The Pause for dates list with about 20 earlier pauses stays scannable | Returning user, 18 Nov. `pause-dates-paper.jpg` |
+| 13 | The four UI test files from earlier milestones raise Swift 6 actor warnings on a clean build (ContrastUITests, HistoryUITests, ScrollUITests, TodayUITests). PausingUITests is fixed with `@MainActor` and an async `setUp`; the same change fixes the others | Seen on a clean `build-for-testing`, 18 Nov |
+| 3, owner's device | A widget tap that opens the app lands in the right place: count sheet, New habit, Today. Added to the widget tap gate | UI and UX designer, first-day user, 18 Nov. `Shared/WidgetOpenIntent.swift`, `RootView.open` |
+| 3, owner's Mac | The Habit menu with a habit and everything both paused today, and Command-Z after a pause | Human factors, 18 Nov. `App/HabitApp.swift` |
 | 13 | History month with many habits has no screenshot | `m2-hist-many.png` is Week only |
 | 4 | Marks in a History row are small beside text at the largest size. If the cells grow, lift the cap on the week header letters (`.dynamicTypeSize(...xxxLarge)` in `HistoryWeekHeader`) | `ax-history.png`, `ax5-history-paper.jpg` |
 | 13 | No screen was checked on a phone smaller than 393 by 852 points | `sheet-ax.png` |

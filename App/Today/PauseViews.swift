@@ -5,6 +5,7 @@ import HabitKit
 /// The line at the top of Today while a pause with no habit covers today. One sentence that says what is
 /// paused, the helper, and one button. At accessibility sizes the helper is left out.
 struct PauseLineView: View {
+    @Environment(Settings.self) private var settings
     let status: SharedPauseStatus
     let clock: HabitClock
     @Environment(AppModel.self) private var model
@@ -48,7 +49,7 @@ struct PauseLineView: View {
     private var helper: String {
         switch status {
         case .resumesTomorrow: String(localized: "Today stays paused. You can still log.")
-        default: String(localized: "Paused days leave your runs as they are. You can still log.")
+        default: PauseText.helper(showRuns: settings.showRuns)
         }
     }
 
@@ -119,6 +120,14 @@ struct PauseEverythingButton: View {
 
 /// Dates in pause wording, in the user's calendar and locale.
 enum PauseText {
+    /// What a pause does, said the same way everywhere. A dash on a box can read as minus, so the line names it.
+    /// Runs are named only when they are shown.
+    static func helper(showRuns: Bool) -> String {
+        showRuns
+            ? String(localized: "A dash marks a paused day. It leaves your runs as they are. You can still log.")
+            : String(localized: "A dash marks a paused day. You can still log.")
+    }
+
     static func dayMonth(_ day: DayKey, clock: HabitClock) -> String {
         clock.date(for: day).formatted(format(clock).day().month(.wide))
     }

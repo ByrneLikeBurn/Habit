@@ -6,6 +6,7 @@ struct RootView: View {
     @Environment(Settings.self) private var settings
     @Environment(AppModel.self) private var model
     @Environment(\.modelContext) private var context
+    @Environment(\.scenePhase) private var scenePhase
     @Query(filter: #Predicate<Pause> { $0.habit == nil }) private var sharedPauses: [Pause]
 
     var body: some View {
@@ -74,10 +75,29 @@ struct RootView: View {
         .onReceive(NotificationCenter.default.publisher(for: ModelContext.didSave)) { _ in
             WidgetReload.now()
         }
+        // A widget tap that cannot log opens the place it names.
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            if phase == .active, let place = WidgetPlace.take() { open(place) }
+        }
         .onAppear {
             if LaunchOptions.current.screen?.opensYou == true { model.tab = .you }
             if LaunchOptions.current.screen?.opensHistory == true { model.tab = .history }
             openLaunchScreen()
+        }
+    }
+
+    private func open(_ place: WidgetPlace) {
+        model.tab = .today
+        model.todayPath = []
+        switch place {
+        case .today: break
+        case .newHabit: model.showNewHabit = true
+        case .count(let id):
+            var fetch = FetchDescriptor<Habit>(predicate: #Predicate { $0.id == id })
+            fetch.fetchLimit = 1
+            if let habit = try? context.fetch(fetch).first, habit.deletedAt == nil {
+                model.counting = CountRequest(habit: habit, day: settings.clock.today)
+            }
         }
     }
 

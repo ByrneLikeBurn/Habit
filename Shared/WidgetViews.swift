@@ -111,12 +111,18 @@ struct TodayWidgetView: View {
         let rows = entry.snapshot.shownRows(room: room, kept: entry.kept[room] ?? [])
         let more = all.count - rows.count
         if !entry.snapshot.hasHabits {
-            VStack(alignment: .leading, spacing: 4) {
-                if !typeSize.isAccessibilitySize {
-                    Text("Nothing to track yet.").font(style.label(.footnote)).foregroundStyle(style.secondary)
+            Button(intent: WidgetOpenIntent(.newHabit)) {
+                VStack(alignment: .leading, spacing: 4) {
+                    if !typeSize.isAccessibilitySize {
+                        Text("Nothing to track yet.").font(style.label(.footnote)).foregroundStyle(style.secondary)
+                    }
+                    Text("Add a habit").font(style.label(.footnote, weight: .semibold)).foregroundStyle(style.text)
                 }
-                Text("Add a habit").font(style.label(.footnote, weight: .semibold)).foregroundStyle(style.text)
+                .frame(minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityHint(Text("Opens the app to add a habit"))
         } else if rows.isEmpty {
             Text("Nothing scheduled today.").font(style.label(.footnote)).foregroundStyle(style.secondary)
         } else if family == .systemMedium && !typeSize.isAccessibilitySize {
@@ -134,11 +140,15 @@ struct TodayWidgetView: View {
         }
         if more > 0 && !stacked {
             // How many more, not how many are left to do. A tap here opens Today.
-            Text(moreText(more))
-                .font(style.label(.caption))
-                .foregroundStyle(style.secondary)
-                // A short, quiet line. It keeps to one line so the row above keeps its room.
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            Button(intent: WidgetOpenIntent(.today)) {
+                Text(moreText(more))
+                    .font(style.label(.caption))
+                    .foregroundStyle(style.secondary)
+                    // A short, quiet line. It keeps to one line so the row above keeps its room.
+                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(Text("Opens Today"))
         }
     }
 }
@@ -162,14 +172,23 @@ struct WidgetRow: View {
                     .frame(width: 16)
                     .accessibilityHidden(true)
             }
-            Text(row.name)
-                .font(style.label(.footnote))
-                .foregroundStyle(style.text)
-                .lineLimit(2)
-                .minimumScaleFactor(stacked ? 0.8 : 1)
-                .fixedSize(horizontal: false, vertical: stacked)
-                .layoutPriority(1)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(row.name)
+                    .font(style.label(.footnote))
+                    .foregroundStyle(style.text)
+                    .lineLimit(row.countLine == nil ? 2 : 1)
+                    .minimumScaleFactor(stacked ? 0.8 : 1)
+                    .fixedSize(horizontal: false, vertical: stacked)
+                // A counted tap may not change the mark, so the count shows what the tap did.
+                if let count = row.countLine {
+                    Text(count)
+                        .font(style.label(.caption2))
+                        .foregroundStyle(style.secondary)
+                        .lineLimit(1)
+                }
+            }
+            .layoutPriority(1)
+            .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 8) {
                 MarkView(state: row.state, isToday: true, showsPlus: false, size: 24)
                     .widgetAccentable()
@@ -180,8 +199,9 @@ struct WidgetRow: View {
 
         Group {
             if row.kind == .counted && (row.tapAmount ?? 0) <= 0 {
-                // A tap amount typed each time needs the count sheet: the row opens the app.
-                label
+                // A tap amount typed each time needs the count sheet: the row opens the app on it.
+                Button(intent: WidgetOpenIntent(.count(row.id))) { label }
+                    .buttonStyle(.plain)
             } else {
                 Button(intent: WidgetLogIntent(habitID: row.id, day: day, total: row.total)) { label }
                     .buttonStyle(.plain)

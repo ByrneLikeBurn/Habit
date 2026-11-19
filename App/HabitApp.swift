@@ -51,6 +51,9 @@ struct HabitApp: App {
                             .undoLineInset(.today)
                             // An Undo left from an earlier visit would act on a habit used since.
                             .onDisappear { settingsModel.undoLine = nil }
+                            // Read on open, and on the post when the window is already open.
+                            .onAppear(perform: openPendingArchived)
+                            .onReceive(NotificationCenter.default.publisher(for: .showArchivedInSettings)) { _ in openPendingArchived() }
                     }
                         .modelContainer(container)
                 }
@@ -218,7 +221,7 @@ private struct HabitCommands: View {
             case .none:
                 Button("Pause Everything") { model.pauseEverything(context: context, clock: clock) }
             case .everything(let startedToday), .until(_, let startedToday):
-                Button(startedToday ? "Undo Pause" : "Resume Everything Tomorrow") { model.resumeShared(context: context, clock: clock) }
+                Button(startedToday ? "Resume Everything Now" : "Resume Everything Tomorrow") { model.resumeShared(context: context, clock: clock) }
             case .resumesTomorrow(let canKeep):
                 Button("Keep Everything Paused") { model.keepShared(context: context, clock: clock, status: status) }
                     .disabled(!canKeep && model.resumedShared.isEmpty)
@@ -248,4 +251,25 @@ struct StoreErrorView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
     }
+}
+
+#if os(macOS)
+extension HabitApp {
+    func openPendingArchived() {
+        guard SettingsOpens.archived else { return }
+        SettingsOpens.archived = false
+        settingsModel.showArchived = true
+    }
+}
+#endif
+
+/// Set by "Show archived habits" before the Settings window opens.
+@MainActor
+enum SettingsOpens {
+    static var archived = false
+}
+
+extension Notification.Name {
+    /// "Show archived habits" on the Mac's empty Today: the Settings window opens on Archived.
+    static let showArchivedInSettings = Notification.Name("showArchivedInSettings")
 }

@@ -316,6 +316,9 @@ struct AllArchivedView: View {
             )
             Button("Show archived habits") {
                 #if os(macOS)
+                // The Settings window has its own model. It opens on Archived.
+                SettingsOpens.archived = true
+                NotificationCenter.default.post(name: .showArchivedInSettings, object: nil)
                 openSettings()
                 #else
                 model.tab = .you
