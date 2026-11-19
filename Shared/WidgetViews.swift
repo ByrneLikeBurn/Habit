@@ -146,6 +146,8 @@ struct TodayWidgetView: View {
                     .foregroundStyle(style.secondary)
                     // A short, quiet line. It keeps to one line so the row above keeps its room.
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .accessibilityHint(Text("Opens Today"))

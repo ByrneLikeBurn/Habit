@@ -7,6 +7,8 @@ struct RootView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
+    /// A widget place waiting for an open sheet to finish closing.
+    @State private var pendingPlace: WidgetPlace?
     @Query(filter: #Predicate<Pause> { $0.habit == nil }) private var sharedPauses: [Pause]
 
     var body: some View {
@@ -46,19 +48,19 @@ struct RootView: View {
             .tabViewStyle(.sidebarAdaptable)
             .environment(\.sharedPauses, sharedPauses)
             .modifier(ImportPresenter())
-            .sheet(isPresented: $model.showNewHabit) {
+            .sheet(isPresented: $model.showNewHabit, onDismiss: openPending) {
                 HabitFormView(habit: nil, today: settings.clock.today)
             }
-            .sheet(item: $model.editing) { habit in
+            .sheet(item: $model.editing, onDismiss: openPending) { habit in
                 HabitFormView(habit: habit, today: settings.clock.today)
             }
-            .sheet(item: $model.counting) { request in
+            .sheet(item: $model.counting, onDismiss: openPending) { request in
                 CountSheet(habit: request.habit, day: request.day)
             }
-            .sheet(item: $model.pauseForm) { request in
+            .sheet(item: $model.pauseForm, onDismiss: openPending) { request in
                 PauseDatesForm(pause: request.pause, clock: settings.clock)
             }
-            .sheet(item: $model.daySheet) { request in
+            .sheet(item: $model.daySheet, onDismiss: openPending) { request in
                 DaySheet(habit: request.habit, day: request.day)
             }
             .sheet(item: $model.pickingPastDay, onDismiss: {
@@ -66,6 +68,8 @@ struct RootView: View {
                 if let next = model.pastDayChosen {
                     model.pastDayChosen = nil
                     model.daySheet = next
+                } else {
+                    openPending()
                 }
             }) { habit in
                 PastDayPicker(habit: habit)
@@ -79,6 +83,9 @@ struct RootView: View {
         .onChange(of: scenePhase, initial: true) { _, phase in
             if phase == .active, let place = WidgetPlace.take() { open(place) }
         }
+        .onReceive(NotificationCenter.default.publisher(for: WidgetPlace.recorded)) { _ in
+            if let place = WidgetPlace.take() { open(place) }
+        }
         .onAppear {
             if LaunchOptions.current.screen?.opensYou == true { model.tab = .you }
             if LaunchOptions.current.screen?.opensHistory == true { model.tab = .history }
@@ -86,7 +93,22 @@ struct RootView: View {
         }
     }
 
+    /// Opens a widget place. A sheet already up is closed first, and the place opens once it has gone,
+    /// because a second sheet cannot show over the first.
     private func open(_ place: WidgetPlace) {
+        let sheetOpen = model.showNewHabit || model.editing != nil || model.counting != nil || model.pauseForm != nil
+            || model.daySheet != nil || model.pickingPastDay != nil
+        guard !sheetOpen else {
+            pendingPlace = place
+            model.pastDayChosen = nil
+            model.showNewHabit = false
+            model.editing = nil
+            model.counting = nil
+            model.pauseForm = nil
+            model.daySheet = nil
+            model.pickingPastDay = nil
+            return
+        }
         model.tab = .today
         model.todayPath = []
         switch place {
@@ -99,6 +121,12 @@ struct RootView: View {
                 model.counting = CountRequest(habit: habit, day: settings.clock.today)
             }
         }
+    }
+
+    private func openPending() {
+        guard let place = pendingPlace else { return }
+        pendingPlace = nil
+        open(place)
     }
 
     /// Opens the screen named by `-screen`, for screenshots.

@@ -309,4 +309,5 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - Counted widget rows show their count under the name, so a tap that leaves the mark hatched still shows what changed (first-day user).
 - The pause helper names the dash: "A dash marks a paused day." It names runs only when Show runs is on (first-day user).
 - On the Mac, "Show archived habits" opens the Settings window on Archived (UI and UX designer).
+- Round two. A widget place is stored with its time and opened only within ten seconds, on the intent's notification or when the app becomes active, so a place the app missed never opens hours later (UI and UX designer). A sheet already up is closed and the place opens once it has gone (UI and UX designer, first-day user). The more line's tap area is 44 points high (first-day user). Turning off the Pause everything switch in You shows the Undo line too (UI and UX designer).
 

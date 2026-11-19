@@ -94,12 +94,19 @@ extension AppModel {
     /// The You switch turned off: ends "Pause everything" only. Dated pauses keep their dates.
     func resumeEverything(context: ModelContext, clock: HabitClock) {
         let today = clock.today
-        perform(context) {
+        var removed: [PauseCopy] = []
+        var resumed: [ResumedPause] = []
+        let done = perform(context) {
             for pause in try PauseWriter.sharedPauses(in: context) where pause.isEverything && pause.covers(today) && pause.endDay == nil {
-                try PauseWriter.end(pause, today: today, in: context)
+                let copy = PauseCopy(pause)
+                switch try PauseWriter.end(pause, today: today, in: context) {
+                case .removed: removed.append(copy)
+                case .endsToday(let previous): resumed.append(ResumedPause(pause: pause, previousEnd: previous))
+                }
             }
-            resumedShared = []
+            resumedShared = resumed
         }
+        if done && !(removed.isEmpty && resumed.isEmpty) { offerResumed(removed: removed, resumed: resumed, context: context) }
     }
 
     /// "Keep paused" on Today: each pause ended today goes back as it was. "Pause everything" opens again.

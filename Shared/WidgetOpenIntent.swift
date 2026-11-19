@@ -18,7 +18,7 @@ struct WidgetOpenIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        SharedStore.defaults.set(place, forKey: WidgetPlace.key)
+        WidgetPlace(rawValue: place)?.record()
         return .result()
     }
 }
@@ -47,12 +47,25 @@ nonisolated enum WidgetPlace: Equatable, Sendable {
         }
     }
 
-    /// Reads and clears the place a widget tap left.
+    /// The app can become active before the intent runs, or the intent can run while the app is open,
+    /// so the place is stored with its time and announced. A place older than this is never opened.
+    static let freshFor: TimeInterval = 10
+    static let recorded = Notification.Name("widgetPlaceRecorded")
+
     @MainActor
-    static func take() -> WidgetPlace? {
+    func record() {
+        SharedStore.defaults.set([Self.key: rawValue, "at": Date().timeIntervalSince1970] as [String: Any], forKey: Self.key)
+        NotificationCenter.default.post(name: Self.recorded, object: nil)
+    }
+
+    /// Reads and clears the place a widget tap left, if it is fresh.
+    @MainActor
+    static func take(now: Date = Date()) -> WidgetPlace? {
         let defaults = SharedStore.defaults
-        guard let raw = defaults.string(forKey: key) else { return nil }
+        guard let stored = defaults.dictionary(forKey: key) else { return nil }
         defaults.removeObject(forKey: key)
+        guard let raw = stored[key] as? String, let at = stored["at"] as? TimeInterval,
+              now.timeIntervalSince1970 - at < freshFor else { return nil }
         return WidgetPlace(rawValue: raw)
     }
 }
