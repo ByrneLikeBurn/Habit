@@ -63,6 +63,16 @@ struct PauseStatusTests {
         #expect(dates.endDay == today.rawValue)
     }
 
+    @Test func removeThenRestorePutsTheSameDatesBack() throws {
+        let context = try makeContext()
+        let dates = try PauseWriter.addDates(first: today.adding(days: -9), last: today.adding(days: -3), in: context)
+        try PauseWriter.remove(dates, in: context)
+        #expect(try shared(context).isEmpty)
+        try PauseWriter.restore(habit: nil, start: today.adding(days: -9), end: today.adding(days: -3), reason: .vacation, in: context)
+        let back = try shared(context)
+        #expect(back.count == 1 && back[0].isDates && back[0].start == today.adding(days: -9) && back[0].end == today.adding(days: -3))
+    }
+
     @Test func resumeTomorrowKeepsTodayPausedAndKeepPausedOpensItAgain() throws {
         let context = try makeContext()
         let habit = addHabit("Read", in: context)

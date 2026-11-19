@@ -71,10 +71,7 @@ extension AppModel {
         perform(context) { try PauseWriter.remove(pause, in: context); removed = true }
         guard removed else { return }
         show(UndoLine(message: String(localized: "Pause removed", comment: "Undo line, a status, not a command."), status: nil) { [weak self] in
-            self?.perform(context) {
-                context.insert(Pause(habit: habit, start: start, end: end, reason: reason))
-                try context.save()
-            }
+            self?.perform(context) { try PauseWriter.restore(habit: habit, start: start, end: end, reason: reason, in: context) }
         })
     }
 

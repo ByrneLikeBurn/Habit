@@ -163,6 +163,16 @@ public enum PauseWriter {
         try context.save()
     }
 
+    /// Undo of Remove: the same pause, written back.
+    @discardableResult
+    public static func restore(habit: Habit?, start: DayKey, end: DayKey?, reason: PauseReason, in context: ModelContext) throws -> Pause {
+        let pause = Pause(habit: habit, start: start, end: end, reason: reason)
+        context.insert(pause)
+        if let habit { habit.pauses = (habit.pauses ?? []) + [pause] }
+        try context.save()
+        return pause
+    }
+
     public static func remove(_ pause: Pause, in context: ModelContext) throws {
         context.delete(pause)
         try context.save()
