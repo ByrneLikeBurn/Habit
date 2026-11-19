@@ -22,8 +22,14 @@ struct TodayWidgetView: View {
     @Environment(\.colorSchemeContrast) private var contrast
     @Environment(\.dynamicTypeSize) private var typeSize
 
-    /// The user's style. In tinted and clear modes the system sets the colour, so marks and text are drawn
-    /// light and full opacity, and the system's vibrant foreground carries them.
+    /// Quiet text. In tinted and clear modes the system's secondary level.
+    private var quiet: AnyShapeStyle {
+        renderingMode == .fullColor ? AnyShapeStyle(style.secondary) : AnyShapeStyle(.secondary)
+    }
+
+    /// The user's style. In tinted and clear modes the system sets the colour from luminance, so marks are drawn
+    /// as Increase Contrast draws them, in the text colour with heavier ink, and quiet text uses the system's
+    /// secondary level. A mid-blue mark or grey text would turn faint there.
     private var style: ResolvedStyle {
         let defaults = SharedStore.defaults
         let choice = AppearanceChoice.resolve(defaults.string(forKey: SettingKey.appearance))
@@ -36,65 +42,82 @@ struct TodayWidgetView: View {
         return ResolvedStyle(tokens: StyleID.resolve(defaults.string(forKey: SettingKey.style)).tokens,
                              appearance: appearance,
                              accent: Swatch.resolve(defaults.string(forKey: SettingKey.accent)),
-                             increaseContrast: contrast == .increased)
+                             increaseContrast: contrast == .increased || renderingMode != .fullColor)
     }
 
-    /// A row is dropped before text shrinks. When rows are dropped, one row's place goes to a line that
-    /// says how many more there are, so a full set of marks never reads as the whole day.
-    private func shownCount(of total: Int) -> Int {
-        let room = typeSize.isAccessibilitySize ? (family == .systemMedium ? 2 : 1) : (family == .systemMedium ? 4 : 3)
+    /// A row is dropped before text shrinks. When rows are dropped, a line says how many more there are,
+    /// so a full set of marks never reads as the whole day. At standard sizes the line takes one row's place
+    /// (none in the medium grid, which has two columns). At accessibility sizes it sits in the header.
+    private func shownCount(of total: Int, room: Int) -> Int {
         if total <= room { return total }
-        // The medium grid has two columns, so the line takes no row there.
-        return family == .systemMedium && !typeSize.isAccessibilitySize ? room : max(room - 1, 1)
+        if typeSize.isAccessibilitySize || family == .systemMedium { return room }
+        return max(room - 1, 1)
+    }
+
+    /// The rooms to try, most rows first. At accessibility sizes the medium widget tries two rows, then one,
+    /// and shows what fits, so nothing overprints.
+    private var rooms: [Int] {
+        if typeSize.isAccessibilitySize { return family == .systemMedium ? [2, 1] : [1] }
+        return [family == .systemMedium ? 4 : 3]
     }
 
     var body: some View {
         let style = style
-        VStack(alignment: .leading, spacing: 4) {
-            header(style)
-            // Habit names can be health details. On a locked device, in StandBy and on the lock screen,
-            // the system redacts the rows. The "Today" header stays.
-            content(style)
-                .privacySensitive()
-            Spacer(minLength: 0)
+        Group {
+            if rooms.count > 1 {
+                ViewThatFits(in: .vertical) {
+                    ForEach(rooms, id: \.self) { layout(room: $0, style) }
+                }
+            } else {
+                layout(room: rooms[0], style)
+            }
         }
         .environment(\.style, style)
         .containerBackground(for: .widget) { style.paper }
     }
 
-    private func header(_ style: ResolvedStyle) -> some View {
+    private func layout(room: Int, _ style: ResolvedStyle) -> some View {
+        let all = entry.snapshot.rows.count
+        let hidden = all - shownCount(of: all, room: room)
+        return VStack(alignment: .leading, spacing: 4) {
+            header(style, hidden: hidden)
+            // Habit names can be health details. On a locked device, in StandBy and on the lock screen,
+            // the system redacts the rows. The "Today" header stays.
+            content(style, room: room)
+                .privacySensitive()
+            Spacer(minLength: 0)
+        }
+    }
+
+    private func header(_ style: ResolvedStyle, hidden: Int) -> some View {
         HStack(spacing: 6) {
             Text("Today").font(style.display(.subheadline, weight: .semibold)).foregroundStyle(style.text)
             Spacer(minLength: 4)
-            if stacked, hiddenCount > 0 {
-                // At accessibility sizes the small widget says how many more here, away from the mark.
+            if typeSize.isAccessibilitySize, hidden > 0 {
+                // At accessibility sizes the count of habits not shown sits here, away from the marks.
                 // The short form fits beside "Today". VoiceOver reads the full words.
-                Text("\(hiddenCount) more", comment: "Small widget header at large text sizes: how many habits did not fit, short. For example: 5 more.")
+                Text("\(hidden) more", comment: "Widget header at large text sizes: how many habits did not fit, short. For example: 5 more.")
                     .font(style.label(.caption))
-                    .foregroundStyle(style.secondary)
+                    .monospacedDigit()
+                    .foregroundStyle(quiet)
                     .lineLimit(1)
-                    .accessibilityLabel(Text(moreText(hiddenCount)))
+                    .accessibilityLabel(Text(moreText(hidden)))
             }
             if entry.snapshot.paused {
                 // The small widget has room for the symbol only. VoiceOver reads "Paused".
                 Label("Paused", systemImage: "pause.circle")
                     .labelStyle(family == .systemSmall ? AnyLabelStyle(.iconOnly) : AnyLabelStyle(.titleAndIcon))
                     .font(style.label(.caption))
-                    .foregroundStyle(style.secondary)
+                    .foregroundStyle(quiet)
             } else if family == .systemMedium && !typeSize.isAccessibilitySize {
                 Text(SharedStore.clock.date(for: entry.snapshot.day).formatted(.dateTime.weekday(.wide).day().month(.wide)))
                     .font(style.label(.caption))
-                    .foregroundStyle(style.secondary)
+                    .foregroundStyle(quiet)
             }
         }
         // The header keeps to one line at every size, so the rows get the room.
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .accessibilityElement(children: .combine)
-    }
-
-    private var hiddenCount: Int {
-        let all = entry.snapshot.rows.count
-        return all - shownCount(of: all)
     }
 
     /// The small widget at accessibility sizes: one row, the name above its mark.
@@ -105,16 +128,16 @@ struct TodayWidgetView: View {
     }
 
     @ViewBuilder
-    private func content(_ style: ResolvedStyle) -> some View {
+    private func content(_ style: ResolvedStyle, room: Int) -> some View {
         let all = entry.snapshot.rows
-        let room = shownCount(of: all.count)
-        let rows = entry.snapshot.shownRows(room: room, kept: entry.kept[room] ?? [])
+        let shown = shownCount(of: all.count, room: room)
+        let rows = entry.snapshot.shownRows(room: shown, kept: entry.kept[shown] ?? [])
         let more = all.count - rows.count
         if !entry.snapshot.hasHabits {
             Button(intent: WidgetOpenIntent(.newHabit)) {
                 VStack(alignment: .leading, spacing: 4) {
                     if !typeSize.isAccessibilitySize {
-                        Text("Nothing to track yet.").font(style.label(.footnote)).foregroundStyle(style.secondary)
+                        Text("Nothing to track yet.").font(style.label(.footnote)).foregroundStyle(quiet)
                     }
                     Text("Add a habit").font(style.label(.footnote, weight: .semibold)).foregroundStyle(style.text)
                 }
@@ -124,7 +147,7 @@ struct TodayWidgetView: View {
             .buttonStyle(.plain)
             .accessibilityHint(Text("Opens the app to add a habit"))
         } else if rows.isEmpty {
-            Text("Nothing scheduled today.").font(style.label(.footnote)).foregroundStyle(style.secondary)
+            Text("Nothing scheduled today.").font(style.label(.footnote)).foregroundStyle(quiet)
         } else if family == .systemMedium && !typeSize.isAccessibilitySize {
             let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
             LazyVGrid(columns: columns, alignment: .leading, spacing: 0) {
@@ -138,12 +161,14 @@ struct TodayWidgetView: View {
                 }
             }
         }
-        if more > 0 && !stacked {
+        if more > 0 && !typeSize.isAccessibilitySize {
+            Spacer().frame(height: 4)
             // How many more, not how many are left to do. A tap here opens Today.
             Button(intent: WidgetOpenIntent(.today)) {
                 Text(moreText(more))
                     .font(style.label(.caption))
-                    .foregroundStyle(style.secondary)
+                    .monospacedDigit()
+                    .foregroundStyle(quiet)
                     // A short, quiet line. It keeps to one line so the row above keeps its room.
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
@@ -162,6 +187,13 @@ struct WidgetRow: View {
     let showsSymbol: Bool
     var stacked = false
     @Environment(\.style) private var style
+    @Environment(\.widgetRenderingMode) private var renderingMode
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// Quiet text. In tinted and clear modes the system's secondary level, so it stays legible on any wallpaper.
+    private var quiet: AnyShapeStyle {
+        renderingMode == .fullColor ? AnyShapeStyle(style.secondary) : AnyShapeStyle(.secondary)
+    }
 
     var body: some View {
         // At accessibility sizes in a narrow widget the name takes the full width, with the mark below it.
@@ -178,14 +210,16 @@ struct WidgetRow: View {
                 Text(row.name)
                     .font(style.label(.footnote))
                     .foregroundStyle(style.text)
-                    .lineLimit(row.countLine == nil ? 2 : 1)
+                    .lineLimit(row.countLine == nil || typeSize.isAccessibilitySize ? 2 : 1)
                     .minimumScaleFactor(stacked ? 0.8 : 1)
                     .fixedSize(horizontal: false, vertical: stacked)
                 // A counted tap may not change the mark, so the count shows what the tap did.
-                if let count = row.countLine {
+                // At accessibility sizes the name takes both lines and VoiceOver reads the count.
+                if let count = row.countLine, !typeSize.isAccessibilitySize {
                     Text(count)
                         .font(style.label(.caption2))
-                        .foregroundStyle(style.secondary)
+                        .monospacedDigit()
+                        .foregroundStyle(quiet)
                         .lineLimit(1)
                 }
             }

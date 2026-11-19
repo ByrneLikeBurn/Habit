@@ -78,6 +78,19 @@ struct SourceChecks {
         #expect(value("other") == "Not scheduled today, %lld habits")
     }
 
+    /// The widget is its own bundle, so it needs its own catalog for "1 more habit". The typographer found
+    /// it reading "1 more habits" when the plurals lived only in the app's catalog.
+    @Test func theWidgetCatalogHasTheMoreLineSingular() throws {
+        let data = try Data(contentsOf: repoRoot.appending(path: "Widget/Localizable.xcstrings"))
+        let catalog = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let strings = try #require(catalog["strings"] as? [String: Any])
+        for (key, one) in ["%lld more habits": "%lld more habit", "%lld more": "%lld more"] {
+            let entry = try #require(strings[key] as? [String: Any], "\(key)")
+            let plural = try #require(((((entry["localizations"] as? [String: Any])?["en"] as? [String: Any])?["variations"] as? [String: Any])?["plural"]) as? [String: Any])
+            #expect(((plural["one"] as? [String: Any])?["stringUnit"] as? [String: Any])?["value"] as? String == one)
+        }
+    }
+
     /// Tokens live in the style files only. A view that computes a colour or names a font is a bug.
     @Test func coloursAndFontsAreNamedOnlyInTheStyleFiles() throws {
         // `Color(` as a call, not as the end of a name such as `swatchColor(`.

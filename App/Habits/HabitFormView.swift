@@ -318,13 +318,16 @@ struct HabitFormView: View {
                 hint(String(localized: "It stays paused until you resume it.") + " " + PauseText.helper(showRuns: settings.showRuns))
             case .paused(let since, let startedToday):
                 if !startedToday {
-                    LabeledContent {
-                        Text(PauseText.short(since, clock: clock)).foregroundStyle(style.secondary)
-                    } label: {
+                    // One date form for pauses across screens. At accessibility sizes the date sits under its label.
+                    let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 2)) : AnyLayout(HStackLayout())
+                    layout {
                         Text("Paused since")
+                        if !typeSize.isAccessibilitySize { Spacer() }
+                        Text(PauseText.dayMonth(since, clock: clock)).foregroundStyle(style.secondary)
                     }
                     .font(style.label(.body))
                     .frame(minHeight: 44)
+                    .accessibilityElement(children: .combine)
                 }
                 pauseButton(startedToday ? "Undo pause" : "Resume tomorrow") { model.resume(habit, context: context, clock: clock) }
                 hint(startedToday

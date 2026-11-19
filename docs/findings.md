@@ -61,6 +61,10 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 3, owner's Mac | The Habit menu with a habit and everything both paused today, and Command-Z after a pause | Human factors, 18 Nov. `App/HabitApp.swift` |
 | 13 | Pause Undo across a day turn: an Undo line or Command-Z used after the day turns over acts with the day it was made on. Test what it does, and that Undo after Keep paused was already tapped changes nothing | Human factors, 18 Nov. `App/Root/AppModel+Pausing.swift` offerUndo |
 | 4 | Commit 8207a27 (fresh widget places, close a sheet first, 44 point more line, Undo on the You switch) answers the UI and UX designer's and first-day user's second rounds. No lens has seen it. They see it at the next stop | `Shared/WidgetOpenIntent.swift`, `RootView.open` |
+| 4 | The paused dash in History Week and Month and Habit detail Month and Year, beside done, part done and the diamond, both appearances, 3x crops, and against the small dot under the blur test. Every paused day in `detail-paused` has a log | Colour vision, 18 Nov |
+| 4 | The widget board at AX1 and AX3, small and medium; an Undo line with a 40 character name at AX5 | Typographer, 18 Nov. `ax5-widget-paper.jpg` |
+| 13 | The widget catalog holds only the two plural entries. Its other strings are not yet extracted for translation | Typographer, 18 Nov. `Widget/Localizable.xcstrings` |
+| 3, owner's Mac | Command-E opens Edit habit with Today focused and with text selected in a sheet; the Habits menu and the Settings window on Pause for dates. If Command-E is taken, use Option-Command-E | Industrial designer, 18 Nov. `App/HabitApp.swift` |
 | 13 | History month with many habits has no screenshot | `m2-hist-many.png` is Week only |
 | 4 | Marks in a History row are small beside text at the largest size. If the cells grow, lift the cap on the week header letters (`.dynamicTypeSize(...xxxLarge)` in `HistoryWeekHeader`) | `ax-history.png`, `ax5-history-paper.jpg` |
 | 13 | No screen was checked on a phone smaller than 393 by 852 points | `sheet-ax.png` |

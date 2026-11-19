@@ -1,0 +1,54 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%lld more": {
+      "comment": "Widget header at large text sizes: how many habits did not fit, short. For example: 5 more.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld more habits": {
+      "comment": "Widget: how many of today's habits did not fit. For example: 3 more habits.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more habit"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more habits"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

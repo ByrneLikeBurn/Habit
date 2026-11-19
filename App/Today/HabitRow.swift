@@ -88,6 +88,8 @@ struct HabitRow: View {
         Text(note)
             .font(style.label(.footnote))
             .foregroundStyle(style.secondary)
+            // "Logged while paused" wraps at the largest sizes rather than being cut.
+            .fixedSize(horizontal: false, vertical: true)
             .accessibilityHidden(true)
     }
     private var target: Int? { habit.rule(on: day).target }
@@ -111,8 +113,8 @@ struct HabitRow: View {
             }
         }
         .buttonStyle(.plain)
-        // On a counted row the name sits low in its target, so the count line reads as part of it.
-        .frame(maxWidth: .infinity, minHeight: 44, alignment: habit.kind == .counted && !typeSize.isAccessibilitySize ? .bottomLeading : .leading)
+        // On a counted row, or one with a pause note, the name sits low in its target, so the line under it reads as part of it.
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: (habit.kind == .counted || pauseNote != nil) && !typeSize.isAccessibilitySize ? .bottomLeading : .leading)
         .contentShape(Rectangle())
         .contextMenu { menu }
         .accessibilityValue(Text(accessibilityValue))

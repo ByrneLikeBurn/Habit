@@ -34,7 +34,7 @@ struct HabitApp: App {
             CommandGroup(before: .sidebar) {
                 ViewCommands()
             }
-            CommandMenu("Habit") {
+            CommandMenu("Habits") {
                 HabitCommands(settings: settings)
             }
         }

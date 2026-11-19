@@ -311,3 +311,12 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - On the Mac, "Show archived habits" opens the Settings window on Archived (UI and UX designer).
 - Round two. A widget place is stored with its time and opened only within ten seconds, on the intent's notification or when the app becomes active, so a place the app missed never opens hours later (UI and UX designer). A sheet already up is closed and the place opens once it has gone (UI and UX designer, first-day user). The more line's tap area is 44 points high (first-day user). Turning off the Pause everything switch in You shows the Undo line too (UI and UX designer).
 
+**Milestone 3 lens round one: Apple industrial designer, typographer, colour vision and low vision, 18 November 2026.**
+- At accessibility sizes a widget row shows the name only, on two lines, as `ax-widget.png` draws it; VoiceOver reads the count. At standard sizes the count line stays under a counted name, as the first-day user asked. The industrial designer, typographer and colour vision lens all found the count at AX5 cut the name and overprinted the header.
+- At accessibility sizes the widget's "N more" sits in the header in both sizes, and the medium widget tries two rows, then one, and shows what fits (`ViewThatFits`). Round one's "the medium shows two" held only where two fit. Asked for by the typographer.
+- The widget has its own string catalog, `Widget/Localizable.xcstrings`, with the plural forms, so it reads "1 more habit". Tested. Asked for by the typographer.
+- In tinted and clear modes the widget draws marks as Increase Contrast does, in the text colour with heavier ink, and quiet text in the system's secondary level. A mid-blue mark turns faint where the system maps luminance to opacity. Asked for by the colour vision lens.
+- The Mac's custom menu is named "Habits", so it is not a second "Habit" beside the app menu (industrial designer).
+- A Today row with a pause note sits its name low in the target, as a counted row does (industrial designer). "Logged while paused" wraps at AX5 (colour vision, typographer). Edit's "Paused since" uses the day and month form used elsewhere, under its label at AX sizes (typographer). Counts use tabular digits in the widget (typographer).
+- Not adopted: a done yes-or-no widget row opening Today instead of taking the log back (industrial designer). A second tap logs it again, so the row is its own undo, as on Today. Human factors and the UI and UX designer passed this toggle in their reviews.
+
