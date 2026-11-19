@@ -47,6 +47,30 @@
         }
       }
     },
+    "%lld days gain a pause.": {
+      "comment": "Pause for dates form, when changing dates. The number is calendar days.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day gains a pause."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days gain a pause."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld days logged": {
       "extractionState": "manual",
       "localizations": {
@@ -86,6 +110,30 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld days logged on a paused day or a day off"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld days lose their pause.": {
+      "comment": "Pause for dates form, when changing dates. The number is calendar days.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day loses its pause."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days lose their pause."
                 }
               }
             }
@@ -155,6 +203,30 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld habits have different details in this file. The version on this device is kept. Nothing here will be replaced."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld logged days will show as they were before the pause.": {
+      "comment": "Pause for dates form, when dates are moved or shortened. The number is how many logged days change back.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld logged day will show as it was before the pause."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld logged days will show as they were before the pause."
                 }
               }
             }
@@ -250,6 +322,30 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "Not scheduled today, %lld habits"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "With these dates, %lld logged days will show as logged while paused.": {
+      "comment": "Pause for dates form. The number is how many logged days, across all habits, change mark.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "With these dates, %lld logged day will show as logged while paused."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "With these dates, %lld logged days will show as logged while paused."
                 }
               }
             }
