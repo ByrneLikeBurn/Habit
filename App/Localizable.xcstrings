@@ -117,30 +117,6 @@
         }
       }
     },
-    "%lld days lose their pause.": {
-      "comment": "Pause for dates form, when changing dates. The number is calendar days.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld day loses its pause."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld days lose their pause."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "%lld days part done": {
       "extractionState": "manual",
       "localizations": {
@@ -180,6 +156,30 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld days paused"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld days will no longer be paused.": {
+      "comment": "Pause for dates form, when changing or removing dates. The number is calendar days.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day will no longer be paused."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days will no longer be paused."
                 }
               }
             }

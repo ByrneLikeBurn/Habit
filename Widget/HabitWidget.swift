@@ -49,8 +49,14 @@ struct TodayProvider: TimelineProvider {
         let habits = (try? context.fetch(FetchDescriptor<Habit>())) ?? []
         let shared = (try? PauseWriter.sharedPauses(in: context)) ?? []
         let clock = SharedStore.clock
-        return WidgetSnapshot.entryDates(clock: clock).map { date in
-            TodayEntry(date: date, snapshot: WidgetSnapshot.make(habits: habits, sharedPauses: shared, today: clock.dayKey(for: date)))
+        return WidgetSnapshot.entryDates(clock: clock).enumerated().map { index, date in
+            let day = clock.dayKey(for: date)
+            let snapshot = WidgetSnapshot.make(habits: habits, sharedPauses: shared, today: day)
+            // Today's rows are chosen once and kept. A day ahead chooses its own at its first draw.
+            guard index == 0 else { return TodayEntry(date: date, snapshot: snapshot) }
+            let kept = snapshot.chosenRows(kept: WidgetRows.kept(on: day))
+            WidgetRows.keep(kept, on: day)
+            return TodayEntry(date: date, snapshot: snapshot, kept: kept)
         }
     }
 }

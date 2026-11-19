@@ -50,6 +50,9 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 13 | `WidgetLogIntent.perform` has no test of its own: only the rule it calls (`accepts`) is tested. The owner's widget gate covers it on a device | QA, 18 Nov. `Shared/WidgetLogIntent.swift` |
 | 13 | The Pause for dates impact line counts active habits only. An archived habit's days change too, unseen | QA, 18 Nov. `Pausing.swift`, `PauseImpact.of` |
 | 13 | No UI test covers the dates form, Keep paused, the Bring back dialog or Remove with Undo. Kit tests cover the rules | QA, 18 Nov. `AppUITests` |
+| Product owner | No way to pause one habit for past dates. "Pause this habit" starts today, and a dated pause covers every habit, so pausing after the fact for one habit costs the others' done marks. Time blindness means a pause is often seen as needed only afterwards | Neurodiversity, 18 Nov. `PauseDatesView.swift`, `HabitFormView.swift` pauseSection |
+| 4 | Habit detail, Month and Year, for a habit brought back after a long archive: the archived span now draws as a band of paused dashes where it drew nothing. Check it does not make the gap louder than silence | Neurodiversity, 18 Nov. No screenshot yet. `AppModel.bringBack` |
+| 4 | The tired daily user and the behavioural scientist used both rounds before the widget's rows became chosen once a day. Their concerns (a row moving under the thumb, prompting what is left) are what the rule answers. They see it at the next stop | `WidgetSnapshot.shownRows` |
 | 13 | History month with many habits has no screenshot | `m2-hist-many.png` is Week only |
 | 4 | Marks in a History row are small beside text at the largest size. If the cells grow, lift the cap on the week header letters (`.dynamicTypeSize(...xxxLarge)` in `HistoryWeekHeader`) | `ax-history.png`, `ax5-history-paper.jpg` |
 | 13 | No screen was checked on a phone smaller than 393 by 852 points | `sheet-ax.png` |

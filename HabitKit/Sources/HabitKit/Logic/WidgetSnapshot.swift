@@ -39,12 +39,23 @@ public struct WidgetSnapshot: Equatable, Sendable {
         shownDay == today.rawValue && shownTotal == currentTotal
     }
 
-    /// The rows that fit in `room`. When all fit, Today's order. When some must be dropped, rows not yet
-    /// logged take the places first, each group in Today's order, so the widget keeps prompting what is left.
-    public func shownRows(room: Int) -> [Row] {
+    /// The rows that fit in `room`. When all fit, Today's order. When some must be dropped, the rows are
+    /// chosen at the day's first draw and `kept` all day, so a logged row stays and shows its mark, and
+    /// nothing moves under the next tap. At that first draw, rows still to do (nothing logged, or part done)
+    /// take the places first, each group in Today's order. While paused nothing is owed: Today's order.
+    public func shownRows(room: Int, kept: [UUID] = []) -> [Row] {
         guard rows.count > room else { return rows }
-        let open = rows.filter { $0.total <= 0 }, logged = rows.filter { $0.total > 0 }
-        return Array((open + logged).prefix(room))
+        let byID = Dictionary(rows.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let still = kept.compactMap { byID[$0] }
+        if still.count == room { return still }
+        if paused { return Array(rows.prefix(room)) }
+        let isToDo: (Row) -> Bool = { $0.total <= 0 || $0.state == .partDone }
+        return Array((rows.filter(isToDo) + rows.filter { !isToDo($0) }).prefix(room))
+    }
+
+    /// The rows chosen for each room size, 1 to 4, given what was kept earlier today.
+    public func chosenRows(kept: [Int: [UUID]]) -> [Int: [UUID]] {
+        Dictionary(uniqueKeysWithValues: (1...4).map { room in (room, shownRows(room: room, kept: kept[room] ?? []).map(\.id)) })
     }
 
     /// The widget's mark size. Its diamond (68% of the mark) sits well above the 12 point jump in the cut.

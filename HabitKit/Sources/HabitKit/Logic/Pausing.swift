@@ -178,11 +178,14 @@ public enum PauseWriter {
         try context.save()
     }
 
-    /// Bring back, with the offer to pause the days a habit was archived: from the day it was archived
-    /// through yesterday. nil when it was archived today, so there is nothing to pause.
+    /// Bring back pauses the days a habit was archived: from the day it was archived through yesterday.
+    /// If the archive day holds a log, the pause starts the day after, so a done day stays done.
+    /// nil when there is nothing to pause.
+    @MainActor
     public static func archivedSpan(of habit: Habit, archivedOn: DayKey, today: DayKey) -> ClosedRange<DayKey>? {
+        let first = habit.total(on: archivedOn) > 0 ? archivedOn.adding(days: 1) : archivedOn
         let last = today.adding(days: -1)
-        return archivedOn <= last ? archivedOn...last : nil
+        return first <= last ? first...last : nil
     }
 
     @discardableResult
@@ -211,23 +214,26 @@ public struct PauseImpact: Equatable, Sendable {
 
     public static let none = PauseImpact(logsGainPause: 0, logsLosePause: 0, daysGainPause: 0, daysLosePause: 0)
 
-    /// Compares `old` (the saved dates, nil for a new pause) with `new`. Logged days count up to today:
-    /// nothing is logged after it yet. Days other pauses already cover do not change.
+    /// Compares `old` (the saved dates, nil for a new pause) with `new` (nil for Remove). Logged days count
+    /// up to today: nothing is logged after it yet. Days other pauses already cover do not change.
     @MainActor
-    public static func of(old: ClosedRange<DayKey>?, new: ClosedRange<DayKey>, habits: [Habit], otherShared: [Pause], today: DayKey) -> PauseImpact {
+    public static func of(old: ClosedRange<DayKey>?, new: ClosedRange<DayKey>?, habits: [Habit], otherShared: [Pause], today: DayKey) -> PauseImpact {
         var result = PauseImpact.none
+        guard let span = [old, new].compactMap({ $0 }).reduce(nil as ClosedRange<DayKey>?, { acc, r in
+            acc.map { min($0.lowerBound, r.lowerBound)...max($0.upperBound, r.upperBound) } ?? r
+        }) else { return result }
         func inRange(_ range: ClosedRange<DayKey>?, _ day: DayKey) -> Bool { range?.contains(day) ?? false }
         func coveredElsewhere(_ day: DayKey) -> Bool { otherShared.contains { $0.covers(day) } }
-        var calendarDay = min(old?.lowerBound ?? new.lowerBound, new.lowerBound)
-        let lastCalendarDay = max(old?.upperBound ?? new.upperBound, new.upperBound)
+        var calendarDay = span.lowerBound
+        let lastCalendarDay = span.upperBound
         while calendarDay <= lastCalendarDay {
             defer { calendarDay = calendarDay.adding(days: 1) }
             let was = inRange(old, calendarDay), will = inRange(new, calendarDay)
             guard was != will, !coveredElsewhere(calendarDay) else { continue }
             if will { result.daysGainPause += 1 } else { result.daysLosePause += 1 }
         }
-        let lowest = min(old?.lowerBound ?? new.lowerBound, new.lowerBound)
-        let highest = min(max(old?.upperBound ?? new.upperBound, new.upperBound), today)
+        let lowest = span.lowerBound
+        let highest = min(span.upperBound, today)
         guard lowest <= highest else { return result }
         for habit in habits where habit.isActive {
             var day = lowest

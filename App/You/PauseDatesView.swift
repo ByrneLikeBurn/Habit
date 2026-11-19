@@ -250,13 +250,17 @@ struct PauseDatesForm: View {
             if running {
                 Text("Today stays paused. Every habit starts again tomorrow.")
             } else {
-                Text("Its days will no longer be paused. You can undo this.")
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(impactLines(nil, clock: clock), id: \.self) { Text($0) }
+                    Text("You can undo this.")
+                }
             }
         }
         .listRowBackground(style.paper)
     }
 
-    private func impactLines(_ range: ClosedRange<DayKey>, clock: HabitClock) -> [String] {
+    /// What saving, or with `range` nil removing, would change.
+    private func impactLines(_ range: ClosedRange<DayKey>?, clock: HabitClock) -> [String] {
         let old = pause.map { $0.start...max($0.start, $0.end ?? clock.today) }
         let others = shared.filter { $0.id != pause?.id }
         let impact = PauseImpact.of(old: old, new: range, habits: habits, otherShared: others, today: clock.today)
@@ -272,7 +276,11 @@ struct PauseDatesForm: View {
                 lines.append(String(localized: "\(impact.daysGainPause) days gain a pause.", comment: "Pause for dates form, when changing dates. The number is calendar days."))
             }
             if impact.daysLosePause > 0 {
-                lines.append(String(localized: "\(impact.daysLosePause) days lose their pause.", comment: "Pause for dates form, when changing dates. The number is calendar days."))
+                lines.append(String(localized: "\(impact.daysLosePause) days will no longer be paused.", comment: "Pause for dates form, when changing or removing dates. The number is calendar days."))
+            }
+            // Days before today that lose their pause may have no log, so a run through them may get shorter.
+            if let old, impact.daysLosePause > 0, old.lowerBound < clock.today, range.map({ old.lowerBound < $0.lowerBound || old.upperBound > $0.upperBound }) ?? true {
+                lines.append(String(localized: "A run through these days may get shorter."))
             }
         }
         return lines

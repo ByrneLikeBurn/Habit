@@ -6,6 +6,8 @@ import HabitKit
 struct TodayEntry: TimelineEntry {
     let date: Date
     let snapshot: WidgetSnapshot
+    /// The rows chosen at the day's first draw, by room size. Empty for a day not yet drawn.
+    var kept: [Int: [UUID]] = [:]
 }
 
 /// The widget's drawing, in Shared so the app can show it on a debug screen for screenshots.
@@ -64,6 +66,14 @@ struct TodayWidgetView: View {
         HStack(spacing: 6) {
             Text("Today").font(style.display(.subheadline, weight: .semibold)).foregroundStyle(style.text)
             Spacer(minLength: 4)
+            if stacked, hiddenCount > 0 {
+                // At accessibility sizes the small widget says how many more here, away from the mark.
+                Text(moreText(hiddenCount))
+                    .font(style.label(.caption))
+                    .foregroundStyle(style.secondary)
+                    .lineLimit(1)
+                    .accessibilityHidden(true)
+            }
             if entry.snapshot.paused {
                 // The small widget has room for the symbol only. VoiceOver reads "Paused".
                 Label("Paused", systemImage: "pause.circle")
@@ -81,6 +91,11 @@ struct TodayWidgetView: View {
         .accessibilityElement(children: .combine)
     }
 
+    private var hiddenCount: Int {
+        let all = entry.snapshot.rows.count
+        return all - shownCount(of: all)
+    }
+
     /// The small widget at accessibility sizes: one row, the name above its mark.
     private var stacked: Bool { typeSize.isAccessibilitySize && family == .systemSmall }
 
@@ -91,7 +106,8 @@ struct TodayWidgetView: View {
     @ViewBuilder
     private func content(_ style: ResolvedStyle) -> some View {
         let all = entry.snapshot.rows
-        let rows = entry.snapshot.shownRows(room: shownCount(of: all.count))
+        let room = shownCount(of: all.count)
+        let rows = entry.snapshot.shownRows(room: room, kept: entry.kept[room] ?? [])
         let more = all.count - rows.count
         if !entry.snapshot.hasHabits {
             VStack(alignment: .leading, spacing: 4) {
@@ -157,14 +173,6 @@ struct WidgetRow: View {
             HStack(spacing: 8) {
                 MarkView(state: row.state, isToday: true, showsPlus: false, size: 24)
                     .widgetAccentable()
-                // In the stacked row, "N more" shares the mark's line, so it fits the small widget.
-                if stacked, let more = moreLine {
-                    Text(more)
-                        .font(style.label(.caption))
-                        .foregroundStyle(style.secondary)
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .accessibilityHidden(true)
-                }
             }
         }
         .frame(minHeight: 44)

@@ -11,12 +11,14 @@ final class PausingUITests: XCTestCase {
         app.launch()
     }
 
-    /// Pause everything acts at once, says so at the top, and the same place offers Undo pause.
+    /// Pause everything acts at once, says so at the top, and the line there offers Undo pause.
     func testPauseEverythingFromTodayAndUndoIt() {
         let pause = app.buttons["pause-everything"]
         XCTAssertTrue(pause.waitForExistence(timeout: 5))
         while !pause.isHittable { app.swipeUp() }
         pause.tap()
+        // The bottom button goes, so Undo pause is never shown twice.
+        XCTAssertFalse(app.buttons["pause-everything"].waitForExistence(timeout: 1))
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Everything is paused.")).firstMatch.waitForExistence(timeout: 2))
         let line = app.buttons["pause-line-button"]
         while !line.isHittable { app.swipeDown() }

@@ -229,6 +229,18 @@ struct PauseImpactTests {
         #expect(impact.daysGainPause == 8)
     }
 
+    /// Remove: every day of the pause loses it, and its logged days draw as they were.
+    @Test func removingCountsTheDaysThatLoseThePause() throws {
+        let context = try makeContext()
+        let habit = addHabit("Read", in: context)
+        try log(.tap, habit, day: today.adding(days: -5), context)
+        let impact = PauseImpact.of(old: today.adding(days: -6)...today.adding(days: -3), new: nil,
+                                    habits: [habit], otherShared: [], today: today)
+        #expect(impact.daysLosePause == 4)
+        #expect(impact.logsLosePause == 1)
+        #expect(impact.daysGainPause == 0)
+    }
+
     @Test func daysAnotherPauseCoversDoNotChange() throws {
         let context = try makeContext()
         let read = addHabit("Read", in: context)
@@ -259,6 +271,18 @@ struct BringBackPauseTests {
         let runs = habit.runSummary(today: today)
         #expect(runs.current == 8)
         #expect(runs.longest == 8)
+    }
+
+    /// Logged and archived the same evening: that day stays done, and the pause starts the day after.
+    @Test func aLoggedArchiveDayStaysDone() throws {
+        let context = try makeContext()
+        let habit = addHabit("Read", in: context)
+        let archivedOn = today.adding(days: -5)
+        try log(.tap, habit, day: archivedOn, context)
+        let span = try #require(PauseWriter.archivedSpan(of: habit, archivedOn: archivedOn, today: today))
+        #expect(span == archivedOn.adding(days: 1)...today.adding(days: -1))
+        try PauseWriter.pauseArchivedSpan(habit, span: span, in: context)
+        #expect(habit.state(on: archivedOn, today: today, sharedPauses: []) == .done)
     }
 
     @Test func archivedTodayHasNothingToPause() throws {
@@ -329,6 +353,46 @@ struct WidgetSnapshotTests {
         #expect(snapshot.shownRows(room: 4).map(\.name) == names)
         #expect(snapshot.shownRows(room: 2).map(\.name) == ["C", "D"])
         #expect(snapshot.shownRows(room: 3).map(\.name) == ["C", "D", "A"])
+        // The rows chosen at the day's first draw stay all day: C logged keeps its place and shows its mark.
+        let kept = snapshot.chosenRows(kept: [:])
+        try log(.tap, habits[2], day: today, context)
+        let after = WidgetSnapshot.make(habits: habits, sharedPauses: [], today: today)
+        #expect(after.shownRows(room: 2).map(\.name) == ["D", "A"])
+        #expect(after.shownRows(room: 2, kept: kept[2] ?? []).map(\.name) == ["C", "D"])
+        #expect(after.chosenRows(kept: kept)[2] == kept[2])
+        // A kept row that has gone, such as an archived habit, means the rows are chosen again.
+        let fewer = WidgetSnapshot.make(habits: [habits[0], habits[1], habits[3]], sharedPauses: [], today: today)
+        #expect(fewer.shownRows(room: 2, kept: kept[2] ?? []).map(\.name) == ["D", "A"])
+    }
+
+    /// While paused nothing is owed, so the rows keep Today's order.
+    @Test func whilePausedTheRowsKeepTodaysOrder() throws {
+        let context = try makeContext()
+        var habits: [Habit] = []
+        for (i, name) in ["A", "B", "C"].enumerated() {
+            let habit = addHabit(name, in: context)
+            habit.sortIndex = i
+            habits.append(habit)
+        }
+        try log(.tap, habits[0], day: today, context)
+        let pause = Pause(habit: nil, start: today, end: nil, reason: .gentle)
+        context.insert(pause)
+        let snapshot = WidgetSnapshot.make(habits: habits, sharedPauses: [pause], today: today)
+        #expect(snapshot.shownRows(room: 2).map(\.name) == ["A", "B"])
+    }
+
+    @Test func aPartDoneCountRanksWithWhatIsLeft() throws {
+        let context = try makeContext()
+        let water = addHabit("Water", .counted, target: 8, unit: "glasses", in: context)
+        water.sortIndex = 0
+        let read = addHabit("Read", in: context)
+        read.sortIndex = 1
+        let walk = addHabit("Walk", in: context)
+        walk.sortIndex = 2
+        try log(.add(3), water, day: today, context)
+        try log(.tap, read, day: today, context)
+        let snapshot = WidgetSnapshot.make(habits: [water, read, walk], sharedPauses: [], today: today)
+        #expect(snapshot.shownRows(room: 2).map(\.name) == ["Water", "Walk"])
     }
 
     @Test func noHabitsAtAll() throws {
