@@ -8,7 +8,9 @@ public enum CountText {
     /// The count line under a counted habit, for example "3 of 8 glasses" or "3 glasses".
     /// Today's line on a row. A habit with no set days and nothing logged today is never owed, so it names
     /// its target ("Target 20 minutes"), not "0 of 20 minutes". Once logged it reads like any other row.
-    public static func todayLine(total: Int, target: Int?, unit: String, noSetDays: Bool, locale: Locale = .autoupdatingCurrent) -> String {
+    /// While a day is paused nothing is owed, so the line names the amount alone ("0 glasses", "3 glasses").
+    public static func todayLine(total: Int, target: Int?, unit: String, noSetDays: Bool, paused: Bool = false, locale: Locale = .autoupdatingCurrent) -> String {
+        if paused { return line(total: total, target: nil, unit: unit, locale: locale) }
         guard noSetDays, total == 0, let target else { return line(total: total, target: target, unit: unit, locale: locale) }
         let t = target.formatted(.number.locale(locale))
         let unit = unit.trimmingCharacters(in: .whitespaces)
