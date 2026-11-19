@@ -164,6 +164,9 @@ struct RootView: View {
                     model.log(.tap, habit: habit, day: day, context: context, clock: clock, undoManager: nil)
                 }
             }
+        case .pauseUndo:
+            // A real Pause everything, so the Undo line and the pause line agree.
+            model.pauseEverything(context: context, clock: clock)
         case .undoCount:
             if let habit = habits.first(where: { $0.kind == .counted && !$0.isArchived }) {
                 model.log(.tap, habit: habit, day: clock.today, context: context, clock: clock, undoManager: nil)

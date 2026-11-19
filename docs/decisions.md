@@ -325,3 +325,12 @@ One entry per decision that changed the brief. Each says what changed and why, i
 - Not adopted: removing the widget reload in `LogHabitIntent.perform` because the app's save observer also reloads (performance). A Shortcut or NFC log can run with no app view alive, and then the intent's reload is the only one.
 - The intents declare `supportedModes` in place of `openAppWhenRun`, which the iOS 26 SDK deprecates (release engineer).
 
+**Milestone 3 lens round one: senior designer, product owner, illustrator, 18 November 2026.**
+- One undo per pause change. While a pause change's Undo line shows, Today's pause line hides its button. Ending the pause just made, from Edit or anywhere else, is that same undo: the line goes and no new line comes. Keep paused closes a resume's line the same way. "Undo pause" on a pause made earlier still shows its own line, so the UI and UX designer's planned pause is never lost to one tap. The senior designer found two undos for one action and an undo that could itself be undone; this meets that and the UI and UX designer's and human factors' concerns. Tested in `PausingUITests`.
+- Pause buttons use the style's outlined capsule (`OutlinedCapsuleButtonStyle`), the same capsule as "Add a past day", in place of the system's grey bordered fill, so later styles restyle them (senior designer).
+- The helper sentence is said once on the You path: in Gentle Mode's footer, not again in the dates list or the form. An existing pause's form drops "The dates can be in the past." and Remove drops "You can undo this.", which the Undo line says (senior designer).
+- Habit detail has no Pause for dates link. On a page about one habit it was the only control that acted on every habit (senior designer, product owner, and the returning user's second option). Pausing one habit for past dates is owed to 13.
+- `docs/spec.md` now describes milestone 3 as built: status, Gentle Mode, pausing, the widget's rows, Undo, and the Mac Habits menu (product owner).
+- Not adopted: cutting the widget's New habit and Today places (product owner). The intent and its fresh-place handling are needed for the count sheet; the other two places are one enum case each, and the UI and UX designer and first-day user asked for them.
+- The illustrator found nothing built toward scenes. At AX5 a scene card above the pause line would crowd the first row; that is a gate for milestone 5.
+

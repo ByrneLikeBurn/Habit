@@ -27,12 +27,22 @@ struct PauseCopy {
     }
 }
 
-/// An undo that runs once, whether from the Undo line or from Command-Z.
+/// An undo that runs once, whether from the Undo line or from Command-Z, and that a matching control can cancel.
 @MainActor
-private final class Once {
+final class Once {
     private var action: (() -> Void)?
     init(_ action: @escaping () -> Void) { self.action = action }
     func run() { let a = action; action = nil; a?() }
+    func cancel() { action = nil }
+}
+
+/// The pause change whose Undo line is showing.
+@MainActor
+struct PauseLineUndo {
+    let lineID: UUID
+    let once: Once
+    /// The pause the change made, when it made one.
+    let made: PersistentIdentifier?
 }
 
 /// Pausing from Today, You, Edit, the row menu and the Mac Habit menu. Every write goes through `PauseWriter`.
@@ -41,11 +51,32 @@ private final class Once {
 extension AppModel {
     /// Shows the line and registers the same undo with the undo manager, so the line and Command-Z never both act.
     private func offerUndo(_ message: String, name: String? = nil, status: String? = nil, action: String,
-                           context: ModelContext, undo: @escaping () throws -> Void) {
-        let once = Once { [weak self] in self?.perform(context) { try undo() } }
+                           made: Pause? = nil, context: ModelContext, undo: @escaping () throws -> Void) {
+        let once = Once { [weak self] in
+            self?.pauseLine = nil
+            self?.perform(context) { try undo() }
+        }
         undoManager?.registerUndo(withTarget: self) { _ in MainActor.assumeIsolated { once.run() } }
         undoManager?.setActionName(action)
-        show(UndoLine(message: message, name: name, status: status) { once.run() })
+        var line = UndoLine(message: message, name: name, status: status) { once.run() }
+        line.isPauseChange = true
+        pauseLine = PauseLineUndo(lineID: line.id, once: once, made: made?.persistentModelID)
+        show(line)
+    }
+
+    /// True when `pause` was made by the change whose Undo line is still showing. Ending it then is that
+    /// same undo, so the line goes and no new line comes.
+    private func isUndoOfShowingLine(_ pause: Pause) -> Bool {
+        guard let pauseLine, pauseLine.made == pause.persistentModelID, undoLine?.id == pauseLine.lineID else { return false }
+        return true
+    }
+
+    /// Closes the showing pause line without running its undo, after a control did the same thing.
+    private func closePauseLine() {
+        guard let pauseLine else { return }
+        pauseLine.once.cancel()
+        if undoLine?.id == pauseLine.lineID { undoLine = nil }
+        self.pauseLine = nil
     }
 
     func pauseEverything(context: ModelContext, clock: HabitClock) {
@@ -57,7 +88,7 @@ extension AppModel {
         }
         guard done, let pause else { return }
         // The line shows where the tap was, so a slip on the button is one tap from undone.
-        offerUndo(String(localized: "Everything is paused."), action: String(localized: "Pause Everything"), context: context) {
+        offerUndo(String(localized: "Everything is paused."), action: String(localized: "Pause Everything"), made: pause, context: context) {
             try PauseWriter.end(pause, today: today, in: context)
         }
     }
@@ -66,6 +97,7 @@ extension AppModel {
     func resumeShared(context: ModelContext, clock: HabitClock) {
         let today = clock.today
         let before = ((try? PauseWriter.sharedPauses(in: context)) ?? []).filter { $0.covers(today) }
+        let isInverse = before.contains(where: isUndoOfShowingLine)
         let copies = before.map { ($0.persistentModelID, PauseCopy($0)) }
         var removed: [PauseCopy] = []
         let done = perform(context) {
@@ -77,7 +109,13 @@ extension AppModel {
             let left = Set(try PauseWriter.sharedPauses(in: context).map(\.persistentModelID))
             removed = copies.filter { !left.contains($0.0) }.map(\.1)
         }
-        if done { offerResumed(removed: removed, resumed: resumedShared, context: context) }
+        guard done else { return }
+        if isInverse {
+            closePauseLine()
+            announce(String(localized: "Pause undone."))
+        } else {
+            offerResumed(removed: removed, resumed: resumedShared, context: context)
+        }
     }
 
     /// The line after a resume. Undo puts a removed pause back whole and an ended one's last day back,
@@ -118,7 +156,10 @@ extension AppModel {
             for resumed in resumedShared { try PauseWriter.keep(resumed.pause, previousEnd: resumed.previousEnd, in: context) }
             resumedShared = []
         }
-        if done { announce(String(localized: "Paused again.")) }
+        guard done else { return }
+        // Keep paused undoes a resume, so a resume's line that is still showing goes with it.
+        if undoLine?.isPauseChange == true { closePauseLine() }
+        announce(String(localized: "Paused again."))
     }
 
     func pause(_ habit: Habit, context: ModelContext, clock: HabitClock) {
@@ -126,7 +167,7 @@ extension AppModel {
         var pause: Pause?
         guard perform(context, { pause = try PauseWriter.pause(habit, today: today, in: context) }), let pause else { return }
         offerUndo(String(localized: "\(habit.name) is paused.", comment: "Undo line and VoiceOver after Pause this habit. The placeholder is the habit's name."),
-                  name: habit.name, status: String(localized: "Paused"), action: String(localized: "Pause"), context: context) {
+                  name: habit.name, status: String(localized: "Paused"), action: String(localized: "Pause"), made: pause, context: context) {
             try PauseWriter.end(pause, today: today, in: context)
         }
     }
@@ -136,8 +177,14 @@ extension AppModel {
         let today = clock.today
         guard let open = (habit.pauses ?? []).first(where: { $0.covers(today) && $0.endDay == nil }) else { return }
         let copy = PauseCopy(open)
+        let isInverse = isUndoOfShowingLine(open)
         var ending: PauseWriter.Ending?
         guard perform(context, { ending = try PauseWriter.end(open, today: today, in: context) }), let ending else { return }
+        if isInverse {
+            closePauseLine()
+            announce(String(localized: "Pause undone."))
+            return
+        }
         switch ending {
         case .removed: offerResumed(removed: [copy], resumed: [], name: habit.name, context: context)
         case .endsToday(let previous): offerResumed(removed: [], resumed: [ResumedPause(pause: open, previousEnd: previous)], name: habit.name, context: context)

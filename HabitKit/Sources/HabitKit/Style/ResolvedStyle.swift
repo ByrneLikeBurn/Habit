@@ -85,3 +85,37 @@ extension View {
             .tint(style.text)
     }
 }
+
+/// The style's secondary button: an outlined capsule in the text colour, as "Add a past day" draws it.
+/// One style owns it, so Pencil and Watercolor restyle it with the rest.
+public struct OutlinedCapsuleButtonStyle: ButtonStyle {
+    public init() {}
+
+    public func makeBody(configuration: Configuration) -> some View {
+        CapsuleLabel(configuration: configuration)
+    }
+
+    private struct CapsuleLabel: View {
+        let configuration: Configuration
+        @Environment(\.style) private var style
+        @Environment(\.isEnabled) private var isEnabled
+
+        var body: some View {
+            configuration.label
+                .font(style.label(.subheadline, weight: .semibold))
+                .foregroundStyle(isEnabled ? style.text : style.tertiary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
+                .frame(minHeight: 36)
+                .background { Capsule().strokeBorder(isEnabled ? style.text : style.tertiary, lineWidth: style.outlineWidth) }
+                .opacity(configuration.isPressed ? 0.6 : 1)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+        }
+    }
+}
+
+extension ButtonStyle where Self == OutlinedCapsuleButtonStyle {
+    public static var outlinedCapsule: OutlinedCapsuleButtonStyle { .init() }
+}

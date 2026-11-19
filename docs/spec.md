@@ -12,7 +12,7 @@ This file records decisions. Items marked **Guess** were made where the brief is
 
 ## Status
 
-Phase 2. Milestone 1, the core loop in Pen and ink, is merged. Milestone 2, History, Habit detail, export and import, is on `feat/history`. The owner approved Lake variant A. No other scene is started. Phase 1 review findings are in `docs/reviews/phase-1.md`.
+Phase 2. Milestones 1 and 2 are merged. Milestone 3, pausing and one Home Screen widget, is on `feat/pausing-widget`. The owner approved Lake variant A. No other scene is started. Phase 1 review findings are in `docs/reviews/phase-1.md`.
 
 ## Creative direction
 
@@ -140,7 +140,7 @@ One drawing has one meaning.
 
 **Past days. Guess.** In the month view of Habit detail, a tap on a past day opens a small sheet for that day. The sheet names the date and the day's state. For a yes-or-no habit it has one action, "Mark done" or "Clear". For a counted habit it is the count sheet. A past day never changes on a single tap. An off-schedule day says "Not scheduled" and still allows a log. One line under the grid says "Tap a past day to change it." The month title has previous and next controls. Future days cannot be logged.
 
-**Gentle Mode.** The switch is in You. While it is on, Today shows one line that says so, with a "Turn off" button on its own line. After Turn off, today stays paused and the line reads "Gentle Mode ends after today." with a "Keep it on" button until the day ends.
+**Gentle Mode.** The section in You holds "Pause everything" and "Pause for dates". While a pause with no habit covers today, Today shows one line that says so, with one button: "Undo pause" for a pause begun today, otherwise "Resume tomorrow". After Resume tomorrow, today stays paused and the line reads "Resumes tomorrow." with "Keep paused" until the day ends. Milestone 3 built this; the decisions are in `docs/decisions.md`.
 
 **Appearance page.** One choice per row: a preview of the scene card and one Today row, Style, Light or dark, then two rows under Colour. "Marks" opens the accent list (Follow the scene, the eight swatches, Custom colour). "Scene colours" opens the palette list (Follow the time of day, the five palettes). The scene row appears when a second scene is approved.
 
@@ -189,7 +189,7 @@ The signing team is not committed. It lives in `Config/Local.xcconfig`, which gi
 
 **Tabs.** The brief had four: Today, Progress, Tags, You. There are now three, with Tags inside You. Today is the list, the check-offs and the scene card. Progress is the all-habit ledger with a heat map. Tags is the NFC walkthrough. You holds Nudges, Appearance, Gentle Mode, Vacation, Archive and Export.
 
-**Pausing.** Vacation Mode pauses with a start and end date. Gentle Mode is armed once with one switch and pauses everything with no end date until it is turned off.
+**Pausing.** "Pause for dates" pauses every habit from a first to a last day, past days allowed. "Pause everything" has no end date until it is resumed. One habit is paused from today, from Edit or its row menu. (The brief's Vacation Mode became Pause for dates in milestone 3.)
 
 **Data model.** Three SwiftData models.
 
@@ -434,7 +434,9 @@ Drawn in `docs/mockups/png/sheet-m3.png`, in Pen and ink. Three reviews saw the 
 
 **Edit.** Archive sits in its own section, away from Pause, to prevent a slip.
 
-**Widget.** Small and medium. Rows keep Today's order. The whole row is the button, 44 points high, and logs through `LogHabitIntent`. Text uses text styles, and a row is dropped before text shrinks. The header reads "Paused" during a pause. VoiceOver reads one element per row: "Drink water, 3 of 8 glasses, button, adds 1", "Read, logged while paused", "Walk outside, paused, button". Marks draw from the store only, never ahead of a write, so a tap on a locked device changes nothing until it is unlocked. The timeline has an entry at each day start and each pause edge. The intent carries the day the widget showed and the state it wanted. On a mismatch it reloads and writes nothing. In tinted and clear modes marks are full opacity and marked accentable, with no row rules.
+**Undo.** Every pause change shows a line with Undo, as logs do, and Command-Z undoes it. While that line shows, Today's pause line hides its button, so one action has one undo. Undoing the pause just made by another control closes the line. "Undo pause" on a pause made earlier shows its own line, so a planned pause is never lost to one tap.
+
+**Widget.** Small and medium. Rows keep Today's order when all fit. When some must be dropped, the rows are chosen the first time a day is drawn, rows still to do first, and kept all day, so nothing moves under a tap; while paused, Today's order. A line says how many more there are; at accessibility sizes it sits in the header and a row shows its name only. A counted row with no tap amount opens its count sheet in the app. The whole row is the button, 44 points high, and logs through `LogHabitIntent`. Text uses text styles, and a row is dropped before text shrinks. The header reads "Paused" during a pause. VoiceOver reads one element per row: "Drink water, 3 of 8 glasses, button, adds 1", "Read, logged while paused", "Walk outside, paused, button". Marks draw from the store only, never ahead of a write, so a tap on a locked device changes nothing until it is unlocked. The timeline has an entry at each day start and each pause edge. The intent carries the day the widget showed and the state it wanted. On a mismatch it reloads and writes nothing. In tinted and clear modes marks are full opacity and marked accentable, with no row rules.
 
 **Still owed.** The largest text size for the Today lines and the widget, clear mode, the Mac and Watch versions, and tests for travel across a pause edge.
 
@@ -489,8 +491,8 @@ Drawn in `docs/mockups/png/sheet-mac.png`. The Apple platform designer and the a
 |---|---|
 | Habit (app) | Settings, Command-comma |
 | File | New Habit, Command-N. Export a Copy, Shift-Command-E. Import a Copy, Shift-Command-I |
-| Edit | Undo Log, Command-Z, through the undo manager, so the amount field keeps its own undo |
-| Habit | Log, Command-Return. Add an Amount, Command-L. Details, Command-I. Edit, Command-E. Pause This Habit. Archive, Command-Delete. Pause Everything, Shift-Command-P, which reads Resume Everything while paused. Pause for Dates. Add a Past Day, Shift-Command-D |
+| Edit | Undo, Command-Z, through the undo manager, for logs and every pause change, so the amount field keeps its own undo |
+| Habits | Log, Command-L. Add an Amount, Option-Command-L. Add a Past Day. Show Details, Command-I. Edit Habit, Command-E. Pause This Habit, which reads Undo Pause, Resume Tomorrow or Keep Paused. Archive Habit. Pause Everything, which reads Resume Everything Now, Resume Everything Tomorrow or Keep Everything Paused. Pause for Dates. Archive and the pause items have no shortcut, so a slip writes nothing. Named "Habits" so it is not a second "Habit" beside the app menu |
 | View | Today, Command-1. History, Command-2. Week, Month, Year, Option-Command-1 to 3. Back, Command-[. Previous Period, Command-Left. Next Period, Command-Right. Go to Today, Command-T, with window tabbing off |
 
 **Can wait until after the MVP.** Habit detail in two columns, with the month beside the stats. A popover in place of the day sheet.

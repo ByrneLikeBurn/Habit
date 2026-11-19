@@ -51,6 +51,7 @@ for look in light:paper dark:ink; do
   shot "pause-form-$tag"          $appearance large disabled -fixture paused -screen pauseForm
   shot "edit-paused-$tag"         $appearance large disabled -fixture one-paused -screen editPaused
   shot "edit-pause-$tag"          $appearance large disabled -fixture today -screen edit
+  shot "pause-undo-$tag"          $appearance large disabled -fixture today -screen pauseUndo
   shot "bring-back-$tag"          $appearance large disabled -fixture one-paused -screen bringBack
   shot "marks-$tag"               $appearance large disabled -fixture today -screen marks
   shot "detail-paused-$tag"       $appearance large disabled -fixture paused -screen detailMonth

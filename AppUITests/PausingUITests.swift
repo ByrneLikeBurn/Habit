@@ -12,22 +12,33 @@ final class PausingUITests: XCTestCase {
         app.launch()
     }
 
-    /// Pause everything acts at once, says so at the top, and the line there offers Undo pause.
-    func testPauseEverythingFromTodayAndUndoIt() {
+    /// While a pause's Undo line shows, it is the one undo: the pause line's button waits.
+    func testPauseEverythingHasOneUndo() {
         let pause = app.buttons["pause-everything"]
         XCTAssertTrue(pause.waitForExistence(timeout: 5))
         while !pause.isHittable { app.swipeUp() }
         pause.tap()
-        // The bottom button goes, so Undo pause is never shown twice.
+        // The bottom button goes, and the pause line shows no second undo while the line is up.
         XCTAssertFalse(app.buttons["pause-everything"].waitForExistence(timeout: 1))
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Everything is paused.")).firstMatch.waitForExistence(timeout: 2))
+        XCTAssertTrue(app.buttons["Undo"].waitForExistence(timeout: 2))
+        XCTAssertFalse(app.buttons["pause-line-button"].exists)
+    }
+
+    /// "Undo pause" on a pause made earlier today removes it, and that can be undone, so a planned
+    /// pause is never lost to one tap.
+    func testUndoPauseOnAnEarlierPauseCanBeUndone() {
+        app.terminate()
+        app.launchArguments = ["-fixture", "paused-today"]
+        app.launch()
         let line = app.buttons["pause-line-button"]
-        while !line.isHittable { app.swipeDown() }
+        XCTAssertTrue(line.waitForExistence(timeout: 5))
         XCTAssertEqual(line.label, "Undo pause")
         line.tap()
         XCTAssertFalse(app.buttons["pause-line-button"].waitForExistence(timeout: 1))
-        // Logging still works after the pause is gone.
-        XCTAssertTrue(app.descendants(matching: .any)["control-Read"].exists)
+        let undo = app.buttons["Undo"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 2))
+        undo.tap()
+        XCTAssertTrue(app.buttons["pause-line-button"].waitForExistence(timeout: 2))
     }
 
     /// A slip on Pause everything is one tap from undone: the Undo line shows where the tap was.

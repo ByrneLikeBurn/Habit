@@ -93,8 +93,7 @@ struct PauseDatesView: View {
                         .font(style.label(.body))
                         .foregroundStyle(style.secondary)
                     Button("Choose dates") { request = PauseRequest(pause: nil) }
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.capsule)
+                        .buttonStyle(.outlinedCapsule)
                 }
                 .padding(.vertical, 8)
             }
@@ -107,7 +106,7 @@ struct PauseDatesView: View {
                 } header: {
                     Text("Earlier")
                 } footer: {
-                    Text(String(localized: "Open one to change its dates.") + " " + PauseText.helper(showRuns: settings.showRuns))
+                    Text("Open one to change its dates.")
                 }
             }
         }
@@ -201,7 +200,12 @@ struct PauseDatesForm: View {
                     }
                 } footer: {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(String(localized: "Every habit is paused on these days. The dates can be in the past.") + " " + PauseText.helper(showRuns: settings.showRuns))
+                        // The helper is said once, in You's Gentle Mode section, not again on this path.
+                        if pause == nil {
+                            Text("Every habit is paused on these days. The dates can be in the past.")
+                        } else {
+                            Text("Every habit is paused on these days.")
+                        }
                         // Save is off until the dates make a pause. This says why.
                         if lastDay == nil && pause == nil {
                             Text("Choose a last day to save.")
@@ -252,16 +256,15 @@ struct PauseDatesForm: View {
                 }
                 dismiss()
             }
-            .buttonStyle(.bordered)
-            .buttonBorderShape(.capsule)
+            .buttonStyle(.outlinedCapsule)
             .accessibilityIdentifier("pause-form-end")
         } footer: {
             if running {
                 Text("Today stays paused. Every habit starts again tomorrow.")
             } else {
+                // The Undo line after Remove says it can be undone.
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(impactLines(nil, clock: clock), id: \.self) { Text($0) }
-                    Text("You can undo this.")
                 }
             }
         }

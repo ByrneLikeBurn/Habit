@@ -22,12 +22,10 @@ struct PauseLineView: View {
                     // At accessibility sizes the helper is not drawn. VoiceOver still reads it.
                     .accessibilityLabel(Text("\(title) \(helper)"))
                     .accessibilityAddTraits(.isHeader)
-                if let button = buttonTitle {
+                // While the Undo line for a pause change shows, it is the one undo, so this button waits.
+                if let button = buttonTitle, model.undoLine?.isPauseChange != true {
                     Button(button) { act() }
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.capsule)
-                        .font(style.label(.subheadline, weight: .semibold))
-                        .frame(minHeight: 44)
+                        .buttonStyle(.outlinedCapsule)
                         .accessibilityIdentifier("pause-line-button")
                 }
             }

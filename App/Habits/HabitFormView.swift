@@ -343,10 +343,7 @@ struct HabitFormView: View {
 
     private func pauseButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
         Button(title, action: action)
-            .buttonStyle(.bordered)
-            .buttonBorderShape(.capsule)
-            .font(style.label(.body, weight: .semibold))
-            .frame(minHeight: 44)
+            .buttonStyle(.outlinedCapsule)
             .accessibilityIdentifier("habit-pause")
     }
 

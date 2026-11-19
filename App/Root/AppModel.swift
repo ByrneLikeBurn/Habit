@@ -17,6 +17,9 @@ struct UndoLine: Identifiable {
     var tab: AppTab = .today
     /// The habit logged, so Today can scroll its row clear of the line when the line covers it.
     var habitID: UUID?
+    /// A line after a pause change. While it shows, Today's pause line hides its button, so one action
+    /// has one undo.
+    var isPauseChange = false
 
     init(message: String, name: String? = nil, status: String? = nil, undo: (@MainActor () -> Void)? = nil) {
         self.message = message
@@ -93,6 +96,9 @@ final class AppModel {
     var periodRequest: PeriodRequest?
     /// The window's undo manager, so a log from the Mac Habit menu can be undone with Command-Z.
     @ObservationIgnored weak var undoManager: UndoManager?
+    /// The pause change whose Undo line is showing, and the pause it made, if any. Undoing that pause by
+    /// any other control is the same undo: the line goes and no new line comes.
+    @ObservationIgnored var pauseLine: PauseLineUndo?
     /// Pauses ended today from Today, for "Keep paused".
     var resumedShared: [ResumedPause] = []
     /// Changes on every log and take-back, for one haptic.
