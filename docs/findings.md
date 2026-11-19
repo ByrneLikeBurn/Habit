@@ -65,6 +65,7 @@ Status is one of: owed (with the milestone), gate (a test that must pass), guess
 | 4 | The widget board at AX1 and AX3, small and medium; an Undo line with a 40 character name at AX5 | Typographer, 18 Nov. `ax5-widget-paper.jpg` |
 | 13 | The widget catalog holds only the two plural entries. Its other strings are not yet extracted for translation | Typographer, 18 Nov. `Widget/Localizable.xcstrings` |
 | 3, owner's Mac | Command-E opens Edit habit with Today focused and with text selected in a sheet; the Habits menu and the Settings window on Pause for dates. If Command-E is taken, use Option-Command-E | Industrial designer, 18 Nov. `App/HabitApp.swift` |
+| 3, owner's device | The medium widget at AX5 on a Home Screen shows two rows when both names fit on one line each. The debug board shows one; `ViewThatFits` falls back to one when two do not fit, so nothing clips either way | Industrial designer, round two, 18 Nov. `ax5-widget-paper.jpg`, `TodayWidgetView.rooms` |
 | 13 | History month with many habits has no screenshot | `m2-hist-many.png` is Week only |
 | 4 | Marks in a History row are small beside text at the largest size. If the cells grow, lift the cap on the week header letters (`.dynamicTypeSize(...xxxLarge)` in `HistoryWeekHeader`) | `ax-history.png`, `ax5-history-paper.jpg` |
 | 13 | No screen was checked on a phone smaller than 393 by 852 points | `sheet-ax.png` |
